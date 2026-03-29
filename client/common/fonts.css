@@ -1,0 +1,45 @@
+/* TYPOGRAPHY */
+
+/* BODY-14: Philosopher regular 14 / 21 */
+@font-face {
+  font-family: "Ahani Regular";
+  src: url("/assets/fonts/abody-en.ttf") format("truetype");
+}
+
+/* BODY-64: Philosopher regular 64 */
+@font-face {
+  font-family: "Ahani First Letter";
+  src: url("/assets/fonts/abodyfirst-en.ttf") format("truetype");
+  font-size: 64px;
+}
+
+/* ITALIC-14: Philosopher italic 14 / 21 */
+@font-face {
+  font-family: "Ahani Italic";
+  src: url("/assets/fonts/abodyitalic-en.ttf") format("truetype");
+  font-style: italic;
+}
+
+/* MENU-20 / HEADER-36 / HEADER-64: Zen-Kurenaido */
+@font-face {
+  font-family: "Ahani Header";
+  src: url("/assets/fonts/amenu-en.ttf") format("truetype");
+}
+
+/* DISPLAY: TorukSC 96 */
+@font-face {
+  font-family: "Ahani Display";
+  src: url("/assets/fonts/adisplay-en.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Nagara Display";
+  src: url("/assets/fonts/adisplay-nagara.ttf") format("truetype");
+}
+
+/* NAVIGATION: TorukSC 64 */
+@font-face {
+  font-family: "Ahani Navigation";
+  src: url("/assets/fonts/adisplay-en.ttf") format("truetype");
+  font-size: 36px;
+}

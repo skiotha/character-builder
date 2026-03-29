@@ -1,0 +1,71 @@
+export function parseTemplate(templateString, data = {}) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(templateString, "text/html");
+  const element = doc.body.firstElementChild;
+
+  hydrate(element, data);
+
+  return element;
+}
+
+function hydrate(element, data) {
+  element.querySelectorAll("[data-bind]").forEach((el) => {
+    const key = el.dataset.bind;
+    const value = getNestedValue(data, key);
+
+    if (value !== undefined) {
+      if (el.dataset.bindAs === "html") {
+        el.innerHTML = value;
+      } else {
+        el.textContent = value;
+      }
+    }
+  });
+
+  element.querySelectorAll("[data-if]").forEach((el) => {
+    const condition = evalCondition(el.dataset.if, data);
+
+    if (!condition) {
+      el.remove();
+    }
+  });
+}
+
+export function getNestedValue(obj, path) {
+  return path.split(".").reduce((current, key) => {
+    return current && current[key];
+  }, obj);
+}
+
+function evalCondition(expression, data) {
+  const evalString = expression.replace(/\w+(\.\w+)*/g, (match) => {
+    const value = getNestedValue(data, match);
+    return value !== undefined ? JSON.stringify(value) : match;
+  });
+
+  try {
+    return new Function(`return ${evalString}`)();
+  } catch {
+    return false;
+  }
+}
+
+export function updateFieldValue(field, newValue) {
+  const tagName = field.tagName.toUpperCase();
+  const type = field.type;
+
+  if (tagName === "INPUT" || tagName === "SELECT" || tagName === "TEXTAREA") {
+    if (type === "number") {
+      field.value = newValue ?? 0;
+    } else if (type === "checkbox") {
+      field.checked = Boolean(newValue);
+    } else {
+      field.value = newValue ?? "";
+    }
+  } else {
+    field.textContent = newValue ?? "";
+  }
+
+  field.classList.add("updated");
+  setTimeout(() => field.classList.remove("updated"), 200);
+}

@@ -1,0 +1,434 @@
+[
+  {
+    "id": "acrobatics",
+    "name": "Acrobatics",
+    "description": "Fencing, climbing, gymnastics.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Quick% to avoid %Free Attacks%. Ability to move through tiles occupied by enemies.",
+        "actions": [
+          {
+            "effect": "enhance_attribute",
+            "target": "attribute_quick"
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "description": "%Quick% to bounce back up after being pushed down. Use battle heels as if the weapon wasn't %unwieldy%.",
+        "actions": [
+          {
+            "effect": "enhance_attribute",
+            "target": "attribute_quick"
+          },
+          {
+            "effect": "remove_weapon_attribute",
+            "target": "weapon_heels",
+            "value": "trait_unwieldy"
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "description": "%Quick% to employ any enemy as your shield. Enemy used in that way can't dodge. Ability to end your movement on the tiles occupied by enemies. %Advantage% on all attacks on enemies you share a tile with.",
+        "actions": [
+          {
+            "effect": "enhance_attribute",
+            "target": "attribute_quick"
+          },
+          {
+            "effect": "advantage",
+            "target": "all_attacks"
+          }
+        ]
+      }
+    ],
+    "tags": ["free_attack", "advantage", "attribute_quick", "weapon_heels"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "smoke_and_mirrors",
+    "name": "Smoke and Mirrors",
+    "description": "Wield %short% and %keen% weapon the way the won't see but will feel.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Discreet% instead of %Accurate% for attacks with %short% and %keen% weapon. All attacks with such weapons have %advantage%.",
+        "actions": [
+          {
+            "effect": "advantage",
+            "target": "weapon_short"
+          },
+          {
+            "effect": "advantage",
+            "target": "weapon_keen"
+          },
+          {
+            "effect": "stat_substitution",
+            "target": "attack"
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "description": "%Discreet% instead of %Quick% to determine %Defense%.",
+        "actions": [
+          {
+            "effect": "stat_substitution",
+            "target": "defense"
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "description": "%Discreet% to get a %Free Attack% during your turn.",
+        "actions": [
+          {
+            "effect": "free_attack",
+            "target": "weapon_keen"
+          },
+          {
+            "effect": "free_attack",
+            "target": "weapon_short"
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "free_attack",
+      "advantage",
+      "attribute_discreet",
+      "weapon_short",
+      "weapon_keen"
+    ],
+    "category": "general",
+    "version": "1.2"
+  },
+  {
+    "id": "intrigues",
+    "name": "Intrigues",
+    "description": "Palace, mansion and boudoir fighting techniques.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "Access to %backstab% attacks: cause +d4 damage on any one %Attack% if you have the %Advantage%. %Discreet% instead of %Accurate% for %backstabs%.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Backstabs% cause %bleeding% damage: +d4 damage until healed with healing powder, mystical powers or Medic skill.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "%Backstab% causes +d8 damage, and there's no limit to how many %backstabs% can be performed during a single turn.",
+        "actions": []
+      }
+    ],
+    "tags": ["backstab", "advantage", "bleeding"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "street_fight",
+    "name": "Street Fight",
+    "description": "Slums, gutter, lower decks fighting techniques.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "Access to %cheap shot%: inflict d6 damage and attempt to stun the target. If stun was successful, make another normal attack instantly.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Quick% to attempt to push the target down after any successful normal attack.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "Access to counterattack %Reaction%: instantly retaliate if was the target of any successful attack. The counterattack causes d6 armor-piercing damage.",
+        "actions": []
+      }
+    ],
+    "tags": ["reaction", "cheap_shot", "attribute_quick"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "opportunism",
+    "name": "Opportunism",
+    "description": "Sailors, outlaws, and artel workers fighting techniques.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "Two attempts at %Free Attacks% triggered by disengaging.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "All %Free Attacks% count as out of turn normal attacks: you can use any active ability during your %Free Attack%. There's only one chance for success with such an attack, as normal",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "Two attempts at all %Free Attacks%, even enhanced ones.",
+        "actions": []
+      }
+    ],
+    "tags": ["free_attack"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "quick_reflexes",
+    "name": "Quick Reflexes",
+    "description": "Survivability.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "Any damaging ability that can inflict more damage than your total HP, deals only half of it's damage if the hit was successful. If missed, it won't deal any damage at all even if the description says it must do halved damage.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "If the enemy misses you, you can swap places with them as an %Reaction%, without triggering %Free Attack%.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "You always win Initiative and act first in any encounter.",
+        "actions": []
+      }
+    ],
+    "tags": ["free_attack", "initiative", "reaction"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "knife_mastery",
+    "name": "Knife Mastery",
+    "description": "The size really doesn't matter when it is about you and your knives.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Quick% instead of %Accurate% for attacks with %short% weapons.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "You can make an extra attack with %short% weapons.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "Any successful attack with %short% weapon means that you are engaged with the enemy at the extreme close quarters. The enemy isn't able to use %long% weapons while engaged and they can't use any other weapon but %short% effectively: they need two successed on each attempt to attack.They can attempt to disengage by spending their %Move Action% which will trigger %Free Attack%. If they were hit with that attack, they will remain engaged.",
+        "actions": []
+      }
+    ],
+    "tags": ["weapon_short", "reaction", "free_attack", "attribute_quick"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "fast_draw",
+    "name": "Fast Draw",
+    "description": "You use weapons faster than others notice there %was% a weapon.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Quick% to make your first attack before %Initiative%. %Quick% to reload a %revolver% without sacrificing your %Move Action%.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Quick% to switch weapons without spending your %Actions%. %Quick% to reload a %rifle% without sacrificing your %Move Action%.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "%Quick% to use potions, bombs, poisons, and traps without sacrificing your %Actions%. You gain the ability to use potions on others during your turn. All %firearms% lose their %unwieldy% trait.",
+        "actions": []
+      }
+    ],
+    "tags": ["weapon_firearm", "attribute_quick", "initiative"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "alchemy",
+    "name": "Alchemy",
+    "description": "Potionmaking. Knowledge of herbs, posions, and medical substancies. Ability to find ingredients in the wild.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Cunning% to collect raw materials and create one dose of a simple potion. Protection from any catastrophic results when using or creatic alchemical bombs. You can creat battle oils.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Cunning% to collect herbs and minerals for one dose of a medium potion or four doses of a simple potion. You can craft alchemical bombs and special ammuniton for %bows% and %firearm% weapons",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "%Cunning% to collect herbs and minerals for one dose of a strong potion, four doses of a medium potion, or eight doses of a simple potion. You can craft ammuniton for artillery and siege weapons.",
+        "actions": []
+      }
+    ],
+    "tags": ["poison", "crafting", "attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "poisoner",
+    "name": "Poisoner",
+    "description": "Knowledge of everything poisonous and venomous. Ability to use poison the deadliest or most effective way.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "Spend %Free Action% to apply poison on your weapon. %Cunning% to affect the enemy with your posion on a successful hit, after which the posion is considered spent. The poisons are described in the %Equipment% sections.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "All poisoned melee weapons remain poisons for the duration of the scene. You can use %hidden weapons% as %Free Actions% if you have the %Advantage% during your turn.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "All your poisons act as if they had a higher grade than they are. Poisons of the highest grade allow two %Cunning% attempts for a success.",
+        "actions": []
+      }
+    ],
+    "tags": ["poison", "advantage", "weapon_hidden", "attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "strangler",
+    "name": "Strangler",
+    "description": "Ability to dispose of enemies the fast, silent, and effective way.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "With %Advantage%, you can turn any successful attack into a suffocating grip that will inflict d6 armor piercing damage for the duration while you can hold the enemy. The enemy can't act in any other way except trying your %Cunning% in attempt to free themselves. In addition, your %hidden weapons% attacks always have %Advantage%.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "You can utilize %chocking spores% -- an alchemical powder. Any successful hit will cause d4 armor piercing damage for the duration of the d4 turns, and the aftected enemies can't move or act.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "You can use %spore bombs% -- an alchemical bomb. %Cunning% is required to throw the bomb to where you want it. After explosion, it will cause d4 damage for d4 turn for everyone affected for as long as they remain within the smoke radius.",
+        "actions": []
+      }
+    ],
+    "tags": ["poison", "weapon_hidden", "attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "oils",
+    "name": "Oils",
+    "description": "Squeeze an extra drop from the oil.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "If you wear no other armor, %battle oils% will provide you with d4 of natural %armor%.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Cunning% to make an attempt to apply %battle oil% on yourself during your turn. %Battle oils% provide protection from the weather like clothes and also prevent d4 of any elemental damage.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "%Cunning% to apply oils on yourself as %Free Action%. You can be under effect of two different types of %battle oils%.",
+        "actions": []
+      }
+    ],
+    "tags": ["battle_oil", "attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "trapper",
+    "name": "Trapper",
+    "description": "Disarm -- or arm -- any trap you have. Create new ones if you haven't any.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Cunning% to plant or disarm a mechanical trap. Your improvised mechanical traps can be created during a single turn and they inflict d6 damage.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Cunning% to plant or disarm an alchemical trap. Your improvised mechanical traps can be created during a single turn and they inflict d8 damage.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "All your traps are treated as if they were of higher grade than they are. The traps of the highest grade allow you two attempt for any related test. Your improvised mechanical traps can be created during a single turn and they inflict d10 damage.",
+        "actions": []
+      }
+    ],
+    "tags": ["attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "beast_sense",
+    "name": "Beast Sense",
+    "description": "Knowledge and awareness related to people, beasts, monsters, and all the various creatures that inhabit the world.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Cunning% to sense or remember the traits of the beings that populate the area around you. %Cunning% to discern the weaknesses of anyone you see before you.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "You can choose any category of the creatures from the following: humans, beasts, or monsters. And successful attack against members of that category will inflict +d4 more damage. In addition, if you have the time, you can share your knowledge with others so they will be able to inflict that additional damage as well.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "Your additional damage is +d6.",
+        "actions": []
+      }
+    ],
+    "tags": ["attribute_cunning"],
+    "category": "ability",
+    "version": "1.2"
+  },
+  {
+    "id": "tactics",
+    "name": "Tactics",
+    "description": "Battle maneuvers, knowledge and experience that help you see the weak points of your enemies or compensate for your own weak points. You ability to organize effective defense or attack.",
+    "effects": [
+      {
+        "level": 1,
+        "description": "%Cunning% instead of %Quick% for %Initiative% tests.",
+        "actions": []
+      },
+      {
+        "level": 2,
+        "description": "%Cunning% instead of %Quick% for %Defense%.",
+        "actions": []
+      },
+      {
+        "level": 3,
+        "description": "%Cunning% instead of %Accuracy% for attack with all melee weapons but %heavy%.",
+        "actions": []
+      }
+    ],
+    "tags": ["attribute_cunning", "initiative", "all_attacks"],
+    "category": "ability",
+    "version": "1.2"
+  }
+]

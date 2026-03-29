@@ -1,0 +1,20 @@
+{
+  "name": "nagara-character-builder",
+  "version": "0.1.0",
+  "description": "Nagara RPG character builder — web application",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server/server.mjs",
+    "start:dev": "node server/watcher.js",
+    "test": "node --test server/tests/"
+  },
+  "imports": {
+    "#config": "./server/config.mjs",
+    "#logger": "./server/logger.mjs",
+    "#nagara": "./server/nagara/index.mjs",
+    "#nagara/*": "./server/nagara/*"
+  }
+}
