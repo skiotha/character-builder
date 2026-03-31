@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "echo \"Session started for $(basename \"$PWD\"): $(date)\" >> ../session-logs/session.log",
+        "powershell": "Add-Content -Path ../session-logs/session.log -Value \"Session started for $(Split-Path -Leaf (Get-Location)): $(Get-Date)\"",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
