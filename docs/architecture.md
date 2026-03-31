@@ -223,13 +223,13 @@ Same pipeline for initial render and real-time updates
 
 See [data-contracts.md](data-contracts.md) for the full schema specification.
 
-| Direction             | Mechanism               | Format                        |
-| --------------------- | ----------------------- | ----------------------------- |
-| Website → Addon       | Paste-import string     | Base64(JSON) or Base64(Lua)   |
-| Addon → Website       | DM sync script (POST)   | JSON over HTTPS               |
-| Addon → Website       | Paste-export (fallback) | Base64 string → paste into UI |
-| Website → Discord Bot | REST API calls          | JSON                          |
-| Discord Bot → Website | REST API calls          | JSON (future)                 |
+| Direction             | Mechanism                      | Format                        |
+| --------------------- | ------------------------------ | ----------------------------- |
+| Website → Addon       | Paste-import string            | Base64(JSON) or Base64(Lua)   |
+| Addon → Website       | DM sync script (POST)          | JSON over HTTPS               |
+| Addon → Website       | Paste-export (fallback)        | Base64 string → paste into UI |
+| Website → Discord Bot | Filesystem reads (same VPS)    | JSON (index + character files)|
+| Discord Bot → Website | `PATCH` REST API               | JSON                          |
 
 ## 6. Deployment
 

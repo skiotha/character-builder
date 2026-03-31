@@ -4,8 +4,8 @@
 
 This is the **Nagara Character Builder**, a zero-dependency Node.js web application for creating and managing RPG characters in a custom tabletop system called Nagara. It is the canonical data store for character data and is consumed by two sibling projects:
 
-- **addon** (`../addon`) — World of Warcraft addon (Lua)
-- **malizia** (`../malizia`) — Discord bot (TypeScript)
+- **addon** ([nagara-addon](https://github.com/skiotha/nagara-addon)) — World of Warcraft addon (Lua)
+- **malizia** ([malizia](https://github.com/skiotha/malizia)) — Discord bot (TypeScript)
 
 All three share the same character data model. The website is the source of truth.
 
@@ -112,6 +112,7 @@ See `docs/roadmap.md` for the full phased work plan. Quick reference:
 When making changes that affect the character data model or API, check:
 
 - `docs/addon-integration.md` — what the addon expects
+- `docs/bot-integration.md` — what the Discord bot expects
 - `docs/data-contracts.md` — canonical schema and API contract
-- `../addon/docs/data-contracts.md` — addon-side contract
-- `../malizia/` — Discord bot (may need matching API changes)
+- [nagara-addon/docs/data-contracts.md](https://github.com/skiotha/nagara-addon/blob/main/docs/data-contracts.md) — addon-side contract
+- [malizia/docs/data-contracts.md](https://github.com/skiotha/malizia/blob/main/docs/data-contracts.md) — bot-side contract

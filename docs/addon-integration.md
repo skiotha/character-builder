@@ -3,8 +3,8 @@
 > Requirements the WoW addon places on the website.
 > This document lives in the website repo but is authored by the addon side.
 > Addon-side contracts and architecture:
-> [`../addon/docs/data-contracts.md`](../../addon/docs/data-contracts.md),
-> [`../addon/docs/architecture.md`](../../addon/docs/architecture.md).
+> [`nagara-addon/docs/data-contracts.md`](https://github.com/skiotha/nagara-addon/blob/main/docs/data-contracts.md),
+> [`nagara-addon/docs/architecture.md`](https://github.com/skiotha/nagara-addon/blob/main/docs/architecture.md).
 
 ---
 
@@ -54,19 +54,15 @@ Content-Type: text/plain; charset=utf-8
 Body: <base64-encoded serialized character>
 ```
 
-The UI will likely consume this through a copyable text box or a "copy to
-clipboard" button, rather than requiring users to hit the raw API.
+The UI will likely consume this through a copyable text box or a "copy to clipboard" button, rather than requiring users to hit the raw API.
 
 ### 2.3 Fields to Include
 
-Every field in the character schema **except** the ones listed below.
-This roughly corresponds to the existing `owner`-visible permission set,
-minus server-internal metadata.
+Every field in the character schema **except** the ones listed below. This roughly corresponds to the existing `owner`-visible permission set, minus server-internal metadata.
 
 ### 2.4 Fields to Exclude
 
-These must be **stripped** before serialization. They either contain
-server-internal data or information the addon cannot use.
+These must be **stripped** before serialization. They either contain server-internal data or information the addon cannot use.
 
 | Field                  | Reason                                        |
 | ---------------------- | --------------------------------------------- |
@@ -127,16 +123,12 @@ For clarity, the exported object should contain exactly:
 
 ## 3. Schema Versioning
 
-The website must include a `schemaVersion` field (integer) in every exported
-character. The addon uses it to detect format changes and run migrations.
+The website must include a `schemaVersion` field (integer) in every exported character. The addon uses it to detect format changes and run migrations.
 
 - Current version: **1**.
-- When the character schema changes in a way that affects the addon, bump this
-  number **and** coordinate with the addon repo so a matching migration is
-  added to `Core/CharSheet.lua`.
+- When the character schema changes in a way that affects the addon, bump this number **and** coordinate with the addon repo so a matching migration is added to `Core/CharSheet.lua`.
 
-The `schemaVersion` is **not** the same as the website's internal data version
-or the API version. It tracks the shape of the data the addon expects.
+The `schemaVersion` is **not** the same as the website's internal data version or the API version. It tracks the shape of the data the addon expects.
 
 ---
 
@@ -150,8 +142,7 @@ Base64( Serialize( characterTable ) )
 
 ### 4.1 Serialization Format
 
-The addon deserializes using its own `Util/Serialize.lua`. The website must
-produce a byte-compatible format. The algorithm (designed for Lua tables) is:
+The addon deserializes using its own `Util/Serialize.lua`. The website must produce a byte-compatible format. The algorithm (designed for Lua tables) is:
 
 ```
 Value encoding:
@@ -180,23 +171,18 @@ Key encoding:
 
 ### 4.2 Base64
 
-Standard Base64 (RFC 4648, `A-Za-z0-9+/`, `=` padding). No URL-safe variant,
-no line breaks.
+Standard Base64 (RFC 4648, `A-Za-z0-9+/`, `=` padding). No URL-safe variant, no line breaks.
 
 ### 4.3 Reference Implementation
 
 The addon's serializer lives at
-[`../addon/Nagara/Util/Serialize.lua`](../../addon/Nagara/Util/Serialize.lua)
-(once implemented). A JavaScript port should pass the same round-trip test
-vectors found in
-[`../addon/test/test_serialize.lua`](../../addon/test/test_serialize.lua).
+[`nagara-addon/Nagara/Util/Serialize.lua`](https://github.com/skiotha/nagara-addon/blob/main/Nagara/Util/Serialize.lua) (once implemented). A JavaScript port should pass the same round-trip test vectors found in [`nagara-addon/test/test_serialize.lua`](https://github.com/skiotha/nagara-addon/blob/main/test/test_serialize.lua).
 
 ---
 
 ## 5. Paste-Export / Reverse Import
 
-Players can export their **addon-side** character data back to the website via
-a manually copied string. The format is identical to §4:
+Players can export their **addon-side** character data back to the website via a manually copied string. The format is identical to §4:
 
 ```
 Base64( Serialize( characterTable ) )
@@ -225,16 +211,13 @@ Body: <base64-encoded serialized character>
 
 ### 5.2 UI
 
-A simple page with a text area ("Paste your addon export string here") and a
-submit button is sufficient. Linked from the character's detail page.
+A simple page with a text area ("Paste your addon export string here") and a submit button is sufficient. Linked from the character's detail page.
 
 ---
 
 ## 6. DM Sync Endpoint
 
-After a game session, the DM runs `scripts/sync_upload.py` from the addon
-repo. The script reads the DM's WoW SavedVariables, extracts cached character
-data, and POSTs changes to the website.
+After a game session, the DM runs `scripts/sync_upload.py` from the addon repo. The script reads the DM's WoW SavedVariables, extracts cached character data, and POSTs changes to the website.
 
 ### 6.1 Endpoint
 
@@ -265,18 +248,13 @@ Body: { <character data matching §2.5 schema> }
 
 ### 6.4 Sync Script Contract
 
-The script sends one request per changed character. It does **not** batch.
-Expected request rate: 1–15 characters per session, infrequent (weekly or
-biweekly). No rate-limiting concerns.
+The script sends one request per changed character. It does **not** batch. Expected request rate: 1–15 characters per session, infrequent (weekly or biweekly). No rate-limiting concerns.
 
 ---
 
 ## 7. Abilities / Static Data Endpoint
 
-The addon ships a baked static database (generated at build time from JSON).
-The source JSON currently lives in the addon repo (`temp/abilities.en.json`
-and similar). If the website becomes the canonical source for abilities,
-spells, rituals, etc., the build script will need to fetch them:
+The addon ships a baked static database (generated at build time from JSON). The source JSON currently lives in the addon repo (`temp/abilities.en.json` and similar). If the website becomes the canonical source for abilities, spells, rituals, etc., the build script will need to fetch them:
 
 ### 7.1 Endpoint (optional, low priority)
 
@@ -289,9 +267,7 @@ GET /api/v1/items
 GET /api/v1/rules
 ```
 
-These return the full dataset for each category as JSON arrays. The addon's
-`scripts/build.py` fetches them at build time and converts to Lua table
-literals. The addon **never** calls these at runtime.
+These return the full dataset for each category as JSON arrays. The addon's `scripts/build.py` fetches them at build time and converts to Lua table literals. The addon **never** calls these at runtime.
 
 > `/api/v1/abilities` already exists. The others can be added as the data is
 > populated on the website.
@@ -300,8 +276,7 @@ literals. The addon **never** calls these at runtime.
 
 ## 8. Effect Object Schema
 
-Effects are the most structurally complex piece of shared data. Both sides
-must agree on the shape. An effect object looks like:
+Effects are the most structurally complex piece of shared data. Both sides must agree on the shape. An effect object looks like:
 
 ```jsonc
 {
@@ -319,9 +294,7 @@ must agree on the shape. An effect object looks like:
 }
 ```
 
-The addon's `Core/Effects.lua` processes these in priority order using the
-pipeline: `setBase → addFlat → multiply → cap`. The website should produce
-effects that follow this structure and ordering convention.
+The addon's `Core/Effects.lua` processes these in priority order using the pipeline: `setBase → addFlat → multiply → cap`. The website should produce effects that follow this structure and ordering convention.
 
 ---
 

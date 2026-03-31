@@ -279,6 +279,7 @@ Schema structure reviewed and stabilized for Phase 3.
 Discord bot.
 
 **Basis:** [addon-integration.md](addon-integration.md),
+[bot-integration.md](bot-integration.md),
 [data-contracts.md](data-contracts.md)
 
 ### Addon Integration
@@ -296,8 +297,16 @@ Discord bot.
 
 ### Discord Bot Integration
 
-- [ ] Review malizia requirements — what API endpoints does the bot need?
-- [ ] Implement any missing endpoints
+- [ ] Add `discordId` field to character schema (string, optional, Discord
+      snowflake — see bot-integration.md §3)
+  - [ ] Include `discordId` in `index.json` `byId` entries
+  - [ ] Decide on linking UX (bot `/link` command vs manual paste)
+- [ ] Verify bot can read `data/index.json` and `data/characters/*.json`
+      directly from the filesystem (same VPS — bot-integration.md §2)
+- [ ] Confirm `PATCH /api/v1/characters/:id` works for bot write scenarios
+      (bot-integration.md §4: `/update`, `/dm-xp`, `/dm-corruption`, `/dm-effect`)
+- [ ] Ensure portrait files are served over HTTPS for Discord embed rendering
+      (bot-integration.md §5)
 - [ ] Document bot-specific API usage in data-contracts.md
 
 ### Shared

@@ -2,7 +2,8 @@
 
 > Canonical data shapes for the character builder and its consumers.
 > Cross-project integration details live in
-> [addon-integration.md](addon-integration.md) (addon-authored).
+> [addon-integration.md](addon-integration.md) (addon-authored) and
+> [bot-integration.md](bot-integration.md) (bot-authored).
 
 ---
 
@@ -299,8 +300,24 @@ Detailed in [addon-integration.md §6](addon-integration.md).
 POST per-character JSON data with DM Bearer token. Conflict resolution
 based on `lastModified` comparison.
 
-### 5.4 Discord Bot
+### 5.4 Discord Bot (Website ↔ Malizia)
 
-The Discord bot (malizia) will consume character data via the standard
-REST API (`GET /characters/:id`, `GET /abilities`). Additional endpoints
-TBD based on bot requirements.
+Detailed in [bot-integration.md](bot-integration.md).
+
+The bot and website run on the **same VPS**. The bot reads character data
+directly from the website's `data/` directory (filesystem reads — no API
+round-trips). Write operations go through the website's `PATCH` API to
+preserve validation, derived-stat recalculation, and SSE broadcasts.
+
+| Direction        | Mechanism                      | Format |
+| ---------------- | ------------------------------ | ------ |
+| Website → Bot    | Filesystem reads (local)       | JSON   |
+| Bot → Website    | `PATCH /api/v1/characters/:id` | JSON   |
+
+**Schema dependency:** The bot depends on the structure of `index.json`
+and character JSON files. A `discordId` field must be added to the
+character schema to map Discord users to characters (see
+bot-integration.md §3).
+
+**Portrait access:** The bot embeds character portraits in Discord
+messages by constructing public HTTPS URLs from `portrait.path`.
