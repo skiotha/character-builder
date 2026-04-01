@@ -4,17 +4,24 @@
   "description": "Nagara RPG character builder — web application",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.6.0"
   },
   "scripts": {
-    "start": "node server/server.mjs",
-    "start:dev": "node server/watcher.js",
-    "test": "node --test server/tests/"
+    "start": "node --experimental-strip-types src/server.mts",
+    "start:dev": "node --experimental-strip-types scripts/watcher.mts",
+    "test": "node --experimental-strip-types --test test/**/*.test.mts"
   },
   "imports": {
-    "#config": "./server/config.mjs",
-    "#logger": "./server/logger.mjs",
-    "#nagara": "./server/nagara/index.mjs",
-    "#nagara/*": "./server/nagara/*"
+    "#config": "./src/lib/config.mts",
+    "#logger": "./src/lib/logger.mts",
+    "#auth": "./src/lib/auth.mts",
+    "#models": "./src/models/index.mts",
+    "#rules": "./src/rules/index.mts",
+    "#middleware": "./src/middleware/index.mts",
+    "#routes": "./src/routes/handlers.mts",
+    "#sse": "./src/sse/broadcast.mts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
   }
 }

@@ -53,28 +53,29 @@ npm run dev
 
 ```
 character-builder/
-├── server/
-│   ├── server.mjs          # HTTP/HTTPS bootstrap
-│   ├── watcher.js           # Auto-restart wrapper
-│   ├── config.mjs           # Environment & path configuration
-│   ├── logger.mjs           # Simple logging
-│   ├── router.mjs           # Request routing (API + static files)
-│   ├── nagara/              # Core business logic
-│   │   ├── handlers/        # API endpoint handlers
-│   │   ├── middleware/       # Auth & permission middleware
-│   │   ├── renderers/       # Server-side HTML renderers
-│   │   ├── templates/       # HTML template definitions
-│   │   ├── schema/          # Character data model & validation
-│   │   └── rules/           # RPG rules engine
-│   ├── data/                # Runtime data (gitignored)
-│   └── tests/
-├── client/                  # Frontend SPA
+├── src/                     # Server source (TypeScript .mts)
+│   ├── server.mts           # HTTP/HTTPS bootstrap
+│   ├── app.mts              # Request routing (API + static files)
+│   ├── lib/                 # Config, logger, auth, utilities
+│   ├── models/              # Character schema, storage, validation
+│   ├── routes/              # API handlers & route wiring
+│   ├── middleware/           # Auth & permission middleware
+│   ├── rules/               # RPG rules engine
+│   ├── renderers/           # Server-side HTML renderers
+│   ├── templates/           # HTML template definitions
+│   └── sse/                 # SSE broadcast
+├── public/                  # Frontend SPA (vanilla JS .mjs)
 │   ├── views/               # Page views
 │   ├── components/          # UI components
 │   ├── behaviors/           # Declarative element behaviors
 │   ├── common/              # Shared styles & icons
-│   └── validation/          # Form validation
-└── assets/                  # Fonts, icons, favicons
+│   ├── validation/          # Form validation
+│   └── assets/              # Fonts, icons, favicons
+├── data/                    # Runtime data (gitignored)
+├── config/                  # Environment configuration
+├── scripts/                 # Watcher, utilities
+├── test/                    # Tests
+└── docs/                    # Architecture, contracts, decisions
 ```
 
 ## API
@@ -120,5 +121,5 @@ For deploying to `nagara.team`:
 1. Set `NODE_ENV=production`
 2. Provide SSL certificate paths via `SSL_KEY` and `SSL_CERT`
 3. Set `NAGARA_DM_TOKEN` to a strong secret
-4. Ensure `server/data/` directory is writable
+4. Ensure `data/` directory is writable
 5. Run with `npm start` or use a process manager (pm2, systemd)

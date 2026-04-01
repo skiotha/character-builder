@@ -2,11 +2,11 @@
 node_modules/
 
 # Runtime data (user-generated)
-server/data/characters/
-server/data/backups/
-server/data/uploads/
-server/data/index.json
-server/data/aliases.json
+data/characters/
+data/backups/
+data/uploads/
+data/index.json
+data/aliases.json
 
 # Environment
 .env

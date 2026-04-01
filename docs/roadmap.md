@@ -8,7 +8,7 @@
 
 ---
 
-## Phase 0 — Documentation & Decisions ✱ CURRENT
+## Phase 0 — Documentation & Decisions ✓ DONE
 
 **Goal:** Cement what exists, why it exists, and what's changing — before
 touching code.
@@ -33,25 +33,25 @@ has a written basis for its decisions.
 
 ---
 
-## Phase 1 — Project Restructure
+## Phase 1 — Project Restructure ✓ DONE
 
 **Goal:** Professional directory layout. No behavior changes. All tests (even if minimal) must pass before and after.
 
 **Basis:** [ADR-006](decisions/006-project-restructure.md)
 
-- [ ] Create target directory structure (`src/`, `public/`, `data/`, `config/`,
+- [x] Create target directory structure (`src/`, `public/`, `data/`, `config/`,
       `scripts/`, `test/`)
-- [ ] Move server source: `server/nagara/*` → `src/`
-- [ ] Move server bootstrap: `server/server.mjs` → `src/server.mts`,
+- [x] Move server source: `server/nagara/*` → `src/`
+- [x] Move server bootstrap: `server/server.mjs` → `src/server.mts`,
       `server/config.mjs` → `src/lib/config.mts`, etc.
-- [ ] Move client: `client/` → `public/`, `assets/` → `public/assets/`
-- [ ] Move runtime data: `server/data/` → `data/`
-- [ ] Move watcher: `server/watcher.js` → `scripts/watcher.mts`
-- [ ] Move tests: `server/tests/` → `test/`
-- [ ] Update `package.json` imports map for new paths (drop '@' from the client's import map)
-- [ ] Update `index.html` import map for new public structure
-- [ ] Update `README.md` with new project structure
-- [ ] Verify the server starts and serves pages correctly
+- [x] Move client: `client/` → `public/`, `assets/` → `public/assets/`
+- [x] Move runtime data: `server/data/` → `data/`
+- [x] Move watcher: `server/watcher.js` → `scripts/watcher.mts`
+- [x] Move tests: `server/tests/` → `test/`
+- [x] Update `package.json` imports map for new paths (drop '@' from the client's import map)
+- [x] Update `index.html` import map for new public structure
+- [x] Update `README.md` with new project structure
+- [x] Verify the server starts and serves pages correctly
 - [ ] Single commit for the entire restructure
 
 **Deliverable:** Cleanly-organized project that runs identically to before.

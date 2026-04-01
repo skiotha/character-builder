@@ -5,7 +5,7 @@
 | Phase | Goal                                       | Status      |
 | ----- | ------------------------------------------ | ----------- |
 | **0** | Documentation & Decisions                  | ✅ Done     |
-| **1** | Project Restructure (ADR-006)              | Not started |
+| **1** | Project Restructure (ADR-006)              | ✅ Done     |
 | **2** | TypeScript Migration (ADR-008)             | Not started |
 | **3** | Schema-Driven Rendering (ADR-009)          | Not started |
 | **4** | Testing (`node:test`, malizia conventions) | Not started |
