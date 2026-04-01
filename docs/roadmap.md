@@ -52,7 +52,7 @@ has a written basis for its decisions.
 - [x] Update `index.html` import map for new public structure
 - [x] Update `README.md` with new project structure
 - [x] Verify the server starts and serves pages correctly
-- [ ] Single commit for the entire restructure
+- [x] Single commit for the entire restructure
 
 **Deliverable:** Cleanly-organized project that runs identically to before.
 
