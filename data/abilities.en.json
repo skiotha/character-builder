@@ -1,0 +1,3660 @@
+[
+  {
+    "id": "acrobatics",
+    "name": "Acrobatics",
+    "category": "ability",
+    "description": "Agility, maneuverability, and gymnastic techniques for movement in combat and bypassing opponents.",
+    "tags": [
+      "mobility",
+      "defense",
+      "melee",
+      "positioning",
+      "quick",
+      "reaction",
+      "battle-heels"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows moving past, away from, or toward an enemy without provoking free attacks, and crossing occupied spaces when there is enough room.",
+        "effects": [
+          {
+            "target": "Free Attacks triggered by movement",
+            "action": "prevent",
+            "value": "movement-related",
+            "description": "Quick check to prevent an enemy's free attacks when moving away from, past, or toward them."
+          },
+          {
+            "target": "Occupied enemy spaces",
+            "action": "allow_traverse",
+            "value": "conditional",
+            "description": "You may cross spaces occupied by an enemy if you can slip through or leap over, but you cannot end your movement there."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Grants a quick reaction to being knocked prone and removes the unwieldy quality of combat heels.",
+        "effects": [
+          {
+            "target": "Standing up from prone",
+            "action": "allow_reaction",
+            "value": "instant",
+            "description": "Quick check to instantly spring to your feet as a reaction after falling prone."
+          },
+          {
+            "target": "Battle heels",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "The Adept may use combat heels as if they lacked the unwieldy quality."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows using an enemy as cover, ending movement on them, and gaining advantage on the next attack.",
+        "effects": [
+          {
+            "target": "Incoming ranged attacks",
+            "action": "use_enemy_as_cover",
+            "value": "conditional",
+            "description": "Quick check to use an enemy as a shield against incoming attacks they can no longer dodge."
+          },
+          {
+            "target": "Occupied enemy spaces",
+            "action": "allow_end_movement",
+            "value": "conditional",
+            "description": "You may end your movement in a space occupied by an enemy if their position allows it."
+          },
+          {
+            "target": "Next attack this turn",
+            "action": "grant_bonus",
+            "value": "advantage",
+            "description": "If you end your movement on an enemy, your next attack this turn is made with advantage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "smoke-and-mirrors",
+    "name": "Smoke and Mirrors",
+    "category": "ability",
+    "description": "A fighting technique with short and precise weapons built on hand speed, deception, and surprise.",
+    "tags": [
+      "discreet",
+      "short-weapon",
+      "precise-weapon",
+      "attack",
+      "defense",
+      "advantage",
+      "melee"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts the hit calculation to Discreet and enhances attacks with short or precise weapons.",
+        "effects": [
+          {
+            "target": "Attack chance with short or precise weapons",
+            "action": "change_base_attribute",
+            "value": "Discreet instead of Accurate",
+            "description": "Use Discreet instead of Accurate to calculate hit chance with short or precise weapons."
+          },
+          {
+            "target": "Attacks with short or precise weapons",
+            "action": "grant_bonus",
+            "value": "advantage",
+            "description": "Any attack with such weapons is made with advantage."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Shifts the Defense calculation to Discreet and makes defense more controlled.",
+        "effects": [
+          {
+            "target": "Defense",
+            "action": "change_base_attribute",
+            "value": "Discreet instead of Quick",
+            "description": "Use Discreet instead of Quick to calculate Defense."
+          },
+          {
+            "target": "Weak and strong sides",
+            "action": "choose_layout",
+            "value": "self-determined",
+            "description": "The Adept decides which of their sides are weak and which are strong."
+          }
+        ]
+      },
+      "master": {
+        "description": "Grants a chance to make an extra free attack during your own turn.",
+        "effects": [
+          {
+            "target": "Free Attack during own turn",
+            "action": "grant_chance",
+            "value": "extra free attack",
+            "description": "Discreet check to gain a chance at an extra free attack during your own turn."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "intrigues",
+    "name": "Intrigues",
+    "category": "ability",
+    "description": "A courtly combat technique exploiting enemy weaknesses, surprise, and backstabs.",
+    "tags": [
+      "stealth",
+      "advantage",
+      "assassination",
+      "damage",
+      "status",
+      "discreet",
+      "melee"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks Backstab when you have advantage and allows attacking through Discreet.",
+        "effects": [
+          {
+            "target": "Backstab",
+            "action": "grant_conditional_attack",
+            "value": "+d4",
+            "description": "Once per turn, when you have advantage, you may deal a Backstab for +d4 damage."
+          },
+          {
+            "target": "Attack chance",
+            "action": "change_base_attribute",
+            "value": "Discreet instead of Accurate",
+            "description": "You may use Discreet instead of Accurate to calculate hit chance."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Enhances Backstab with persistent bleeding.",
+        "effects": [
+          {
+            "target": "Backstab",
+            "action": "add_status",
+            "value": "bleeding d4 per turn",
+            "description": "A Backstab causes bleeding that deals d4 additional damage each turn until the wound is treated."
+          }
+        ]
+      },
+      "master": {
+        "description": "Increases Backstab's direct damage and removes the per-turn limit on such strikes.",
+        "effects": [
+          {
+            "target": "Backstab direct damage",
+            "action": "modify_value",
+            "value": "+d8 instead of +d4",
+            "description": "The direct bonus damage of a Backstab is now +d8 instead of +d4."
+          },
+          {
+            "target": "Backstab uses per turn",
+            "action": "remove_limit",
+            "value": "while advantage is maintained",
+            "description": "The Master is no longer limited in the number of Backstabs per turn as long as advantage is maintained."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "street-fighting",
+    "name": "Street Fighting",
+    "category": "ability",
+    "description": "Rough and brutal melee techniques for stunning, knocking down, and countering opponents.",
+    "tags": [
+      "melee",
+      "control",
+      "stun",
+      "knockdown",
+      "counterattack",
+      "armor-piercing",
+      "quick",
+      "extra-attack"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks a dirty hit that stuns the target and allows an immediate follow-up attack.",
+        "effects": [
+          {
+            "target": "Enemy struck by dirty hit",
+            "action": "add_damage",
+            "value": "d6",
+            "description": "A dirty hit deals d6 damage."
+          },
+          {
+            "target": "Enemy struck by dirty hit",
+            "action": "add_status",
+            "value": "stunned",
+            "description": "On a hit, the target is stunned."
+          },
+          {
+            "target": "Attacker",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "The stun allows you to immediately make one more normal attack."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows converting any successful attack into a knockdown.",
+        "effects": [
+          {
+            "target": "Any successful attack",
+            "action": "add_status",
+            "value": "prone",
+            "description": "Quick check to make any successful attack end with a trip or shove that knocks the enemy prone."
+          }
+        ]
+      },
+      "master": {
+        "description": "Grants a reactive counterattack against any melee attack made against you.",
+        "effects": [
+          {
+            "target": "Enemy making a melee attack against the user",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "A counterattack as a reaction deals d6 armor-ignoring damage each time the Master is targeted by a melee attack."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "knife-mastery",
+    "name": "Knife Mastery",
+    "category": "ability",
+    "description": "Specialization in short cutting and thrusting weapons with emphasis on speed and close-quarters combat.",
+    "tags": [
+      "short-weapon",
+      "melee",
+      "attack",
+      "dueling",
+      "control",
+      "quick",
+      "extra-attack"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts the attack calculation for short weapons to Quick.",
+        "effects": [
+          {
+            "target": "Attack chance with short weapons",
+            "action": "change_base_attribute",
+            "value": "Quick instead of Accurate",
+            "description": "Use Quick instead of Accurate to calculate hit chance with short weapons."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Grants an extra knife attack each turn.",
+        "effects": [
+          {
+            "target": "Knife attacks per turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "One extra knife attack per turn."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows forcing close-quarters combat, restricting the enemy's weapon options, and worsening their defense.",
+        "effects": [
+          {
+            "target": "Enemy weapon options",
+            "action": "restrict_usage",
+            "value": "cannot effectively use other melee weapons; cannot use long weapons",
+            "description": "After a successful knife attack the enemy can no longer effectively use other melee weapons except knives, and cannot use long weapons at all."
+          },
+          {
+            "target": "Enemy defense against knife attacks",
+            "action": "worsen_defense",
+            "value": "roll twice, take worse",
+            "description": "The enemy's defense against these attacks is rolled twice and the worse result is used."
+          },
+          {
+            "target": "Enemy disengage",
+            "action": "restrict_escape",
+            "value": "initiative win or movement plus successful evade vs free attack",
+            "description": "The enemy can only disengage by winning initiative or spending movement and successfully evading a free attack."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "opportunism",
+    "name": "Opportunism",
+    "category": "ability",
+    "description": "A ruthless melee school that makes free attacks an especially dangerous tool of pressure.",
+    "tags": ["melee", "extra-attack", "reaction", "control"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows rerolling failed free attacks against enemies attempting to disengage.",
+        "effects": [
+          {
+            "target": "Free Attacks against disengaging enemies",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "A failed free attack check against an enemy leaving melee may be rerolled once."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows replacing a standard free attack with any other active ability.",
+        "effects": [
+          {
+            "target": "Free Attacks",
+            "action": "replace_default_attack",
+            "value": "any active ability, single check",
+            "description": "A free attack can be replaced with any other active ability, but only one success check is allowed."
+          }
+        ]
+      },
+      "master": {
+        "description": "Makes free attacks a full platform for active techniques and improves their reliability.",
+        "effects": [
+          {
+            "target": "Free Attacks",
+            "action": "replace_default_attack",
+            "value": "any active ability",
+            "description": "The Master may use any active ability during a free attack without the Adept's single-check restriction."
+          },
+          {
+            "target": "Hit checks during Free Attacks",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "If the hit check on a free attack fails, it may be rerolled."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fast-reflexes",
+    "name": "Fast Reflexes",
+    "category": "ability",
+    "description": "Extreme reaction speed and survivability that soften dangerous blows and constantly outpace opponents.",
+    "tags": [
+      "survival",
+      "initiative",
+      "reaction",
+      "positioning",
+      "defense",
+      "hp"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Caps especially dangerous damage and negates half-damage from missed hits of such abilities.",
+        "effects": [
+          {
+            "target": "Abilities dealing more damage than current Toughness",
+            "action": "cap_damage",
+            "value": "half on hit, zero on miss",
+            "description": "If an attack could inflict more damage than your current Toughness, it inflicts only half damage on a hit or nothing at all on a miss."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows instant escape behind a missed opponent.",
+        "effects": [
+          {
+            "target": "Enemy that missed the user",
+            "action": "swap_positions",
+            "value": "behind target",
+            "description": "After an enemy misses, the Adept may react by swapping places with them and ending up behind their back, without provoking free attacks."
+          }
+        ]
+      },
+      "master": {
+        "description": "Guarantees initiative priority unless the opponent has the same mastery.",
+        "effects": [
+          {
+            "target": "Initiative order",
+            "action": "set_priority",
+            "value": "always first unless opposed by same ability",
+            "description": "The Master always wins initiative and acts first, unless facing another master of the same ability."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "quick-hand",
+    "name": "Quick Hand",
+    "category": "ability",
+    "description": "The art of drawing, swapping, and maintaining weapons with lightning speed, even while moving.",
+    "tags": [
+      "weapons",
+      "reload",
+      "mobility",
+      "utility",
+      "firearms",
+      "quick",
+      "ranged",
+      "melee"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows beating the enemy on the first draw and reloading a revolver without losing movement.",
+        "effects": [
+          {
+            "target": "First draw and attack",
+            "action": "quick_check",
+            "value": "quicker than opponent",
+            "description": "Quick check to draw and make the first attack before the opponent."
+          },
+          {
+            "target": "Revolver reloads",
+            "action": "remove_movement_cost",
+            "value": "revolver",
+            "description": "A revolver can be reloaded on the move without losing Movement."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows swapping weapons on the move and reloading rifles just as freely.",
+        "effects": [
+          {
+            "target": "Weapon swaps",
+            "action": "allow_swap_without_attack_loss",
+            "value": "single motion",
+            "description": "You can holster one weapon and draw another in a single motion without losing your attack."
+          },
+          {
+            "target": "Rifle reloads",
+            "action": "remove_movement_cost",
+            "value": "rifle",
+            "description": "A rifle can be reloaded on the move without losing Movement."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the action cost from consumables and makes firearms more convenient to handle.",
+        "effects": [
+          {
+            "target": "Elixirs, grenades, poisons and traps",
+            "action": "remove_action_cost",
+            "value": "use as part of turn",
+            "description": "Elixirs, grenades, poisons, and traps can be used without spending an Action."
+          },
+          {
+            "target": "Firearms with unwieldy quality",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "All firearms are treated as if they lack the unwieldy quality."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "alchemy",
+    "name": "Alchemy",
+    "category": "ability",
+    "description": "Potion-brewing and reagent gathering for elixirs, oils, grenades, and special ammunition.",
+    "tags": ["crafting", "alchemy", "grenades", "ammunition", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows gathering ingredients for simple elixirs, working safely with grenades, and brewing combat oils.",
+        "effects": [
+          {
+            "target": "Simple elixir ingredients",
+            "action": "gather_resources",
+            "value": "one simple dose",
+            "description": "Cunning check to gather ingredients for one dose of a simple elixir."
+          },
+          {
+            "target": "Alchemical grenades",
+            "action": "prevent_catastrophe",
+            "value": "self",
+            "description": "The Novice no longer suffers catastrophes when using alchemical grenades."
+          },
+          {
+            "target": "Combat oils",
+            "action": "unlock_crafting",
+            "value": "combat oils",
+            "description": "Unlocks the crafting of combat oils."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows preparing more complex elixirs and crafting ammunition and grenades.",
+        "effects": [
+          {
+            "target": "Advanced alchemical production",
+            "action": "gather_resources",
+            "value": "one complex dose or d4 weak doses",
+            "description": "Cunning check to gather herbs and minerals for one dose of a complex elixir or d4 doses of a weak elixir."
+          },
+          {
+            "target": "Grenades and special ammunition",
+            "action": "unlock_crafting",
+            "value": "grenades and special ammo",
+            "description": "The Adept can produce grenades and special ammunition for bows and firearms."
+          }
+        ]
+      },
+      "master": {
+        "description": "Unlocks master-tier recipes and production of heavy weapon ammunition.",
+        "effects": [
+          {
+            "target": "Master alchemical production",
+            "action": "gather_resources",
+            "value": "one master dose or d4 strong or d8 weak doses",
+            "description": "Cunning check to gather resources for a master elixir, d4 strong doses, or d8 weak doses."
+          },
+          {
+            "target": "Artillery and siege ammunition",
+            "action": "unlock_crafting",
+            "value": "siege ammunition",
+            "description": "The Master can produce ammunition for artillery and siege weapons."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "poisoner",
+    "name": "Poisoner",
+    "category": "ability",
+    "description": "Knowledge of poisons and how to reliably deliver them via a weapon or hidden device.",
+    "tags": [
+      "poison",
+      "weapons",
+      "status",
+      "alchemy",
+      "assassination",
+      "cunning"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows quickly coating a weapon with poison and activating it with a Cunning check.",
+        "effects": [
+          {
+            "target": "Poison application",
+            "action": "allow_free_action",
+            "value": "coat weapon",
+            "description": "The Novice can coat a weapon with poison at any time as a free action."
+          },
+          {
+            "target": "Poisoned successful weapon hit",
+            "action": "trigger_effect_on_check",
+            "value": "one successful hit",
+            "description": "Cunning check to activate the poison on a successful hit; the poison lasts for one successful hit."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Keeps poison on the weapon for the entire battle and speeds up hidden weapon use.",
+        "effects": [
+          {
+            "target": "Applied poison",
+            "action": "extend_duration",
+            "value": "entire battle",
+            "description": "Poison applied to a weapon remains effective for the entire battle regardless of hit count."
+          },
+          {
+            "target": "Hidden weapon use",
+            "action": "allow_free_action",
+            "value": "with advantage",
+            "description": "The Adept can use a hidden weapon in combat as a free action when they have advantage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises most poisons by one rank, making them considerably harder to resist.",
+        "effects": [
+          {
+            "target": "Poisons on weapons",
+            "action": "increase_rank",
+            "value": "one rank, except master poisons",
+            "description": "Every poison on the weapon is treated as one rank higher, except master-tier poisons."
+          },
+          {
+            "target": "Poison effect checks",
+            "action": "grant_additional_check",
+            "value": 1,
+            "description": "Poisons at this level allow two Cunning checks instead of one, making them especially difficult to resist."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "strangling",
+    "name": "Strangling",
+    "category": "ability",
+    "description": "Silent elimination with a garrote and suffocating alchemical substances.",
+    "tags": [
+      "stealth",
+      "grapple",
+      "poison",
+      "alchemy",
+      "armor-piercing",
+      "cunning",
+      "melee"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows entering a choking grapple when you have advantage, dealing armor-ignoring damage and denying the target's actions.",
+        "effects": [
+          {
+            "target": "Enemy hit with advantage",
+            "action": "apply_stranglehold",
+            "value": "d6 armor-ignoring",
+            "description": "After a successful hit with advantage, you may enter a rear grapple, dealing d6 armor-ignoring damage and preventing the target from taking actions."
+          },
+          {
+            "target": "Maintained stranglehold",
+            "action": "maintain_on_check",
+            "value": "cunning",
+            "description": "Cunning check to determine whether the choking grapple is maintained on the next turn."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Unlocks suffocating spores against one target for several turns.",
+        "effects": [
+          {
+            "target": "Enemy hit by suffocating spores",
+            "action": "deal_periodic_damage",
+            "value": "d4 for d4 turns",
+            "description": "A successful throw of suffocating spores deals d4 armor-ignoring damage per turn for d4 turns; the target can still move and act."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns the suffocating spores into a grenade that covers an entire room or small area.",
+        "effects": [
+          {
+            "target": "All enemies in affected small area",
+            "action": "deal_periodic_damage",
+            "value": "d4 for d4 turns",
+            "description": "A spore bomb deals d4 armor-ignoring damage per turn for d4 turns to all enemies in a room, corridor, or small open space."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "oils",
+    "name": "Combat Oils",
+    "category": "ability",
+    "description": "The skill of extracting maximum protection and useful secondary effects from body oils.",
+    "tags": ["alchemy", "armor", "protection", "utility", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Grants natural armor if the character applied a combat oil beforehand and wears no other armor.",
+        "effects": [
+          {
+            "target": "User without worn armor",
+            "action": "grant_bonus",
+            "value": "d4 natural armor",
+            "description": "If you applied a combat oil beforehand and wear no other armor, you gain d4 natural Armor."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows applying oil during the current turn and extends protection to elements and some mystical damage.",
+        "effects": [
+          {
+            "target": "Body oil application",
+            "action": "apply_on_check",
+            "value": "current turn",
+            "description": "Cunning check to apply oil to yourself during the current turn."
+          },
+          {
+            "target": "Elemental and physical mystical effects",
+            "action": "reduce_damage",
+            "value": "d4",
+            "description": "Combat oils also protect against elements like clothing and prevent d4 damage from physical mystical effects such as fire, ice, acid, and electricity."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the action cost of applying oil and allows two body oils to be active at once.",
+        "effects": [
+          {
+            "target": "Body oil application",
+            "action": "allow_free_action",
+            "value": "self-application",
+            "description": "Cunning check to apply oil to yourself as a free action."
+          },
+          {
+            "target": "Active body oils",
+            "action": "increase_limit",
+            "value": 2,
+            "description": "The Master can have two body oils active simultaneously."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "trapping",
+    "name": "Trapping",
+    "category": "ability",
+    "description": "Working with mechanical and alchemical traps, including field construction and disarming.",
+    "tags": ["traps", "crafting", "control", "utility", "alchemy", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows setting and disarming mechanical traps, and quickly improvising them in the field.",
+        "effects": [
+          {
+            "target": "Mechanical traps",
+            "action": "set_or_disarm_on_check",
+            "value": "cunning",
+            "description": "Cunning check to set or disarm a mechanical trap."
+          },
+          {
+            "target": "Improvised mechanical traps",
+            "action": "set_damage_cap",
+            "value": "d6",
+            "description": "Improvised mechanical traps built in one turn deal up to d6 damage."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Adds alchemical trap expertise and increases the damage of improvised mechanisms.",
+        "effects": [
+          {
+            "target": "Alchemical traps",
+            "action": "set_or_disarm_on_check",
+            "value": "cunning",
+            "description": "Cunning check to set or disarm an alchemical trap."
+          },
+          {
+            "target": "Improvised mechanical traps",
+            "action": "set_damage_cap",
+            "value": "d8",
+            "description": "Improvised mechanical traps built in one turn now deal up to d8 damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises all traps by one grade and strengthens improvised constructions.",
+        "effects": [
+          {
+            "target": "All traps used by the user",
+            "action": "increase_grade",
+            "value": "one grade",
+            "description": "All of the Master's traps are treated as one grade higher, and master-tier traps allow two checks for their effects."
+          },
+          {
+            "target": "Improvised traps",
+            "action": "set_damage_cap",
+            "value": "d10",
+            "description": "Improvised traps built in one turn deal up to d10 damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "beast-sense",
+    "name": "Beast Sense",
+    "category": "ability",
+    "description": "Tracker and biological knowledge of humans, beasts, and monsters.",
+    "tags": ["knowledge", "tracking", "damage", "support", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows identifying weaknesses and traits of living creatures at a glance.",
+        "effects": [
+          {
+            "target": "Observed creature",
+            "action": "identify_traits",
+            "value": "special abilities and weaknesses",
+            "description": "Cunning check to understand the special abilities, traits, and physical weaknesses of a person or animal at a glance."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows choosing a favored prey category and sharing knowledge about it with allies.",
+        "effects": [
+          {
+            "target": "Chosen creature category",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Choose a creature category; every hit against its members deals +d4 more damage."
+          },
+          {
+            "target": "Allies",
+            "action": "share_information",
+            "value": "with preparation time",
+            "description": "If there is time to explain, the Adept can share this knowledge with companions."
+          }
+        ]
+      },
+      "master": {
+        "description": "Increases damage against the chosen creature category.",
+        "effects": [
+          {
+            "target": "Chosen creature category",
+            "action": "modify_value",
+            "value": "+d6 instead of +d4",
+            "description": "The additional damage against the chosen creature category is now +d6."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tactics",
+    "name": "Tactics",
+    "category": "ability",
+    "description": "Combat calculus that replaces speed and precision with cold situational understanding.",
+    "tags": [
+      "utility",
+      "attribute-swap",
+      "initiative",
+      "defense",
+      "weapons",
+      "cunning"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts initiative to Cunning.",
+        "effects": [
+          {
+            "target": "Initiative",
+            "action": "change_base_attribute",
+            "value": "Cunning instead of Quick",
+            "description": "Use Cunning instead of Quick to determine initiative."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Shifts the Defense calculation to Cunning.",
+        "effects": [
+          {
+            "target": "Defense",
+            "action": "change_base_attribute",
+            "value": "Cunning instead of Quick",
+            "description": "Use Cunning instead of Quick to determine your Defense."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows relying on calculation for hit chance with almost any weapon except heavy ones.",
+        "effects": [
+          {
+            "target": "Hit chance with non-heavy weapons",
+            "action": "change_base_attribute",
+            "value": "Cunning instead of Accurate",
+            "description": "Use Cunning instead of Accurate to calculate hit chance with any weapon except heavy ones."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "medic",
+    "name": "Medic",
+    "category": "ability",
+    "description": "Field medicine, surgery, and knowledge of the body for both healing and harm.",
+    "tags": ["healing", "support", "knowledge", "damage", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Provides basic healing without supplies and improves it with medicine.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "restore_health",
+            "value": "d4 by surgery or d6 with remedies",
+            "description": "Cunning check to heal a patient for d4 Toughness with surgery alone, or d6 with remedies."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Raises healing caps and adds damage from anatomical knowledge.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "increase_healing_cap",
+            "value": "d6 by surgery, d8 with remedies",
+            "description": "Healing without supplies is capped at d6, and with remedies at d8."
+          },
+          {
+            "target": "Weapon damage dealt by the user",
+            "action": "grant_bonus",
+            "value": "+d2",
+            "description": "Knowledge of the human body permanently increases damage with any weapon by +d2."
+          }
+        ]
+      },
+      "master": {
+        "description": "Further raises healing caps and preserves some effect even on failure.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "increase_healing_cap",
+            "value": "d8 by surgery, d10 with remedies",
+            "description": "Healing without supplies is capped at d8, and with remedies at d10."
+          },
+          {
+            "target": "Failed treatment attempts",
+            "action": "grant_partial_effect",
+            "value": "d4 or d6 healing",
+            "description": "Even failed treatment attempts still restore d4 or d6 damage to the patient."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "erudite",
+    "name": "Erudite",
+    "category": "ability",
+    "description": "Knowledge of languages, history, and artifacts that helps understand and use the world's heritage.",
+    "tags": ["knowledge", "artifacts", "magic", "utility", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows identifying artifacts and reading old human languages.",
+        "effects": [
+          {
+            "target": "Artifacts",
+            "action": "identify_qualities",
+            "value": "quality and hidden traits",
+            "description": "Cunning check to identify an artifact's quality and hidden qualities without testing it on yourself."
+          },
+          {
+            "target": "Rare or old human languages",
+            "action": "enable_fluent_use",
+            "value": "reading and speech",
+            "description": "Cunning check to read and speak rare or old human languages fluently; simple phrases require no check."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows activating foreign artifacts and speaking elven and demonic languages fluently.",
+        "effects": [
+          {
+            "target": "Artifact activation",
+            "action": "change_base_attribute",
+            "value": "Cunning instead of the original attribute",
+            "description": "Cunning check to activate any artifact instead of the attribute originally required."
+          },
+          {
+            "target": "Elf and demon languages",
+            "action": "enable_fluent_use",
+            "value": "reading and speech",
+            "description": "Cunning check to speak and read elven and demonic languages fluently; simple phrases require no check."
+          }
+        ]
+      },
+      "master": {
+        "description": "Makes Cunning the key to defending against magic, activating scrolls, and reading ancient non-human languages.",
+        "effects": [
+          {
+            "target": "Defense against spells",
+            "action": "change_base_attribute",
+            "value": "Cunning instead of Resolute",
+            "description": "Use Cunning instead of Resolute to defend against foreign spells."
+          },
+          {
+            "target": "Spell scrolls, tablets and extinct non-human languages",
+            "action": "unlock_usage",
+            "value": "activation and fluent use",
+            "description": "Allows activating spells from scrolls and tablets, and reading and speaking extinct and archaic non-human languages fluently."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "naval-warfare-and-artillery",
+    "name": "Naval Warfare and Artillery",
+    "category": "ability",
+    "description": "Operation and organization of cannons, siege engines, and alchemical military equipment.",
+    "tags": ["artillery", "utility", "crafting", "grenades", "ranged"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks work with light artillery and field fortifications.",
+        "effects": [
+          {
+            "target": "Swivels, broadside artillery and fortifications",
+            "action": "unlock_usage",
+            "value": "basic military hardware",
+            "description": "The Novice can use swivel guns, broadside artillery, and construct defensive structures and barricades."
+          },
+          {
+            "target": "Alchemical grenades",
+            "action": "prevent_catastrophe",
+            "value": "self",
+            "description": "The character no longer suffers catastrophes when using alchemical grenades."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Unlocks heavy guns, siege engines, and special ammunition.",
+        "effects": [
+          {
+            "target": "Cannons, mortars, catapults, forts and ships",
+            "action": "unlock_usage",
+            "value": "advanced military hardware",
+            "description": "The Adept can use and organize the construction of cannons, mortars, and catapults, and identify weak points in forts and ships."
+          },
+          {
+            "target": "Special military ammunition",
+            "action": "unlock_usage",
+            "value": "smoke screens, breach rounds, fire tubes, portable bombards, culverins",
+            "description": "Unlocks the use of smoke screens, breach rounds, fire tubes, portable bombards, and culverins without catastrophe risk."
+          }
+        ]
+      },
+      "master": {
+        "description": "Increases the destructive potential of all siege weapons used.",
+        "effects": [
+          {
+            "target": "Military weapons used by the user",
+            "action": "grant_quality",
+            "value": "massive if absent",
+            "description": "All siege weapons used by the Master gain the massive quality if they lacked it."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blacksmith",
+    "name": "Blacksmith",
+    "category": "ability",
+    "description": "Crafting, repairing, and modifying weapons, armor, and ammunition.",
+    "tags": ["crafting", "weapons", "armor", "equipment", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows making simple weapons and ammunition, and fitting or repairing armor.",
+        "effects": [
+          {
+            "target": "Simple ammunition and weapons",
+            "action": "unlock_crafting",
+            "value": "simple ammo, polearms, short weapons, simple weapons",
+            "description": "Cunning check to craft simple ammunition, polearms, short weapons, and other simple weapons without special modifiers."
+          },
+          {
+            "target": "Armor fit and repair",
+            "action": "unlock_crafting",
+            "value": "fit and patch armor",
+            "description": "Also allows fitting armor to a body type and patching damage."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Unlocks nearly any non-mystical weapon and items with one extra quality.",
+        "effects": [
+          {
+            "target": "Non-mystical weapons and equipment",
+            "action": "unlock_crafting",
+            "value": "any non-mystical item with one extra quality",
+            "description": "Cunning check to craft any non-mystical item with one extra quality of any complexity."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows removing negatives, adding multiple positive qualities, and working with mystical traits.",
+        "effects": [
+          {
+            "target": "Crafted or modified items",
+            "action": "remove_negative_or_add_positive_qualities",
+            "value": "unlimited positive qualities",
+            "description": "Cunning check to remove negative qualities from an item or craft an item with any number of positive qualities."
+          },
+          {
+            "target": "Mystical equipment",
+            "action": "unlock_crafting",
+            "value": "mystical qualities and demigod hands",
+            "description": "The Master can add mystical qualities to items and produce demiurge hands."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute",
+    "name": "Exceptional Attribute",
+    "category": "ability",
+    "description": "Continuous training that breaks the normal cap of one chosen attribute.",
+    "tags": ["attribute-swap", "advancement", "scaling"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Raises one chosen attribute by one point.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 1,
+            "description": "One attribute may be raised by one point."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Brings the total increase of the chosen attribute to two points.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 2,
+            "description": "Same one attribute may be raised by a total of two points."
+          }
+        ]
+      },
+      "master": {
+        "description": "Brings the total increase of the chosen attribute to three points.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 3,
+            "description": "Same one attribute may be raised by a total of three points."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "sixth-sense",
+    "name": "Sixth Sense",
+    "category": "ability",
+    "description": "Intuitive shooting and orientation without relying on normal vision.",
+    "tags": [
+      "ranged",
+      "perception",
+      "defense",
+      "attribute-swap",
+      "initiative",
+      "vigilant"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts ranged combat accuracy to Vigilant.",
+        "effects": [
+          {
+            "target": "Ranged attack chance",
+            "action": "change_base_attribute",
+            "value": "Vigilant instead of Accurate",
+            "description": "Use Vigilant instead of Accurate to calculate ranged weapon hit chance."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Shifts initiative and Defense to Vigilant.",
+        "effects": [
+          {
+            "target": "Initiative and Defense",
+            "action": "change_base_attribute",
+            "value": "Vigilant instead of Quick",
+            "description": "Use Vigilant instead of Quick to calculate initiative and Defense."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows maintaining full effectiveness in darkness and while blinded.",
+        "effects": [
+          {
+            "target": "Ability use while blinded or in darkness",
+            "action": "ignore_condition",
+            "value": "darkness and blindness",
+            "description": "Darkness or blindness does not affect the Master's abilities."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "witchcraft",
+    "name": "Witchcraft",
+    "category": "ability",
+    "description": "A third eye that lets you see the Shadows, hidden magic, and the true nature of things.",
+    "tags": ["magic", "perception", "shadows", "corruption", "vigilant"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows seeing the dominant aspect of a target's true nature at the cost of one temporary Corruption.",
+        "effects": [
+          {
+            "target": "Object, place or creature",
+            "action": "reveal_true_aspect",
+            "value": "1 temporary corruption",
+            "description": "Vigilant check to see the dominant aspect of the true nature of an object, place, or creature, at the cost of one temporary Corruption."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Reveals all aspects of a target's Shadow at the cost of d4 temporary Corruption.",
+        "effects": [
+          {
+            "target": "Object, place or creature",
+            "action": "reveal_all_aspects",
+            "value": "d4 temporary corruption",
+            "description": "The Adept can see all Shadow aspects of objects, places, and creatures, at the cost of d4 temporary Corruption."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows clearly seeing the Shadows and the powers linked to them at the cost of d6 temporary Corruption.",
+        "effects": [
+          {
+            "target": "Shadows and linked powers",
+            "action": "reveal_magic_structure",
+            "value": "d6 temporary corruption",
+            "description": "The Master can clearly see the Shadows of all things and the powers and abilities tied to them, spending d6 temporary Corruption."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "marksmanship",
+    "name": "Marksmanship",
+    "category": "ability",
+    "description": "Pure specialization in damage and penetrating power with ranged weapons.",
+    "tags": [
+      "ranged",
+      "damage",
+      "firearms",
+      "bows",
+      "armor-piercing",
+      "accurate"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Raises the base damage of the main ranged weapon archetypes.",
+        "effects": [
+          {
+            "target": "Revolvers, bows and rifles",
+            "action": "increase_damage",
+            "value": "revolver d8, bow and revolver d10, rifle d12",
+            "description": "Revolver damage increases to d8, bows and revolvers to d10, and rifles to d12."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Adds a crippling shot that can pin the target in place.",
+        "effects": [
+          {
+            "target": "Enemy hit by ranged attack",
+            "action": "pin_on_check",
+            "value": "until failure",
+            "description": "Accurate check to have a shot pin the enemy to the spot and hold them there until the marksman fails a check."
+          }
+        ]
+      },
+      "master": {
+        "description": "Makes all shots armor-piercing.",
+        "effects": [
+          {
+            "target": "Ranged weapon attacks",
+            "action": "ignore_armor",
+            "value": true,
+            "description": "The Master's shots ignore armor."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hunter-instinct",
+    "name": "Hunter's Instinct",
+    "category": "ability",
+    "description": "Specialization against one quarry, leaving them little chance to escape alive.",
+    "tags": [
+      "ranged",
+      "tracking",
+      "damage",
+      "reaction",
+      "damage",
+      "extra-attack"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows marking one target and rerolling failed ranged attacks against them.",
+        "effects": [
+          {
+            "target": "One chosen target",
+            "action": "reroll_failed_checks",
+            "value": "all ranged attacks",
+            "description": "Mark up to one target; all failed ranged attack checks against them may be rerolled until the fight ends or the target dies."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Increases damage against the marked target.",
+        "effects": [
+          {
+            "target": "Chosen target",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "All attacks against the chosen target deal +d4 more damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Punishes any movement by the marked target with free ranged attacks.",
+        "effects": [
+          {
+            "target": "Chosen target movement",
+            "action": "trigger_free_attack",
+            "value": "one attack, two on escape",
+            "description": "Any attempt by the target to move triggers a free ranged attack; an escape attempt triggers two."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "skirmish",
+    "name": "Skirmish",
+    "category": "ability",
+    "description": "The art of making ranged weapons dangerous even at close range.",
+    "tags": [
+      "ranged",
+      "melee",
+      "reaction",
+      "counterattack",
+      "weapons",
+      "extra-attack"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows responding to a melee hit with a jab from an arrow, bayonet, or barrel.",
+        "effects": [
+          {
+            "target": "Enemy making a melee attack against the user",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "You can respond to a melee attack against you with a strike from an arrow, bayonet, or revolver barrel for d6 damage, including ammunition effects."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Increases ranged weapon damage when used in melee.",
+        "effects": [
+          {
+            "target": "Ranged weapons used in melee",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Ranged weapon damage in melee increases to d8."
+          }
+        ]
+      },
+      "master": {
+        "description": "After a successful ranged strike, allows immediately following up with a second free shot.",
+        "effects": [
+          {
+            "target": "Successful arrow attack",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "After a successful arrow attack, the Master may immediately make one more free shot at the enemy in the same reaction."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "trick-shooting",
+    "name": "Trick Shooting",
+    "category": "ability",
+    "description": "Precise shot control for disarming, blinding, and other spectacular techniques.",
+    "tags": ["ranged", "control", "reaction", "utility", "accurate"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows sacrificing the attack and movement for a precision shot with a powerful secondary effect.",
+        "effects": [
+          {
+            "target": "Precision shot target",
+            "action": "apply_called_shot",
+            "value": "disarm, blind, pin or similar",
+            "description": "You may sacrifice your attack and Movement to perform a precision shot: disarm, blind, pin, or similar effect."
+          },
+          {
+            "target": "Target hit by trick shot",
+            "action": "remove_next_action",
+            "value": 1,
+            "description": "A normal attack alongside such a shot causes the target to lose their next action on hit while they deal with the new problem."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows hitting by ricochet without direct line of sight against a predictably moving target.",
+        "effects": [
+          {
+            "target": "Target without direct line of sight",
+            "action": "ignore_line_of_sight_conditionally",
+            "value": "if target stayed still or moved normally last turn",
+            "description": "Direct line of sight is no longer needed if the target did not move or moved normally last turn: arrows and bullets can ricochet and still find them."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows parrying attacks against yourself and allies using a ranged weapon.",
+        "effects": [
+          {
+            "target": "Incoming melee or ranged attack",
+            "action": "parry_on_check",
+            "value": "Accurate",
+            "description": "Accurate check to parry with a ranged weapon against a melee attack targeting an ally, or a ranged attack against yourself or an ally; a successful parry negates the damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "suppressive-fire",
+    "name": "Suppressive Fire",
+    "category": "ability",
+    "description": "A technique for firing multiple arrows or shots in a single turn.",
+    "tags": ["ranged", "extra-attack", "bows", "firearms", "reload"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows trading movement for a second shot and quickly reloading firearms.",
+        "effects": [
+          {
+            "target": "Bow attacks this turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "By sacrificing movement, you may fire two arrows instead of one — at the same target or different ones."
+          },
+          {
+            "target": "Firearm reloads",
+            "action": "allow_free_action",
+            "value": "reload",
+            "description": "Firearms can be reloaded as a free action."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Removes the movement cost from the second arrow and transfers it to the second firearm shot.",
+        "effects": [
+          {
+            "target": "Bow and firearm attacks this turn",
+            "action": "grant_extra_attack",
+            "value": "two bow shots without movement loss or two firearm shots with movement cost",
+            "description": "The Adept can fire two bow shots without sacrificing movement, or two firearm shots at the cost of movement."
+          }
+        ]
+      },
+      "master": {
+        "description": "Brings the volley of arrows or shots up to three per turn.",
+        "effects": [
+          {
+            "target": "Bow and firearm attacks this turn",
+            "action": "increase_attack_count",
+            "value": "three bow shots without movement loss or three firearm shots with movement cost",
+            "description": "The Master can fire three bow shots without spending movement, or three firearm shots at the cost of movement."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "steel-throw",
+    "name": "Steel Throw",
+    "category": "ability",
+    "description": "Mastery of thrown weapons and turning almost any object into a projectile.",
+    "tags": ["thrown", "extra-attack", "damage", "weapons", "flexibility"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Increases the damage of thrown weapons.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Thrown weapon damage increased to d8."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows throwing twice in one attack and effectively throwing standard melee weapons.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Any thrown weapon attack allows two throws at the same or different targets."
+          },
+          {
+            "target": "Melee weapons",
+            "action": "allow_thrown_use",
+            "value": "any melee weapon",
+            "description": "The Adept can also effectively throw any melee weapon."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns a single thrown weapon attack into a triple volley.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "increase_attack_count",
+            "value": 3,
+            "description": "Any thrown weapon attack allows three consecutive throws at the same or different targets."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "cloak-dance",
+    "name": "Cloak Dance",
+    "category": "ability",
+    "description": "A dueling technique using a cloak or other fabric as an active defensive tool.",
+    "tags": ["defense", "cloak", "control", "extra-attack", "entangling"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "A simple cloth in the free hand raises Defense.",
+        "effects": [
+          {
+            "target": "Defense while holding cloth in off-hand",
+            "action": "grant_bonus",
+            "value": 1,
+            "description": "A simple piece of cloth in the off-hand raises Defense by one."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows blinding an enemy with the cloth and immediately continuing the attack.",
+        "effects": [
+          {
+            "target": "Enemy adjacent to the user",
+            "action": "blind_without_damage",
+            "value": "until next turn",
+            "description": "The Adept may attempt to blind an adjacent enemy with the cloth; on success, the target is blinded until the start of the next turn."
+          },
+          {
+            "target": "User after successful blind",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "A successful blind grants an immediate second free attack."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns the cloth into a full entangling weapon.",
+        "effects": [
+          {
+            "target": "Cloth used in off-hand",
+            "action": "grant_quality",
+            "value": "entangling",
+            "description": "The cloth in the Master's hand gains the entangling weapon quality."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blessed-swordsman",
+    "name": "Blessed Swordsman",
+    "category": "ability",
+    "description": "The highest technique of the balanced sword, focused on counterattacks and pure dueling.",
+    "tags": [
+      "weapons",
+      "dueling",
+      "damage",
+      "reaction",
+      "extra-attack",
+      "counterattack"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Raises main-hand weapon damage when in a dueling stance.",
+        "effects": [
+          {
+            "target": "Main-hand balanced sword damage",
+            "action": "increase_damage",
+            "value": "d10",
+            "description": "Main-hand weapon damage increases to d10."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows responding with one free attack per turn after a successful Defense.",
+        "effects": [
+          {
+            "target": "Successful Defense check",
+            "action": "grant_counterattack",
+            "value": "once per turn",
+            "description": "After a successful Defense check, the Adept may make one free attack as a reaction."
+          }
+        ]
+      },
+      "master": {
+        "description": "Further increases damage and removes the limit on counterattacks after a successful Defense.",
+        "effects": [
+          {
+            "target": "Main-hand balanced sword damage",
+            "action": "increase_damage",
+            "value": "d12",
+            "description": "Main-hand weapon damage increases to d12."
+          },
+          {
+            "target": "Successful Defense checks",
+            "action": "remove_limit",
+            "value": "counterattacks",
+            "description": "The Master can make unlimited counterattacks after each successful Defense check."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "at-the-top",
+    "name": "At the Top",
+    "category": "ability",
+    "description": "A combat heel technique that combines kicks and strikes into one rhythm.",
+    "tags": [
+      "equipment",
+      "melee",
+      "extra-attack",
+      "weapons",
+      "dueling",
+      "battle-heels"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Enhances combat heels and removes their unwieldy quality.",
+        "effects": [
+          {
+            "target": "Battle heels",
+            "action": "grant_bonus",
+            "value": "+d2 damage",
+            "description": "Battle heels deal +d2 more damage."
+          },
+          {
+            "target": "Battle heels",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "Battle heels lose the unwieldy quality."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows adding a free heel kick to other weapon attacks once per turn.",
+        "effects": [
+          {
+            "target": "Combat heel attack on current turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Once per turn you may make a free combat heel attack, provided no normal heel attack was made this turn."
+          }
+        ]
+      },
+      "master": {
+        "description": "Gives combat heels the long quality for interactions.",
+        "effects": [
+          {
+            "target": "Battle heels",
+            "action": "grant_quality",
+            "value": "long",
+            "description": "The Master's combat heels gain the long quality in addition to their existing qualities."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "entanglement",
+    "name": "Entanglement",
+    "category": "ability",
+    "description": "Mastery of nets, bolas, whips, and other weapons that first bind, then choke.",
+    "tags": ["entangling", "control", "melee", "knockdown", "armor-piercing"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows rerolling failed entangle attempts.",
+        "effects": [
+          {
+            "target": "Failed entangle attempts",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Novice may reroll any failed attempt to entangle an enemy."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows achieving knockdowns just as reliably.",
+        "effects": [
+          {
+            "target": "Failed knockdown attempts",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Adept may reroll any failed attempt to knock an enemy prone."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns every successful entangling weapon hit into a choking throat strike.",
+        "effects": [
+          {
+            "target": "Successful entangling weapon attacks",
+            "action": "add_damage_and_status",
+            "value": "d6 armor-ignoring, suffocating",
+            "description": "Every successful entangling weapon attack gains a suffocating effect and deals d6 armor-ignoring damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "composite-weapon-mastery",
+    "name": "Composite Weapon Mastery",
+    "category": "ability",
+    "description": "The art of wielding flails, chain swords, and other composite weapons.",
+    "tags": ["weapons", "entangling", "extra-attack", "damage", "reach"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Grants composite weapons the entangling quality.",
+        "effects": [
+          {
+            "target": "Composite weapons",
+            "action": "grant_quality",
+            "value": "entangling",
+            "description": "All composite weapons gain the entangling quality in addition to their existing qualities."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Increases the secondary damage of composite weapon hits.",
+        "effects": [
+          {
+            "target": "Secondary damage from composite weapons",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Secondary damage from composite weapon hits increases to d8."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows striking all adjacent enemies with a sweeping blow.",
+        "effects": [
+          {
+            "target": "All adjacent enemies",
+            "action": "attack_all_targets",
+            "value": "one attack each turn",
+            "description": "The Master can attack all surrounding enemies each turn: one attack per enemy."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "axe-patterns",
+    "name": "Axe Patterns",
+    "category": "ability",
+    "description": "Specialization in axes combining stunning exchanges and powerful cleaving strikes.",
+    "tags": ["weapons", "melee", "extra-attack", "stun", "damage"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks a combo attack: a blunt side strike followed by a normal attack.",
+        "effects": [
+          {
+            "target": "Axe combo attack",
+            "action": "unlock_combo",
+            "value": "d6 blunt hit into normal attack",
+            "description": "The Novice can first hit with the blunt side of the axe for d6 to shock and stun, then immediately follow up with a normal attack on success."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows making two attacks per turn at the cost of reduced damage.",
+        "effects": [
+          {
+            "target": "Axe attacks this turn",
+            "action": "grant_extra_attack",
+            "value": "two attacks, -d2 damage",
+            "description": "The Adept can make two attacks per turn, but damage is reduced by -d2."
+          }
+        ]
+      },
+      "master": {
+        "description": "Enhances every single strike per action.",
+        "effects": [
+          {
+            "target": "Single attack per action",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Any single attack per action deals +d4 more damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "polearm",
+    "name": "Polearm",
+    "category": "ability",
+    "description": "Classic mastery of long weapons that control range and enemy movement.",
+    "tags": [
+      "polearm",
+      "reach",
+      "reaction",
+      "damage",
+      "control",
+      "extra-attack",
+      "melee"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Increases the damage of spears, halberds, staffs, and any long weapon.",
+        "effects": [
+          {
+            "target": "Long weapons",
+            "action": "increase_damage",
+            "value": "spears and halberds d10, staffs d8, all long weapons +d2",
+            "description": "Spears and halberds deal d10, staffs d8, and all long weapons gain +d2 damage."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows greeting any approach or retreat with a free attack against enemies without long weapons.",
+        "effects": [
+          {
+            "target": "Enemy approaching or leaving melee",
+            "action": "trigger_free_attack",
+            "value": "as reaction unless enemy also has long weapon",
+            "description": "The Adept can make a free attack against anyone who approaches or retreats, as long as they are not also armed with a long weapon."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns free attacks with a long weapon into a hard movement stop.",
+        "effects": [
+          {
+            "target": "Enemy hit by free attack from long weapon",
+            "action": "stop_movement",
+            "value": "immediate",
+            "description": "Any free attack by the Master instantly stops the enemy's movement, even if the hit does not pierce armor."
+          },
+          {
+            "target": "Enemy trying to approach or retreat",
+            "action": "lock_distance_while_successful",
+            "value": "cannot approach or withdraw",
+            "description": "As long as the Master continues to successfully meet such movements, the enemy can neither approach nor withdraw without permission."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "staff-mastery",
+    "name": "Staff Mastery",
+    "category": "ability",
+    "description": "A variant of long weapon mastery that makes the staff simultaneously a defense, a lever, and a striking tool.",
+    "tags": [
+      "polearm",
+      "defense",
+      "reaction",
+      "extra-attack",
+      "knockdown",
+      "accurate"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Raises Defense with long weapons, and especially with the staff.",
+        "effects": [
+          {
+            "target": "Defense with long weapons",
+            "action": "grant_bonus",
+            "value": "+1 with long weapons, +2 with staff",
+            "description": "Defense increases by one with long weapons and by two with the staff."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows responding with the staff's other end after a blocked attack, and counterattacking after a successful Defense.",
+        "effects": [
+          {
+            "target": "Blocked first attack with long weapon",
+            "action": "grant_extra_attack",
+            "value": "d6 with other end",
+            "description": "If the first attack was blocked, the Adept may make a free attack with the other end of the long weapon for up to d6 damage."
+          },
+          {
+            "target": "Successful Defense check",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "After a successful Defense check, the Adept may make a reactive free attack with the staff for d6 damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows knocking the enemy down after a hit and immediately following up with an advantage attack.",
+        "effects": [
+          {
+            "target": "Enemy hit by staff",
+            "action": "knock_down_on_check",
+            "value": "follow-up d6 with advantage",
+            "description": "Accurate check to knock the enemy prone after a successful attack and immediately make a free follow-up attack for d6 with advantage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "double-strike",
+    "name": "Double Strike",
+    "category": "ability",
+    "description": "A combat style with two blades or other weapons in both hands.",
+    "tags": ["off-hand", "extra-attack", "short-weapon", "melee", "defense"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks the basic dual-wield scheme and a Defense bonus from the off-hand.",
+        "effects": [
+          {
+            "target": "Dual wield attack routine",
+            "action": "unlock_style",
+            "value": "main-hand any melee d8, off-hand short melee d6",
+            "description": "You can use any melee weapon in the main hand and a short weapon in the off-hand, making two attacks per turn against one target: d8 and d6."
+          },
+          {
+            "target": "Defense with off-hand weapon",
+            "action": "grant_bonus",
+            "value": 1,
+            "description": "If you hold a weapon in the off-hand, Defense increases by one."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Removes the short weapon restriction from the off-hand.",
+        "effects": [
+          {
+            "target": "Dual wield loadout",
+            "action": "expand_allowed_weapons",
+            "value": "two melee weapons up to d8 each",
+            "description": "The Adept can use two melee weapons, even if they are not short, each dealing up to d8 damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises the damage ceiling for the main-hand weapon.",
+        "effects": [
+          {
+            "target": "Main-hand weapon damage",
+            "action": "increase_damage",
+            "value": "d10",
+            "description": "The main-hand weapon can deal up to d10 damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "iron-body",
+    "name": "Iron Body",
+    "category": "ability",
+    "description": "Raw physical power that replaces precision and increases melee damage.",
+    "tags": ["strong", "melee", "attribute-swap", "damage"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts melee hit chance to Strong.",
+        "effects": [
+          {
+            "target": "Melee attack chance",
+            "action": "change_base_attribute",
+            "value": "Strong instead of Accurate",
+            "description": "Use Strong instead of Accurate to calculate melee weapon hit chance."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Enhances all melee weapon strikes.",
+        "effects": [
+          {
+            "target": "Melee weapon attacks",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "All melee weapon attacks deal d4 more damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows replacing the normal bonus with an exceptionally powerful strike once per turn.",
+        "effects": [
+          {
+            "target": "One melee attack each turn",
+            "action": "modify_value",
+            "value": "+d8 instead of +d4",
+            "description": "Once per turn the Master can deal +d8 damage instead of the usual +d4."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "behemoth",
+    "name": "Behemoth",
+    "category": "ability",
+    "description": "Specialization in heavy two-handed weapons and their momentum.",
+    "tags": ["weapons", "damage", "armor-piercing"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Raises heavy two-handed weapon damage to d12.",
+        "effects": [
+          {
+            "target": "Heavy two-handed weapons",
+            "action": "increase_damage",
+            "value": "d12",
+            "description": "Heavy two-handed weapons can deal up to d12 damage."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows using the reverse momentum of a miss to still hit the target.",
+        "effects": [
+          {
+            "target": "Missed heavy two-handed attack",
+            "action": "convert_miss_to_hit",
+            "value": "d8 max damage",
+            "description": "If an attack missed, the Adept can use the returning momentum of the swing to still hit the target for up to d8 damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Makes heavy two-handed strikes armor-piercing.",
+        "effects": [
+          {
+            "target": "Heavy two-handed attacks",
+            "action": "ignore_armor",
+            "value": true,
+            "description": "Heavy two-handed weapon attacks ignore armor."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shields",
+    "name": "Shields",
+    "category": "ability",
+    "description": "A combat style in which the shield becomes not just defense but also a striking weapon.",
+    "tags": ["shield", "defense", "melee", "knockdown", "off-hand"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Enhances the shield and one-handed weapon combination and significantly raises Defense.",
+        "effects": [
+          {
+            "target": "Main-hand one-handed weapons",
+            "action": "increase_damage",
+            "value": "one-handed swords d10, short one-handed d8",
+            "description": "One-handed swords in the main hand deal up to d10, short one-handed weapons up to d8."
+          },
+          {
+            "target": "Defense while using shield",
+            "action": "grant_bonus",
+            "value": 2,
+            "description": "Shields raise Defense by two."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows following up every successful hit with a shield strike that may knock the enemy prone.",
+        "effects": [
+          {
+            "target": "Successful main-hand attack",
+            "action": "grant_extra_attack",
+            "value": "shield strike d4",
+            "description": "Every successful main-hand weapon attack can be followed by a shield strike that deals d4 damage on success."
+          },
+          {
+            "target": "Enemy hit by shield strike",
+            "action": "knock_down_on_check",
+            "value": "Strong",
+            "description": "Strong check to determine whether the shield strike also knocks the enemy prone."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises shield strike damage to a full offensive value.",
+        "effects": [
+          {
+            "target": "Shield strikes",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "A shield strike deals up to d8 damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "unarmed-combat",
+    "name": "Unarmed Combat",
+    "category": "ability",
+    "description": "A complete combat art using bare hands, claws, and any natural body weapon.",
+    "tags": ["weapons", "extra-attack", "damage", "melee"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Makes unarmed strikes dangerous and enhances innate natural weapons.",
+        "effects": [
+          {
+            "target": "Unarmed attacks",
+            "action": "increase_damage",
+            "value": "d6",
+            "description": "Unarmed attacks deal d6 damage."
+          },
+          {
+            "target": "Natural weapon traits",
+            "action": "grant_bonus",
+            "value": "+d2 effectiveness",
+            "description": "If the body already has a natural weapon, its effectiveness increases by +d2."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows making two unarmed attacks instead of one.",
+        "effects": [
+          {
+            "target": "Unarmed attacks this turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "The Adept of Unarmed Combat can make two attacks instead of one."
+          }
+        ]
+      },
+      "master": {
+        "description": "Adds painful strikes targeting the most vulnerable spots.",
+        "effects": [
+          {
+            "target": "Unarmed attacks",
+            "action": "grant_bonus",
+            "value": "+d6 damage",
+            "description": "Every Master attack deals an additional d6 damage by targeting the least protected areas of the body."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wrestling",
+    "name": "Wrestling",
+    "category": "ability",
+    "description": "Controlling the enemy's body through grapples, throws, and choking holds without magic.",
+    "tags": [
+      "grapple",
+      "thrown",
+      "control",
+      "reaction",
+      "armor-piercing",
+      "quick",
+      "strong"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "After any successful attack, unlocks a grapple with a choice between throwing and holding.",
+        "effects": [
+          {
+            "target": "Enemy hit by the user",
+            "action": "unlock_grapple_followup",
+            "value": "throw or hold",
+            "description": "Any successful attack unlocks a grapple: Strong check to throw the enemy for d4 armor-ignoring damage and knock them prone, or hold them without damage, preventing movement and actions."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows counter-grappling after a successful Defense and Quick check.",
+        "effects": [
+          {
+            "target": "Enemy attacking the user",
+            "action": "counter_grapple_on_checks",
+            "value": "Defense plus Quick, d4 damage and interrupt",
+            "description": "On successful Defense and Quick checks, the Adept may react by counter-grappling, throwing the enemy prone, dealing d4 damage, and interrupting their turn."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows preempting an attack with a grapple via a Quick check and immediately following up on the fallen target.",
+        "effects": [
+          {
+            "target": "Incoming attack against the user",
+            "action": "replace_defense_with_speed_check",
+            "value": "auto-throw on success",
+            "description": "The Master may replace a Defense check with a Quick check; success automatically throws the enemy prone, deals d6 damage, and interrupts their turn."
+          },
+          {
+            "target": "Prone enemy thrown by the user",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "After a successful preemptive throw, the Master may make a free attack against the fallen enemy."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "berserk",
+    "name": "Berserk",
+    "category": "ability",
+    "description": "Deliberate battle-rage that sacrifices Defense for devastating melee attacks.",
+    "tags": ["melee", "damage", "defense", "armor"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Provides a large melee damage boost at the cost of a sharp Defense penalty.",
+        "effects": [
+          {
+            "target": "Melee attacks while enraged",
+            "action": "grant_bonus",
+            "value": "+d6 damage",
+            "description": "Rage allows dealing +d6 more damage in melee."
+          },
+          {
+            "target": "Defense while enraged",
+            "action": "set_value",
+            "value": 5,
+            "description": "While this effect is active, Defense drops to 5."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Turns rage into a layer of armor and reduces all incoming damage.",
+        "effects": [
+          {
+            "target": "Incoming attacks",
+            "action": "reduce_damage",
+            "value": "d4",
+            "description": "The Adept takes d4 less damage from all attacks."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the Defense penalty while keeping all other rage bonuses.",
+        "effects": [
+          {
+            "target": "Defense while enraged",
+            "action": "remove_penalty",
+            "value": "defense reduction",
+            "description": "Rage no longer affects the Defense score while preserving the ability's other bonuses."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "recovery",
+    "name": "Recovery",
+    "category": "ability",
+    "description": "Meditative self-healing that allows getting back on your feet even in combat.",
+    "tags": ["healing", "resolute", "reaction", "survival"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows restoring d4 Toughness once per day, retrying until success.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "restore_health_on_check",
+            "value": "d4 once per day",
+            "description": "Resolute check to restore d4 Toughness once per day; you may retry once per turn as an action until success."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Raises the single-use self-healing cap to d6.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "increase_healing_cap",
+            "value": "d6 once per day",
+            "description": "The Recovery Adept can restore up to d6 Toughness once per day."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises the healing cap to d8 and allows triggering as a reaction to fresh wounds.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "increase_healing_cap",
+            "value": "d8 once per day",
+            "description": "The Master can restore up to d8 Toughness once per day."
+          },
+          {
+            "target": "Freshly received damage",
+            "action": "allow_reaction",
+            "value": "self-heal trigger",
+            "description": "This recovery can be triggered as a reaction to damage just received."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "feat-of-strength",
+    "name": "Feat of Strength",
+    "category": "ability",
+    "description": "Heroic might that makes the body more durable and dangerous without any magical cost.",
+    "tags": ["strong", "survival", "damage", "conditional", "strong"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts the Toughness calculation to Strong, without changing the pain threshold.",
+        "effects": [
+          {
+            "target": "Toughness",
+            "action": "change_formula",
+            "value": "Strong + 5",
+            "description": "The Novice's Toughness is calculated as Strong + 5, but the pain threshold does not increase."
+          }
+        ]
+      },
+      "adept": {
+        "description": "When at half Toughness, allows rerolling all failed Strong checks.",
+        "effects": [
+          {
+            "target": "Failed Strong checks at half Toughness",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "When Toughness is reduced to half, you may reroll all failed Strong checks, including Strong-based attacks."
+          }
+        ]
+      },
+      "master": {
+        "description": "When at half Toughness, adds bonus melee damage.",
+        "effects": [
+          {
+            "target": "Melee weapon attacks at half Toughness",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "When the Master's Toughness is reduced to half, all melee weapon attacks deal +d4 more damage."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bodyguard",
+    "name": "Bodyguard",
+    "category": "ability",
+    "description": "The art of shielding allies and immediately punishing those who strike them.",
+    "tags": [
+      "protection",
+      "support",
+      "reaction",
+      "defense",
+      "counterattack",
+      "resolute"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows intercepting even an attack the ally cannot defend against.",
+        "effects": [
+          {
+            "target": "Attack against an ally",
+            "action": "intercept_on_check",
+            "value": "resolute",
+            "description": "Resolute check to intercept an attack against an ally that they cannot defend against."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows defending effectively against all redirected hits.",
+        "effects": [
+          {
+            "target": "Reflected or intercepted attacks on behalf of an ally",
+            "action": "use_full_defense",
+            "value": "without restriction",
+            "description": "The Adept can defend effectively against all redirected attacks on an ally, using their full Defense without restriction."
+          }
+        ]
+      },
+      "master": {
+        "description": "Turns any attack on an ally into an opportunity for a free attack.",
+        "effects": [
+          {
+            "target": "Enemy attacking an ally",
+            "action": "trigger_free_attack",
+            "value": 1,
+            "description": "Any attack on an ally triggers a free attack against the attacker from the Master Bodyguard."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "soldier",
+    "name": "Soldier",
+    "category": "ability",
+    "description": "Professional armor mastery that makes it a second skin and a mystical foundation.",
+    "tags": ["armor", "defense", "mobility", "magic", "equipment", "quick"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Enhances any worn armor by one protection step.",
+        "effects": [
+          {
+            "target": "Worn armor",
+            "action": "increase_protection",
+            "value": "light d6, medium d8, heavy d10",
+            "description": "Any armor protects +d2 better: light grants d6 instead of d4, medium d8 instead of d6, heavy d10 instead of d8."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Removes physical armor restrictions that affect Defense and mobility.",
+        "effects": [
+          {
+            "target": "Armor movement and defense penalties",
+            "action": "remove_penalty",
+            "value": "physical armor restrictions",
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows resisting armor bypass and using mystical powers even in cumbersome armor.",
+        "effects": [
+          {
+            "target": "Armor bypass or armor piercing effects",
+            "action": "counter_on_check",
+            "value": "Quick",
+            "description": "Quick check to counter any armor-bypassing or armor-piercing effects."
+          },
+          {
+            "target": "Mystical power use in armor",
+            "action": "remove_penalty",
+            "value": "armor restrictions",
+            "description": "Mystical powers are no longer hindered by any worn armor, even the bulkiest."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fortitude",
+    "name": "Fortitude",
+    "category": "ability",
+    "description": "Mental discipline and will that protect against restraints and deflect weak psychic attacks.",
+    "tags": [
+      "resistance",
+      "resolute",
+      "strong",
+      "mental",
+      "reaction",
+      "armor-piercing"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows rerolling failed checks to break free from physical restraints.",
+        "effects": [
+          {
+            "target": "Failed Strong or Resolute checks against physical restraints",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Novice may reroll any failed Strong or Resolute check to break free from nets, traps, magical ice, and other restraining physical effects."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Extends the same reliability to non-physical mental effects.",
+        "effects": [
+          {
+            "target": "Failed Strong or Resolute checks against mental effects",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Adept may reroll any failed Strong or Resolute check against confusion, charm, domination, and other non-physical effects."
+          }
+        ]
+      },
+      "master": {
+        "description": "Punishes failed mental attacks with a blast of force.",
+        "effects": [
+          {
+            "target": "Attacker whose mental attack failed",
+            "action": "deal_damage",
+            "value": "d6 armor-ignoring",
+            "description": "Any failed mental attack against the Master triggers a d6 armor-ignoring damage reaction against the attacker."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-powers",
+    "name": "Mystical Powers",
+    "category": "ability",
+    "description": "The foundational ability to wield spells that increase permanent and temporary Corruption.",
+    "tags": ["magic", "spellcasting", "corruption", "tradition", "resolute"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks a novice-tier spell.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "novice",
+            "description": "Allows wielding a Novice-tier spell."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Unlocks an adept-tier spell.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "adept",
+            "description": "Allows wielding an Adept-tier spell."
+          }
+        ]
+      },
+      "master": {
+        "description": "Unlocks a master-tier spell.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "master",
+            "description": "Allows wielding a Master-tier spell."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-order",
+    "name": "Mystical Tradition: Order",
+    "category": "ability",
+    "description": "The academic Order tradition that lowers the cost of learning and using its own spells.",
+    "tags": [
+      "magic",
+      "tradition",
+      "mystical-tradition",
+      "mental",
+      "resolute",
+      "corruption"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes permanent Corruption from novice spells and rituals of the academic tradition.",
+        "effects": [
+          {
+            "target": "Academic novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Order Initiate gains no permanent Corruption when learning Novice-tier spells and rituals of the academic tradition."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Caps temporary Corruption from academic magic and removes the permanent cost of adept spells.",
+        "effects": [
+          {
+            "target": "Academic spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Casting academic spells and rituals raises temporary Corruption by no more than one point."
+          },
+          {
+            "target": "Academic adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The full Order member gains no permanent Corruption when learning adept-tier spells of their tradition."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the permanent cost of master spells and helps maintain chained and mass magic.",
+        "effects": [
+          {
+            "target": "Academic master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Senior Order Mage gains no permanent Corruption when learning master-tier spells of their tradition."
+          },
+          {
+            "target": "Failed checks for chained or mass spells",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Failed checks related to the duration or effectiveness of chained and mass spells may be rerolled."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-witches-circle",
+    "name": "Mystical Tradition: Witches' Circle",
+    "category": "ability",
+    "description": "The wild witch tradition that reduces Corruption costs for its curses, natural magic, and rituals.",
+    "tags": [
+      "magic",
+      "tradition",
+      "mystical-tradition",
+      "curse",
+      "resolute",
+      "corruption"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes permanent Corruption from novice spells and rituals of the witch tradition.",
+        "effects": [
+          {
+            "target": "Wild novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Witch Apprentice gains no permanent Corruption when learning Novice-tier spells and rituals of the wild tradition."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Caps temporary Corruption from wild magic and removes the cost of learning adept spells.",
+        "effects": [
+          {
+            "target": "Wild spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Casting wild spells and rituals raises temporary Corruption by no more than one point."
+          },
+          {
+            "target": "Wild adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Witch gains no permanent Corruption when learning Adept-tier spells of their tradition."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the permanent cost of master-tier spells of the wild tradition.",
+        "effects": [
+          {
+            "target": "Wild master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Elder Witch of the Mists gains no permanent Corruption when learning master-tier spells of their wild tradition."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-theurgy",
+    "name": "Mystical Tradition: Theurgy",
+    "category": "ability",
+    "description": "The Apoleata Church tradition that reduces the cost of healing and protective magic and strengthens it against monsters.",
+    "tags": [
+      "magic",
+      "tradition",
+      "church",
+      "healing",
+      "protection",
+      "mystical-tradition",
+      "corruption",
+      "resolute"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes permanent Corruption from novice church spells and rituals.",
+        "effects": [
+          {
+            "target": "Church novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Apoleata Cleric gains no permanent Corruption when learning novice-tier spells and rituals of the church tradition."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Caps temporary Corruption from church magic and removes the cost of learning adept spells.",
+        "effects": [
+          {
+            "target": "Church spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Casting church spells and rituals raises temporary Corruption by no more than one point."
+          },
+          {
+            "target": "Church adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Brother or Sister of the Apoleata Church gains no permanent Corruption when learning adept-tier spells of their tradition."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the cost of learning master-tier church magic and enhances healing and holy damage.",
+        "effects": [
+          {
+            "target": "Church master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Father or Mother of the Apoleata Church gains no permanent Corruption when learning master-tier spells of their tradition."
+          },
+          {
+            "target": "Healing and anti-monster spell effects",
+            "action": "grant_bonus",
+            "value": "+d4 effectiveness",
+            "description": "All healing spells and non-mystical healing practices become +d4 more effective, as do damaging spells against monsters and Vices."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-ratassan",
+    "name": "Mystical Tradition: Ratassan",
+    "category": "ability",
+    "description": "The Lapalian court tradition of fire and battle magic that reduces the cost of its own school.",
+    "tags": [
+      "magic",
+      "tradition",
+      "mystical-tradition",
+      "fire",
+      "corruption",
+      "resolute"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes permanent Corruption from novice spells and rituals of the court tradition.",
+        "effects": [
+          {
+            "target": "Court novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Lapalian Baron gains no permanent Corruption when learning novice-tier spells and rituals of the court tradition."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Caps temporary Corruption from court magic and removes the cost of learning adept spells.",
+        "effects": [
+          {
+            "target": "Court spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Casting court spells and rituals raises temporary Corruption by no more than one point."
+          },
+          {
+            "target": "Court adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Lapalian Viscount gains no permanent Corruption when learning adept-tier spells of the court tradition."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the cost of learning master-tier court spells and improves elemental reliability.",
+        "effects": [
+          {
+            "target": "Court master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "The Lapalian Marquis gains no permanent Corruption when learning master-tier spells of the court tradition."
+          },
+          {
+            "target": "Failed elemental spell checks",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Master may reroll any failed check on elemental spells."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-sorcery",
+    "name": "Mystical Tradition: Sorcery",
+    "category": "ability",
+    "description": "A sorcerous tradition that does not shun Corruption but learns to use it as fuel and a weapon.",
+    "tags": [
+      "magic",
+      "tradition",
+      "corruption",
+      "shadows",
+      "mystical-tradition",
+      "resolute",
+      "corruption"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows minimizing new Corruption to one point through Resolute.",
+        "effects": [
+          {
+            "target": "New corruption gain",
+            "action": "minimize_on_check",
+            "value": 1,
+            "description": "Resolute check to minimize new Corruption to one point."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows retrying a failed mystical check at the cost of additional temporary Corruption.",
+        "effects": [
+          {
+            "target": "Failed mystical power check",
+            "action": "reroll_failed_checks",
+            "value": "gain d4 temporary corruption on successful retry",
+            "description": "If the sorcerer failed a Mystical Power check, they may retry it at the cost of their own Corruption; on success the spell fires, but the sorcerer gains d4 temporary Corruption."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows using the target's Corruption to lower their defense against spells.",
+        "effects": [
+          {
+            "target": "Spell defense of corrupted targets",
+            "action": "change_defense_formula",
+            "value": "Shadow instead of Resolute",
+            "description": "The powerful sorcerer can force a corrupted target to defend against their magic with Shadow — Resolute minus current Corruption; monsters are immune to this."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-sirens",
+    "name": "Mystical Tradition: Sirens",
+    "category": "ability",
+    "description": "The song tradition of domination and enchantment, making mind magic especially resilient.",
+    "tags": [
+      "magic",
+      "tradition",
+      "mystical-tradition",
+      "mental",
+      "mind-control",
+      "resolute",
+      "corruption"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes permanent Corruption from novice powers and grants a reroll on a single-target mind effect.",
+        "effects": [
+          {
+            "target": "Novice spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Learning Novice-tier mystical powers adds no permanent Corruption."
+          },
+          {
+            "target": "Single-target mind-affecting spell or effect",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Siren Novice may reroll a check for a spell or other effect targeting one mind, if it is not a mass effect."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Removes the permanent cost of adept powers and allows rerolling any one mind effect check.",
+        "effects": [
+          {
+            "target": "Adept spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Learning Adept-tier mystical powers adds no permanent Corruption."
+          },
+          {
+            "target": "One mind-affecting spell or effect check",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "The Siren may reroll any one check for a spell or other mind-affecting effect."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the permanent cost of master powers and allows repeating mind effect checks as many times as the effect requires.",
+        "effects": [
+          {
+            "target": "Master spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Learning Master-tier mystical powers adds no permanent Corruption."
+          },
+          {
+            "target": "Mind-affecting spell or effect checks",
+            "action": "remove_limit",
+            "value": "repeats as needed",
+            "description": "The Siren may repeat as many spell and mind-affecting effect checks as the effect demands."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-symbolism",
+    "name": "Mystical Tradition: Symbolism",
+    "category": "ability",
+    "description": "The tradition of magical symbols, preparing and packaging effects in advance without immediate Shadow harm.",
+    "tags": [
+      "magic",
+      "tradition",
+      "mystical-tradition",
+      "spellcasting",
+      "traps",
+      "corruption",
+      "resolute"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Requires physically drawing symbols slowly and allows only one to be prepared.",
+        "effects": [
+          {
+            "target": "Prepared symbols",
+            "action": "set_preparation_rules",
+            "value": "one hour, one stored symbol, one-turn activation",
+            "description": "A rune must have a physical form; its creation takes one hour, only one symbol may be stored at a time, and activation requires a full turn."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows drawing symbols in one turn, storing several, and triggering them with a word or condition.",
+        "effects": [
+          {
+            "target": "Prepared symbols",
+            "action": "relax_preparation_rules",
+            "value": "draw in one turn, multiple stored symbols, free-action activation",
+            "description": "A symbol can be drawn in one turn, multiple may be stored, and activation can be done as a free action with a short word or a preset trigger."
+          },
+          {
+            "target": "Existing symbol",
+            "action": "erase_on_touch",
+            "value": true,
+            "description": "The Symbolist can erase any symbol with a simple touch."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows drawing and activating symbols directly in the air instantly.",
+        "effects": [
+          {
+            "target": "Air-drawn symbols",
+            "action": "instant_cast",
+            "value": "draw in air and activate immediately",
+            "description": "The experienced Symbolist can draw symbols in the air and activate them immediately; such symbols burn in the air until the end of combat."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "ritualist",
+    "name": "Ritualist",
+    "category": "ability",
+    "description": "The ability to study, identify, and perform long mystical rituals of various traditions.",
+    "tags": ["magic", "corruption", "knowledge", "tradition", "resolute"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows learning one ritual of any tradition.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 1,
+            "description": "The Novice Ritualist may learn up to one ritual if they find a teacher or other source of knowledge."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Raises the known ritual limit to three.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 3,
+            "description": "The Adept Ritualist may learn up to three rituals."
+          }
+        ]
+      },
+      "master": {
+        "description": "Raises the known ritual limit to six.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 6,
+            "description": "The Master Ritualist may learn up to six rituals."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "special-gift",
+    "name": "Special Gift",
+    "category": "ability",
+    "description": "A rare mystical talent that helps carry Corruption more safely and access wider magic.",
+    "tags": ["magic", "corruption", "spellcasting", "scaling", "resolute"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Reduces the temporary Corruption of one chosen spell or ability to one point.",
+        "effects": [
+          {
+            "target": "One chosen spell or ability with temporary corruption cost",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Choose one available spell or ability: its temporary Corruption on use never exceeds one point."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Doubles the Corruption Threshold and Limit.",
+        "effects": [
+          {
+            "target": "Corruption Threshold and Limit",
+            "action": "multiply_value",
+            "value": 2,
+            "description": "The Special Gift Adept doubles their Corruption Threshold and Corruption Limit."
+          }
+        ]
+      },
+      "master": {
+        "description": "Unlocks novice-tier powers from all traditions and allows rerolling mystical checks at the cost of a risk.",
+        "effects": [
+          {
+            "target": "Mystical traditions",
+            "action": "unlock_spell_tier",
+            "value": "novice from all traditions",
+            "description": "The Master can use all mystical powers from all traditions at least at the novice level."
+          },
+          {
+            "target": "Any mystical check",
+            "action": "reroll_failed_checks",
+            "value": "gain d8 corruption if second roll also fails",
+            "description": "Any mystical check may be rerolled, but if the second check also fails the character gains d8 Corruption."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "guided-sin",
+    "name": "Guided Sin",
+    "category": "ability",
+    "description": "Manipulating Corruption as your own energy: redirecting, amplifying, and offloading it onto others.",
+    "tags": ["corruption", "magic", "utility", "resolute"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows absorbing temporary Corruption that was meant to affect a nearby ally.",
+        "effects": [
+          {
+            "target": "Temporary corruption affecting nearby ally",
+            "action": "redirect_to_self",
+            "value": "free action",
+            "description": "The Novice can redirect onto themselves any temporary Corruption that was about to affect someone nearby."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows rolling gained Corruption twice and choosing the more desirable outcome.",
+        "effects": [
+          {
+            "target": "Corruption gain for self or redirected target",
+            "action": "roll_twice_choose_result",
+            "value": "higher or lower",
+            "description": "The Adept may roll Corruption gain checks twice and choose the more desirable amount — higher or lower."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows directing incoming Corruption toward a visible target.",
+        "effects": [
+          {
+            "target": "Visible victim",
+            "action": "redirect_corruption_on_check",
+            "value": "Resolute",
+            "description": "Resolute check to redirect incoming Corruption to a visible target; on failure the Master takes half and the rest dissipates."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "demiurge-hands",
+    "name": "Demiurge Hands",
+    "category": "ability",
+    "description": "The skill of unlocking the potential of costly mystical hands and more safely redirecting Corruption into them.",
+    "tags": ["magic", "equipment", "corruption", "flexibility", "resolute"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Makes all demiurge hands flexible.",
+        "effects": [
+          {
+            "target": "Demiurge hands",
+            "action": "grant_quality",
+            "value": "flexible",
+            "description": "All of the Novice's demiurge hands gain the flexible quality."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows swapping hands on the move and once per battle redirecting some temporary Corruption into them.",
+        "effects": [
+          {
+            "target": "Equipped demiurge hands",
+            "action": "swap_on_movement",
+            "value": true,
+            "description": "The Adept can swap equipped demiurge hands during their turn by spending movement."
+          },
+          {
+            "target": "Temporary corruption received by the user",
+            "action": "redirect_to_item",
+            "value": "once per battle up to difficulty modifier",
+            "description": "Once per battle the Adept can redirect into a demiurge hand an amount of received temporary Corruption equal to its difficulty modifier."
+          }
+        ]
+      },
+      "master": {
+        "description": "Removes the binding difficulty, allows freely swapping hands, and maintains one effect for the whole day.",
+        "effects": [
+          {
+            "target": "Demiurge hands difficulty modifier",
+            "action": "remove_penalty",
+            "value": "hampering modifier",
+            "description": "The hampering difficulty modifier no longer applies to the Master."
+          },
+          {
+            "target": "Equipped demiurge hands",
+            "action": "allow_free_action",
+            "value": "swap hands",
+            "description": "The Master can swap demiurge hands as a free action."
+          },
+          {
+            "target": "One chosen demiurge hand effect",
+            "action": "maintain_on_check",
+            "value": "Resolute through the day",
+            "description": "At the start of the day the Master may make a Resolute check to maintain the effect of any one demiurge hand for the entire day, regardless of further hand swaps."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "runic-tattoos",
+    "name": "Runic Tattoos",
+    "category": "ability",
+    "description": "Using ritual-inscribed tattoos as a hidden source of protection, healing, and damage.",
+    "tags": ["magic", "corruption", "armor", "damage"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows activating tattoos for temporary armor and weather protection.",
+        "effects": [
+          {
+            "target": "User before each incoming attack",
+            "action": "grant_bonus",
+            "value": "d4 armor for 1 temporary corruption per attack",
+            "description": "The Novice may activate runic tattoos to gain a temporary +d4 Armor bonus at the cost of one temporary Corruption per attack received."
+          },
+          {
+            "target": "User against weather",
+            "action": "grant_protection",
+            "value": "as clothing",
+            "description": "Runic tattoos also protect against wind and weather as if they were clothing."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows converting Corruption into targeted self-healing.",
+        "effects": [
+          {
+            "target": "User",
+            "action": "restore_health",
+            "value": "1 Toughness for 1 temporary corruption",
+            "description": "The Adept can activate tattoos to restore one point of Toughness at the cost of one temporary Corruption."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows adding mystical damage to every successful attack at the cost of Corruption.",
+        "effects": [
+          {
+            "target": "Successful attacks by the user",
+            "action": "grant_bonus",
+            "value": "+d4 mystical damage",
+            "description": "The Master can activate tattoos to add +d4 damage to each successful attack, paying temporary Corruption equal to the amount of bonus mystical damage dealt."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "leader",
+    "name": "Leader",
+    "category": "ability",
+    "description": "Charismatic command that turns personal will into spell power and combat coordination.",
+    "tags": ["leadership", "appealing", "support", "magic", "damage"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts spell power to Appealing.",
+        "effects": [
+          {
+            "target": "Spell power",
+            "action": "change_base_attribute",
+            "value": "Appealing instead of Resolute",
+            "description": "Use Appealing instead of Resolute to determine spell power, though the Corruption Threshold is still calculated from Resolute."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows designating one priority target for the whole group.",
+        "effects": [
+          {
+            "target": "One announced enemy",
+            "action": "grant_bonus_to_allies",
+            "value": "+d4 damage",
+            "description": "The Adept can choose and announce one enemy; all ally attacks against them deal +d4 more damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "If a speech was given before battle, shares resistance to magic with listeners.",
+        "effects": [
+          {
+            "target": "All listeners before battle",
+            "action": "share_attribute",
+            "value": "use leader's Appealing instead of own Resolute for spell defense",
+            "description": "If the Master had the opportunity to give a speech before the battle, all who heard it may use the Master's Appealing instead of their own Resolute for spell defense."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "dominance",
+    "name": "Dominance",
+    "category": "ability",
+    "description": "An overwhelming presence that makes enemies hesitate, retreat, or end the fight.",
+    "tags": ["appealing", "control", "melee", "mind-control"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Shifts melee hit chance to Appealing.",
+        "effects": [
+          {
+            "target": "Melee attack chance",
+            "action": "change_base_attribute",
+            "value": "Appealing instead of Accurate",
+            "description": "Use Appealing instead of Accurate to calculate melee weapon hit chance."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows forcing an enemy not to attack the Adept on their next turn.",
+        "effects": [
+          {
+            "target": "One enemy",
+            "action": "hesitate_on_check",
+            "value": "cannot attack user on next turn",
+            "description": "Appealing check to make an enemy hesitate on their next turn; they will not attack the Adept but may still strike allies."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows breaking the will to continue fighting in an already wounded side.",
+        "effects": [
+          {
+            "target": "Enemy in ongoing or impending conflict",
+            "action": "end_combat_on_check",
+            "value": "surrender, flee or negotiate",
+            "description": "Appealing check to end combat with an enemy: they may surrender, flee, or agree to negotiate; in an ongoing fight this is possible if someone on their side has been wounded."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mobile-combat",
+    "name": "Mobile Combat",
+    "category": "ability",
+    "description": "A mobile fighting style with constant weapon switching and reactive lunges when breaking distance.",
+    "tags": [
+      "mobility",
+      "weapons",
+      "ranged",
+      "melee",
+      "defense",
+      "extra-attack",
+      "reaction"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows splitting movement before and after the attack.",
+        "effects": [
+          {
+            "target": "Movement on user's turn",
+            "action": "split_movement",
+            "value": "before and after attack",
+            "description": "The Mobile Combat Novice may split their Movement into portions before and after the attack."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Removes the limit on weapon swaps per turn.",
+        "effects": [
+          {
+            "target": "Weapon changes during the turn",
+            "action": "remove_limit",
+            "value": "weapon swaps",
+            "description": "The Adept can swap weapons as many times per turn as desired, instantly switching from swords to a revolver and back."
+          }
+        ]
+      },
+      "master": {
+        "description": "Improves the reliability of disengaging and allows responding to incoming free attacks with free attacks of your own.",
+        "effects": [
+          {
+            "target": "Failed Defense checks against Free Attacks while disengaging",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "The Master may reroll all failed Defense checks against incoming Free Attacks triggered by disengaging."
+          },
+          {
+            "target": "Enemy making a Free Attack against the user",
+            "action": "trigger_free_attack",
+            "value": "use any available weapon",
+            "description": "Whenever the Master is targeted by such a free attack, they may make a free attack against the opponent using any available weapon."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "pyrotechnics",
+    "name": "Pyrotechnics",
+    "category": "ability",
+    "description": "Spy alchemy for blinding, stunning, and devastating thrown charges.",
+    "tags": [
+      "alchemy",
+      "status",
+      "grenades",
+      "stealth",
+      "armor-piercing",
+      "accurate"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Unlocks blinding powder and safe use of grenades and mines.",
+        "effects": [
+          {
+            "target": "Enemy in melee range",
+            "action": "blind_on_check",
+            "value": "d4 armor-ignoring damage and d4 rounds blind",
+            "description": "Accurate check to use blinding powder in melee; on success the target takes d4 armor-ignoring damage and is blinded for d4 rounds."
+          },
+          {
+            "target": "Alchemical mines and grenades",
+            "action": "prevent_catastrophe",
+            "value": true,
+            "description": "Using alchemical mines or grenades can no longer result in a catastrophic outcome."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Unlocks a smoke canister that damages and blinds an area.",
+        "effects": [
+          {
+            "target": "Enemies in smoke area",
+            "action": "deal_damage_and_blind_on_check",
+            "value": "d4 armor-ignoring",
+            "description": "Accurate check to correctly deploy a smoke canister; all who do not leave the affected area take d4 armor-ignoring damage and cannot see."
+          }
+        ]
+      },
+      "master": {
+        "description": "Grants a thunder ball with high armor-ignoring damage and blinding.",
+        "effects": [
+          {
+            "target": "Thunder ball target or area",
+            "action": "deal_damage_on_check",
+            "value": "d12 on success, d6 on failure, blind d4 rounds",
+            "description": "Accurate check to use a thunder ball that deals up to d12 armor-ignoring damage on success or d6 on failure, and blinds for d4 rounds."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "artifact-creation",
+    "name": "Artifact Creation",
+    "category": "ability",
+    "description": "Guild mastery of crafting artifacts and reading the mystic qualities already bound to them.",
+    "tags": ["crafting", "artifacts", "magic", "knowledge", "cunning"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows creating simple artifacts.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "simple artifact",
+            "description": "Cunning check to create a simple artifact."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Allows creating powerful artifacts.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "powerful artifact",
+            "description": "Cunning check to create a powerful artifact."
+          }
+        ]
+      },
+      "master": {
+        "description": "Allows creating legendary artifacts.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "legendary artifact",
+            "description": "Cunning check to create a legendary artifact."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "armored-mystic",
+    "name": "Armored Mystic",
+    "category": "ability",
+    "description": "A templar school that allows casting in heavy armor and enhancing it with mysticism.",
+    "tags": ["magic", "armor", "church", "defense"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Removes medium armor interference with mystical powers.",
+        "effects": [
+          {
+            "target": "Mystical power use in medium armor",
+            "action": "remove_penalty",
+            "value": "medium armor",
+            "description": "Medium armor has no effect on the effectiveness of mystical powers."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Extends the same comfort to heavy armor.",
+        "effects": [
+          {
+            "target": "Mystical power use in heavy armor",
+            "action": "remove_penalty",
+            "value": "heavy armor",
+            "description": "Heavy armor has no effect on the effectiveness of mystical powers."
+          }
+        ]
+      },
+      "master": {
+        "description": "Mystically enhances the armor itself by one additional protection step.",
+        "effects": [
+          {
+            "target": "Worn armor",
+            "action": "grant_bonus",
+            "value": "+d4 protection",
+            "description": "The armor's effectiveness is enhanced by mystical energies, providing +d4 more protection."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bloody-combat",
+    "name": "Bloody Combat",
+    "category": "ability",
+    "description": "A brutal combat school of fighting through wounds, making the character more dangerous as Toughness falls.",
+    "tags": ["melee", "damage", "healing", "conditional", "corruption"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "When at half Toughness, allows rerolling melee attack checks.",
+        "effects": [
+          {
+            "target": "Melee attack checks at half Toughness",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "When the Novice's Toughness is reduced to half, all melee weapon attack checks may be rerolled."
+          }
+        ]
+      },
+      "adept": {
+        "description": "When at half Toughness, sharply increases melee damage.",
+        "effects": [
+          {
+            "target": "Melee attacks at half Toughness",
+            "action": "grant_bonus",
+            "value": "+d8 damage",
+            "description": "When the Adept's Toughness is reduced to half, all melee attacks deal +d8 more damage."
+          }
+        ]
+      },
+      "master": {
+        "description": "Converts half of damage dealt into self-healing.",
+        "effects": [
+          {
+            "target": "Damage dealt by the user",
+            "action": "life_steal",
+            "value": "half damage dealt",
+            "description": "Half of the damage the Master deals to enemies is added to their own Toughness as healing."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-rune-magic",
+    "name": "Mystical Tradition: Rune Magic",
+    "category": "ability",
+    "description": "The runic tradition that can store Corruption in a phylactery and preserve power in items.",
+    "tags": [
+      "magic",
+      "tradition",
+      "runes",
+      "corruption",
+      "mystical-tradition",
+      "melee",
+      "damage"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Allows binding the soul to a runic object and redirecting novice-level permanent Corruption into it.",
+        "effects": [
+          {
+            "target": "Chosen runic object",
+            "action": "bind_soul",
+            "value": "phylactery",
+            "description": "The Novice Volkhv can imbue their soul into a chosen runic object; all permanent Corruption from novice-level spells is redirected into that object."
+          },
+          {
+            "target": "Elemental rune on phylactery",
+            "action": "grant_bonus",
+            "value": "+d4 elemental damage",
+            "description": "An elemental rune on the phylactery can be activated to increase damage dealt by +d4 fire, ice, acid, or electricity."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Redirects permanent Corruption from adept spells into the phylactery and helps reduce new spikes.",
+        "effects": [
+          {
+            "target": "Permanent corruption from adept spells",
+            "action": "redirect_to_item",
+            "value": "phylactery",
+            "description": "All permanent Corruption from adept-level spells is redirected into the phylactery."
+          },
+          {
+            "target": "New corruption gain",
+            "action": "reroll_failed_checks",
+            "value": "choose lower result",
+            "description": "Each time the Adept gains new Corruption, they may reroll the amount and choose the lower result."
+          }
+        ]
+      },
+      "master": {
+        "description": "Redirects master-level permanent Corruption into the staff and removes the temporary cost of using tradition powers.",
+        "effects": [
+          {
+            "target": "Permanent corruption from master spells",
+            "action": "redirect_to_item",
+            "value": "staff",
+            "description": "All permanent Corruption from master-level spells is redirected into the staff."
+          },
+          {
+            "target": "Runic tradition spell use",
+            "action": "remove_temporary_corruption",
+            "value": true,
+            "description": "The Master Volkhv gains no temporary Corruption when using their tradition's powers."
+          }
+        ]
+      }
+    }
+  }
+]

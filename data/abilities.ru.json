@@ -1,0 +1,3476 @@
+[
+  {
+    "id": "acrobatics",
+    "name": "Акробатика",
+    "category": "ability",
+    "description": "Подвижность, маневренность и гимнастические приемы для перемещения в бою и обхода противников.",
+    "tags": ["подвижность", "защита", "ближний-бой", "позиционирование"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет перемещаться мимо, от или к противнику без провоцирования свободных атак и пересекать занятые области, если там достаточно места.",
+        "effects": [
+          {
+            "target": "Free Attacks triggered by movement",
+            "action": "prevent",
+            "value": "movement-related",
+            "description": "Скорость, чтобы предотвратить свободные атаки противника при движении от, мимо или к цели."
+          },
+          {
+            "target": "Occupied enemy spaces",
+            "action": "allow_traverse",
+            "value": "conditional",
+            "description": "Можно пересекать области, занятые противником, если персонаж может проскользнуть или перепрыгнуть, но нельзя закончить движение в этой области."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Дает быструю реакцию на падение и снимает неудобство боевых каблуков.",
+        "effects": [
+          {
+            "target": "Standing up from prone",
+            "action": "allow_reaction",
+            "value": "instant",
+            "description": "Скорость, чтобы моментально, как реакция, вскочить на ноги после падения."
+          },
+          {
+            "target": "Combat heels",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "Адепт может пользоваться боевыми каблуками так, как если бы они не имели качество неудобного."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет использовать противника как укрытие, завершать движение на нем и получать преимущество на следующую атаку.",
+        "effects": [
+          {
+            "target": "Incoming ranged attacks",
+            "action": "use_enemy_as_cover",
+            "value": "conditional",
+            "description": "Скорость, чтобы использовать противника как щит от сторонних атак, от которых тот уже не сможет уклониться."
+          },
+          {
+            "target": "Occupied enemy spaces",
+            "action": "allow_end_movement",
+            "value": "conditional",
+            "description": "Можно закончить движение в области, занятой противником, если его положение это позволяет."
+          },
+          {
+            "target": "Next attack this turn",
+            "action": "grant_bonus",
+            "value": "advantage",
+            "description": "Если движение закончено на противнике, следующая атака в этом ходу выполняется с преимуществом."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "smoke-and-mirrors",
+    "name": "Дым и Зеркала",
+    "category": "ability",
+    "description": "Техника боя коротким и точным оружием, основанная на скорости рук, обмане и внезапности.",
+    "tags": ["сноровка", "короткое-оружие", "атака", "защита", "преимущество"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит расчет попадания на Сноровку и усиливает атаки коротким или точным оружием.",
+        "effects": [
+          {
+            "target": "Attack chance with short or precise weapons",
+            "action": "change_base_attribute",
+            "value": "Сноровка вместо Аккуратности",
+            "description": "Сноровка вместо Аккуратности для расчета шанса попадания коротким или точным оружием."
+          },
+          {
+            "target": "Attacks with short or precise weapons",
+            "action": "grant_bonus",
+            "value": "advantage",
+            "description": "Любая атака таким оружием применяется с преимуществом."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Переносит расчет защиты на Сноровку и делает оборону более контролируемой.",
+        "effects": [
+          {
+            "target": "Defense",
+            "action": "change_base_attribute",
+            "value": "Сноровка вместо Скорости",
+            "description": "Сноровка вместо Скорости для расчета Защиты."
+          },
+          {
+            "target": "Weak and strong sides",
+            "action": "choose_layout",
+            "value": "self-determined",
+            "description": "Адепт сам определяет, какие его стороны считать слабыми, а какие сильными."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дает шанс на дополнительную свободную атаку во время собственного хода.",
+        "effects": [
+          {
+            "target": "Free Attack during own turn",
+            "action": "grant_chance",
+            "value": "extra free attack",
+            "description": "Сноровка, чтобы получить шанс на дополнительную свободную атаку во время своего хода."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "intrigues",
+    "name": "Интриги",
+    "category": "ability",
+    "description": "Дворцовая боевая техника, использующая слабости противника, внезапность и удары в спину.",
+    "tags": [
+      "скрытность",
+      "преимущество",
+      "убийство",
+      "урон",
+      "статус",
+      "сноровка"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает Удар в Спину при преимуществе и позволяет атаковать через Сноровку.",
+        "effects": [
+          {
+            "target": "Backstab",
+            "action": "grant_conditional_attack",
+            "value": "+d4",
+            "description": "Один раз за ход, при наличии преимущества, можно нанести Удар в Спину на +d4 урона."
+          },
+          {
+            "target": "Attack chance",
+            "action": "change_base_attribute",
+            "value": "Сноровка вместо Аккуратности",
+            "description": "При определении шанса на попадание можно использовать Сноровку вместо Аккуратности."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает Удар в Спину длительным кровотечением.",
+        "effects": [
+          {
+            "target": "Backstab",
+            "action": "add_status",
+            "value": "bleeding d4 per turn",
+            "description": "Удар в Спину вызывает кровотечение на d4 дополнительного урона каждый ход, пока рана не будет вылечена."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает прямой урон Удара в Спину и снимает лимит на количество таких ударов за ход.",
+        "effects": [
+          {
+            "target": "Backstab direct damage",
+            "action": "modify_value",
+            "value": "+d8 instead of +d4",
+            "description": "Прямой дополнительный урон Удара в Спину теперь составляет +d8 вместо +d4."
+          },
+          {
+            "target": "Backstab uses per turn",
+            "action": "remove_limit",
+            "value": "while advantage is maintained",
+            "description": "Мастер больше не ограничен в числе Ударов в Спину за ход, пока сохраняет преимущество во время атаки."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "street-fighting",
+    "name": "Уличный Бой",
+    "category": "ability",
+    "description": "Грубые и жесткие приемы ближнего боя для оглушения, опрокидывания и контратак.",
+    "tags": [
+      "ближний-бой",
+      "контроль",
+      "оглушение",
+      "опрокидывание",
+      "контратака",
+      "пробивание-брони"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает грязный удар, который оглушает цель и позволяет сразу провести еще одну атаку.",
+        "effects": [
+          {
+            "target": "Enemy struck by dirty hit",
+            "action": "add_damage",
+            "value": "d6",
+            "description": "Подлый удар наносит d6 урона."
+          },
+          {
+            "target": "Enemy struck by dirty hit",
+            "action": "add_status",
+            "value": "stunned",
+            "description": "В случае попадания цель оглушается."
+          },
+          {
+            "target": "Attacker",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Оглушение дает возможность нанести еще одну нормальную атаку сразу следом."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет превращать любую успешную атаку в опрокидывание.",
+        "effects": [
+          {
+            "target": "Any successful attack",
+            "action": "add_status",
+            "value": "prone",
+            "description": "Скорость, чтобы любая успешно проведенная атака заканчивалась подножкой или толчком, которые валят противника на землю."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дает реакционную контратаку против любой атаки ближнего боя по персонажу.",
+        "effects": [
+          {
+            "target": "Enemy making a melee attack against the user",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "Контратака как реакция наносит d6 урона, игнорирующего броню, каждый раз, когда мастер становится целью атаки ближнего боя."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "knife-mastery",
+    "name": "Владение Ножами",
+    "category": "ability",
+    "description": "Специализация на коротком режуще-колющем оружии с упором на скорость и бой вплотную.",
+    "tags": ["короткое-оружие", "ближний-бой", "атака", "дуэль", "контроль"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит расчет атаки коротким оружием на Скорость.",
+        "effects": [
+          {
+            "target": "Attack chance with short weapons",
+            "action": "change_base_attribute",
+            "value": "Скорость вместо Аккуратности",
+            "description": "Скорость вместо Аккуратности при расчете атаки коротким оружием."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Дает дополнительную атаку ножом каждый ход.",
+        "effects": [
+          {
+            "target": "Knife attacks per turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Дополнительная атака ножом на каждом ходу."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет навязать бой вплотную, ограничить оружие противника и ухудшить его защиту.",
+        "effects": [
+          {
+            "target": "Enemy weapon options",
+            "action": "restrict_usage",
+            "value": "cannot effectively use other melee weapons; cannot use long weapons",
+            "description": "После успешной атаки ножом противник уже не может эффективно пользоваться другим оружием ближнего боя, кроме ножей, а длинным оружием не может пользоваться вообще."
+          },
+          {
+            "target": "Enemy defense against knife attacks",
+            "action": "worsen_defense",
+            "value": "roll twice, take worse",
+            "description": "Защита противника против таких атак испытывается дважды, и выбирается наихудший для него вариант."
+          },
+          {
+            "target": "Enemy disengage",
+            "action": "restrict_escape",
+            "value": "initiative win or movement plus successful evade vs free attack",
+            "description": "Противник может оторваться только если выиграет инициативу или потратит движение и сумеет увернуться от свободной атаки."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "opportunism",
+    "name": "Оппортунизм",
+    "category": "ability",
+    "description": "Жесткая школа ближнего боя, превращающая свободные атаки в особенно опасный инструмент давления.",
+    "tags": ["ближний-бой", "свободная-атака", "реакция", "контроль"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет перебрасывать сорвавшиеся свободные атаки по врагу, который пытается выйти из ближнего боя.",
+        "effects": [
+          {
+            "target": "Free Attacks against disengaging enemies",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Проваленную проверку на свободную атаку по противнику, покидающему ближний бой, можно повторить один раз."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет заменять обычную свободную атаку любой другой активной способностью.",
+        "effects": [
+          {
+            "target": "Free Attacks",
+            "action": "replace_default_attack",
+            "value": "any active ability, single check",
+            "description": "Свободную атаку можно заменить любой другой активной способностью, но только с одной проверкой на успех."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает свободные атаки полноценной площадкой для активных приемов и повышает их надежность.",
+        "effects": [
+          {
+            "target": "Free Attacks",
+            "action": "replace_default_attack",
+            "value": "any active ability",
+            "description": "Мастер может применять при свободной атаке любую активную способность без ограничений уровня адепта."
+          },
+          {
+            "target": "Hit checks during Free Attacks",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Если проверка попадания свободной атакой провалена, ее можно повторить."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "quick-reflexes",
+    "name": "Быстрые Рефлексы",
+    "category": "ability",
+    "description": "Предельная реакция и выживаемость, позволяющие смягчать опасные удары и постоянно опережать противника.",
+    "tags": [
+      "выживаемость",
+      "инициатива",
+      "реакция",
+      "позиционирование",
+      "защита"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Срезает особенно опасный урон и отменяет половинный урон от неудачных попаданий таких способностей.",
+        "effects": [
+          {
+            "target": "Abilities dealing more damage than current Survivability",
+            "action": "cap_damage",
+            "value": "half on hit, zero on miss",
+            "description": "Если способность могла бы нанести больше урона, чем у персонажа есть Выживаемости, она наносит только половину урона при попадании и не наносит ничего при промахе."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет мгновенно обойти промахнувшегося противника и занять позицию у него за спиной.",
+        "effects": [
+          {
+            "target": "Enemy that missed the user",
+            "action": "swap_positions",
+            "value": "behind target",
+            "description": "После чужого промаха адепт может реакцией поменяться с противником местами и оказаться у него за спиной, не провоцируя свободных атак."
+          }
+        ]
+      },
+      "master": {
+        "description": "Гарантирует первенство в инициативе, если у противника нет той же вершины мастерства.",
+        "effects": [
+          {
+            "target": "Initiative order",
+            "action": "set_priority",
+            "value": "always first unless opposed by same ability",
+            "description": "Мастер всегда выигрывает инициативу и ходит первым, если не сталкивается с другим мастером той же способности."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "quick-hand",
+    "name": "Быстрая Рука",
+    "category": "ability",
+    "description": "Искусство молниеносно доставать, менять и обслуживать оружие прямо в движении.",
+    "tags": ["оружие", "перезарядка", "подвижность", "утилита", "огнестрел"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет опередить врага первым выхватом и перезаряжать револьвер без потери движения.",
+        "effects": [
+          {
+            "target": "First draw and attack",
+            "action": "speed_check",
+            "value": "quicker than opponent",
+            "description": "Скорость, чтобы выхватить оружие и провести первую атаку раньше противника."
+          },
+          {
+            "target": "Revolver reloads",
+            "action": "remove_movement_cost",
+            "value": "revolver",
+            "description": "Револьвер можно перезаряжать на ходу, не теряя Движения."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет на ходу менять оружие и так же свободно перезаряжать ружья.",
+        "effects": [
+          {
+            "target": "Weapon swaps",
+            "action": "allow_swap_without_attack_loss",
+            "value": "single motion",
+            "description": "Можно убрать одно оружие и достать другое одним движением, не теряя права на атаку."
+          },
+          {
+            "target": "Rifle reloads",
+            "action": "remove_movement_cost",
+            "value": "rifle",
+            "description": "Ружье можно перезаряжать на ходу без потери Движения."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает цену действия с расходников и делает огнестрел более удобным в обращении.",
+        "effects": [
+          {
+            "target": "Elixirs, grenades, poisons and traps",
+            "action": "remove_action_cost",
+            "value": "use as part of turn",
+            "description": "Эликсиры, гранаты, яды и ловушки можно применять без потери Действия."
+          },
+          {
+            "target": "Firearms with unwieldy quality",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "Все огнестрельное оружие используется так, будто не имеет качества неудобного."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "alchemy",
+    "name": "Алхимия",
+    "category": "ability",
+    "description": "Зельеварение и поиск реагентов для эликсиров, масел, гранат и особых боеприпасов.",
+    "tags": ["создание", "алхимия", "гранаты", "боеприпасы"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет собирать сырье для простых эликсиров, безопасно работать с гранатами и варить боевые масла.",
+        "effects": [
+          {
+            "target": "Simple elixir ingredients",
+            "action": "gather_resources",
+            "value": "one simple dose",
+            "description": "Сообразительность, чтобы собрать сырье для одной дозы простого эликсира."
+          },
+          {
+            "target": "Alchemical grenades",
+            "action": "prevent_catastrophe",
+            "value": "self",
+            "description": "Неофит больше не страдает от катастроф при использовании алхимических гранат."
+          },
+          {
+            "target": "Combat oils",
+            "action": "unlock_crafting",
+            "value": "combat oils",
+            "description": "Открывает производство боевых масел."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет готовить более сложные эликсиры и создавать боеприпасы и гранаты.",
+        "effects": [
+          {
+            "target": "Advanced alchemical production",
+            "action": "gather_resources",
+            "value": "one complex dose or d4 weak doses",
+            "description": "Сообразительность, чтобы собрать травы и минералы для одной дозы сложного эликсира или d4 доз слабого эликсира."
+          },
+          {
+            "target": "Grenades and special ammunition",
+            "action": "unlock_crafting",
+            "value": "grenades and special ammo",
+            "description": "Адепт может производить гранаты и особые снаряды для луков и огнестрельного оружия."
+          }
+        ]
+      },
+      "master": {
+        "description": "Открывает мастерские рецепты и производство боеприпасов для тяжелого вооружения.",
+        "effects": [
+          {
+            "target": "Master alchemical production",
+            "action": "gather_resources",
+            "value": "one master dose or d4 strong or d8 weak doses",
+            "description": "Сообразительность, чтобы собрать ресурсы для мастерского эликсира, d4 сильных или d8 слабых доз."
+          },
+          {
+            "target": "Artillery and siege ammunition",
+            "action": "unlock_crafting",
+            "value": "siege ammunition",
+            "description": "Мастер может производить снаряды для артиллерии и осадных машин."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "poisoner",
+    "name": "Отравитель",
+    "category": "ability",
+    "description": "Знание ядов и способов надежно нанести их через оружие или скрытое приспособление.",
+    "tags": ["яд", "оружие", "статус", "алхимия", "убийство"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет быстро наносить яд на оружие и активировать его проверкой Сообразительности.",
+        "effects": [
+          {
+            "target": "Poison application",
+            "action": "allow_free_action",
+            "value": "coat weapon",
+            "description": "Неофит может покрыть оружие ядом в любой момент через свободное действие."
+          },
+          {
+            "target": "Poisoned successful weapon hit",
+            "action": "trigger_effect_on_check",
+            "value": "one successful hit",
+            "description": "Сообразительность, чтобы при успешной атаке отравленным оружием яд возымел действие; яда хватает на одно успешное попадание."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Сохраняет яд на оружии на весь бой и ускоряет применение скрытого оружия.",
+        "effects": [
+          {
+            "target": "Applied poison",
+            "action": "extend_duration",
+            "value": "entire battle",
+            "description": "Яд, нанесенный на оружие, остается действенным весь бой независимо от числа попаданий."
+          },
+          {
+            "target": "Hidden weapon use",
+            "action": "allow_free_action",
+            "value": "with advantage",
+            "description": "Адепт может применять тайное оружие в бою как свободное действие, если у него есть преимущество."
+          }
+        ]
+      },
+      "master": {
+        "description": "Повышает ранг большинства ядов и делает их заметно труднее для сопротивления.",
+        "effects": [
+          {
+            "target": "Poisons on weapons",
+            "action": "increase_rank",
+            "value": "one rank, except master poisons",
+            "description": "Каждый яд на оружии считается ядом старшего ранга, кроме уже мастерских."
+          },
+          {
+            "target": "Poison effect checks",
+            "action": "grant_additional_check",
+            "value": 1,
+            "description": "Яды этого уровня позволяют провести две проверки Сообразительности вместо одной, из-за чего им особенно тяжело сопротивляться."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "strangling",
+    "name": "Удушение",
+    "category": "ability",
+    "description": "Тихое устранение гарротой и удушающими алхимическими средствами.",
+    "tags": ["скрытность", "захват", "яд", "пробивание-брони"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет при преимуществе перейти в душащий захват, наносящий игнорирующий броню урон и лишающий цель действий.",
+        "effects": [
+          {
+            "target": "Enemy hit with advantage",
+            "action": "apply_stranglehold",
+            "value": "d6 armor-ignoring",
+            "description": "После успешной атаки с преимуществом можно перейти в захват со спины, нанося d6 игнорирующего броню урона и не давая цели совершать действия."
+          },
+          {
+            "target": "Maintained stranglehold",
+            "action": "maintain_on_check",
+            "value": "Intellect",
+            "description": "Сообразительность, чтобы проверить, сохранится ли удушающий захват на следующем ходу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает использование удушающих спор против одной цели на несколько ходов.",
+        "effects": [
+          {
+            "target": "Enemy hit by suffocating spores",
+            "action": "deal_periodic_damage",
+            "value": "d4 for d4 turns",
+            "description": "Успешный бросок удушающих спор наносит d4 игнорирующего броню урона в течение d4 ходов; цель может двигаться и действовать."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает удушающие споры в гранату, накрывающую целое помещение или небольшой участок.",
+        "effects": [
+          {
+            "target": "All enemies in affected small area",
+            "action": "deal_periodic_damage",
+            "value": "d4 for d4 turns",
+            "description": "Споровая бомба наносит всем противникам в комнате, коридоре или небольшом открытом пространстве d4 игнорирующего броню урона в течение d4 ходов."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "oils",
+    "name": "Масла",
+    "category": "ability",
+    "description": "Умение извлекать из нательных масел максимум защиты и полезных вторичных эффектов.",
+    "tags": ["алхимия", "броня", "охрана", "утилита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Дает природную броню, если персонаж заранее натерт боевым маслом и не носит другой брони.",
+        "effects": [
+          {
+            "target": "User without worn armor",
+            "action": "grant_bonus",
+            "value": "d4 natural armor",
+            "description": "Если персонаж заранее нанес на себя боевое масло и не носит другой брони, он получает d4 естественной Брони."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет наносить масло прямо в текущем ходу и расширяет защиту на стихии и часть мистического урона.",
+        "effects": [
+          {
+            "target": "Body oil application",
+            "action": "apply_on_check",
+            "value": "current turn",
+            "description": "Сообразительность, чтобы нанести на себя масло в течение текущего хода."
+          },
+          {
+            "target": "Elemental and physical mystical effects",
+            "action": "reduce_damage",
+            "value": "d4",
+            "description": "Боевые масла также защищают от стихий как одежда и предотвращают d4 урона от физических мистических эффектов вроде огня, льда, кислоты и электричества."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает затратность нанесения масла и позволяет сочетать два нательных масла сразу.",
+        "effects": [
+          {
+            "target": "Body oil application",
+            "action": "allow_free_action",
+            "value": "self-application",
+            "description": "Сообразительность, чтобы нанести на себя масло как свободное действие."
+          },
+          {
+            "target": "Active body oils",
+            "action": "increase_limit",
+            "value": 2,
+            "description": "Мастер может находиться под эффектами двух нательных масел одновременно."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "trapping",
+    "name": "Трапперство",
+    "category": "ability",
+    "description": "Работа с механическими и алхимическими ловушками, включая их полевое создание и обезвреживание.",
+    "tags": ["ловушки", "создание", "контроль", "утилита", "алхимия"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет ставить и обезвреживать механические ловушки, а также быстро мастерить их в поле.",
+        "effects": [
+          {
+            "target": "Mechanical traps",
+            "action": "set_or_disarm_on_check",
+            "value": "Intellect",
+            "description": "Сообразительность, чтобы расставить или обезвредить механическую ловушку."
+          },
+          {
+            "target": "Improvised mechanical traps",
+            "action": "set_damage_cap",
+            "value": "d6",
+            "description": "Импровизированные механические ловушки, созданные за один ход, наносят до d6 урона."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Добавляет работу с алхимическими ловушками и повышает урон импровизированных механизмов.",
+        "effects": [
+          {
+            "target": "Alchemical traps",
+            "action": "set_or_disarm_on_check",
+            "value": "Intellect",
+            "description": "Сообразительность, чтобы расставить или обезвредить алхимическую ловушку."
+          },
+          {
+            "target": "Improvised mechanical traps",
+            "action": "set_damage_cap",
+            "value": "d8",
+            "description": "Импровизированные механические ловушки, созданные за один ход, теперь наносят до d8 урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Повышает грейд всех ловушек и усиливает импровизированные конструкции.",
+        "effects": [
+          {
+            "target": "All traps used by the user",
+            "action": "increase_grade",
+            "value": "one grade",
+            "description": "Все ловушки мастера считаются ловушками более высокого грейда, а мастерские позволяют проводить две проверки на свои эффекты."
+          },
+          {
+            "target": "Improvised traps",
+            "action": "set_damage_cap",
+            "value": "d10",
+            "description": "Импровизированные ловушки, созданные за один ход, наносят до d10 урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "animal-world",
+    "name": "Животный Мир",
+    "category": "ability",
+    "description": "Следопытское и биологическое знание о людях, зверях и чудовищах.",
+    "tags": ["знание", "слежка", "урон", "поддержка"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет по одному взгляду распознавать слабости и характерные черты живых существ.",
+        "effects": [
+          {
+            "target": "Observed creature",
+            "action": "identify_traits",
+            "value": "special abilities and weaknesses",
+            "description": "Сообразительность, чтобы понять особые способности, характерные черты и физические слабости человека или животного по одному взгляду."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет выбрать любимую категорию добычи и лучше делиться знанием о ней.",
+        "effects": [
+          {
+            "target": "Chosen creature category",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Выберите категорию существ; каждый удар по ее представителям наносит на +d4 больше урона."
+          },
+          {
+            "target": "Allies",
+            "action": "share_information",
+            "value": "with preparation time",
+            "description": "Если есть время на объяснение, адепт может поделиться этим знанием со спутниками."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает урон по выбранной категории.",
+        "effects": [
+          {
+            "target": "Chosen creature category",
+            "action": "modify_value",
+            "value": "+d6 instead of +d4",
+            "description": "Дополнительный урон по выбранной категории существ теперь равен +d6."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tactics",
+    "name": "Тактика",
+    "category": "ability",
+    "description": "Боевой расчет, заменяющий скорость и меткость холодным пониманием ситуации.",
+    "tags": ["утилита", "замена-атрибута", "инициатива", "защита", "оружие"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит инициативу на Сообразительность.",
+        "effects": [
+          {
+            "target": "Initiative",
+            "action": "change_base_attribute",
+            "value": "Сообразительность вместо Скорости",
+            "description": "Сообразительность вместо Скорости для определения своей инициативы."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Переносит расчет Защиты на Сообразительность.",
+        "effects": [
+          {
+            "target": "Defense",
+            "action": "change_base_attribute",
+            "value": "Сообразительность вместо Скорости",
+            "description": "Сообразительность вместо Скорости для определения своей Защиты."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет опираться на расчет при попадании почти любым оружием, кроме тяжелого.",
+        "effects": [
+          {
+            "target": "Hit chance with non-heavy weapons",
+            "action": "change_base_attribute",
+            "value": "Сообразительность вместо Аккуратности",
+            "description": "Сообразительность вместо Аккуратности для расчета шанса попасть любым оружием, кроме тяжелого."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "medic",
+    "name": "Медик",
+    "category": "ability",
+    "description": "Полевая медицина, хирургия и знание тела как в лечении, так и в причинении вреда.",
+    "tags": ["исцеление", "поддержка", "знание", "урон"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Дает базовое исцеление без средств и усиливает его с медикаментами.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "restore_health",
+            "value": "d4 by surgery or d6 with remedies",
+            "description": "Сообразительность, чтобы исцелить пациента на d4 Выживаемости только навыками хирурга или на d6 с помощью целебных средств."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Повышает пределы исцеления и добавляет урон за знание анатомии.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "increase_healing_cap",
+            "value": "d6 by surgery, d8 with remedies",
+            "description": "Исцеление без подручных средств не превышает d6, а с целебными средствами — d8."
+          },
+          {
+            "target": "Weapon damage dealt by the user",
+            "action": "grant_bonus",
+            "value": "+d2",
+            "description": "Знание человеческого тела повышает урон любым оружием на +d2."
+          }
+        ]
+      },
+      "master": {
+        "description": "Еще повышает пределы лечения и сохраняет часть эффекта даже при неудаче.",
+        "effects": [
+          {
+            "target": "Patient healing per day",
+            "action": "increase_healing_cap",
+            "value": "d8 by surgery, d10 with remedies",
+            "description": "Исцеление без средств не превышает d8, а с целебными средствами — d10."
+          },
+          {
+            "target": "Failed treatment attempts",
+            "action": "grant_partial_effect",
+            "value": "d4 or d6 healing",
+            "description": "Даже неудачные попытки лечения все равно помогают пациенту на d4 или d6 излеченного урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "erudite",
+    "name": "Эрудит",
+    "category": "ability",
+    "description": "Знание языков, истории и артефактов, которое помогает понимать и использовать наследие мира.",
+    "tags": ["знание", "артефакты", "магия", "утилита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет разбираться в артефактах и старых человеческих языках.",
+        "effects": [
+          {
+            "target": "Artifacts",
+            "action": "identify_properties",
+            "value": "quality and hidden traits",
+            "description": "Сообразительность, чтобы определить качество артефакта и его скрытые свойства, не проверяя его на себе."
+          },
+          {
+            "target": "Rare or old human languages",
+            "action": "enable_fluent_use",
+            "value": "reading and speech",
+            "description": "Сообразительность для чтения и свободного разговора на редких или старых человеческих языках; простые фразы не требуют проверки."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет активировать чужие артефакты и свободно пользоваться языками эльфов и демонов.",
+        "effects": [
+          {
+            "target": "Artifact activation",
+            "action": "change_base_attribute",
+            "value": "Сообразительность вместо исходного атрибута",
+            "description": "Сообразительность для активации любого артефакта вместо того атрибута, который предполагался изначально."
+          },
+          {
+            "target": "Elf and demon languages",
+            "action": "enable_fluent_use",
+            "value": "reading and speech",
+            "description": "Сообразительность для свободного разговора и чтения на языках эльфов и демонов; простые фразы не требуют проверки."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает Сообразительность ключом к защите от магии, свиткам и древним нечеловеческим языкам.",
+        "effects": [
+          {
+            "target": "Defense against spells",
+            "action": "change_base_attribute",
+            "value": "Сообразительность вместо Воли",
+            "description": "Сообразительность вместо Воли для защиты от чужих заклинаний."
+          },
+          {
+            "target": "Spell scrolls, tablets and extinct non-human languages",
+            "action": "unlock_usage",
+            "value": "activation and fluent use",
+            "description": "Позволяет активировать заклинания со свитков и табличек и свободно читать и говорить на вымерших и античных нечеловеческих языках."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "naval-warfare-and-artillery",
+    "name": "Морское Военное Дело и Артиллерия",
+    "category": "ability",
+    "description": "Эксплуатация и организация пушек, осадных машин и алхимического военного снаряжения.",
+    "tags": ["артиллерия", "утилита", "создание", "гранаты"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает работу с легкой артиллерией и полевыми укреплениями.",
+        "effects": [
+          {
+            "target": "Swivels, broadside artillery and fortifications",
+            "action": "unlock_usage",
+            "value": "basic military hardware",
+            "description": "Неофит может использовать вертлюги, бортовую артиллерию и возводить оборонительные сооружения и баррикады."
+          },
+          {
+            "target": "Alchemical grenades",
+            "action": "prevent_catastrophe",
+            "value": "self",
+            "description": "При использовании алхимических гранат персонаж больше не страдает от катастроф."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает тяжелые орудия, осадные машины и специальные боеприпасы.",
+        "effects": [
+          {
+            "target": "Cannons, mortars, catapults, forts and ships",
+            "action": "unlock_usage",
+            "value": "advanced military hardware",
+            "description": "Адепт может использовать и организовывать создание пушек, мортир и катапульт, а также определять слабые места фортов и кораблей."
+          },
+          {
+            "target": "Special military ammunition",
+            "action": "unlock_usage",
+            "value": "smoke screens, breach rounds, fire tubes, portable bombards, culverins",
+            "description": "Открывает работу с дымовыми завесами, прорывными снарядами, огненными трубками, переносными бомбардами и кулевринами без риска катастрофы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Увеличивает разрушительный потенциал всего применяемого военного вооружения.",
+        "effects": [
+          {
+            "target": "Military weapons used by the user",
+            "action": "grant_quality",
+            "value": "massive if absent",
+            "description": "Все используемое мастером военное вооружение получает качество массивного, если не имело его раньше."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blacksmith",
+    "name": "Кузнец",
+    "category": "ability",
+    "description": "Изготовление, починка и модификация оружия, брони и боеприпасов.",
+    "tags": ["создание", "оружие", "броня", "снаряжение"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет делать простое оружие и боеприпасы и подгонять или чинить броню.",
+        "effects": [
+          {
+            "target": "Simple ammunition and weapons",
+            "action": "unlock_crafting",
+            "value": "simple ammo, polearms, short weapons, simple weapons",
+            "description": "Сообразительность, чтобы изготовить простую амуницию для лука, древковое или короткое оружие и другое простое оружие без специальных модификаторов."
+          },
+          {
+            "target": "Armor fit and repair",
+            "action": "unlock_crafting",
+            "value": "fit and patch armor",
+            "description": "Также позволяет подгонять доспехи по телосложению и латать повреждения."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает почти любое немистическое оружие и предметы с одним дополнительным свойством.",
+        "effects": [
+          {
+            "target": "Non-mystical weapons and equipment",
+            "action": "unlock_crafting",
+            "value": "any non-mystical item with one extra property",
+            "description": "Сообразительность, чтобы изготовить оружие с одним дополнительным свойством любой сложности и вообще любое оружие и снаряжение без мистических свойств."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет снимать недостатки, добавлять множество полезных качеств и работать с мистическими свойствами.",
+        "effects": [
+          {
+            "target": "Crafted or modified items",
+            "action": "remove_negative_or_add_positive_properties",
+            "value": "unlimited positive properties",
+            "description": "Сообразительность, чтобы снять негативные качества с предмета или изготовить предмет с любым числом положительных свойств."
+          },
+          {
+            "target": "Mystical equipment",
+            "action": "unlock_crafting",
+            "value": "mystical properties and demigod hands",
+            "description": "Мастер может добавлять мистические свойства к предметам и производить ладони демиурга."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute",
+    "name": "Исключительный Атрибут",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел одного выбранного атрибута.",
+    "tags": ["замена-атрибута", "развитие", "масштабирование"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает один выбранный атрибут на единицу.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 1,
+            "description": "Один атрибут может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение выбранного атрибута до двух единиц.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 2,
+            "description": "Один атрибут может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение выбранного атрибута до трех единиц.",
+        "effects": [
+          {
+            "target": "One chosen attribute",
+            "action": "increase_value",
+            "value": 3,
+            "description": "Один атрибут может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "sixth-sense",
+    "name": "Шестое Чувство",
+    "category": "ability",
+    "description": "Интуитивная стрельба и ориентация без надежды на обычное зрение.",
+    "tags": ["дальний-бой", "восприятие", "замена-атрибута", "инициатива"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит меткость дальнего боя на Бдительность.",
+        "effects": [
+          {
+            "target": "Ranged attack chance",
+            "action": "change_base_attribute",
+            "value": "Бдительность вместо Аккуратности",
+            "description": "Бдительность вместо Аккуратности для расчета шанса попадания оружием дальнего боя."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Переносит инициативу и Защиту на Бдительность.",
+        "effects": [
+          {
+            "target": "Initiative and Defense",
+            "action": "change_base_attribute",
+            "value": "Бдительность вместо Скорости",
+            "description": "Бдительность вместо Скорости для расчета инициативы и Защиты."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет сохранять эффективность в темноте и при ослеплении.",
+        "effects": [
+          {
+            "target": "Ability use while blinded or in darkness",
+            "action": "ignore_condition",
+            "value": "darkness and blindness",
+            "description": "Темнота или ослепление не сказываются на способностях мастера."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "witchcraft",
+    "name": "Ворожба",
+    "category": "ability",
+    "description": "Третий глаз, позволяющий видеть Тени, скрытую магию и подлинную природу вещей.",
+    "tags": ["магия", "восприятие", "тени", "порочность"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет увидеть доминирующую сторону истинной природы цели ценой малой временной Порочности.",
+        "effects": [
+          {
+            "target": "Object, place or creature",
+            "action": "reveal_true_aspect",
+            "value": "1 temporary corruption",
+            "description": "Бдительность, чтобы увидеть доминантную сторону истинной природы объекта, места или существа, пожертвовав единицей временной Порочности."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Раскрывает все стороны Тени цели ценой d4 временной Порочности.",
+        "effects": [
+          {
+            "target": "Object, place or creature",
+            "action": "reveal_all_aspects",
+            "value": "d4 temporary corruption",
+            "description": "Адепт может видеть все стороны Теней объектов, мест и существ, жертвуя d4 временной Порочности."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет явно видеть Тени и связанные с ними силы, платя d6 временной Порочности.",
+        "effects": [
+          {
+            "target": "Shadows and linked powers",
+            "action": "reveal_magic_structure",
+            "value": "d6 temporary corruption",
+            "description": "Мастер может явно видеть Тени всего сущего и связанные с ними силы и способности, потратив d6 временной Порочности."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "marksmanship",
+    "name": "Стрельба",
+    "category": "ability",
+    "description": "Чистая специализация на уроне и пробивной силе оружия дальнего боя.",
+    "tags": ["дальний-бой", "урон", "огнестрел", "луки", "пробивание-брони"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает базовый урон основных дальнобойных архетипов оружия.",
+        "effects": [
+          {
+            "target": "Revolvers, bows and rifles",
+            "action": "increase_damage",
+            "value": "revolver d8, bow and revolver d10, rifle d12",
+            "description": "Урон револьверов увеличивается до d8, луков и револьверов — до d10, а ружей — до d12."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Добавляет травмирующий выстрел, способный пригвоздить цель на месте.",
+        "effects": [
+          {
+            "target": "Enemy hit by ranged attack",
+            "action": "pin_on_check",
+            "value": "until failure",
+            "description": "Аккуратность, чтобы выстрел имел шанс пригвоздить противника к месту и удерживать его там, пока стрелок не провалит проверку."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает все выстрелы бронебойными.",
+        "effects": [
+          {
+            "target": "Ranged weapon attacks",
+            "action": "ignore_armor",
+            "value": true,
+            "description": "Выстрелы мастера игнорируют броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "hunter-instinct",
+    "name": "Инстинкт Охотника",
+    "category": "ability",
+    "description": "Специализация на одной добыче, которая почти лишается шанса уйти живой.",
+    "tags": ["дальний-бой", "слежка", "реакция", "урон"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет выбрать одну цель и перебрасывать по ней промахи дальнобойными атаками.",
+        "effects": [
+          {
+            "target": "One chosen target",
+            "action": "reroll_failed_checks",
+            "value": "all ranged attacks",
+            "description": "Выберите до одной цели; все проверки на атаку оружием дальнего боя по ней можно повторять при провале, пока бой не закончится или цель не умрет."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает урон по отмеченной цели.",
+        "effects": [
+          {
+            "target": "Chosen target",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Все атаки по выбранной цели наносят на +d4 больше урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Наказывает любое движение отмеченной цели свободными дальнобойными атаками.",
+        "effects": [
+          {
+            "target": "Chosen target movement",
+            "action": "trigger_free_attack",
+            "value": "one attack, two on escape",
+            "description": "Любая попытка цели сдвинуться с места провоцирует свободную атаку оружием дальнего боя, а попытка убежать провоцирует две."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "skirmish",
+    "name": "Стычка",
+    "category": "ability",
+    "description": "Искусство делать дальнобойное оружие опасным даже вплотную.",
+    "tags": ["дальний-бой", "ближний-бой", "реакция", "контратака", "оружие"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет отвечать на удар в ближнем бою тычком стрелой, штыком или обухом.",
+        "effects": [
+          {
+            "target": "Enemy making a melee attack against the user",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "Можно ответить на атаку ближнего боя по себе ударом стрелой, штыком или обухом револьвера на d6 урона с учетом эффектов амуниции."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Повышает урон дальнобойного оружия в рукопашной.",
+        "effects": [
+          {
+            "target": "Ranged weapons used in melee",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Урон от дальнобойного оружия в ближнем бою увеличивается до d8."
+          }
+        ]
+      },
+      "master": {
+        "description": "После успешного стрелкового удара позволяет тут же добить врага вторым свободным выстрелом.",
+        "effects": [
+          {
+            "target": "Successful arrow attack",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "После успешно проведенной атаки стрелой мастер может тут же сделать еще один свободный выстрел по врагу в ходе той же реакции."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "trick-shooting",
+    "name": "Трюковая Стрельба",
+    "category": "ability",
+    "description": "Точный контроль над выстрелом ради обезоруживания, ослепления и других эффектных приемов.",
+    "tags": ["дальний-бой", "контроль", "реакция", "утилита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет пожертвовать атакой и движением ради прицельного выстрела с сильным вторичным эффектом.",
+        "effects": [
+          {
+            "target": "Precision shot target",
+            "action": "apply_called_shot",
+            "value": "disarm, blind, pin or similar",
+            "description": "Можно пожертвовать атакой и Движением, чтобы выполнить прицельный выстрел: выбить оружие, ослепить или пригвоздить цель."
+          },
+          {
+            "target": "Target hit by trick shot",
+            "action": "remove_next_action",
+            "value": 1,
+            "description": "Обычная атака с таким выстрелом при попадании заставляет цель потерять следующее действие, пока она справляется с новой проблемой."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет попадать рикошетами без прямой линии видимости по предсказуемо движущейся цели.",
+        "effects": [
+          {
+            "target": "Target without direct line of sight",
+            "action": "ignore_line_of_sight_conditionally",
+            "value": "if target stayed still or moved normally last turn",
+            "description": "Прямая видимость больше не нужна, если цель на прошлом ходу не двигалась или двигалась стандартно: стрелы и пули могут рикошетить и все равно находить ее."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет парировать дальнобойным оружием удары по себе и союзникам.",
+        "effects": [
+          {
+            "target": "Incoming melee or ranged attack",
+            "action": "parry_on_check",
+            "value": "Accuracy",
+            "description": "Аккуратность, чтобы парировать дальнобойным оружием атаку ближнего боя по союзнику или дальнюю атаку по себе либо союзнику; успешная парировка отменяет урон."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "suppressive-fire",
+    "name": "Заградительный Огонь",
+    "category": "ability",
+    "description": "Техника выпуска множества стрел или выстрелов за один ход.",
+    "tags": ["дальний-бой", "мультиатака", "луки", "огнестрел", "перезарядка"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет обменять движение на второй выстрел и быстро перезаряжать огнестрел.",
+        "effects": [
+          {
+            "target": "Bow attacks this turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Если пожертвовать движением, можно выпустить две стрелы вместо одной — по одной цели или по разным."
+          },
+          {
+            "target": "Firearm reloads",
+            "action": "allow_free_action",
+            "value": "reload",
+            "description": "Огнестрельное оружие можно перезаряжать свободным действием."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Снимает цену движения со второй стрелы и переносит ее на второй выстрел из огнестрела.",
+        "effects": [
+          {
+            "target": "Bow and firearm attacks this turn",
+            "action": "grant_extra_attack",
+            "value": "two bow shots without movement loss or two firearm shots with movement cost",
+            "description": "Адепт может делать два выстрела из лука без жертвы движением или два выстрела из огнестрельного оружия, потратив движение."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит град стрел или выстрелов до трех за ход.",
+        "effects": [
+          {
+            "target": "Bow and firearm attacks this turn",
+            "action": "increase_attack_count",
+            "value": "three bow shots without movement loss or three firearm shots with movement cost",
+            "description": "Мастер может сделать три выстрела из лука без траты движения или три выстрела из огнестрельного оружия, пожертвовав движением."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "steel-throw",
+    "name": "Стальной Бросок",
+    "category": "ability",
+    "description": "Мастерство метательного оружия и превращения почти любого предмета в снаряд.",
+    "tags": ["метательное", "мультиатака", "урон", "оружие", "гибкость"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает урон метательного оружия.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Урон от метательного оружия увеличен до d8."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет бросать дважды за одну атаку и эффективно метать обычное оружие ближнего боя.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Любая атака метательным оружием позволяет сделать два броска по одной цели или по нескольким."
+          },
+          {
+            "target": "Melee weapons",
+            "action": "allow_thrown_use",
+            "value": "any melee weapon",
+            "description": "Адепт также может эффективно метать любое оружие ближнего боя."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает одну атаку метательным оружием в тройной залп.",
+        "effects": [
+          {
+            "target": "Thrown weapon attacks",
+            "action": "increase_attack_count",
+            "value": 3,
+            "description": "Любая атака метательным оружием позволяет сделать три броска подряд по одной цели или по нескольким."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "cloak-dance",
+    "name": "Танец с Плащом",
+    "category": "ability",
+    "description": "Дуэльная техника использования плаща или другой ткани как активного оборонительного инструмента.",
+    "tags": ["защита", "плащ", "контроль", "свободная-атака", "дуэль"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Простая ткань в свободной руке повышает Защиту.",
+        "effects": [
+          {
+            "target": "Defense while holding cloth in off-hand",
+            "action": "grant_bonus",
+            "value": 1,
+            "description": "Простая тряпка во второй руке повышает Защиту на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет ослепить врага полотном и немедленно продолжить атаку.",
+        "effects": [
+          {
+            "target": "Enemy adjacent to the user",
+            "action": "blind_without_damage",
+            "value": "until next turn",
+            "description": "Адепт может попытаться ослепить противника полотном в руке; при успехе цель считается ослепленной до начала следующего хода."
+          },
+          {
+            "target": "User after successful blind",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Успешное ослепление дает возможность тут же провести вторую свободную атаку."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает полотно полноценным опутывающим оружием.",
+        "effects": [
+          {
+            "target": "Cloth used in off-hand",
+            "action": "grant_quality",
+            "value": "entangling",
+            "description": "Полотно в руке мастера приобретает качество опутывающего оружия."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blessed-swordsman",
+    "name": "Благословенный Мечник",
+    "category": "ability",
+    "description": "Высшая техника владения сбалансированным мечом с упором на контратаки и чистую дуэль.",
+    "tags": ["оружие", "дуэль", "свободная-атака", "контратака"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает урон оружия в основной руке при соблюдении дуэльной стойки.",
+        "effects": [
+          {
+            "target": "Main-hand balanced sword damage",
+            "action": "increase_damage",
+            "value": "d10",
+            "description": "Урон оружием в основной руке увеличивается до d10."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет один раз за ход отвечать свободной атакой на успешную защиту.",
+        "effects": [
+          {
+            "target": "Successful Defense check",
+            "action": "grant_counterattack",
+            "value": "once per turn",
+            "description": "После успешной проверки Защиты адепт может провести одну свободную атаку как реакцию."
+          }
+        ]
+      },
+      "master": {
+        "description": "Еще повышает урон и снимает лимит на контратаки после удачной защиты.",
+        "effects": [
+          {
+            "target": "Main-hand balanced sword damage",
+            "action": "increase_damage",
+            "value": "d12",
+            "description": "Урон основной рукой увеличивается до d12."
+          },
+          {
+            "target": "Successful Defense checks",
+            "action": "remove_limit",
+            "value": "counterattacks",
+            "description": "Мастер может проводить неограниченное число контратак после каждой удачной проверки Защиты."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "at-the-top",
+    "name": "На вершине",
+    "category": "ability",
+    "description": "Техника боевых каблуков, совмещающая удары ногами и руками в один ритм.",
+    "tags": ["снаряжение", "ближний-бой", "свободная-атака", "оружие", "дуэль"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Усиливает боевые каблуки и избавляет их от неудобства.",
+        "effects": [
+          {
+            "target": "Combat heels",
+            "action": "grant_bonus",
+            "value": "+d2 damage",
+            "description": "Боевые каблуки наносят на +d2 больше урона."
+          },
+          {
+            "target": "Combat heels",
+            "action": "remove_penalty",
+            "value": "unwieldy",
+            "description": "Боевые каблуки теряют качество неудобного."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет раз за ход добавлять свободный удар каблуком к атакам другим оружием.",
+        "effects": [
+          {
+            "target": "Combat heel attack on current turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Раз за ход можно провести свободную атаку боевыми каблуками, если до этого в ходу не было обычных атак каблуками."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает боевые каблуки длинным оружием для себя и других взаимодействий.",
+        "effects": [
+          {
+            "target": "Combat heels",
+            "action": "grant_quality",
+            "value": "long",
+            "description": "Боевые каблуки мастера получают качество длинного в дополнение к уже имеющимся."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "entanglement",
+    "name": "Опутывание",
+    "category": "ability",
+    "description": "Владение сетями, боласами, кнутами и прочим оружием, которое сначала связывает, а потом душит.",
+    "tags": ["опутывание", "контроль", "опрокидывание", "пробивание-брони"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет повторять неудачные попытки опутать врага.",
+        "effects": [
+          {
+            "target": "Failed entangle attempts",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Неофит может повторить любую неуспешную попытку опутать врага."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет столь же надежно добиваться опрокидывания.",
+        "effects": [
+          {
+            "target": "Failed knockdown attempts",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Адепт может повторить любую неуспешную попытку повалить врага на землю."
+          }
+        ]
+      },
+      "master": {
+        "description": "Каждую успешную атаку опутывающим оружием превращает в душащий удар по горлу.",
+        "effects": [
+          {
+            "target": "Successful entangling weapon attacks",
+            "action": "add_damage_and_status",
+            "value": "d6 armor-ignoring, suffocating",
+            "description": "Каждая успешная атака опутывающим оружием получает удушающий эффект и наносит d6 игнорирующего броню урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "composite-weapon-mastery",
+    "name": "Мастерство Владения Составным Оружием",
+    "category": "ability",
+    "description": "Искусство обращения с цепами, цепными мечами и другим составным оружием.",
+    "tags": ["оружие", "опутывание", "мультиатака", "урон", "досягаемость"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Добавляет составному оружию опутывающее качество.",
+        "effects": [
+          {
+            "target": "Composite weapons",
+            "action": "grant_quality",
+            "value": "entangling",
+            "description": "Все составное оружие приобретает качество опутывающего в дополнение к уже имеющимся."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Повышает вторичный урон от попаданий составным оружием.",
+        "effects": [
+          {
+            "target": "Secondary damage from composite weapons",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Вторичный урон от попадания составным оружием увеличивается до d8."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет размахом задевать всех противников вокруг.",
+        "effects": [
+          {
+            "target": "All adjacent enemies",
+            "action": "attack_all_targets",
+            "value": "one attack each turn",
+            "description": "Мастер может каждый ход наносить атаки по всем окружающим его врагам: сколько врагов, столько и атак."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "axe-patterns",
+    "name": "Рисунки Топорами",
+    "category": "ability",
+    "description": "Специализация на топорах, сочетающая оглушающие размены и мощные рубящие удары.",
+    "tags": ["оружие", "ближний-бой", "мультиатака", "оглушение", "урон"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает комбинированную атаку тупой стороной с последующим обычным ударом.",
+        "effects": [
+          {
+            "target": "Axe combo attack",
+            "action": "unlock_combo",
+            "value": "d6 blunt hit into normal attack",
+            "description": "Неофит может сперва ударить тупой стороной топора на d6, чтобы шокировать и оглушить, а при успехе сразу продолжить обычной атакой."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет делать две атаки за ход ценой снижения урона.",
+        "effects": [
+          {
+            "target": "Axe attacks this turn",
+            "action": "grant_extra_attack",
+            "value": "two attacks, -d2 damage",
+            "description": "Адепт может выполнить две атаки за один ход, но урон сокращается на -d2."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает каждый одиночный удар за действие.",
+        "effects": [
+          {
+            "target": "Single attack per action",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Любая одна атака за действие наносит на +d4 больше урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "polearm",
+    "name": "Древковое Оружие",
+    "category": "ability",
+    "description": "Классическое мастерство длинного оружия, контролирующего дистанцию и движение врага.",
+    "tags": [
+      "древковое",
+      "досягаемость",
+      "контроль",
+      "свободная-атака",
+      "ближний-бой"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает урон копий, алебард, посохов и любого длинного оружия.",
+        "effects": [
+          {
+            "target": "Long weapons",
+            "action": "increase_damage",
+            "value": "spears and halberds d10, staffs d8, all long weapons +d2",
+            "description": "Копья и алебарды наносят d10, посохи — d8, а все длинное оружие увеличивает урон на +d2."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет встречать свободной атакой любой подход или отход противника без длинного оружия.",
+        "effects": [
+          {
+            "target": "Enemy approaching or leaving melee",
+            "action": "trigger_free_attack",
+            "value": "as reaction unless enemy also has long weapon",
+            "description": "Адепт может провести свободную атаку по любому, кто пытается подойти или отойти, если тот сам не вооружен длинным оружием."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает свободные атаки длинным оружием в жесткий стопор движения.",
+        "effects": [
+          {
+            "target": "Enemy hit by free attack from long weapon",
+            "action": "stop_movement",
+            "value": "immediate",
+            "description": "Любая свободная атака мастера заставляет противника мгновенно прервать движение даже если удар не пробил броню."
+          },
+          {
+            "target": "Enemy trying to approach or retreat",
+            "action": "lock_distance_while_successful",
+            "value": "cannot approach or withdraw",
+            "description": "Пока мастер продолжает успешно встречать такие движения, противник не может ни подойти, ни отойти без его согласия."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "staff-mastery",
+    "name": "Владение Посохами",
+    "category": "ability",
+    "description": "Подвид мастерства длинного оружия, делающий посох одновременно защитой, рычагом и ударным инструментом.",
+    "tags": ["древковое", "защита", "свободная-атака", "опрокидывание"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Повышает Защиту с длинным оружием и особенно — с посохом.",
+        "effects": [
+          {
+            "target": "Defense with long weapons",
+            "action": "grant_bonus",
+            "value": "+1 with long weapons, +2 with staff",
+            "description": "Защита увеличивается на единицу при использовании длинного оружия и на две — при использовании посоха."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет отвечать вторым концом посоха на отраженную атаку и контратаковать после успешной защиты.",
+        "effects": [
+          {
+            "target": "Blocked first attack with long weapon",
+            "action": "grant_extra_attack",
+            "value": "d6 with other end",
+            "description": "Если первая атака была отражена, адепт может провести дополнительную свободную атаку другим концом длинного оружия с максимальным уроном d6."
+          },
+          {
+            "target": "Successful Defense check",
+            "action": "grant_counterattack",
+            "value": "d6",
+            "description": "После удачной защиты адепт может провести ответную свободную атаку посохом на d6 как реакцию."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет валить врага после удара и сразу добивать его второй атакой с преимуществом.",
+        "effects": [
+          {
+            "target": "Enemy hit by staff",
+            "action": "knock_down_on_check",
+            "value": "follow-up d6 with advantage",
+            "description": "Аккуратность, чтобы после успешной атаки опрокинуть противника и тут же произвести дополнительную свободную атаку на d6 с преимуществом."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "double-strike",
+    "name": "Двойной Удар",
+    "category": "ability",
+    "description": "Боевой стиль с двумя клинками или иными оружиями в обеих руках.",
+    "tags": ["вторая-рука", "мультиатака", "ближний-бой", "защита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает базовую двухоружейную схему и бонус к Защите от второй руки.",
+        "effects": [
+          {
+            "target": "Dual wield attack routine",
+            "action": "unlock_style",
+            "value": "main-hand any melee d8, off-hand short melee d6",
+            "description": "Можно использовать любое оружие ближнего боя в основной руке и короткое — во второй, выполняя две атаки за ход против одной цели: d8 и d6."
+          },
+          {
+            "target": "Defense with off-hand weapon",
+            "action": "grant_bonus",
+            "value": 1,
+            "description": "Если во второй руке есть оружие, Защита повышается на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Снимает ограничение короткого оружия со второй руки.",
+        "effects": [
+          {
+            "target": "Dual wield loadout",
+            "action": "expand_allowed_weapons",
+            "value": "two melee weapons up to d8 each",
+            "description": "Адепт может использовать два оружия ближнего боя, даже если они не короткие, и каждое из них может нанести до d8 урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Поднимает потолок урона для оружия в главной руке.",
+        "effects": [
+          {
+            "target": "Main-hand weapon damage",
+            "action": "increase_damage",
+            "value": "d10",
+            "description": "Оружие в главной руке может наносить до d10 урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "iron-body",
+    "name": "Железное Тело",
+    "category": "ability",
+    "description": "Грубая физическая мощь, заменяющая точность и повышающая урон в ближнем бою.",
+    "tags": ["сила", "ближний-бой", "замена-атрибута", "урон"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит шанс попадания в ближнем бою на Силу.",
+        "effects": [
+          {
+            "target": "Melee attack chance",
+            "action": "change_base_attribute",
+            "value": "Сила вместо Аккуратности",
+            "description": "Сила вместо Аккуратности для расчета шанса попадания оружием ближнего боя."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает все удары оружием ближнего боя.",
+        "effects": [
+          {
+            "target": "Melee weapon attacks",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Все атаки оружием ближнего боя наносят на d4 больше урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Раз в ход позволяет заменить обычное усиление на особенно мощный удар.",
+        "effects": [
+          {
+            "target": "One melee attack each turn",
+            "action": "modify_value",
+            "value": "+d8 instead of +d4",
+            "description": "Раз за ход мастер может нанести на d8 больше урона вместо обычных d4."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "behemoth",
+    "name": "Бегемот",
+    "category": "ability",
+    "description": "Специализация на тяжелом двуручном оружии и его инерции.",
+    "tags": ["оружие", "урон", "пробивание-брони"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Поднимает урон тяжелого двуручного оружия до d12.",
+        "effects": [
+          {
+            "target": "Heavy two-handed weapons",
+            "action": "increase_damage",
+            "value": "d12",
+            "description": "Тяжелое двуручное оружие может наносить до d12 урона."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет использовать обратную инерцию промаха, чтобы все-таки достать цель.",
+        "effects": [
+          {
+            "target": "Missed heavy two-handed attack",
+            "action": "convert_miss_to_hit",
+            "value": "d8 max damage",
+            "description": "Если атака промахнулась, адепт может использовать возвращающую инерцию замаха, чтобы все-таки попасть по цели с максимальным уроном d8."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает тяжелые двуручные удары бронебойными.",
+        "effects": [
+          {
+            "target": "Heavy two-handed attacks",
+            "action": "ignore_armor",
+            "value": true,
+            "description": "Атаки тяжелым двуручным оружием игнорируют броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "shields",
+    "name": "Щиты",
+    "category": "ability",
+    "description": "Боевой стиль, в котором щит становится не только защитой, но и ударным оружием.",
+    "tags": ["щит", "защита", "ближний-бой", "опрокидывание", "вторая-рука"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Усиливает комбинацию щита с одноручным оружием и заметно повышает Защиту.",
+        "effects": [
+          {
+            "target": "Main-hand one-handed weapons",
+            "action": "increase_damage",
+            "value": "one-handed swords d10, short one-handed d8",
+            "description": "Одноручные мечи в основной руке наносят до d10 урона, а одноручное короткое оружие — до d8."
+          },
+          {
+            "target": "Defense while using shield",
+            "action": "grant_bonus",
+            "value": 2,
+            "description": "Щиты повышают Защиту на две единицы."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет добивать каждый успешный удар атакой щитом с шансом повалить врага.",
+        "effects": [
+          {
+            "target": "Successful main-hand attack",
+            "action": "grant_extra_attack",
+            "value": "shield strike d4",
+            "description": "Каждая успешная атака оружием в основной руке может сопровождаться атакой щитом, которая при успехе наносит d4 урона."
+          },
+          {
+            "target": "Enemy hit by shield strike",
+            "action": "knock_down_on_check",
+            "value": "Strength",
+            "description": "Сила, чтобы определить, смогла ли эта атака щитом также повалить противника на землю."
+          }
+        ]
+      },
+      "master": {
+        "description": "Поднимает урон щитового удара до полноценного атакующего значения.",
+        "effects": [
+          {
+            "target": "Shield strikes",
+            "action": "increase_damage",
+            "value": "d8",
+            "description": "Удар щитом наносит до d8 урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "unarmed-combat",
+    "name": "Невооруженный Бой",
+    "category": "ability",
+    "description": "Полноценное боевое искусство голыми руками, когтями и любым натуральным оружием тела.",
+    "tags": ["оружие", "мультиатака", "урон", "ближний-бой"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Делает безоружные удары опасными и усиливает врожденное натуральное оружие.",
+        "effects": [
+          {
+            "target": "Unarmed attacks",
+            "action": "increase_damage",
+            "value": "d6",
+            "description": "Невооруженные атаки наносят d6 урона."
+          },
+          {
+            "target": "Natural weapon traits",
+            "action": "grant_bonus",
+            "value": "+d2 effectiveness",
+            "description": "Если тело уже наделено натуральным оружием, его эффективность увеличивается на +d2."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет наносить две безоружные атаки вместо одной.",
+        "effects": [
+          {
+            "target": "Unarmed attacks this turn",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "Адепт Невооруженного Боя может наносить две атаки вместо одной."
+          }
+        ]
+      },
+      "master": {
+        "description": "Добавляет болезненные удары по самым уязвимым местам.",
+        "effects": [
+          {
+            "target": "Unarmed attacks",
+            "action": "grant_bonus",
+            "value": "+d6 damage",
+            "description": "Каждая атака мастера приносит дополнительно d6 урона, потому что он бьет в наиболее незащищенные участки тела."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wrestling",
+    "name": "Борьба",
+    "category": "ability",
+    "description": "Контроль тела противника через захваты, броски и удушающие удержания без всякой магии.",
+    "tags": [
+      "захват",
+      "метательное",
+      "контроль",
+      "реакция",
+      "пробивание-брони"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "После любой успешной атаки открывает захват с выбором между броском и удержанием.",
+        "effects": [
+          {
+            "target": "Enemy hit by the user",
+            "action": "unlock_grapple_followup",
+            "value": "throw or hold",
+            "description": "Любая успешная атака открывает захват: Сила, чтобы бросить врага на d4 игнорирующего броню урона и опрокинуть его, либо удерживать без урона, не давая двигаться и действовать."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет контратаковать захватом после удачной защиты и проверки Скорости.",
+        "effects": [
+          {
+            "target": "Enemy attacking the user",
+            "action": "counter_grapple_on_checks",
+            "value": "Defense plus Speed, d4 damage and interrupt",
+            "description": "При удачной проверке Защиты и Скорости адепт может реакцией контратаковать захватом, бросить противника на землю, нанести d4 урона и прервать его ход."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет опережать атаку захватом через Скорость и сразу добивать упавшую цель.",
+        "effects": [
+          {
+            "target": "Incoming attack against the user",
+            "action": "replace_defense_with_speed_check",
+            "value": "auto-throw on success",
+            "description": "Мастер может заранее заменить проверку Защиты проверкой Скорости; успех автоматически бросает противника на землю, наносит d6 урона и прерывает его ход."
+          },
+          {
+            "target": "Prone enemy thrown by the user",
+            "action": "grant_extra_attack",
+            "value": 1,
+            "description": "После удачного упреждающего броска мастер может провести свободную атаку по упавшему противнику."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fury",
+    "name": "Ярость",
+    "category": "ability",
+    "description": "Осознанная боевая злость, которая жертвует защитой ради разрушительной ближней атаки.",
+    "tags": ["ближний-бой", "урон", "защита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Дает большой прирост урона в ближнем бою ценой резкого падения Защиты.",
+        "effects": [
+          {
+            "target": "Melee attacks while enraged",
+            "action": "grant_bonus",
+            "value": "+d6 damage",
+            "description": "Злость позволяет наносить на +d6 больше урона в ближнем бою."
+          },
+          {
+            "target": "Defense while enraged",
+            "action": "set_value",
+            "value": 5,
+            "description": "Пока действует этот эффект, Защита снижается до 5."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Превращает ярость в слой брони и уменьшает любой получаемый урон.",
+        "effects": [
+          {
+            "target": "Incoming attacks",
+            "action": "reduce_damage",
+            "value": "d4",
+            "description": "Адепт получает на d4 меньше урона от всех атак."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает штраф к Защите, сохраняя все прочие бонусы ярости.",
+        "effects": [
+          {
+            "target": "Defense while enraged",
+            "action": "remove_penalty",
+            "value": "defense reduction",
+            "description": "Злость больше не влияет на показатель Защиты, сохраняя остальные бонусы способности."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "recovery",
+    "name": "Восстановление",
+    "category": "ability",
+    "description": "Медитативное самолечение, позволяющее быстро поднимать себя на ноги даже в бою.",
+    "tags": ["исцеление", "воля", "реакция", "выживаемость"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет раз в день восстанавливать d4 Выживаемости, пытаясь до первого успеха.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "restore_health_on_check",
+            "value": "d4 once per day",
+            "description": "Воля, чтобы восстановить d4 Выживаемости раз в день; попытки можно повторять раз в ход ценой действия до первого успеха."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Повышает разовый предел самолечения до d6.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "increase_healing_cap",
+            "value": "d6 once per day",
+            "description": "Адепт Восстановления может восстановить до d6 Выживаемости раз в день."
+          }
+        ]
+      },
+      "master": {
+        "description": "Повышает предел лечения до d8 и позволяет срабатывать в ответ на свежую рану.",
+        "effects": [
+          {
+            "target": "Self healing",
+            "action": "increase_healing_cap",
+            "value": "d8 once per day",
+            "description": "Мастер может восстановить до d8 Выживаемости раз в день."
+          },
+          {
+            "target": "Freshly received damage",
+            "action": "allow_reaction",
+            "value": "self-heal trigger",
+            "description": "Это восстановление можно применить даже реакцией на только что полученные повреждения."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "feat-of-strength",
+    "name": "Подвиг Силы",
+    "category": "ability",
+    "description": "Героическая мощь, делающая тело выносливее и опаснее без всякой магической цены.",
+    "tags": ["сила", "выживаемость", "урон", "условное"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит расчет Выживаемости на Силу, не меняя болевой порог.",
+        "effects": [
+          {
+            "target": "Survivability",
+            "action": "change_formula",
+            "value": "Сила + 5",
+            "description": "Выживаемость неофита рассчитывается через Силу + 5, но болевой порог не увеличивается."
+          }
+        ]
+      },
+      "adept": {
+        "description": "При половинной Выживаемости позволяет перебрасывать все проваленные проверки на Силу.",
+        "effects": [
+          {
+            "target": "Failed Strength checks at half Survivability",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "Когда Выживаемость снижена наполовину, можно повторить все проваленные проверки на Силу, включая атаки, основанные на Силе."
+          }
+        ]
+      },
+      "master": {
+        "description": "При половинной Выживаемости добавляет бонусный урон в ближнем бою.",
+        "effects": [
+          {
+            "target": "Melee weapon attacks at half Survivability",
+            "action": "grant_bonus",
+            "value": "+d4 damage",
+            "description": "Когда Выживаемость мастера снижена наполовину, он наносит на +d4 больше урона своим оружием ближнего боя."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bodyguard",
+    "name": "Телохранитель",
+    "category": "ability",
+    "description": "Искусство закрывать союзников собой и немедленно карать тех, кто поднимает на них руку.",
+    "tags": ["охрана", "поддержка", "реакция", "защита", "контратака"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет принять на себя даже ту атаку, от которой союзник не может защититься.",
+        "effects": [
+          {
+            "target": "Attack against an ally",
+            "action": "intercept_on_check",
+            "value": "Will",
+            "description": "Воля, чтобы загородить собой атаку по союзнику, от которой тот не может защититься."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет эффективно обороняться от всех перенаправленных на себя ударов.",
+        "effects": [
+          {
+            "target": "Reflected or intercepted attacks on behalf of an ally",
+            "action": "use_full_defense",
+            "value": "without restriction",
+            "description": "Адепт может эффективно обороняться от всех отраженных атак на союзника, используя свою Защиту без ограничения."
+          }
+        ]
+      },
+      "master": {
+        "description": "Любое нападение на союзника превращает в повод для собственной свободной атаки.",
+        "effects": [
+          {
+            "target": "Enemy attacking an ally",
+            "action": "trigger_free_attack",
+            "value": 1,
+            "description": "Любое нападение на союзника вызывает свободную атаку по нападавшему от мастера-телохранителя."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "soldier",
+    "name": "Солдат",
+    "category": "ability",
+    "description": "Профессиональное владение броней, превращающее ее во вторую кожу и мистическую опору.",
+    "tags": ["броня", "защита", "подвижность", "магия", "снаряжение"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Усиливает любую носимую броню на один шаг защиты.",
+        "effects": [
+          {
+            "target": "Worn armor",
+            "action": "increase_protection",
+            "value": "light d6, medium d8, heavy d10",
+            "description": "Любая броня защищает на +d2 лучше: легкая дает d6 вместо d4, средняя — d8 вместо d6, тяжелая — d10 вместо d8."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Снимает физические ограничения брони, влияющие на Защиту и подвижность.",
+        "effects": [
+          {
+            "target": "Armor movement and defense penalties",
+            "action": "remove_penalty",
+            "value": "physical armor restrictions",
+            "description": "Физические ограничения брони, влияющие на Защиту через снижение Скорости, больше не мешают, и адепт двигается в броне так же эффективно, как без нее."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет сопротивляться пробитию брони и применять мистические силы даже в громоздком доспехе.",
+        "effects": [
+          {
+            "target": "Armor bypass or armor piercing effects",
+            "action": "counter_on_check",
+            "value": "Speed",
+            "description": "Скорость, чтобы противодействовать любым эффектам игнорирования или пробивания брони."
+          },
+          {
+            "target": "Mystical power use in armor",
+            "action": "remove_penalty",
+            "value": "armor restrictions",
+            "description": "Мистические силы больше не ограничиваются никакой носимой броней, даже самой громоздкой."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fortitude",
+    "name": "Стойкость",
+    "category": "ability",
+    "description": "Ментальная дисциплина и воля, защищающие от ограничений и отражающие слабые психические удары.",
+    "tags": ["сопротивление", "воля", "сила", "ментальное", "реакция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет перебрасывать проверки на освобождение от физических ограничений.",
+        "effects": [
+          {
+            "target": "Failed Strength or Will checks against physical restraints",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Неофит может повторить любую неудачную проверку Силы или Воли для освобождения от сетей, ловушек, магического льда и других ограничивающих физических эффектов."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Распространяет ту же надежность на нефизические ментальные воздействия.",
+        "effects": [
+          {
+            "target": "Failed Strength or Will checks against mental effects",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Адепт может повторить любую неудачную проверку Силы или Воли против замешательства, очарования, подчинения и прочих нефизических эффектов."
+          }
+        ]
+      },
+      "master": {
+        "description": "Наказывает провалившиеся ментальные атаки обратным выбросом силы.",
+        "effects": [
+          {
+            "target": "Attacker whose mental attack failed",
+            "action": "deal_damage",
+            "value": "d6 armor-ignoring",
+            "description": "Любая провалившаяся ментальная атака по мастеру вызывает ответную реакцию в d6 игнорирующего броню урона по нападавшему."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-powers",
+    "name": "Мистические Силы",
+    "category": "ability",
+    "description": "Базовая способность владеть заклинаниями, которые повышают постоянную и временную Порочность.",
+    "tags": ["магия", "заклинания", "порочность", "традиция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает заклинание уровня неофита.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "novice",
+            "description": "Позволяет владеть заклинанием уровня Неофита."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает заклинание уровня адепта.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "adept",
+            "description": "Позволяет владеть заклинанием уровня Адепта."
+          }
+        ]
+      },
+      "master": {
+        "description": "Открывает заклинание уровня мастера.",
+        "effects": [
+          {
+            "target": "Spell access",
+            "action": "unlock_spell_tier",
+            "value": "master",
+            "description": "Позволяет владеть заклинанием уровня Мастера."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-order",
+    "name": "Мистическая Традиция: Орден",
+    "category": "ability",
+    "description": "Академическая традиция Ордена, снижающая цену изучения и применения собственных заклинаний.",
+    "tags": ["магия", "традиция", "мистическая-традиция", "ментальное"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает постоянную Порочность с неофитских заклинаний и ритуалов академической традиции.",
+        "effects": [
+          {
+            "target": "Academic novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Инициат Ордена не получает постоянной Порочности, изучая заклинания уровня Неофита и ритуалы академической традиции."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Ограничивает временную Порочность от академической магии и снимает постоянную цену с адептских заклинаний.",
+        "effects": [
+          {
+            "target": "Academic spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Применение академических заклинаний и ритуалов повышает временную Порочность не больше чем на одну единицу."
+          },
+          {
+            "target": "Academic adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Полноправный член Ордена не получает постоянной Порочности при изучении адептских заклинаний своей традиции."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает постоянную цену с мастерских заклинаний и помогает удерживать массовую и цепную магию.",
+        "effects": [
+          {
+            "target": "Academic master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Старший маг Ордена не получает постоянной Порочности при изучении мастерских заклинаний своей традиции."
+          },
+          {
+            "target": "Failed checks for chained or mass spells",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Можно повторить проваленные проверки, связанные с продолжительностью или эффективностью цепных и массовых заклинаний."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-witches-circle",
+    "name": "Мистическая Традиция: Круг Ведьм",
+    "category": "ability",
+    "description": "Дикая ведьмовская традиция, снижающая Порочность своих проклятий, природной магии и ритуалов.",
+    "tags": ["магия", "традиция", "мистическая-традиция", "проклятие"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает постоянную Порочность с неофитских заклинаний и ритуалов ведьмовской традиции.",
+        "effects": [
+          {
+            "target": "Wild novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Ученица ведьм не получает постоянной Порочности, когда изучает заклинания уровня Неофита и ритуалы своей дикой традиции."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Ограничивает временную Порочность от дикой магии и снимает цену изучения адептских заклинаний.",
+        "effects": [
+          {
+            "target": "Wild spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Применение диких заклинаний и ритуалов повышает временную Порочность не больше чем на одну единицу."
+          },
+          {
+            "target": "Wild adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Ведьма не получает постоянной Порочности, когда изучает заклинания уровня Адепта своей традиции."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает постоянную цену с мастерских заклинаний дикой традиции.",
+        "effects": [
+          {
+            "target": "Wild master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Старшая Ведьма Туманов не получает постоянной Порочности, когда изучает мастерские заклинания своей дикой традиции."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-theurgy",
+    "name": "Мистическая Традиция: Теургия",
+    "category": "ability",
+    "description": "Церковная традиция Аполеаты, снижающая цену исцеляющей и защитной магии и усиливающая ее против чудовищ.",
+    "tags": [
+      "магия",
+      "традиция",
+      "церковь",
+      "исцеление",
+      "охрана",
+      "мистическая-традиция"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает постоянную Порочность с неофитских церковных заклинаний и ритуалов.",
+        "effects": [
+          {
+            "target": "Church novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Клирик Аполеаты не получает постоянной Порочности, изучая неофитские заклинания и ритуалы церковной традиции."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Ограничивает временную Порочность от церковной магии и снимает цену изучения адептских заклинаний.",
+        "effects": [
+          {
+            "target": "Church spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Применение церковных заклинаний и ритуалов повышает временную Порочность не больше чем на одну единицу."
+          },
+          {
+            "target": "Church adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Брат или Сестра Церкви Аполеаты не получают постоянной Порочности при изучении адептских заклинаний своей традиции."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает цену изучения мастерской церковной магии и усиливает лечение и священный урон.",
+        "effects": [
+          {
+            "target": "Church master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Отец или Мать Церкви Аполеаты не получают постоянной Порочности при изучении мастерских заклинаний своей традиции."
+          },
+          {
+            "target": "Healing and anti-monster spell effects",
+            "action": "grant_bonus",
+            "value": "+d4 effectiveness",
+            "description": "Все исцеляющие заклинания и немистические практики лечения становятся эффективнее на +d4, как и повреждающие заклинания против монстров и Пороков."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-ratassan",
+    "name": "Мистическая Традиция: Ратассан",
+    "category": "ability",
+    "description": "Дворцовая лапалийская традиция огненной и боевой магии, снижающая цену собственной школы.",
+    "tags": ["магия", "традиция", "мистическая-традиция", "огонь"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает постоянную Порочность с неофитских заклинаний и ритуалов дворцовой традиции.",
+        "effects": [
+          {
+            "target": "Court novice spells and rituals",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Лапалийский барон не получает постоянной Порочности, изучая неофитские заклинания и ритуалы дворцовой традиции."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Ограничивает временную Порочность от дворцовой магии и снимает цену изучения адептских заклинаний.",
+        "effects": [
+          {
+            "target": "Court spells and rituals",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Применение дворцовых заклинаний и ритуалов повышает временную Порочность не больше чем на одну единицу."
+          },
+          {
+            "target": "Court adept spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Виконт Лапалийи не получает постоянной Порочности при изучении адептских заклинаний дворцовой традиции."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает цену изучения мастерских дворцовых заклинаний и повышает надежность стихии.",
+        "effects": [
+          {
+            "target": "Court master spells",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Маркиз Лапалийи не получает постоянной Порочности при изучении мастерских заклинаний дворцовой традиции."
+          },
+          {
+            "target": "Failed elemental spell checks",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Мастер может повторить любую неуспешную проверку на стихийные заклинания."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-sorcery",
+    "name": "Мистическая Традиция: Колдовство",
+    "category": "ability",
+    "description": "Колдовская традиция, которая не избегает Порока, а учится использовать его как топливо и оружие.",
+    "tags": ["магия", "традиция", "порочность", "тени", "мистическая-традиция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет волей ужать новую Порочность до единицы.",
+        "effects": [
+          {
+            "target": "New corruption gain",
+            "action": "minimize_on_check",
+            "value": 1,
+            "description": "Воля, чтобы минимизировать новую Порочность до одной единицы."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет повторить провал магии ценой дополнительной временной Порочности.",
+        "effects": [
+          {
+            "target": "Failed mystical power check",
+            "action": "reroll_failed_checks",
+            "value": "gain d4 temporary corruption on successful retry",
+            "description": "Если колдун провалил проверку применения Мистической Силы, он может повторить ее за счет собственной Порочности; при успехе заклинание срабатывает, но колдун получает d4 временной Порочности."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет использовать чужую Порочность, понижая защиту цели против своих заклинаний.",
+        "effects": [
+          {
+            "target": "Spell defense of corrupted targets",
+            "action": "change_defense_formula",
+            "value": "Shadow instead of Will",
+            "description": "Сильный колдун может заставить цель защищаться от его магии Тенью, то есть Волей за вычетом текущей Порочности; монстры к этому невосприимчивы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-sirens",
+    "name": "Мистическая Традиция: Сирены",
+    "category": "ability",
+    "description": "Песенная традиция подчинения и очарования, делающая магию разума особенно устойчивой.",
+    "tags": [
+      "магия",
+      "традиция",
+      "мистическая-традиция",
+      "ментальное",
+      "контроль-разума"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает постоянную Порочность с неофитских сил и дает переброс одиночного воздействия на разум.",
+        "effects": [
+          {
+            "target": "Novice spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Изучение мистических сил уровня Неофита не добавляет постоянной Порочности."
+          },
+          {
+            "target": "Single-target mind-affecting spell or effect",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Неофит Сирен может повторить проверку заклинания или другого эффекта, воздействующего на разум, если это не массовое воздействие."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Снимает постоянную цену с адептских сил и позволяет перебросить любую одну проверку воздействия на разум.",
+        "effects": [
+          {
+            "target": "Adept spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Изучение мистических сил уровня Адепта не добавляет постоянной Порочности."
+          },
+          {
+            "target": "One mind-affecting spell or effect check",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Сирена может повторить одну любую проверку заклинания и другого эффекта, воздействующего на разум."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает постоянную цену с мастерских сил и позволяет повторять проверки разума столько раз, сколько нужно по эффекту.",
+        "effects": [
+          {
+            "target": "Master spells of the tradition",
+            "action": "remove_permanent_corruption",
+            "value": true,
+            "description": "Изучение мистических сил уровня Мастера не добавляет постоянной Порочности."
+          },
+          {
+            "target": "Mind-affecting spell or effect checks",
+            "action": "remove_limit",
+            "value": "repeats as needed",
+            "description": "Сирена может повторить столько проверок заклинаний и других воздействий на разум, сколько требуется по эффекту."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-symbolism",
+    "name": "Мистическая Традиция: Символизм",
+    "category": "ability",
+    "description": "Традиция магических символов, заранее подготавливающая и упаковывающая эффекты без немедленного вреда Тени.",
+    "tags": [
+      "магия",
+      "традиция",
+      "мистическая-традиция",
+      "заклинания",
+      "ловушки"
+    ],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Требует физически рисовать символы долго и позволяет держать заготовленным только один.",
+        "effects": [
+          {
+            "target": "Prepared symbols",
+            "action": "set_preparation_rules",
+            "value": "one hour, one stored symbol, one-turn activation",
+            "description": "Руна должна иметь физическую форму; ее создание занимает час, заготовить заранее можно только один символ, а активация требует целого хода."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет рисовать символы за ход, хранить несколько и запускать их словом или условием.",
+        "effects": [
+          {
+            "target": "Prepared symbols",
+            "action": "relax_preparation_rules",
+            "value": "draw in one turn, multiple stored symbols, free-action activation",
+            "description": "Символ можно нарисовать за один ход, хранить больше одного и активировать свободным действием коротким словом либо заданным условием."
+          },
+          {
+            "target": "Existing symbol",
+            "action": "erase_on_touch",
+            "value": true,
+            "description": "Символист может стереть любой символ простым прикосновением."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет рисовать и активировать символы прямо в воздухе мгновенно.",
+        "effects": [
+          {
+            "target": "Air-drawn symbols",
+            "action": "instant_cast",
+            "value": "draw in air and activate immediately",
+            "description": "Опытный Символист может рисовать символы в воздухе и моментально их активировать; такие символы горят в воздухе до конца боя."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "ritualist",
+    "name": "Ритуалист",
+    "category": "ability",
+    "description": "Умение изучать, распознавать и проводить долгие мистические ритуалы разных традиций.",
+    "tags": ["магия", "порочность", "знание", "традиция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет выучить один ритуал любой традиции.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 1,
+            "description": "Неофит Ритуалист может изучить до одного ритуала, если найдет учителя или другой источник знания."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Повышает лимит известных ритуалов до трех.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 3,
+            "description": "Адепт Ритуалист может изучить до трех ритуалов."
+          }
+        ]
+      },
+      "master": {
+        "description": "Повышает лимит известных ритуалов до шести.",
+        "effects": [
+          {
+            "target": "Known rituals",
+            "action": "increase_limit",
+            "value": 6,
+            "description": "Мастер Ритуалист может изучить до шести ритуалов."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "special-gift",
+    "name": "Особый Дар",
+    "category": "ability",
+    "description": "Редкий мистический талант, помогающий безопаснее носить Порок и пользоваться более широкой магией.",
+    "tags": ["магия", "порочность", "заклинания", "масштабирование"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Снижает временную Порочность одного выбранного заклинания или способности до единицы.",
+        "effects": [
+          {
+            "target": "One chosen spell or ability with temporary corruption cost",
+            "action": "cap_temporary_corruption",
+            "value": 1,
+            "description": "Выберите одно доступное заклинание или способность: их временная Порочность при использовании никогда не превышает единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Удваивает Порог и Предел Порочности.",
+        "effects": [
+          {
+            "target": "Corruption Threshold and Limit",
+            "action": "multiply_value",
+            "value": 2,
+            "description": "Адепт Особого Дара повышает свои Порог Порочности и Предел Порочности в два раза."
+          }
+        ]
+      },
+      "master": {
+        "description": "Открывает доступ к новичковым силам всех традиций и позволяет перебрасывать мистические проверки ценой риска.",
+        "effects": [
+          {
+            "target": "Mystical traditions",
+            "action": "unlock_spell_tier",
+            "value": "novice from all traditions",
+            "description": "Мастер может пользоваться всеми мистическими силами из всех традиций хотя бы на уровне новичка."
+          },
+          {
+            "target": "Any mystical check",
+            "action": "reroll_failed_checks",
+            "value": "gain d8 corruption if second roll also fails",
+            "description": "Любую проверку, связанную с мистическими силами, можно повторить, но если вторая проверка тоже провалена, персонаж получает d8 Порочности."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "guided-sin",
+    "name": "Направляемый Грех",
+    "category": "ability",
+    "description": "Манипуляция Порочностью как собственной энергией: перенаправление, усиление и сброс на других.",
+    "tags": ["порочность", "магия", "утилита", "воля"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет забирать на себя временную Порочность, которая должна была коснуться стоящего рядом.",
+        "effects": [
+          {
+            "target": "Temporary corruption affecting nearby ally",
+            "action": "redirect_to_self",
+            "value": "free action",
+            "description": "Неофит может перенаправлять на себя временную Порочность в любой ситуации, когда она должна была повлиять на кого-то еще рядом."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет дважды прокидывать приобретенную Порочность и выбирать более желательный исход.",
+        "effects": [
+          {
+            "target": "Corruption gain for self or redirected target",
+            "action": "roll_twice_choose_result",
+            "value": "higher or lower",
+            "description": "Адепт может дважды проходить проверки на приобретенную Порочность и выбрать более желательный для себя объем — меньший или больший."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет направлять принимаемую Порочность на видимую жертву.",
+        "effects": [
+          {
+            "target": "Visible victim",
+            "action": "redirect_corruption_on_check",
+            "value": "Will",
+            "description": "Воля, чтобы направить свою получаемую Порочность на видимую жертву; при неудаче мастер получает половину, а остальное рассеивается."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "demiurge-hands",
+    "name": "Ладони демиурга",
+    "category": "ability",
+    "description": "Навык раскрывать потенциал дорогих мистических ладоней и безопаснее перенаправлять в них Порочность.",
+    "tags": ["магия", "снаряжение", "порочность", "гибкость"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Делает все ладони демиурга гибкими.",
+        "effects": [
+          {
+            "target": "Demiurge hands",
+            "action": "grant_quality",
+            "value": "flexible",
+            "description": "Все ладони демиурга неофита получают качество гибкого."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет менять ладони в движении и раз за бой сбрасывать в них часть временной Порочности.",
+        "effects": [
+          {
+            "target": "Equipped demiurge hands",
+            "action": "swap_on_movement",
+            "value": true,
+            "description": "Адепт может заменять надетые ладони демиурга прямо во время хода, тратя на это движение."
+          },
+          {
+            "target": "Temporary corruption received by the user",
+            "action": "redirect_to_item",
+            "value": "once per battle up to difficulty modifier",
+            "description": "Раз за бой адепт может перенаправить в ладонь демиурга объем полученной временной Порочности, равный ее модификатору затруднения."
+          }
+        ]
+      },
+      "master": {
+        "description": "Снимает сковывающее затруднение, позволяет менять ладони свободно и удерживать один эффект на весь день.",
+        "effects": [
+          {
+            "target": "Demiurge hands difficulty modifier",
+            "action": "remove_penalty",
+            "value": "binding modifier",
+            "description": "Сковывающий модификатор затруднения больше не действует на мастера."
+          },
+          {
+            "target": "Equipped demiurge hands",
+            "action": "allow_free_action",
+            "value": "swap hands",
+            "description": "Мастер может заменять ладони демиурга свободным действием."
+          },
+          {
+            "target": "One chosen demiurge hand effect",
+            "action": "maintain_on_check",
+            "value": "Will through the day",
+            "description": "В начале дня мастер может проверить Волю, чтобы сохранить на себе эффект любой ладони демиурга на весь день независимо от дальнейшей смены ладоней."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "runic-tattoos",
+    "name": "Рунические Тату",
+    "category": "ability",
+    "description": "Использование нанесенных ритуалом татуировок как скрытого источника защиты, исцеления и урона.",
+    "tags": ["магия", "порочность", "броня", "урон"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет включать татуировки ради временной брони и защиты от непогоды.",
+        "effects": [
+          {
+            "target": "User before each incoming attack",
+            "action": "grant_bonus",
+            "value": "d4 armor for 1 temporary corruption per attack",
+            "description": "Неофит может по желанию активировать рунические тату, чтобы получить временную прибавку d4 к Броне ценой единицы временной Порочности за каждую принятую атаку."
+          },
+          {
+            "target": "User against weather",
+            "action": "grant_protection",
+            "value": "as clothing",
+            "description": "Дополнительно рунические тату защищают от ветра и непогоды так, как если бы были одеждой."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет превращать Порочность в точечное самоисцеление.",
+        "effects": [
+          {
+            "target": "User",
+            "action": "restore_health",
+            "value": "1 Survivability for 1 temporary corruption",
+            "description": "Адепт может активировать татуировки, чтобы исцелять единицу своей Выживаемости ценой единицы временной Порочности."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет за Порочность добавлять мистический урон к каждой успешной атаке.",
+        "effects": [
+          {
+            "target": "Successful attacks by the user",
+            "action": "grant_bonus",
+            "value": "+d4 mystical damage",
+            "description": "Мастер может активировать тату, чтобы добавить +d4 урона к каждой успешной атаке, заплатив временной Порочностью по числу нанесенного дополнительного мистического урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "leader",
+    "name": "Лидер",
+    "category": "ability",
+    "description": "Харизматичное командование, превращающее личную волю в силу заклинаний и боевой координации.",
+    "tags": ["лидерство", "харизма", "поддержка", "магия"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит силу заклинаний на Соблазнительность.",
+        "effects": [
+          {
+            "target": "Spell power",
+            "action": "change_base_attribute",
+            "value": "Соблазнительность вместо Воли",
+            "description": "Соблазнительность вместо Воли для определения силы заклинаний, хотя Порог Порочности по-прежнему считается из Воли."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет назначить одну приоритетную цель для всей группы.",
+        "effects": [
+          {
+            "target": "One announced enemy",
+            "action": "grant_bonus_to_allies",
+            "value": "+d4 damage",
+            "description": "Адепт может выбрать и объявить одного противника, и все атаки союзников по нему будут наносить на +d4 больше урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Если успел произнести речь перед боем, делится своей волей к сопротивлению магии со слушателями.",
+        "effects": [
+          {
+            "target": "All listeners before battle",
+            "action": "share_attribute",
+            "value": "use leader's Charisma instead of own Will for spell defense",
+            "description": "Если у мастера была возможность произнести речь перед сражением, все, кто ее слышал, могут использовать его Соблазнительность вместо своей Воли для защиты от чужих заклинаний."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "dominance",
+    "name": "Доминирование",
+    "category": "ability",
+    "description": "Подавляющее присутствие, которое заставляет врага колебаться, отступать или прекращать бой.",
+    "tags": ["харизма", "контроль", "ближний-бой", "контроль-разума"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит шанс попадания в ближнем бою на Соблазнительность.",
+        "effects": [
+          {
+            "target": "Melee attack chance",
+            "action": "change_base_attribute",
+            "value": "Соблазнительность вместо Аккуратности",
+            "description": "Соблазнительность вместо Аккуратности для расчета шанса попадания оружием ближнего боя."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет заставить противника не поднимать руку на доминатора в следующий ход.",
+        "effects": [
+          {
+            "target": "One enemy",
+            "action": "hesitate_on_check",
+            "value": "cannot attack user on next turn",
+            "description": "Соблазнительность, чтобы заставить противника заколебаться на время его следующего хода; он не будет атаковать адепта, но еще может бить его союзников."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет сломить волю к продолжению боя у уже раненой стороны.",
+        "effects": [
+          {
+            "target": "Enemy in ongoing or impending conflict",
+            "action": "end_combat_on_check",
+            "value": "surrender, flee or negotiate",
+            "description": "Соблазнительность, чтобы прекратить бой с противником: он может сложить оружие, сбежать или согласиться на переговоры; в уже начатом бою это возможно, если кто-то из его стороны ранен."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mobile-combat",
+    "name": "Маневренный Бой",
+    "category": "ability",
+    "description": "Подвижный пиратский стиль боя с постоянной сменой оружия и ответными выпадами при разрыве дистанции.",
+    "tags": ["подвижность", "оружие", "свободная-атака", "реакция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет делить движение до и после атаки.",
+        "effects": [
+          {
+            "target": "Movement on user's turn",
+            "action": "split_movement",
+            "value": "before and after attack",
+            "description": "Неофит Маневренного Боя может разделять свое Движение на части до и после атаки."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Снимает лимит на число смен оружия за ход.",
+        "effects": [
+          {
+            "target": "Weapon changes during the turn",
+            "action": "remove_limit",
+            "value": "weapon swaps",
+            "description": "Адепт может менять оружие за ход столько раз, сколько захочет, мгновенно переходя от мечей к револьверу и обратно."
+          }
+        ]
+      },
+      "master": {
+        "description": "Повышает надежность разрыва дистанции и позволяет отвечать на чужие свободные атаки своими.",
+        "effects": [
+          {
+            "target": "Failed Defense checks against Free Attacks while disengaging",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "Мастер может повторить все проваленные проверки Защиты против чужих Свободных Атак, если они были вызваны разрывом дистанции."
+          },
+          {
+            "target": "Enemy making a Free Attack against the user",
+            "action": "trigger_free_attack",
+            "value": "use any available weapon",
+            "description": "Каждый раз, когда мастер становится целью такой свободной атаки, он может сам провести свободную атаку по оппоненту любым доступным оружием."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "pyrotechnics",
+    "name": "Пиротехника",
+    "category": "ability",
+    "description": "Шпионская алхимия для ослепления, оглушения и разрушительных бросковых зарядов.",
+    "tags": ["алхимия", "статус", "гранаты", "скрытность", "пробивание-брони"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Открывает ослепляющий порошок и безопасную работу с гранатами и минами.",
+        "effects": [
+          {
+            "target": "Enemy in melee range",
+            "action": "blind_on_check",
+            "value": "d4 armor-ignoring damage and d4 rounds blind",
+            "description": "Аккуратность, чтобы использовать ослепляющий порошок в ближнем бою; при успехе цель получает d4 игнорирующего броню урона и слепнет на d4 ходов."
+          },
+          {
+            "target": "Alchemical mines and grenades",
+            "action": "prevent_catastrophe",
+            "value": true,
+            "description": "Использование алхимических мин или гранат больше не может привести к катастрофическому результату."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает дымовую шашку, наносящую урон и ослепляющую область.",
+        "effects": [
+          {
+            "target": "Enemies in smoke area",
+            "action": "deal_damage_and_blind_on_check",
+            "value": "d4 armor-ignoring",
+            "description": "Аккуратность, чтобы правильно применить дымовую шашку; все, кто не покинет область поражения, получают d4 игнорирующего броню урона и не могут ничего видеть."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дает громовой шар с большим бронебойным уроном и ослеплением.",
+        "effects": [
+          {
+            "target": "Thunder ball target or area",
+            "action": "deal_damage_on_check",
+            "value": "d12 on success, d6 on failure, blind d4 rounds",
+            "description": "Аккуратность, чтобы использовать громовой шар, который наносит до d12 игнорирующего броню урона при успехе или d6 при неудаче и ослепляет на d4 раундов."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "artifact-creation",
+    "name": "Создание Артефактов",
+    "category": "ability",
+    "description": "Гильдейское мастерство изготовления артефактов и чтения уже наложенной на них мистики.",
+    "tags": ["создание", "артефакты", "магия", "знание"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет создавать простые артефакты.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "simple artifact",
+            "description": "Сообразительность, чтобы создать простой артефакт."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет создавать могущественные артефакты.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "powerful artifact",
+            "description": "Сообразительность, чтобы создать могущественный артефакт."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет создавать легендарные артефакты.",
+        "effects": [
+          {
+            "target": "Artifact crafting",
+            "action": "craft_on_check",
+            "value": "legendary artifact",
+            "description": "Сообразительность, чтобы создать легендарный артефакт."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "armored-mystic",
+    "name": "Бронированный Мистик",
+    "category": "ability",
+    "description": "Храмовническая школа, позволяющая кастовать в тяжелой броне и усиливать ее мистикой.",
+    "tags": ["магия", "броня", "церковь", "защита"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Убирает помехи средней брони для мистических сил.",
+        "effects": [
+          {
+            "target": "Mystical power use in medium armor",
+            "action": "remove_penalty",
+            "value": "medium armor",
+            "description": "Средняя броня не сказывается на эффективности мистических сил."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Распространяет тот же комфорт на тяжелую броню.",
+        "effects": [
+          {
+            "target": "Mystical power use in heavy armor",
+            "action": "remove_penalty",
+            "value": "heavy armor",
+            "description": "Тяжелая броня не сказывается на эффективности мистических сил."
+          }
+        ]
+      },
+      "master": {
+        "description": "Мистически усиливает саму броню на дополнительный защитный шаг.",
+        "effects": [
+          {
+            "target": "Worn armor",
+            "action": "grant_bonus",
+            "value": "+d4 protection",
+            "description": "Эффективность брони усиливается мистическими энергиями, и она защищает на +d4 больше."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bloody-combat",
+    "name": "Кровавый Бой",
+    "category": "ability",
+    "description": "Жестокая школа боя через ранение, делающая персонажа опаснее по мере потери Выживаемости.",
+    "tags": ["ближний-бой", "урон", "исцеление", "условное", "порочность"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "При падении до половины Выживаемости позволяет перебрасывать атаки ближнего боя.",
+        "effects": [
+          {
+            "target": "Melee attack checks at half Survivability",
+            "action": "reroll_failed_checks",
+            "value": "all",
+            "description": "Когда Выживаемость неофита снижена вполовину, он может повторять все проверки на атаки оружием ближнего боя."
+          }
+        ]
+      },
+      "adept": {
+        "description": "При половине Выживаемости резко поднимает урон в ближнем бою.",
+        "effects": [
+          {
+            "target": "Melee attacks at half Survivability",
+            "action": "grant_bonus",
+            "value": "+d8 damage",
+            "description": "Когда Выживаемость адепта снижена вполовину, все его атаки в ближнем бою наносят на +d8 больше урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает половину нанесенного урона в собственное исцеление.",
+        "effects": [
+          {
+            "target": "Damage dealt by the user",
+            "action": "life_steal",
+            "value": "half damage dealt",
+            "description": "Половина урона, наносимого мастером врагу, добавляется к его Выживаемости в качестве исцеления."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "mystical-tradition-rune-magic",
+    "name": "Мистическая Традиция: Магия Рун",
+    "category": "ability",
+    "description": "Руническая традиция, умеющая выносить Порочность в филактерию и сохранять силу в предметах.",
+    "tags": ["магия", "традиция", "руны", "порочность", "мистическая-традиция"],
+    "source": "abilities.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет связать душу с руническим предметом и вынести в него постоянную Порочность от новичковых сил.",
+        "effects": [
+          {
+            "target": "Chosen runic object",
+            "action": "bind_soul",
+            "value": "phylactery",
+            "description": "Неофит Волхв может вложить душу в выбранный рунический объект; вся постоянная Порочность от заклинаний уровня новичка будет перенаправлена в этот объект."
+          },
+          {
+            "target": "Elemental rune on phylactery",
+            "action": "grant_bonus",
+            "value": "+d4 elemental damage",
+            "description": "Можно активировать стихийную руну на филактерии, чтобы увеличить наносимый урон на +d4 огнем, льдом, кислотой или электричеством."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Перенаправляет в филактерию постоянную Порочность от адептских заклинаний и помогает снижать новые всплески.",
+        "effects": [
+          {
+            "target": "Permanent corruption from adept spells",
+            "action": "redirect_to_item",
+            "value": "phylactery",
+            "description": "Вся постоянная Порочность от заклинаний уровня Адепта будет перенаправлена в филактерию."
+          },
+          {
+            "target": "New corruption gain",
+            "action": "reroll_failed_checks",
+            "value": "choose lower result",
+            "description": "Каждый раз, когда адепт получает новую Порочность, он может повторить тест и выбрать меньшее значение."
+          }
+        ]
+      },
+      "master": {
+        "description": "Перенаправляет мастерскую постоянную Порочность в посох и снимает временную цену использования собственной традиции.",
+        "effects": [
+          {
+            "target": "Permanent corruption from master spells",
+            "action": "redirect_to_item",
+            "value": "staff",
+            "description": "Вся постоянная Порочность от заклинаний уровня Мастера будет перенаправлена в посох."
+          },
+          {
+            "target": "Runic tradition spell use",
+            "action": "remove_temporary_corruption",
+            "value": true,
+            "description": "Мастер Волхв не получает временной Порочности, если использует силы своей традиции."
+          }
+        ]
+      }
+    }
+  }
+]
