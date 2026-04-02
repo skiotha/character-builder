@@ -6,7 +6,7 @@
 | ----- | ------------------------------------------ | ----------- |
 | **0** | Documentation & Decisions                  | ✅ Done     |
 | **1** | Project Restructure (ADR-006)              | ✅ Done     |
-| **2** | TypeScript Migration (ADR-008)             | Not started |
+| **2** | TypeScript Migration (ADR-008)             | ✅ Done     |
 | **3** | Schema-Driven Rendering (ADR-009)          | Not started |
 | **4** | Testing (`node:test`, malizia conventions) | Not started |
 | **5** | Bug Fixes & Hardening                      | Not started |
