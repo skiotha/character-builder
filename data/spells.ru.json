@@ -1,0 +1,2371 @@
+[
+  {
+    "id": "break-will",
+    "name": "Сломить Волю",
+    "category": "spell",
+    "description": "Подчинение чужой воли и принуждение жертвы к нужным мистику действиям.",
+    "tags": [
+      "магия",
+      "контроль",
+      "контроль-разума",
+      "ментальное",
+      "орден",
+      "круг",
+      "колдовство",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет захватить контроль над одним существом, пока мистик поддерживает концентрацию и успешные проверки Воли.",
+        "effects": [
+          {
+            "target": "Controlled creature",
+            "action": "control_target",
+            "value": "1 action per turn",
+            "description": "Воля и концентрация позволяют взять под контроль монстра, человека или животное: цель может совершать только одно действие за ход и не может использовать активные способности или силы."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Сохраняет контроль без концентрации и не мешает мистику действовать самому.",
+        "effects": [
+          {
+            "target": "Break Will concentration",
+            "action": "remove_requirement",
+            "value": "concentration",
+            "description": "Концентрация больше не требуется для поддержания контроля, и мистик может свободно выполнять другие действия."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает контроль полным и позволяет принуждать цель использовать весь свой доступный потенциал.",
+        "effects": [
+          {
+            "target": "Controlled creature",
+            "action": "expand_control",
+            "value": "all actions and checks",
+            "description": "Контролируемое существо можно заставить выполнять все доступные ему действия за ход и проходить любые проверки навыков без ограничений."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "illusory-correction",
+    "name": "Иллюзорная Коррекция",
+    "category": "spell",
+    "description": "Искажение восприятия реальности, позволяющее переигрывать неудачные для мистика проверки.",
+    "tags": [
+      "магия",
+      "реакция",
+      "защита",
+      "утилита",
+      "орден",
+      "иллюзия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет один раз за ход как реакцию повторить проваленную защиту.",
+        "effects": [
+          {
+            "target": "Failed Defense check",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Как реакция мистик может один раз за ход повторить проваленную проверку Защиты."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Расширяет повтор на любую проверку, связанную с самим мистиком.",
+        "effects": [
+          {
+            "target": "Failed self-related check",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Как реакция мистик может один раз за ход повторить любую свою неудачную проверку."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет вмешиваться в любые проверки поблизости, даже чужие.",
+        "effects": [
+          {
+            "target": "Nearby check",
+            "action": "force_reroll",
+            "value": "1 per turn",
+            "description": "Как реакция мистик может вызвать повтор любой проверки вокруг себя, даже если она касалась другого существа."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "levitation",
+    "name": "Левитация",
+    "category": "spell",
+    "description": "Управление гравитацией для парения в воздухе и подъема союзников.",
+    "tags": [
+      "магия",
+      "подвижность",
+      "поддержка",
+      "защита",
+      "орден",
+      "теургия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Поднимает мистика над землей, но требует концентрации и грозит падением при ее потере.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "enable_flight",
+            "value": "self with concentration",
+            "description": "Воля позволяет мистику взлететь над землей; при потере концентрации он падает и получает до d6 урона, игнорирующего броню."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет левитировать союзника с теми же рисками при срыве эффекта.",
+        "effects": [
+          {
+            "target": "Ally",
+            "action": "enable_flight",
+            "value": "single ally with concentration",
+            "description": "Воля поднимает над землей союзника; если концентрация прерывается, союзник падает и получает до d6 урона, игнорирующего броню."
+          }
+        ]
+      },
+      "master": {
+        "description": "Поднимает самого мистика и всю группу, а при срыве эффекта обеспечивает мягкое приземление.",
+        "effects": [
+          {
+            "target": "Caster and allies",
+            "action": "enable_group_flight",
+            "value": "separate checks per ally",
+            "description": "Мистик может поднять себя и всех союзников, выполняя отдельную проверку для каждого; при потере концентрации группа безопасно планирует вниз."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "thought-throw",
+    "name": "Бросок Мыслью",
+    "category": "spell",
+    "description": "Телекинетическое перемещение объектов и врагов силой одной мысли.",
+    "tags": [
+      "магия",
+      "урон",
+      "контроль",
+      "реакция",
+      "дальний-бой",
+      "орден",
+      "ментальное",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет бросать предметы в цель и перехватывать атаки поднятым объектом.",
+        "effects": [
+          {
+            "target": "Object or chosen target",
+            "action": "throw_object",
+            "value": "d8 damage or block attack",
+            "description": "Воля позволяет поднять и бросить объект, нанося до d8 урона, либо как реакция поднять предмет и заблокировать физическую или ментальную атаку по мистику."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Дает возможность поднимать и швырять врага, опрокидывая его на спину.",
+        "effects": [
+          {
+            "target": "Enemy",
+            "action": "throw_target",
+            "value": "d8 damage and prone",
+            "description": "Воля поднимает врага в воздух, бросает его прочь от мистика, наносит до d8 урона и валит цель на спину."
+          }
+        ]
+      },
+      "master": {
+        "description": "Распространяет бросок сразу на группу врагов, пока проверки не начнут проваливаться.",
+        "effects": [
+          {
+            "target": "Enemy group",
+            "action": "throw_multiple_targets",
+            "value": "until first failed check",
+            "description": "Мистик может одновременно поднять и отбросить от себя группу врагов, выполняя проверку для каждого следующего до первого провала."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "true-form",
+    "name": "Истинная Форма",
+    "category": "spell",
+    "description": "Раскрытие подлинной сущности существ и явлений сквозь иллюзии и превращения.",
+    "tags": [
+      "магия",
+      "утилита",
+      "контроль",
+      "восприятие",
+      "иллюзия",
+      "трансформация",
+      "орден",
+      "теургия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет видеть сквозь иллюзии и эффекты, скрывающие истинную природу вещей.",
+        "effects": [
+          {
+            "target": "Illusions and disguises",
+            "action": "reveal_true_form",
+            "value": "single perception effect",
+            "description": "Воля позволяет видеть сквозь иллюзии, трансформации и другие эффекты сокрытия; иллюзии развеиваются, а трансформации остаются видимыми в истинном виде."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Выводит подлинную сущность наружу сразу у группы существ и срывает трансформации.",
+        "effects": [
+          {
+            "target": "Group of creatures",
+            "action": "force_true_form",
+            "value": "group reveal",
+            "description": "Мистик может заставить группу существ проявить подлинную сущность; наложенные трансформации также спадут."
+          }
+        ]
+      },
+      "master": {
+        "description": "Не дает цели снова сменить форму после раскрытия ее природы.",
+        "effects": [
+          {
+            "target": "Shapeshifting creature",
+            "action": "prevent_transformation",
+            "value": "maintain true form",
+            "description": "Воля принуждает существо сохранять истинную форму и не позволяет ему снова превратиться, пока действует эффект."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "unnoticeability",
+    "name": "Незаметность",
+    "category": "spell",
+    "description": "Отведение чужого внимания, превращающее мистика и его союзников в невидимок.",
+    "tags": [
+      "магия",
+      "скрытность",
+      "утилита",
+      "поддержка",
+      "иллюзия",
+      "орден",
+      "теургия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Убирает мистика из области чувств одного существа до первого вредоносного действия.",
+        "effects": [
+          {
+            "target": "Single creature perception",
+            "action": "grant_invisibility",
+            "value": "single observer",
+            "description": "Воля делает мистика незаметным для одного существа, пока он не совершит атаку или другое вредящее действие против цели."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Расширяет незаметность на целую группу наблюдателей.",
+        "effects": [
+          {
+            "target": "Group perception",
+            "action": "grant_invisibility",
+            "value": "group of observers",
+            "description": "Мистик может исчезнуть из поля видимости сразу группы существ."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет скрывать от группы не только себя, но и союзников.",
+        "effects": [
+          {
+            "target": "Caster and allies",
+            "action": "grant_group_invisibility",
+            "value": "independent ally resolution",
+            "description": "Мистик делает невидимыми для группы существ себя и союзников; незаметность каждого союзника отслеживается независимо."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "reflection",
+    "name": "Отражение",
+    "category": "spell",
+    "description": "Создание призрачных копий, которые сбивают противников с толку и принимают удары на себя.",
+    "tags": ["магия", "защита", "иллюзия", "орден", "мираж", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Создает вокруг мистика d4 иллюзорные копии, исчезающие от попаданий.",
+        "effects": [
+          {
+            "target": "Illusion copies",
+            "action": "summon_illusion_copies",
+            "value": "d4 copies",
+            "description": "Мистик создает d4 неотличимых копии вокруг себя; враги без способности отличать реальность могут атаковать их вместо оригинала, а любое попадание по копии развеивает ее."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Увеличивает число копий и делает их устойчивее к урону по площади.",
+        "effects": [
+          {
+            "target": "Illusion copies",
+            "action": "improve_illusion_copies",
+            "value": "d6 copies, area removes one",
+            "description": "Количество копий увеличивается до d6, а урон по площади развеивает только одну из них."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит число копий до d8 и делает их невосприимчивыми к площадному урону.",
+        "effects": [
+          {
+            "target": "Illusion copies",
+            "action": "improve_illusion_copies",
+            "value": "d8 copies, area ignored",
+            "description": "Мастер создает d8 копий, и урон по площади больше не уменьшает их число."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "psychic-strike",
+    "name": "Психический Удар",
+    "category": "spell",
+    "description": "Психическое оружие, усиливающее обычный удар ментальным воздействием.",
+    "tags": [
+      "магия",
+      "ближний-бой",
+      "урон",
+      "ментальное",
+      "орден",
+      "ментализм",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Создает психическую копию оружия и дает повторную попытку при промахе.",
+        "effects": [
+          {
+            "target": "Melee attack",
+            "action": "reroll_failed_checks",
+            "value": 1,
+            "description": "Мистик формирует психическую копию оружия ближнего боя и, если атака промахнулась, может повторить проверку на попадание еще раз."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Парализует цель и делает физическую часть удара автоматически успешной.",
+        "effects": [
+          {
+            "target": "Target of psychic strike",
+            "action": "add_status",
+            "value": "paralyzed and auto-hit",
+            "description": "Воля заставляет психический удар парализовать цель, а физическая атака по ней становится автоматически успешной."
+          }
+        ]
+      },
+      "master": {
+        "description": "Добавляет к удару отдельный психический урон, игнорирующий броню.",
+        "effects": [
+          {
+            "target": "Target of psychic strike",
+            "action": "add_damage",
+            "value": "d4 armor-ignoring",
+            "description": "Психический удар наносит поверх физической атаки d4 дополнительного урона, который игнорирует броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "anathema",
+    "name": "Анафема",
+    "category": "spell",
+    "description": "Развеивание чужой магии и любых не-ритуальных мистических эффектов.",
+    "tags": [
+      "магия",
+      "утилита",
+      "охрана",
+      "руны",
+      "теургия",
+      "колдовство",
+      "развеивание",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает длящийся эффект чужого заклинания с одной цели.",
+        "effects": [
+          {
+            "target": "Ongoing hostile spell",
+            "action": "dispel_magic",
+            "value": "single target",
+            "description": "Воля позволяет снять длящийся эффект чужого заклинания с себя или любого другого существа."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет развеивать эффекты сразу у группы целей.",
+        "effects": [
+          {
+            "target": "Group of creatures or objects",
+            "action": "dispel_magic",
+            "value": "group effect",
+            "description": "Заклинание может быть применено для снятия магических эффектов сразу с группы созданий или предметов."
+          }
+        ]
+      },
+      "master": {
+        "description": "Очищает от магии целую область, включая призванных существ и сотворенные явления.",
+        "effects": [
+          {
+            "target": "Area of effect",
+            "action": "dispel_area_magic",
+            "value": "area including summons",
+            "description": "Мастер может снять любую магию с области, в том числе убрать призванных существ и сотворенные явления."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "witch-hammer",
+    "name": "Молот Ведьм",
+    "category": "spell",
+    "description": "Освящение оружия для особенно разрушительных ударов по чудовищам и порочным существам.",
+    "tags": [
+      "магия",
+      "ближний-бой",
+      "урон",
+      "теургия",
+      "оружие",
+      "церковь",
+      "охота-на-монстров",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Усиливает освященное оружие и особенно карает монстров.",
+        "effects": [
+          {
+            "target": "Blessed weapon",
+            "action": "add_damage",
+            "value": "+d4, or +d6 vs monsters",
+            "description": "Освященное оружие наносит на d4 больше урона, а по порочным существам и монстрам — на d6 больше."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Увеличивает дополнительный урон оружия до d8.",
+        "effects": [
+          {
+            "target": "Blessed weapon",
+            "action": "modify_value",
+            "value": "+d8 damage",
+            "description": "Оружие мистика наносит на d8 больше урона."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит усиление оружия до d10 дополнительного урона.",
+        "effects": [
+          {
+            "target": "Blessed weapon",
+            "action": "modify_value",
+            "value": "+d10 damage",
+            "description": "Оружие мистика наносит на d10 больше урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blessed-shield",
+    "name": "Благословленный Щит",
+    "category": "spell",
+    "description": "Невидимый святой щит, который повышает броню и карает нападающих.",
+    "tags": [
+      "магия",
+      "защита",
+      "охрана",
+      "урон",
+      "поддержка",
+      "теургия",
+      "щит",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Создает щит до конца боя, повышающий броню и наносящий урон атакующим монстрам.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "grant_barrier",
+            "value": "+d4 armor and d4 retaliatory damage",
+            "description": "Воля создает в воздухе щит до конца боя: он повышает Броню на +d4 и наносит d4 игнорирующего броню урона монстрам, атакующим мистика."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Расширяет щит на одного союзника рядом и поднимает оба значения до d6.",
+        "effects": [
+          {
+            "target": "Caster and one ally",
+            "action": "expand_barrier",
+            "value": "+d6 armor and d6 retaliatory damage",
+            "description": "Щит может дополнительно защищать одного соседнего союзника, а его Броня и ответный урон повышаются до d6."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет защищать уже двух союзников рядом и усиливает щит до d8.",
+        "effects": [
+          {
+            "target": "Caster and two allies",
+            "action": "expand_barrier",
+            "value": "+d8 armor and d8 retaliatory damage",
+            "description": "Щит может дополнительно охватывать до двух союзников рядом с мистиком, а Броня и ответный урон повышаются до d8."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "holy-aura",
+    "name": "Святая Аура",
+    "category": "spell",
+    "description": "Постоянная аура, которая жжет чудовищ и одновременно поддерживает живых союзников.",
+    "tags": [
+      "магия",
+      "урон",
+      "исцеление",
+      "поддержка",
+      "теургия",
+      "аура",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Заполняет пространство вокруг мистика священной аурой, ранящей враждебных монстров.",
+        "effects": [
+          {
+            "target": "Hostile monsters in aura",
+            "action": "add_damage_over_time",
+            "value": "d6 per turn",
+            "description": "Воля наполняет пространство аурой, и враждебные монстры получают до d6 урона каждый ход, пока мистик поддерживает эффект."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает урон ауры и добавляет исцеление живым существам.",
+        "effects": [
+          {
+            "target": "Creatures in aura",
+            "action": "heal_and_harm_aura",
+            "value": "d8 damage, d4 healing",
+            "description": "Урон ауры увеличивается до d8, а все живые существа в ее области начинают восстанавливать d4 Выживаемости каждый ход."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит урон и исцеление ауры до высшего уровня.",
+        "effects": [
+          {
+            "target": "Creatures in aura",
+            "action": "heal_and_harm_aura",
+            "value": "d10 damage, d6 healing",
+            "description": "Урон ауры увеличивается до d10, а исцеление живых существ — до d6 Выживаемости каждый ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "burning-glass-of-apoleata",
+    "name": "Горящее Стекло Аполеаты",
+    "category": "spell",
+    "description": "Сосредоточенный луч святого света, особенно губительный для чудовищ.",
+    "tags": [
+      "магия",
+      "урон",
+      "дальний-бой",
+      "теургия",
+      "огонь",
+      "охота-на-монстров",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Фокусирует свет души в луч, наносящий больше урона монстрам.",
+        "effects": [
+          {
+            "target": "Single target",
+            "action": "add_damage",
+            "value": "d6, or d8 vs monsters",
+            "description": "Воля собирает горящий луч, который наносит цели d6 урона, а монстру — d8."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Превращает луч в площадной эффект и еще сильнее карает монстров.",
+        "effects": [
+          {
+            "target": "All targets in area",
+            "action": "add_damage",
+            "value": "d8, or d12 vs monsters",
+            "description": "Воля позволяет нанести d8 урона всем целям сразу, а монстрам — d12."
+          }
+        ]
+      },
+      "master": {
+        "description": "Добавляет к лучу оглушение всех пораженных монстров.",
+        "effects": [
+          {
+            "target": "Monsters hit by burning glass",
+            "action": "add_status",
+            "value": "stunned for 1 turn",
+            "description": "При успехе мистик может дополнительно оглушить всех пораженных монстров на один ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "life-giver",
+    "name": "Дающий Жизнь",
+    "category": "spell",
+    "description": "Очищение Порочности и исцеляющее влияние, рожденное любовью к живому.",
+    "tags": [
+      "магия",
+      "исцеление",
+      "поддержка",
+      "порочность",
+      "теургия",
+      "клирикализм",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Снимает Порочность с одной цели и превращает избыток очищения в исцеление.",
+        "effects": [
+          {
+            "target": "Single target",
+            "action": "reduce_corruption",
+            "value": "d4 or heal remainder",
+            "description": "Заклинание снимает до d4 Порочности; если у цели ее меньше, оставшаяся часть превращается в исцеление."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Распространяет очищающий эффект на всех видимых союзников.",
+        "effects": [
+          {
+            "target": "Visible allies",
+            "action": "expand_healing",
+            "value": "all visible allies",
+            "description": "Эффект очищения и исцеления начинает работать на всех видимых союзников вокруг мистика."
+          }
+        ]
+      },
+      "master": {
+        "description": "Ослабляет любые новые эффекты приобретенной Порочности рядом с мистиком.",
+        "effects": [
+          {
+            "target": "Acquired corruption effects",
+            "action": "reduce_corruption",
+            "value": "d4 less in caster presence",
+            "description": "Любой эффект приобретенной Порочности в присутствии мистика сокращается на d4."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "purgatory",
+    "name": "Чистилище",
+    "category": "spell",
+    "description": "Кара Порочности, превращающая черноту души цели в паралич и чистый урон.",
+    "tags": [
+      "магия",
+      "контроль",
+      "урон",
+      "порочность",
+      "теургия",
+      "фанатизм",
+      "кровь",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Сравнивает d20 с Порочностью цели, парализуя ее и обжигая монстров.",
+        "effects": [
+          {
+            "target": "Target corruption",
+            "action": "conditional_paralyze",
+            "value": "d20 <= corruption, plus d6 vs monsters",
+            "description": "Если бросок d20 меньше или равен Порочности цели, она парализуется на ход, а монстры дополнительно получают d6 игнорирующего броню урона."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет сравнивать результат сразу с Порочностью всех видимых целей.",
+        "effects": [
+          {
+            "target": "Visible targets",
+            "action": "expand_corruption_judgement",
+            "value": "all visible targets",
+            "description": "Бросок d20 начинает сравниваться с Порочностью всех видимых целей одновременно."
+          }
+        ]
+      },
+      "master": {
+        "description": "Срабатывает реактивно на любое использование или получение Порочности и превращает ее в урон.",
+        "effects": [
+          {
+            "target": "Any creature gaining or using corruption",
+            "action": "reflect_corruption_as_damage",
+            "value": "1 damage per corruption",
+            "description": "Как реакция эффект автоматически бьет любую цель, которая приобретает или использует Порочность: каждая ее единица превращается в единицу урона, игнорирующего броню; союзников можно исключить."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "laying-on-of-hands",
+    "name": "Наложение Рук",
+    "category": "spell",
+    "description": "Прямое чудесное исцеление через прикосновение, взгляд и очищение от ядов.",
+    "tags": ["магия", "исцеление", "поддержка", "теургия", "круг", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Исцеляет прикосновением d6 Выживаемости.",
+        "effects": [
+          {
+            "target": "Touched target",
+            "action": "heal",
+            "value": "d6 hp",
+            "description": "Воля позволяет исцелить цель через прикосновение на d6 Выживаемости."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает исцеление и снимает яд с кровотечением.",
+        "effects": [
+          {
+            "target": "Touched target",
+            "action": "heal_and_cleanse",
+            "value": "d8 hp and remove poison/bleeding",
+            "description": "Прикосновение исцеляет на d8 Выживаемости и избавляет цель от всех эффектов яда или кровотечения."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет лечить особенно сильно вблизи или лечить на расстоянии одним взглядом.",
+        "effects": [
+          {
+            "target": "Touched or seen target",
+            "action": "heal",
+            "value": "d12 touch or d8 at range",
+            "description": "Воля исцеляет d12 Выживаемости через прикосновение или d8 на расстоянии, только взглядом."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "inherit-wound",
+    "name": "Наследовать Рану",
+    "category": "spell",
+    "description": "Перераспределение ран, ядов и кровотечения между существами по воле мистика.",
+    "tags": [
+      "магия",
+      "исцеление",
+      "поддержка",
+      "урон",
+      "самопожертвование",
+      "теургия",
+      "круг",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет принять на себя вред с другого существа, исцелив его.",
+        "effects": [
+          {
+            "target": "Caster and ally",
+            "action": "transfer_damage",
+            "value": "heal d6, caster takes same amount",
+            "description": "Мистик может забрать на себя вред от другого существа: цель исцеляется на d6 Выживаемости, а мистик получает столько же урона."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает исцеление, уменьшает ответный урон и позволяет принимать на себя токсины.",
+        "effects": [
+          {
+            "target": "Caster and ally",
+            "action": "transfer_damage_and_status",
+            "value": "heal d8, caster takes half, absorbs poison/bleeding",
+            "description": "Исцеление увеличивается до d8, мистик получает только половину этого урона и может перенести на себя все эффекты яда и кровотечения."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет отправить оставшийся вред на любое другое существо в поле зрения.",
+        "effects": [
+          {
+            "target": "Visible creature",
+            "action": "redirect_damage",
+            "value": "remaining half, armor-ignoring",
+            "description": "Оставшуюся половину повреждений мистик может перенести на любое другое видимое существо; от этого урона нельзя защититься, и он игнорирует броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "maltransformation",
+    "name": "Малтрансформация",
+    "category": "spell",
+    "description": "Насильственное превращение жертвы в безобидного зверя.",
+    "tags": ["магия", "контроль", "трансформация", "круг", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Превращает одну цель в безобидное животное, пока мистик держит концентрацию.",
+        "effects": [
+          {
+            "target": "Single target",
+            "action": "transform_target",
+            "value": "harmless beast with concentration",
+            "description": "Воля и концентрация превращают выбранную цель в безобидного зверя; в этой форме она не может действовать и пользоваться оружием."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Убирает необходимость поддерживать концентрацию на превращении.",
+        "effects": [
+          {
+            "target": "Maltransformation concentration",
+            "action": "remove_requirement",
+            "value": "concentration",
+            "description": "Для поддержания эффекта концентрация больше не требуется."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет накладывать превращение сразу на несколько существ.",
+        "effects": [
+          {
+            "target": "Nearby creatures",
+            "action": "transform_multiple_targets",
+            "value": "until first failed check",
+            "description": "Мистик может менять форму сразу нескольких существ вокруг себя, выполняя проверку Воли для каждого следующего до первого провала."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "wild-hunt",
+    "name": "Дикая Охота",
+    "category": "spell",
+    "description": "Призыв зверей на помощь из самой окружающей природы.",
+    "tags": ["магия", "поддержка", "призыв", "круг", "звери", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Призывает одного слабого зверя, естественного для местности.",
+        "effects": [
+          {
+            "target": "Natural beast ally",
+            "action": "summon_creature",
+            "value": "1 weak beast",
+            "description": "Мистик призывает себе на помощь одного слабого зверя, подходящего для этой земли; после боя животное уходит обратно."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет вызвать одного сильного зверя или целую свору слабых.",
+        "effects": [
+          {
+            "target": "Natural beast allies",
+            "action": "summon_creature",
+            "value": "1 strong or d4 weak beasts",
+            "description": "Мистик может призвать одного сильного зверя или d4 слабых."
+          }
+        ]
+      },
+      "master": {
+        "description": "Открывает призыв могучих зверей и более многочисленных стай.",
+        "effects": [
+          {
+            "target": "Natural beast allies",
+            "action": "summon_creature",
+            "value": "1 mighty, d4 strong, or d6 weak beasts",
+            "description": "Мистик может призвать одного могучего зверя, d4 сильных или d6 слабых."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "change-form",
+    "name": "Смена Формы",
+    "category": "spell",
+    "description": "Превращение самого мистика в зверя ради скорости, боя и живучести.",
+    "tags": [
+      "магия",
+      "трансформация",
+      "подвижность",
+      "защита",
+      "ближний-бой",
+      "круг",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет стать небольшим животным и резко повысить подвижность и уклонение.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "shapeshift_self",
+            "value": "small animal form",
+            "description": "Воля позволяет принять форму небольшого животного: мистик повторяет все неудачные проверки Сноровки и Скорости, включая Защиту, и больше не провоцирует Свободные Атаки."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Открывает боевую звериную форму с базовыми боевыми свойствами.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "upgrade_shapeshift",
+            "value": "combat beast with Hardened and Natural Weapon",
+            "description": "Мистик может превращаться в боевое животное и получает свойства Защищенный (Неофит) и Натуральное Оружие (Неофит)."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет принимать большую боевую форму с регенерацией и могучей силой.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "upgrade_shapeshift",
+            "value": "large combat beast with Regeneration and Mighty",
+            "description": "Мистик может превращаться в большое боевое животное и получает свойства Регенерация (Неофит) и Могучий (Неофит)."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "thorn-cloak",
+    "name": "Плащ Шипов",
+    "category": "spell",
+    "description": "Живой покров из лиан и шипов, защищающий мистика и ранящий нападающих.",
+    "tags": ["магия", "защита", "охрана", "урон", "круг", "природа", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Окружает мистика живыми зарослями, повышая броню, особенно если он стоит на месте.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "grant_barrier",
+            "value": "+d4 armor, or +d6 if stationary",
+            "description": "Лианы, корни и шипы повышают Броню мистика на +d4, либо на +d6, если он не двигался на прошлом ходу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет растительному плащу защищать и соседних союзников.",
+        "effects": [
+          {
+            "target": "Nearby allies",
+            "action": "expand_barrier",
+            "value": "shared protection while adjacent",
+            "description": "Лианы могут защищать и союзников, пока те не разрывают дистанцию с мистиком."
+          }
+        ]
+      },
+      "master": {
+        "description": "Пробужденная природа начинает автоматически отвечать на вражеские атаки.",
+        "effects": [
+          {
+            "target": "Attackers against protected targets",
+            "action": "retaliate",
+            "value": "d10 armor-ignoring",
+            "description": "Каждая успешная атака по мистику или защищенным союзникам вызывает d10 ответного урона, игнорирующего броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "embrace-of-earth",
+    "name": "Объятья Земли",
+    "category": "spell",
+    "description": "Уход под землю ради неуязвимости, перемещения и скрытого применения сил.",
+    "tags": [
+      "магия",
+      "защита",
+      "подвижность",
+      "утилита",
+      "круг",
+      "земля",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет уйти под землю и скрыться от врагов, но лишает других действий.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "burrow",
+            "value": "safe underground state with repeat checks",
+            "description": "Воля помещает мистика под землю, где до него не могут дотянуться враги; он не может действовать, а при провале очередной проверки Воли возвращается на поверхность."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Разрешает применять мистические силы под землей и убирает проверки на поддержание эффекта.",
+        "effects": [
+          {
+            "target": "Caster underground",
+            "action": "improve_burrow",
+            "value": "cast spells underground without upkeep",
+            "description": "Мистик может использовать силы, находясь под землей, и больше не обязан повторять проверки Воли, чтобы оставаться там."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дает обзор поверхности и свободное движение под землей.",
+        "effects": [
+          {
+            "target": "Caster underground",
+            "action": "improve_burrow",
+            "value": "surface sight and free movement",
+            "description": "Мистик видит союзников и врагов на поверхности, может применять на них силы и свободно перемещаться под землей."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "binding-vines",
+    "name": "Опутывающие Лианы",
+    "category": "spell",
+    "description": "Призыв корней и лиан, которые сковывают врагов и постепенно разрывают их шипами.",
+    "tags": [
+      "магия",
+      "контроль",
+      "статус",
+      "урон",
+      "круг",
+      "колдовство",
+      "опутывание",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Опутывает одного врага и лишает его подвижности.",
+        "effects": [
+          {
+            "target": "Single enemy",
+            "action": "restrain_target",
+            "value": "immobilized",
+            "description": "Воля призывает лианы, корни или щупальца, которые опутывают цель: она не может двигаться, но еще способна стрелять и читать заклинания."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет протянуть цепочку опутывания сразу по нескольким врагам.",
+        "effects": [
+          {
+            "target": "Enemy chain",
+            "action": "restrain_multiple_targets",
+            "value": "until first failed check",
+            "description": "Воля может обхватить цепочку из врагов, пока проверки не дойдут до первого неуспеха."
+          }
+        ]
+      },
+      "master": {
+        "description": "Добавляет к лианам шипы, наносящие постоянный урон.",
+        "effects": [
+          {
+            "target": "Restrained enemies",
+            "action": "add_damage",
+            "value": "d6 armor-ignoring",
+            "description": "Призываемые лианы покрываются шипами, и опутанные враги получают d6 урона, игнорирующего броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "storm-arrow",
+    "name": "Штормовая Стрела",
+    "category": "spell",
+    "description": "Зачарование стрел, которые зависают в воздухе и сами находят цель.",
+    "tags": ["магия", "дальний-бой", "урон", "утилита", "круг", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Подвешивает до пяти стрел рядом с мистиком и позволяет выпускать их без промаха.",
+        "effects": [
+          {
+            "target": "Enchanted arrows",
+            "action": "enchant_ammunition",
+            "value": "up to 5 arrows, d6 damage, 1 per turn",
+            "description": "Воля зачаровывает горсть стрел, которые зависают рядом с мистиком и как свободное действие отправляются во врага, всегда попадая и нанося d6 урона со всеми уже нанесенными на боеприпас эффектами."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает стрелы и позволяет выпускать по две одновременно.",
+        "effects": [
+          {
+            "target": "Enchanted arrows",
+            "action": "modify_value",
+            "value": "d8 damage, 2 arrows at once",
+            "description": "Стрелы начинают наносить до d8 урона, и мистик может отправлять сразу две стрелы одновременно."
+          }
+        ]
+      },
+      "master": {
+        "description": "Поднимает залп до трех стрел за раз.",
+        "effects": [
+          {
+            "target": "Enchanted arrows",
+            "action": "modify_value",
+            "value": "3 arrows at once",
+            "description": "Мистик может отправить по цели или целям сразу три стрелы одновременно."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "curse",
+    "name": "Проклятье",
+    "category": "spell",
+    "description": "Злой глаз мистика, который ломает чужие действия и обращает саму активность жертвы против нее.",
+    "tags": [
+      "магия",
+      "проклятие",
+      "контроль",
+      "урон",
+      "круг",
+      "колдовство",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Заставляет цель добиваться двух успехов во всех действиях против мистика.",
+        "effects": [
+          {
+            "target": "Cursed target",
+            "action": "increase_action_cost",
+            "value": "2 successes vs caster",
+            "description": "Воля накладывает на противника проклятье, из-за которого любое действие против мистика требует двух успехов вместо одного."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Распространяет двойную перепроверку вообще на все действия жертвы.",
+        "effects": [
+          {
+            "target": "Cursed target",
+            "action": "increase_action_cost",
+            "value": "2 successes on all actions",
+            "description": "Противник начинает дважды перепроверять все свои действия, независимо от того, на кого они направлены."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает проклятье в смертельное — любое действие начинает ранить цель.",
+        "effects": [
+          {
+            "target": "Cursed target",
+            "action": "add_damage_on_action",
+            "value": "d6 armor-ignoring",
+            "description": "Воля накладывает на цель проклятье смерти: любое ее действие, независимо от успеха, причиняет ей d6 урона, игнорирующего броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tormenting-spirits",
+    "name": "Пытающие Духи",
+    "category": "spell",
+    "description": "Призыв духов, которые мучают жертву, срывают концентрацию и подтачивают ее разум.",
+    "tags": [
+      "магия",
+      "контроль",
+      "ментальное",
+      "урон",
+      "колдовство",
+      "спиритуализм",
+      "некромантия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Срывает концентрацию и усложняет все проверки цели.",
+        "effects": [
+          {
+            "target": "Tormented target",
+            "action": "break_concentration_and_weaken",
+            "value": "2 checks for success",
+            "description": "Призванные духи прерывают концентрацию цели и заставляют ее выполнять две проверки для любого успеха; Воля позволяет перенести мучение на следующий ход."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Добавляет постоянное иссушение Воли жертвы.",
+        "effects": [
+          {
+            "target": "Tormented target",
+            "action": "reduce_attribute_over_time",
+            "value": "Will -d4 per turn",
+            "description": "Воля и концентрация позволяют духам снижать Волю цели на d4 каждый ход, пока длится эффект."
+          }
+        ]
+      },
+      "master": {
+        "description": "Увеличивает темп разрушения Воли до d6 за ход.",
+        "effects": [
+          {
+            "target": "Tormented target",
+            "action": "modify_value",
+            "value": "Will -d6 per turn",
+            "description": "Урон Воле цели увеличивается до d6 каждый ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "larval-pustule",
+    "name": "Личиночный Нарыв",
+    "category": "spell",
+    "description": "Порочная инвазия личинок, которые разъедают тело жертвы изнутри.",
+    "tags": [
+      "магия",
+      "урон",
+      "статус",
+      "круг",
+      "колдовство",
+      "порочность",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Подсаживает личинок во врага, причиняя постоянный внутренний урон и лишая концентрации.",
+        "effects": [
+          {
+            "target": "Infested enemy",
+            "action": "add_damage_over_time",
+            "value": "d4 armor-ignoring and no concentration",
+            "description": "Мистик помещает личинок внутрь тела врага: тот получает d4 урона, игнорирующего броню, каждый ход, не может поддерживать концентрацию, а Воля позволяет перенести эффект на следующий ход."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Увеличивает урон от личинок до d6 за ход.",
+        "effects": [
+          {
+            "target": "Infested enemy",
+            "action": "modify_value",
+            "value": "d6 damage per turn",
+            "description": "Личинки наносят d6 урона каждый ход."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит урон от инвазии до d8 за ход.",
+        "effects": [
+          {
+            "target": "Infested enemy",
+            "action": "modify_value",
+            "value": "d8 damage per turn",
+            "description": "Личинки наносят d8 урона каждый ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "bewilderment",
+    "name": "Замешательство",
+    "category": "spell",
+    "description": "Погружение жертвы в лабиринт ощущений, из-за которого она теряет контроль над поведением.",
+    "tags": [
+      "магия",
+      "контроль",
+      "статус",
+      "ментальное",
+      "круг",
+      "сирены",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Смущает одного противника и каждый ход случайно определяет его поведение.",
+        "effects": [
+          {
+            "target": "Bewildered target",
+            "action": "confuse_target",
+            "value": "d6 behavior table with concentration",
+            "description": "Воля и концентрация смущают противника: каждый ход d6 определяет, будет ли цель парализована, нападет на ближайшего союзника или на ближайшего врага."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Убирает концентрацию и исключает самого мистика из списка вероятных целей.",
+        "effects": [
+          {
+            "target": "Bewildered target",
+            "action": "improve_confusion",
+            "value": "no concentration, never attacks caster",
+            "description": "Эффект больше не требует концентрации, а цель перестает пытаться атаковать самого мистика."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет накладывать замешательство сразу на нескольких врагов.",
+        "effects": [
+          {
+            "target": "Multiple enemies",
+            "action": "confuse_multiple_targets",
+            "value": "until first failed check",
+            "description": "Мистик может наложить заклинание на нескольких врагов, проверяя Волю для каждого следующего вплоть до первого провала."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "ghost-strike",
+    "name": "Призрачный Удар",
+    "category": "spell",
+    "description": "Проклятое оружие, которое убивает сильнее обычного и поднимает павших как нежить.",
+    "tags": [
+      "магия",
+      "ближний-бой",
+      "урон",
+      "призыв",
+      "колдовство",
+      "некромантия",
+      "оружие",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Окутывает оружие зловещим пламенем и повышает его урон.",
+        "effects": [
+          {
+            "target": "Cursed melee weapon",
+            "action": "add_damage",
+            "value": "+d4 damage",
+            "description": "Колдун поджигает зловещее пламя вокруг оружия ближнего боя, и оно начинает наносить на d4 больше урона."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Поднимает убитых этим оружием живых существ как послушную нежить.",
+        "effects": [
+          {
+            "target": "Living creature slain by weapon",
+            "action": "raise_undead",
+            "value": "until end of battle",
+            "description": "Любое живое существо, убитое оружием мистика, тут же восстает как нежить и подчиняется колдуну до конца боя."
+          }
+        ]
+      },
+      "master": {
+        "description": "Увеличивает дополнительный урон проклятого оружия до d8.",
+        "effects": [
+          {
+            "target": "Cursed melee weapon",
+            "action": "modify_value",
+            "value": "+d8 damage",
+            "description": "Дополнительный урон от Призрачного Удара повышается до +d8."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "corrupt-aura",
+    "name": "Порочная Аура",
+    "category": "spell",
+    "description": "Аура порочной энергии, вредящая живым и подпитывающая чудовищ.",
+    "tags": [
+      "магия",
+      "урон",
+      "исцеление",
+      "порочность",
+      "колдовство",
+      "аура",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Создает вокруг мистика порочную ауру, наносящую живым урон и требующую концентрации.",
+        "effects": [
+          {
+            "target": "Living creatures near caster",
+            "action": "add_damage_over_time",
+            "value": "d6 armor-ignoring with concentration",
+            "description": "Воля создает вокруг мистика ауру, которая вредит людям и животным, нанося d6 урона, игнорирующего броню, пока поддерживается концентрация."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Убирает необходимость концентрации и позволяет щадить избранных существ.",
+        "effects": [
+          {
+            "target": "Corrupt aura upkeep",
+            "action": "remove_requirement",
+            "value": "concentration and selective exclusion",
+            "description": "Концентрация больше не требуется, а мистик может исключать выбранных им существ из области действия ауры."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает ауру и превращает ее в источник исцеления для чудовищ.",
+        "effects": [
+          {
+            "target": "Creatures in aura",
+            "action": "heal_and_harm_aura",
+            "value": "d8 damage, d8 healing for monsters",
+            "description": "Аура наносит до d8 урона и одновременно исцеляет чудовищ и призванных существ на d8 Выживаемости."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "black-arrow",
+    "name": "Черная Стрела",
+    "category": "spell",
+    "description": "Порочный захват цели темной стрелой, которая причиняет боль и удерживает жертву.",
+    "tags": [
+      "магия",
+      "дальний-бой",
+      "урон",
+      "контроль",
+      "колдовство",
+      "порочность",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Запускает одну черную стрелу, которая ранит и удерживает цель до прерывания концентрации.",
+        "effects": [
+          {
+            "target": "Hit target",
+            "action": "restrain_target",
+            "value": "d6 armor-ignoring, one active effect",
+            "description": "Воля отправляет Черную Стрелу: при попадании она наносит d6 урона, игнорирующего броню, и не дает цели действовать, пока не будет прервана концентрация или успешная Воля на освобождение."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет удерживать несколько целей сразу одной связанной цепочкой.",
+        "effects": [
+          {
+            "target": "Multiple targets",
+            "action": "restrain_multiple_targets",
+            "value": "group releases together",
+            "description": "Эффект начинает действовать на несколько целей до первого промаха; любое успешное освобождение одной цели освобождает всю группу."
+          }
+        ]
+      },
+      "master": {
+        "description": "Разрывает общую зависимость и позволяет освобождаться каждой цели отдельно.",
+        "effects": [
+          {
+            "target": "Multiple restrained targets",
+            "action": "separate_escape_checks",
+            "value": "individual release",
+            "description": "Освобождение становится индивидуальным для каждой цели, пока мистик поддерживает концентрацию."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "black-breath",
+    "name": "Черное Дыхание",
+    "category": "spell",
+    "description": "Игра с Порочностью цели: заклинание либо исцеляет, либо углубляет черноту души.",
+    "tags": [
+      "магия",
+      "исцеление",
+      "порочность",
+      "утилита",
+      "колдовство",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Сравнивает d4 с текущей Порочностью цели, решая между исцелением и добавлением Порочности.",
+        "effects": [
+          {
+            "target": "Single target corruption",
+            "action": "heal_or_increase_corruption",
+            "value": "d4 comparison",
+            "description": "Если d4 меньше текущей Порочности цели, она исцеляется на выпавшее значение; если больше — получает столько же Порочности."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Увеличивает силу эффекта до d6.",
+        "effects": [
+          {
+            "target": "Single target corruption",
+            "action": "modify_value",
+            "value": "d6 comparison",
+            "description": "Для сравнения и определения исхода используется d6 вместо d4."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет применять эффект к группе целей, пока цепочка не упрется в первое исцеление.",
+        "effects": [
+          {
+            "target": "Target group",
+            "action": "chain_effect",
+            "value": "until first healing result",
+            "description": "Заклинание может быть применено на группу целей и распространяется по ней вплоть до первого случая, когда оно исцеляет."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "spirit-path",
+    "name": "Тропа Духов",
+    "category": "spell",
+    "description": "Переход в нематериальную духовную форму для прохода сквозь препятствия и игнорирования брони.",
+    "tags": [
+      "магия",
+      "подвижность",
+      "защита",
+      "утилита",
+      "колдовство",
+      "некромантия",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет временно стать духом и проходить сквозь стены, врагов и обычное оружие.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "become_ethereal",
+            "value": "up to 10 meters",
+            "description": "Воля переводит мистика в форму духа: он может преодолеть до десяти метров, пройти сквозь стены и врагов и стать неуязвимым для обычного оружия."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Разрешает принимать форму духа как реакцию на физическую атаку.",
+        "effects": [
+          {
+            "target": "Incoming physical attack",
+            "action": "defensive_transformation",
+            "value": "Will instead of Defense",
+            "description": "Воля заменяет Защиту и позволяет как реакция стать духом на время вражеской физической атаки, после чего мистик сразу возвращается в нормальную форму."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет атакам самого мистика касаться духовного мира и проходить сквозь броню.",
+        "effects": [
+          {
+            "target": "Caster attacks",
+            "action": "ignore_armor",
+            "value": "all attacks can ignore armor",
+            "description": "Воля позволяет оружию или заклинаниям мистика проникать в мир духов в момент столкновения, из-за чего его атаки могут игнорировать броню."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "teleport",
+    "name": "Телепорт",
+    "category": "spell",
+    "description": "Разрыв реальности ради мгновенного перемещения через Другой мир.",
+    "tags": [
+      "магия",
+      "подвижность",
+      "утилита",
+      "порочность",
+      "колдовство",
+      "демонология",
+      "телепортация",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Переносит мистика на короткую дистанцию, но наносит вред и может впустить существо из Другого мира.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "teleport",
+            "value": "up to 2 moves, d4 armor-ignoring on travel",
+            "description": "Воля телепортирует мистика на расстояние до двух нормальных движений: переход через Другой мир наносит d4 урона, игнорирующего броню, не провоцирует Свободные Атаки и при провале может выпустить монстра из разрыва."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Делает переход безопасным и позволяет остановить появление монстра после неудачи.",
+        "effects": [
+          {
+            "target": "Teleport mishap",
+            "action": "negate_teleport_backlash",
+            "value": "no self-damage, may stop summoned monster",
+            "description": "Мистик больше не получает урон при путешествии по Другому миру и может повторить Волю, чтобы не дать монстру пройти через разрыв, если телепорт не удался."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет брать с собой спутника ценой боли и временной Порочности для него.",
+        "effects": [
+          {
+            "target": "Nearby companion",
+            "action": "teleport_with_target",
+            "value": "d4 armor-ignoring and d4 temporary corruption",
+            "description": "Мистик может взять в путь любого стоящего рядом спутника; тот получает d4 урона, игнорирующего броню, и d4 временной Порочности."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "banishment",
+    "name": "Изгнание",
+    "category": "spell",
+    "description": "Выталкивание врага в Другой мир с риском обратного прорыва чудовища.",
+    "tags": [
+      "магия",
+      "контроль",
+      "урон",
+      "порочность",
+      "колдовство",
+      "демонология",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Отправляет одного врага в Другой мир и возвращает его ослабленным.",
+        "effects": [
+          {
+            "target": "Single enemy",
+            "action": "banish_target",
+            "value": "returns next turn with d4 damage and d4 temporary corruption",
+            "description": "Воля выталкивает выбранного врага в Другой мир; на следующий ход тот возвращается шокированным, получает d4 урона, игнорирующего броню, и d4 временной Порочности."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет держать цель изгнанной, пока она не выдержит проверку Воли.",
+        "effects": [
+          {
+            "target": "Banished target",
+            "action": "extend_banishment",
+            "value": "until target passes Will check",
+            "description": "Цель остается в Другом мире до тех пор, пока не пройдет проверку Воли, чтобы вернуться, а портал остается открытым, пока она жива и пытается вернуться."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает изгнание в реакцию на атаку по мистику.",
+        "effects": [
+          {
+            "target": "Attacker against caster",
+            "action": "reaction_banishment",
+            "value": "returns after 1 turn",
+            "description": "Воля позволяет как реакция отправить напавшее на мистика существо в Другой мир; оно возвращается через один ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "retribution",
+    "name": "Возмездие",
+    "category": "spell",
+    "description": "Злость мистика связывает цель с неудачами и отраженным уронам.",
+    "tags": [
+      "магия",
+      "урон",
+      "поддержка",
+      "контроль",
+      "колдовство",
+      "сирены",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Помечает одну цель так, чтобы ее было легче добивать всем союзникам.",
+        "effects": [
+          {
+            "target": "Marked target",
+            "action": "grant_rerolls_against_target",
+            "value": "all attackers reroll misses",
+            "description": "Воля насыщает цель темной энергией, позволяя любому атакующему повторить любую неуспешную атаку по ней до конца боя."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Создает реактивную губительную связь между мистиком и одним нападающим.",
+        "effects": [
+          {
+            "target": "Chosen attacker",
+            "action": "link_damage",
+            "value": "mirrors all damage taken by caster",
+            "description": "Как реакция мистик может связать себя с одним атакующим: весь урон, получаемый мистиком, независимо от источника, повторяется на связанную цель."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет накапливать несколько губительных связей одновременно.",
+        "effects": [
+          {
+            "target": "All linked attackers",
+            "action": "stack_damage_links",
+            "value": "new link on each attack",
+            "description": "Мистик может создавать новую губительную связь с каждым новым атакующим, не разрывая старых, и дублировать урон сразу на всех связанных противников."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "sulfur-cascade",
+    "name": "Каскад Серы",
+    "category": "spell",
+    "description": "Яростные огненные потоки, которые жгут врагов волной за волной.",
+    "tags": ["магия", "урон", "огонь", "двор", "дальний-бой", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Хлещет одного врага огнем, причиняя урон даже при неудаче.",
+        "effects": [
+          {
+            "target": "Single enemy",
+            "action": "add_damage",
+            "value": "d12 on success or d6 on failure",
+            "description": "Воля хлещет врага каскадом огня на d12 урона, либо на d6, если проверка была провалена."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет огненному каскаду перескакивать на следующих врагов.",
+        "effects": [
+          {
+            "target": "Enemy chain",
+            "action": "chain_attack",
+            "value": "continues until first failure",
+            "description": "После первого успешного попадания мистик может ударить следующего врага, затем еще следующего и так далее, пока не случится первый провал."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает каскады в непрерывное обжигание, прерываемое только серией неудач.",
+        "effects": [
+          {
+            "target": "Enemies hit by cascades",
+            "action": "sustain_attack",
+            "value": "continues until two failed checks in a turn",
+            "description": "Огненные каскады продолжают обжигать врагов, пока мистик не провалит две проверки за ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fire-wall",
+    "name": "Огненная Стена",
+    "category": "spell",
+    "description": "Стена или купол пламени, который режет пространство и сжигает всякий проход сквозь себя.",
+    "tags": ["магия", "огонь", "контроль", "защита", "двор", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Возводит огненную стену, перекрывающую проходы и наносящую тяжелый урон при пересечении.",
+        "effects": [
+          {
+            "target": "Area barrier",
+            "action": "create_barrier",
+            "value": "d12 armor-ignoring on crossing",
+            "description": "Воля возводит широкую стену вихрящегося пламени: она заставляет врагов обходить себя, наносит d12 урона, игнорирующего броню, при пересечении и сжигает мелкие предметы вроде стрел."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет свернуть стену в кольцо вокруг нужной группы существ.",
+        "effects": [
+          {
+            "target": "Chosen enclosed area",
+            "action": "reshape_barrier",
+            "value": "ring around allies or enemies",
+            "description": "Огненную стену можно свернуть в кольцо вокруг мистика, союзников и выбранных для изоляции врагов."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дает стене форму полноценного огненного купола.",
+        "effects": [
+          {
+            "target": "Chosen enclosed area",
+            "action": "reshape_barrier",
+            "value": "dome",
+            "description": "Стена может принимать форму купола."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "fire-soul",
+    "name": "Огненная Душа",
+    "category": "spell",
+    "description": "Огонь становится для мистика и щитом, и оружием, и даже источником исцеления.",
+    "tags": ["магия", "огонь", "защита", "реакция", "урон", "двор", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Обжигает нападающих и дает дополнительную защиту от огня.",
+        "effects": [
+          {
+            "target": "Attackers and fire defense",
+            "action": "retaliate_and_resist",
+            "value": "d6 returned damage and +d6 armor vs fire",
+            "description": "Как реакция мистик наносит d6 огненного урона тому, кто его атаковал, и получает +d6 Брони при защите от огня."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает ответный урон в ближнем бою и защиту от огня.",
+        "effects": [
+          {
+            "target": "Melee attackers and fire defense",
+            "action": "modify_value",
+            "value": "d10 returned damage and +d10 armor vs fire",
+            "description": "Возвращенный урон в ближнем бою повышается до d10, а защита от огня — до +d10 Брони."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает мистика невосприимчивым к огню и превращает пламя в исцеление.",
+        "effects": [
+          {
+            "target": "Fire and attackers",
+            "action": "grant_immunity_and_retaliation",
+            "value": "fire immunity, heal half fire damage, d10 returned damage",
+            "description": "Мистик больше не получает урон от огня, половина потенциального огненного урона возвращается ему как исцеление, а любой не-ментальный удар по нему может получить d10 ответного урона."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "battle-hymn",
+    "name": "Боевой Гимн",
+    "category": "spell",
+    "description": "Воодушевляющая песнь, которая усиливает физические качества союзников и поддерживает их в бою.",
+    "tags": ["магия", "поддержка", "исцеление", "племя", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Поднимает одно выбранное физическое качество каждого союзника.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "grant_bonus",
+            "value": "+1 Speed, Strength, or Accuracy",
+            "description": "Скорость, Сила или Точность союзников — по их выбору — увеличиваются на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Усиливает сразу все три боевые характеристики союзников.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "grant_bonus",
+            "value": "+1 Speed, Strength, and Accuracy",
+            "description": "Скорость, Сила и Точность союзников увеличиваются на единицу."
+          }
+        ]
+      },
+      "master": {
+        "description": "Дополняет гимн единоразовым боевым исцелением.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "heal",
+            "value": "d6 once per battle",
+            "description": "Гимн дополнительно излечивает d6 Выживаемости один раз за бой."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "elegy",
+    "name": "Элегия",
+    "category": "spell",
+    "description": "Сосредотачивающая песнь, которая укрепляет разум, харизму и самоконтроль союзников.",
+    "tags": ["магия", "поддержка", "утилита", "порочность", "племя", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет каждому союзнику выбрать одно усиливаемое ментальное качество.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "grant_bonus",
+            "value": "+1 Discreet, Will, or Appealing",
+            "description": "Сноровка, Воля или Соблазнительность союзников — по их выбору — увеличиваются на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Поднимает все три качества сразу.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "grant_bonus",
+            "value": "+1 Discreet, Will, and Appealing",
+            "description": "Сноровка, Воля и Соблазнительность союзников увеличиваются на единицу."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет песне один раз за бой предотвратить временную Порочность.",
+        "effects": [
+          {
+            "target": "Allies",
+            "action": "prevent_corruption",
+            "value": "d4 temporary corruption once per battle",
+            "description": "Элегия дополнительно предотвращает d4 временной Порочности один раз за бой."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "pamphlet",
+    "name": "Памфлет",
+    "category": "spell",
+    "description": "Оскорбительная гармоника, которая дезориентирует врагов и заставляет их перечеркивать собственные успехи.",
+    "tags": ["магия", "контроль", "урон", "племя", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Заставляет раненых врагов повторять даже успешные проверки.",
+        "effects": [
+          {
+            "target": "Wounded enemies",
+            "action": "force_reroll_successes",
+            "value": "all successful checks",
+            "description": "Соблазнительность заставляет раненых врагов повторять все свои успешные проверки на любое действие."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Распространяет тот же эффект на всех врагов, а не только на раненых.",
+        "effects": [
+          {
+            "target": "All enemies",
+            "action": "force_reroll_successes",
+            "value": "all successful checks",
+            "description": "Все враги начинают повторять все свои успешные проверки на любое действие."
+          }
+        ]
+      },
+      "master": {
+        "description": "Добавляет к насмешке постоянный игнорирующий броню урон по цели.",
+        "effects": [
+          {
+            "target": "Affected target",
+            "action": "add_damage_over_time",
+            "value": "d4 armor-ignoring per turn",
+            "description": "При успехе цель дополнительно получает d4 урона, игнорирующего броню, каждый ход, пока продолжается эффект."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "dancing-weapon",
+    "name": "Танцующее Оружие",
+    "category": "spell",
+    "description": "Поднятое силой воли оружие, которое сражается само и защищает мистика.",
+    "tags": [
+      "магия",
+      "ближний-бой",
+      "защита",
+      "утилита",
+      "племя",
+      "руны",
+      "оружие",
+      "воля"
+    ],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет оружию сражаться вместо мистика, но запрещает использовать другие активные способности.",
+        "effects": [
+          {
+            "target": "Floating weapon",
+            "action": "animate_weapon",
+            "value": "Will for attack and defense, no other active abilities",
+            "description": "Воля заменяет Точность для попадания и Скорость для Защиты, пока оружие сражается само; мистик не может использовать другие активные способности."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Разрешает колдовать и пользоваться способностями параллельно с танцующим оружием.",
+        "effects": [
+          {
+            "target": "Floating weapon upkeep",
+            "action": "remove_restriction",
+            "value": "may use abilities, full action to activate",
+            "description": "Мистик может применять способности и другие силы, пока эффект активен, хотя для запуска оружия требуется полное действие."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает зачарование постоянным и не требующим отдельного действия для запуска.",
+        "effects": [
+          {
+            "target": "Floating weapon upkeep",
+            "action": "remove_activation_cost",
+            "value": "always enchanted",
+            "description": "Оружие мистика зачаровано всегда и не требует действия для активации: пока оно занимает защитную позицию, мистик может делать все остальное."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "banishing-seal",
+    "name": "Изгоняющая Печать",
+    "category": "spell",
+    "description": "Символ, который выталкивает выбранный тип существ из обозначенной области.",
+    "tags": ["магия", "контроль", "урон", "символизм", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Прогоняет группу существ выбранного типа за пределы области символа.",
+        "effects": [
+          {
+            "target": "Chosen creature type in symbol area",
+            "action": "repel_targets",
+            "value": "until first failed check",
+            "description": "Воля прогоняет группу существ выбранного типа из области действия символа; изгнанные существа покидают ее сами и не могут вернуться в течение часа."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Наказывает существо, на котором оборвалась цепочка изгнания, если оно медлит уйти.",
+        "effects": [
+          {
+            "target": "Creature where chain breaks",
+            "action": "threaten_departure",
+            "value": "d4 armor-ignoring",
+            "description": "Существо, на котором была оборвана цепочка, рискует получить d4 урона, игнорирующего броню, если не покинет область немедленно."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает наказание за сопротивление изгнанию.",
+        "effects": [
+          {
+            "target": "Creature where chain breaks",
+            "action": "threaten_departure",
+            "value": "d8 armor-ignoring, or d4 if it leaves",
+            "description": "Существо, на котором оборвалась цепочка, рискует получить d8 урона, игнорирующего броню, но может сократить его до d4, если немедленно уйдет."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "draining-glyph",
+    "name": "Иссушающий Глиф",
+    "category": "spell",
+    "description": "Пробужденный символ высасывает жизненную силу врагов и позже перенаправляет ее союзникам.",
+    "tags": ["магия", "урон", "исцеление", "символизм", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Наносит всем врагам рядом регулярный урон, пока мистик держит концентрацию.",
+        "effects": [
+          {
+            "target": "Nearby enemies",
+            "action": "add_damage_over_time",
+            "value": "d4 armor-ignoring with concentration",
+            "description": "Воля и концентрация заставляют символ наносить всем врагам вокруг d4 урона, игнорирующего броню, каждый ход."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет глифу работать без концентрации.",
+        "effects": [
+          {
+            "target": "Glyph upkeep",
+            "action": "remove_requirement",
+            "value": "concentration",
+            "description": "Для сохранения эффекта концентрация больше не требуется."
+          }
+        ]
+      },
+      "master": {
+        "description": "Начинает перенаправлять украденную жизненную силу в союзников.",
+        "effects": [
+          {
+            "target": "Nearby allies",
+            "action": "heal",
+            "value": "d4 hp per turn",
+            "description": "Украденная жизненная сила перенаправляется в союзников и восстанавливает им d4 Выживаемости каждый ход."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "blinding-symbol",
+    "name": "Ослепляющий Символ",
+    "category": "spell",
+    "description": "Вспышка света из символа, которая лишает врагов зрения на все более долгий срок.",
+    "tags": ["магия", "контроль", "статус", "символизм", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Ослепляет группу врагов на один ход.",
+        "effects": [
+          {
+            "target": "Enemy group",
+            "action": "add_status",
+            "value": "blinded for 1 turn",
+            "description": "Воля ослепляет группу врагов на один ход."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет поддерживать слепоту концентрацией и повторными проверками Воли.",
+        "effects": [
+          {
+            "target": "Blinded targets",
+            "action": "extend_status",
+            "value": "until concentration ends or Will fails",
+            "description": "Эффект продолжается, пока мистик поддерживает концентрацию и не проваливает Волю."
+          }
+        ]
+      },
+      "master": {
+        "description": "Делает слепоту устойчивой к времени и снимаемой только магией или эликсирами.",
+        "effects": [
+          {
+            "target": "Blinded targets",
+            "action": "extend_status",
+            "value": "until healed by magic or elixirs",
+            "description": "Эффект сохраняется, пока цель не исцелит себя магией или эликсирами."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "protective-runes",
+    "name": "Защитные Руны",
+    "category": "spell",
+    "description": "Ограждающие руны создают отдельный слой магической брони и отвечают врагу обратным уроном.",
+    "tags": ["магия", "защита", "охрана", "урон", "руны", "символизм", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Создает рунную броню, которая отдельно проверяется против каждого удара.",
+        "effects": [
+          {
+            "target": "Rune-protected target",
+            "action": "grant_barrier",
+            "value": "d4 armor with concentration",
+            "description": "Воля и концентрация создают d4 Брони, которая отдельно проверяется для каждого входящего удара."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Добавляет к рунам ответный игнорирующий броню урон.",
+        "effects": [
+          {
+            "target": "Attackers against rune-protected target",
+            "action": "retaliate",
+            "value": "d4 armor-ignoring",
+            "description": "Защитные руны начинают возвращать d4 урона, игнорирующего броню."
+          }
+        ]
+      },
+      "master": {
+        "description": "Усиливает и защиту, и ответный урон, а также убирает нужду в концентрации.",
+        "effects": [
+          {
+            "target": "Rune-protected target",
+            "action": "improve_barrier",
+            "value": "d6 armor and d6 retaliatory damage, no concentration",
+            "description": "Броня и ответный урон увеличиваются до d6, а концентрация больше не требуется для поддержания эффекта."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "sphere",
+    "name": "Сфера",
+    "category": "spell",
+    "description": "Вращающееся оружие образует вокруг мистика защитную сферу от физического оружия.",
+    "tags": ["магия", "защита", "охрана", "руны", "оружие", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Заменяет обычную защиту Волей, но ограничивает действия движением.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "change_base_attribute",
+            "value": "Will instead of Speed vs physical weapons",
+            "description": "Пока действует Сфера, Воля заменяет Скорость для определения Защиты против физического оружия, но мистик может совершать только движение."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Делает защиту от физического оружия автоматической, пока держится концентрация.",
+        "effects": [
+          {
+            "target": "Caster",
+            "action": "grant_immunity",
+            "value": "automatic protection from physical weapons with concentration",
+            "description": "Защитная Сфера автоматически отражает все физическое оружие, пока мистик поддерживает концентрацию."
+          }
+        ]
+      },
+      "master": {
+        "description": "Позволяет защищать соседнего союзника и действовать свободнее без концентрации.",
+        "effects": [
+          {
+            "target": "Caster and nearby ally",
+            "action": "expand_barrier",
+            "value": "protect ally, no concentration, non-attack actions allowed",
+            "description": "Сфера может защищать не только мистика, но и ближайшего союзника; мистик может выполнять другие не-боевые действия, а концентрация больше не нужна."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "staff-projectile",
+    "name": "Снаряд-Посох",
+    "category": "spell",
+    "description": "Посох или иное оружие превращается в самонаводящийся снаряд, который всегда возвращается к хозяину.",
+    "tags": ["магия", "дальний-бой", "урон", "руны", "оружие", "воля"],
+    "source": "spells.md",
+    "tiers": {
+      "novice": {
+        "description": "Позволяет бросать посох Волей вместо Аккуратности и передавать ему уже наложенные эффекты.",
+        "effects": [
+          {
+            "target": "Thrown staff",
+            "action": "ranged_weapon_spell",
+            "value": "d8 damage with enchantments",
+            "description": "Воля заменяет Аккуратность, чтобы нанести цели d8 урона брошенным посохом; все уже наложенные на него эффекты зачарования могут сработать при попадании."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Позволяет посоху обходить препятствия и усиливает удар.",
+        "effects": [
+          {
+            "target": "Thrown staff",
+            "action": "ignore_obstacles",
+            "value": "d10 damage",
+            "description": "Посох может сам преодолевать стены и врагов, если мистик видит хотя бы часть цели, а наносимый урон увеличивается до d10."
+          }
+        ]
+      },
+      "master": {
+        "description": "Превращает бросок в цепную атаку по нескольким целям с убывающим уроном.",
+        "effects": [
+          {
+            "target": "Up to five visible targets",
+            "action": "chain_attack",
+            "value": "d12/d10/d8... without breaking on miss",
+            "description": "Мистик может атаковать одновременно до пяти видимых целей: первая получает d12 урона, вторая d10 и так далее, а промах по одной цели не обрывает цепочку."
+          }
+        ]
+      }
+    }
+  }
+]
