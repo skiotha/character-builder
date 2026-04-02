@@ -1,11 +1,18 @@
 import { validateDmToken } from "#auth";
 import { addClient, removeClient } from "#sse";
-import { getCharacter } from "../models/storage.mts";
+import { getCharacter } from "#models/storage";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleCharacterStream(req, res, characterId) {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+export async function handleCharacterStream(
+  req: NagaraRequest,
+  res: ServerResponse,
+  characterId: string,
+): Promise<boolean> {
+  const url = new URL(req.url!, `http://${req.headers.host}`);
   const playerId =
-    url.searchParams.get("playerId") || req.headers["x-player-id"];
+    url.searchParams.get("playerId") ||
+    (req.headers["x-player-id"] as string | undefined);
   const dmId = url.searchParams.get("dmId") || req.headers["x-dm-id"];
   const isDM = validateDmToken(dmId);
 
@@ -22,7 +29,7 @@ export async function handleCharacterStream(req, res, characterId) {
     return true;
   }
 
-  const isOwner = character.playerId === playerId;
+  const isOwner = (character as Record<string, unknown>).playerId === playerId;
   // if (!isOwner && !isDM) {
   //     res.writeHead(403)
   //     res.end('Forbidden: you do not have access to this character')
@@ -46,7 +53,7 @@ export async function handleCharacterStream(req, res, characterId) {
       res.write(": keepalive\n\n");
       // res.write("event: ping\ndata: {}\n\n");
     } catch (error) {
-      console.error("[SSE] keep-alive write failed", error.message);
+      console.error("[SSE] keep-alive write failed", (error as Error).message);
       clearInterval(keepAliveInterval);
       removeClient(characterId, res);
     }

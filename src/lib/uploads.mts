@@ -3,13 +3,20 @@ import fsp from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { pipeline } from "node:stream/promises";
+
 import { DATA_DIR } from "#config";
 
-const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
+import type { Readable } from "node:stream";
+
+const UPLOAD_DIR: string = path.join(DATA_DIR, "uploads");
 
 await fsp.mkdir(path.join(UPLOAD_DIR, "portraits"), { recursive: true });
 
-export async function uploadPortrait(characterId, fileStream, filename) {
+export async function uploadPortrait(
+  characterId: string,
+  fileStream: Readable,
+  filename: string,
+): Promise<string> {
   const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".avif", ".webp"];
   const extension = path.extname(filename).toLowerCase();
 
@@ -37,7 +44,7 @@ export async function uploadPortrait(characterId, fileStream, filename) {
   return `/uploads/portraits/${characterId}/${safeName}`;
 }
 
-export async function deletePortrait(characterId) {
+export async function deletePortrait(characterId: string): Promise<void> {
   const characterUploadDir = path.join(UPLOAD_DIR, "portraits", characterId);
 
   try {
@@ -45,7 +52,7 @@ export async function deletePortrait(characterId) {
   } catch (error) {
     console.warn(
       `Could not delete portrait for character ${characterId}:`,
-      error.message,
+      (error as Error).message,
       `\nDoes the file exist?`,
     );
   }

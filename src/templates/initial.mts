@@ -1,3 +1,4 @@
+// @ts-nocheck — This file is being removed in Phase 3 (ADR-009 schema-driven rendering)
 const TEXTS = {
   welcome: {
     article: {
@@ -53,7 +54,7 @@ const BEHAVIOR_MAP = {
   wow: ["hint-enabled", "link-enabled"],
 };
 
-export function renderInitial() {
+export function renderInitial(): string {
   return `
     ${renderWelcomeBlock()}
 

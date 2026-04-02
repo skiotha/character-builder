@@ -1,10 +1,10 @@
-/**
- * Transforming portrait crop data from stored portrait-sized to new dashboard-preview size
- * @param {*} originalCrop
- * @param {Number} fromSize
- * @param {Number} toSize
- */
-export function scaleCropForContainer(originalCrop, fromSize, toSize) {
+import type { PortraitCrop, PortraitDimensions } from "#rpg-types";
+
+export function scaleCropForContainer(
+  originalCrop: PortraitCrop,
+  fromSize: PortraitDimensions,
+  toSize: PortraitDimensions,
+): PortraitCrop {
   const widthRatio = toSize.width / fromSize.width;
   const heightRatio = toSize.height / fromSize.height;
 

@@ -16,18 +16,30 @@ import {
   getNestedValue,
   setNestedValue,
 } from "./traversal.mts";
+import type {
+  ValidationResult,
+  UpdateValidationResult,
+  FieldUpdate,
+} from "#types";
 
-const REQUIRED_FIELDS = getFieldPathsByProperty("required", true);
-const FIELDS_WITH_VALIDATION = getFieldPathsByProperty("validate", undefined);
-export const SERVER_CONTROLLED_FIELDS = getFieldPathsByProperty(
+const REQUIRED_FIELDS: string[] = getFieldPathsByProperty("required", true);
+const FIELDS_WITH_VALIDATION: string[] = getFieldPathsByProperty(
+  "validate",
+  undefined,
+);
+export const SERVER_CONTROLLED_FIELDS: string[] = getFieldPathsByProperty(
   "serverControlled",
   true,
 );
 
-export function validateCharacterCreation(data, playerId, playerName) {
-  const errors = [];
-  const warnings = [];
-  const validatedData = {};
+export function validateCharacterCreation(
+  data: Record<string, unknown>,
+  playerId: string,
+  playerName: string,
+): ValidationResult {
+  const errors: ValidationResult["errors"] = [];
+  const warnings: ValidationResult["warnings"] = [];
+  const validatedData: Record<string, unknown> = {};
 
   const defaultCharacter = generateDefaultCharacter(playerId, playerName);
 
@@ -74,12 +86,12 @@ export function validateCharacterCreation(data, playerId, playerName) {
     const validation = validateFieldValue(
       fieldPath,
       userValue,
-      mergedCharacter,
+      mergedCharacter as Record<string, unknown>,
     );
     if (!validation.valid) {
       errors.push({
         field: fieldPath,
-        error: validation.error,
+        error: validation.error || "Validation failed",
         code: "VALIDATION",
       });
 
@@ -118,13 +130,13 @@ export function validateCharacterCreation(data, playerId, playerName) {
 }
 
 export async function validateCharacterUpdate(
-  updates,
-  character,
-  role,
-  options,
-) {
-  const errors = [];
-  const validUpdates = [];
+  updates: FieldUpdate[],
+  character: Record<string, unknown>,
+  role: string,
+  _options?: Record<string, unknown>,
+): Promise<UpdateValidationResult> {
+  const errors: UpdateValidationResult["errors"] = [];
+  const validUpdates: FieldUpdate[] = [];
 
   for (const update of updates) {
     const { field, value, operation = "set" } = update;
@@ -140,7 +152,11 @@ export async function validateCharacterUpdate(
 
     const validation = validateFieldValue(field, value, character);
     if (!validation.valid) {
-      errors.push({ field, error: validation.error, code: "VALIDATION" });
+      errors.push({
+        field,
+        error: validation.error || "Validation failed",
+        code: "VALIDATION",
+      });
       continue;
     }
 
@@ -157,9 +173,10 @@ export async function validateCharacterUpdate(
     }
 
     if (update.field === "traits" && update.operation === "push") {
-      const ability = update.value;
-      const cost = ability.cost[0];
-      const unspent = character.experience.unspent;
+      const ability = update.value as Record<string, unknown>;
+      const cost = (ability.cost as number[])[0]!;
+      const unspent = (character as Record<string, Record<string, unknown>>)
+        .experience?.unspent as number;
 
       if (unspent < cost) {
         errors.push({
@@ -177,8 +194,9 @@ export async function validateCharacterUpdate(
   return { validUpdates, errors };
 }
 
-export function skipOnCreation(fieldPath, userRole) {
+export function skipOnCreation(fieldPath: string, userRole: string): boolean {
   const schema = getFieldSchema(fieldPath);
+  if (!schema) return false;
 
   if (schema.serverControlled) return false;
 

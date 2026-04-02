@@ -55,13 +55,17 @@ Adopt the same TypeScript conventions as `mychar` and `malizia`.
 ```jsonc
 {
   "scripts": {
-    "start": "node --experimental-strip-types src/server.mts",
-    "start:dev": "node --experimental-strip-types --env-file-if-exists=config/nagara.development.env scripts/watcher.mts",
+    "start": "node src/server.mts",
+    "start:dev": "node --env-file-if-exists=config/nagara.development.env scripts/watcher.mts",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node --experimental-strip-types --test test/**/*.test.mts",
+    "test": "node --test test/**/*.test.mts",
   },
 }
 ```
+
+> **Note:** Type stripping became unflagged in Node 23.6.0 and is enabled
+> by default in Node 24+. The `--experimental-strip-types` flag originally
+> specified here is no longer needed with our `>=24.0.0` engine requirement.
 
 ### Migration Strategy
 
@@ -79,5 +83,5 @@ Types are added incrementally:
 - **Positive:** Consistent with sibling projects. Same tsconfig, same conventions, same mental model.
 - **Positive:** No build step. Files execute directly via Node.js strip-types.
 - **Positive:** IDE support (autocomplete, refactoring, inline errors) works immediately.
-- **Negative:** `--experimental-strip-types` is still flagged experimental in Node 24. Risk is low — the feature is stable and widely adopted.
+- **Negative:** ~~`--experimental-strip-types` is still flagged experimental in Node 24.~~ Resolved — unflagged since Node 23.6.0, default in Node 24+.
 - **Negative:** Migration is a large mechanical diff across all files. Combining it with the restructure (ADR-006) minimizes the number of disruptive commits.

@@ -1,56 +1,64 @@
-import { SERVER_CONTROLLED_FIELDS } from "../models/validation.mts";
+import { SERVER_CONTROLLED_FIELDS } from "#models/validation";
 
-function generateId() {
+function generateId(): string {
   return (
     crypto.randomUUID?.() ||
     Date.now().toString(36) + Math.random().toString(36).substring(2)
   );
 }
 
-function generateBackupCode() {
+function generateBackupCode(): string {
   const adjectives = ["Iris", "Crystal", "Shadow", "Iron", "Golden", "Silent"];
   const nouns = ["Wolf", "Dragon", "Phoenix", "Tiger", "Hawk", "Serpent"];
   const numbers = Math.floor(100 + Math.random() * 900);
 
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]!;
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]!;
 
   return `${adj}-${noun}-${numbers}`;
 }
 
-function validateCharacter(data) {
-  if (!data.characterName || data.characterName.trim().length < 2) {
+function validateCharacter(data: Record<string, unknown>): boolean {
+  if (
+    !data.characterName ||
+    (typeof data.characterName === "string" &&
+      data.characterName.trim().length < 2)
+  ) {
     throw new Error("Character name must be at least 2 characters");
   }
 
   return true;
 }
 
-function generateHumanReadableId() {
+function generateHumanReadableId(): string {
   const prefixes = ["iris", "wolf", "dragon", "shadow", "crystal"];
-  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]!;
   const numbers = Math.floor(1000 + Math.random() * 9000);
   return `${prefix}-${numbers}`;
 }
 
-function filterServerControlledFields(data) {
-  const filtered = { ...data };
+function filterServerControlledFields(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const filtered: Record<string, unknown> = { ...data };
 
   for (const fieldPath of SERVER_CONTROLLED_FIELDS) {
     const keys = fieldPath.split(".");
-    let current = filtered;
+    let current: Record<string, unknown> | null = filtered;
 
     for (let i = 0; i < keys.length - 1; i++) {
-      if (current[keys[i]]) {
-        current = current[keys[i]];
+      const key = keys[i]!;
+      if (current[key] && typeof current[key] === "object") {
+        current = current[key] as Record<string, unknown>;
       } else {
         current = null;
         break;
       }
     }
 
-    if (current && current[keys[keys.length - 1]] !== undefined) {
-      delete current[keys[keys.length - 1]];
+    const lastKey = keys[keys.length - 1]!;
+    if (current && current[lastKey] !== undefined) {
+      delete current[lastKey];
     }
   }
 

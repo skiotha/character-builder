@@ -1,8 +1,13 @@
 import { renderDashboard } from "../templates/dashboard.mts";
-import * as nagara from "../models/index.mts";
+import * as nagara from "#models";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function renderDashboardView(req, res) {
-  const playerId = req.headers["x-player-id"];
+export async function renderDashboardView(
+  req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
+  const playerId = req.headers["x-player-id"] as string | undefined;
 
   if (!playerId) {
     res.writeHead(401, { "Content-Type": "text/html" });

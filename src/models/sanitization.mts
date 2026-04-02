@@ -1,4 +1,9 @@
-export function sanitizeCharacterForRole(characterData, role) {
+import type { CharacterRole } from "#types";
+
+export function sanitizeCharacterForRole(
+  characterData: Record<string, unknown>,
+  role: CharacterRole,
+): Record<string, unknown> {
   if (role !== "dm" && role !== "owner") {
     delete characterData.backupCode;
     delete characterData.playerId;

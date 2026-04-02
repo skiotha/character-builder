@@ -3,20 +3,41 @@
   "version": "0.1.0",
   "description": "Nagara RPG character builder — web application",
   "type": "module",
+  "keywords": [
+    "nagara"
+  ],
+  "homepage": "https://github.com/skiotha/character-builder#readme",
+  "bugs": {
+    "url": "https://github.com/skiotha/character-builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skiotha/character-builder.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "ahani",
+    "email": "skiotha.bl@gmail.com"
+  },
   "engines": {
-    "node": ">=22.6.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
-    "start": "node --experimental-strip-types src/server.mts",
-    "start:dev": "node --experimental-strip-types scripts/watcher.mts",
-    "test": "node --experimental-strip-types --test test/**/*.test.mts"
+    "start": "node src/server.mts",
+    "start:dev": "node --env-file-if-exists=config/nagara.development.env scripts/watcher.mts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test test/**/*.test.mts"
   },
   "imports": {
     "#config": "./src/lib/config.mts",
     "#logger": "./src/lib/logger.mts",
     "#auth": "./src/lib/auth.mts",
+    "#types": "./src/types.mts",
+    "#rpg-types": "./src/rpg-types.mts",
     "#models": "./src/models/index.mts",
+    "#models/*": "./src/models/*.mts",
     "#rules": "./src/rules/index.mts",
+    "#renderers": "./src/renderers/index.mts",
     "#middleware": "./src/middleware/index.mts",
     "#routes": "./src/routes/handlers.mts",
     "#sse": "./src/sse/broadcast.mts"

@@ -2,10 +2,15 @@ import {
   filterServerControlledFields,
   generateHumanReadableId,
 } from "../lib/utils.mts";
-import { createCharacter } from "../models/index.mts";
-import { validateCharacterCreation } from "../models/validation.mts";
+import { createCharacter } from "#models";
+import { validateCharacterCreation } from "#models/validation";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleCreateCharacter(req, res) {
+export async function handleCreateCharacter(
+  req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
   let body = "";
   req.on("data", (chunk) => (body += chunk));
 
@@ -42,7 +47,7 @@ export async function handleCreateCharacter(req, res) {
 
       const character = await createCharacter(
         playerId,
-        validation.validatedData,
+        validation.validatedData!,
       );
 
       res.writeHead(201, { "Content-Type": "application/json" });
@@ -52,7 +57,9 @@ export async function handleCreateCharacter(req, res) {
 
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(
-        JSON.stringify({ error: error.message || "Invalid character data" }),
+        JSON.stringify({
+          error: (error as Error).message || "Invalid character data",
+        }),
       );
     }
   });

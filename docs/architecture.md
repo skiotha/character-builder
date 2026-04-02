@@ -71,8 +71,8 @@ Entry point for all HTTP requests. Responsibilities:
 - CORS headers (see ADR-007)
 - SPA fallback (serve `index.html` for unmatched client routes)
 
-Currently implemented as a single function with an if/else chain in `router.mjs`.
-Planned migration to a declarative router pattern (see roadmap Phase 1).
+Currently implemented as a single function with an if/else chain in `app.mts`.
+Planned migration to a declarative router pattern (see roadmap Phase 7).
 
 ### 3.2 Handlers
 
@@ -119,9 +119,9 @@ The schema is served to the client via `GET /api/v1/schema` (cached, ETag-friend
 
 Calculates derived character stats from primary attributes and active effects.
 
-- **Attribute formulas** (`attributes.mjs`): secondary stats derived from primaries (toughness from strong, defense from quick, etc.)
-- **Effect applicator** (`applicator.mjs`): applies modifier pipeline to character fields
-- **Derived recalculation** (`derived.mjs`): orchestrates the full recalculation pass, called on every character update before saving
+- **Attribute formulas** (`attributes.mts`): secondary stats derived from primaries (toughness from strong, defense from quick, etc.)
+- **Effect applicator** (`applicator.mts`): applies modifier pipeline to character fields
+- **Derived recalculation** (`derived.mts`): orchestrates the full recalculation pass, called on every character update before saving
 
 ### 3.6 Storage
 
@@ -234,7 +234,7 @@ See [data-contracts.md](data-contracts.md) for the full schema specification.
 ## 6. Deployment
 
 - **Domain:** `nagara.team` / `www.nagara.team`
-- **Development:** `node --experimental-strip-types src/server.mts` on localhost:3000 (HTTP)
+- **Development:** `node src/server.mts` on localhost:3000 (HTTP)
 - **Production:** HTTPS on a VPS, bound to 0.0.0.0:443. HTTP (port 80) redirects to HTTPS
 - **SSL:** Certs stored in `../secrets/ssl/` (outside all repos, never committed)
   - `nagara.team.key` — private key

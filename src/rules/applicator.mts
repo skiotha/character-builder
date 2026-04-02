@@ -1,18 +1,32 @@
-import { setNestedValue, getNestedValue } from "../models/traversal.mts";
+import { setNestedValue, getNestedValue } from "#models/traversal";
 
-export function applyEffect(character, targetPath, modifier) {
-  const currentValue = getNestedValue(character, targetPath) ?? 0;
-  let newValue;
+interface Modifier {
+  type: string;
+  value: unknown;
+}
+
+interface EquipmentEffect {
+  target: string;
+  modifier: Modifier;
+}
+
+export function applyEffect(
+  character: Record<string, unknown>,
+  targetPath: string,
+  modifier: Modifier,
+): void {
+  const currentValue = (getNestedValue(character, targetPath) as number) ?? 0;
+  let newValue: number;
 
   switch (modifier.type) {
     case "add":
-      newValue = currentValue + modifier.value;
+      newValue = currentValue + (modifier.value as number);
       break;
     case "mul":
-      newValue = currentValue * modifier.value;
+      newValue = currentValue * (modifier.value as number);
       break;
     case "set":
-      newValue = modifier.value;
+      newValue = modifier.value as number;
       break;
     case "advantage":
       setNestedValue(character, targetPath + ".advantage", true);
@@ -24,22 +38,15 @@ export function applyEffect(character, targetPath, modifier) {
   setNestedValue(character, targetPath, newValue);
 }
 
-/*
-{
-  name: "Longsword",
-  damage: "1d8",
-  effects: [
-    { target: "combat.attackBonus", modifier: { type: "add", value: 2 } },
-    { target: "combat.criticalRange", modifier: { type: "set", value: 19 } }
-  ]
-}
-*/
+export function applyEquipmentBonuses(
+  character: Record<string, unknown>,
+): void {
+  const equipment = character.equipment as Record<string, unknown> | undefined;
+  const weapons = (equipment?.weapons || []) as Array<Record<string, unknown>>;
 
-export function applyEquipmentBonuses(character) {
-  const weapons = character.equipment?.weapons || [];
-
-  weapons.forEach((weapons) => {
-    weapons.effects?.forEach((effect) =>
+  weapons.forEach((weapon) => {
+    const effects = weapon.effects as EquipmentEffect[] | undefined;
+    effects?.forEach((effect) =>
       applyEffect(character, effect.target, effect.modifier),
     );
   });

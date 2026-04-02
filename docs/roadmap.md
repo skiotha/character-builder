@@ -58,29 +58,38 @@ has a written basis for its decisions.
 
 ---
 
-## Phase 2 — TypeScript Migration
+## Phase 2 — TypeScript Migration ✓ DONE
 
 **Goal:** `.mts` files with strong typing. Node 24 engine.
 
 **Basis:** [ADR-008](decisions/008-typescript-strip-types.md)
 
-- [ ] Add `tsconfig.json` (mirrors mychar/malizia)
-- [ ] Add `@types/node` devDependency
-- [ ] Update `package.json` engine to `">=24.0.0"`
-- [ ] Update `package.json` scripts for `--experimental-strip-types`
-- [ ] Rename files `.mjs` → `.mts` (combined with restructure if done together)
-- [ ] Define core interfaces:
-  - [ ] `Character` — full character object
-  - [ ] `CharacterIndex` — index.json structure
-  - [ ] `SchemaField` — schema definition shape
-  - [ ] `Effect`, `Trait` — sub-objects
-  - [ ] `Request`, `Response` extensions (req.character, req.characterPermissions)
-- [ ] Add type annotations to leaf modules: `config`, `logger`, `auth`, `utils`
-- [ ] Add type annotations to models: `storage`, `schema`, `traversal`, `validation`
-- [ ] Add type annotations to rules: `attributes`, `applicator`, `derived`
-- [ ] Add type annotations to handlers and routes
-- [ ] Add type annotations to middleware, SSE, renderers
-- [ ] Run `npm run typecheck` clean
+- [x] Add `tsconfig.json` (mirrors mychar/malizia)
+- [x] Add `@types/node` devDependency
+- [x] Update `package.json` engine to `">=24.0.0"`
+- [x] Update `package.json` scripts (strip-types removed — default in Node 24+)
+- [x] Rename files `.mjs` → `.mts` (done in Phase 1 restructure)
+- [x] Define core interfaces:
+  - [x] `Character` — full character object (`src/rpg-types.mts`)
+  - [x] `CharacterIndex` — index.json structure (`src/types.mts`)
+  - [x] `SchemaField` — schema definition shape (`src/types.mts`)
+  - [x] `Effect`, `Trait` — sub-objects (`src/rpg-types.mts`)
+  - [x] `Request`, `Response` extensions (`NagaraRequest` in `src/types.mts`)
+- [x] Add type annotations to leaf modules: `config`, `logger`, `auth`, `utils`
+- [x] Add type annotations to models: `storage`, `schema`, `traversal`, `validation`
+- [x] Add type annotations to rules: `attributes`, `applicator`, `derived`
+- [x] Add type annotations to handlers and routes
+- [x] Add type annotations to middleware, SSE, renderers
+- [x] Run `npm run typecheck` clean
+- [x] Split types: `src/rpg-types.mts` (RPG domain) + `src/types.mts` (app infra)
+- [x] Barrel files: `src/rules/index.mts`, `src/renderers/index.mts` created
+- [x] Subpath import aliases: `#types`, `#rpg-types`, `#renderers`, `#models/*`
+
+**Notes:**
+- Templates (`src/templates/`) have `@ts-nocheck` — minimal investment since
+  they are being removed in Phase 3. Full typing deferred to Phase 3 cleanup.
+- Middleware chain type mismatch identified and documented — deferred to Phase 5
+  (see Medium Priority).
 
 ### Schema Review (gate before Phase 3)
 
@@ -246,6 +255,15 @@ Schema structure reviewed and stabilized for Phase 3.
 
 ### Medium Priority
 
+- [ ] Fix middleware chain type mismatch — `createMiddlewareChain()` accepts
+      `...MiddlewareFn[]` but route handlers (signature `(req, res) → boolean`)
+      are passed in as middleware. This works at runtime because JS ignores
+      extra arguments, but the types are a lie. The `finalHandler?` parameter
+      on `MiddlewareChainHandler` exists for this purpose but is never used.
+      Fix: either (a) make final handlers use `finalHandler` param as intended,
+      or (b) redesign the chain to distinguish middleware from terminal handlers
+      at the type level. During Phase 2, return types were widened to
+      `boolean | void` to paper over this — revert once the design is fixed.
 - [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
       storage (`storage.mjs`). Handler should call service, service calls storage
 - [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical

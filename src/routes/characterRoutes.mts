@@ -1,14 +1,24 @@
 import { createMiddlewareChain } from "#middleware";
 import { withCharacterPermissions } from "#middleware";
 import { handleGetCharacter } from "./handleGetCharacter.mts";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export function createCharacterRoute() {
+export function createCharacterRoute(): (
+  req: NagaraRequest,
+  res: ServerResponse,
+  pathParts: string[],
+) => Promise<boolean> {
   const getCharacterApiChain = createMiddlewareChain(
     withCharacterPermissions,
     handleGetCharacter,
   );
 
-  return async (req, res, pathParts) => {
+  return async (
+    req: NagaraRequest,
+    res: ServerResponse,
+    pathParts: string[],
+  ) => {
     try {
       const handled = await getCharacterApiChain(req, res, pathParts);
 

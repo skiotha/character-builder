@@ -1,3 +1,4 @@
+// @ts-nocheck — This file is being removed in Phase 3 (ADR-009 schema-driven rendering)
 import { scaleCropForContainer } from "../lib/general.mts";
 
 const TEXTS = {
@@ -55,7 +56,7 @@ const TEXTS = {
   },
 };
 
-export function renderDashboard(characters) {
+export function renderDashboard(characters: Record<string, unknown>[]): string {
   const dashboardCharacters = characters.map((char) => ({
     name: char.characterName,
     id: char.id,

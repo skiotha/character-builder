@@ -1,17 +1,22 @@
-import { sanitizeCharacterForRole } from "../models/sanitization.mts";
+import { sanitizeCharacterForRole } from "#models/sanitization";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleGetCharacter(req, res) {
+export async function handleGetCharacter(
+  req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
   const character = req.character;
 
   if (character) {
     const sanitizedCharacter = sanitizeCharacterForRole(
       character,
-      req.characterPermissions.role,
+      req.characterPermissions!.role,
     );
 
     const response = {
       ...sanitizedCharacter,
-      _permissions: req.characterPermissions,
+      _permissions: req.characterPermissions!,
     };
 
     res.writeHead(200);

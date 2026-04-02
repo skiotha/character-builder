@@ -1,9 +1,16 @@
 import { validateCharacterCreation } from "../src/models/validation.mts";
 
-async function runCreationTests() {
+interface TestCase {
+  name: string;
+  data: Record<string, unknown>;
+  shouldPass: boolean;
+  expectedError?: string;
+}
+
+async function runCreationTests(): Promise<void> {
   console.log("Running character creation tests...");
 
-  const testCases = [
+  const testCases: TestCase[] = [
     {
       name: "Valid character",
       data: {
@@ -81,8 +88,8 @@ async function runCreationTests() {
     } else if (!test.shouldPass && test.expectedError) {
       const hasExpectedError = result.errors.some(
         (err) =>
-          err.error?.includes(test.expectedError) ||
-          err.field?.includes(test.expectedError),
+          err.error?.includes(test.expectedError!) ||
+          err.field?.includes(test.expectedError!),
       );
 
       if (!hasExpectedError) {

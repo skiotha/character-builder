@@ -1,6 +1,11 @@
 import { validateDmToken } from "#auth";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleValidateDM(req, res) {
+export async function handleValidateDM(
+  req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
   const token = req.headers["x-dm-id"];
 
   if (validateDmToken(token)) {

@@ -1,15 +1,19 @@
-import { fork } from "node:child_process";
+import { fork, type ChildProcess } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname: string = dirname(fileURLToPath(import.meta.url));
 
 console.log(`[${new Date().toISOString()}] Starting application watcher...`);
 
-function startApp() {
-  const child = fork(join(__dirname, "..", "src", "server.mts"), [], {
-    execArgv: ["--experimental-strip-types"],
-  });
+function startApp(): void {
+  const child: ChildProcess = fork(
+    join(__dirname, "..", "src", "server.mts"),
+    [],
+    {
+      execArgv: ["--experimental-strip-types"],
+    },
+  );
 
   child.on("exit", (code, signal) => {
     console.error(

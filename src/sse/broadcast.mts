@@ -1,36 +1,36 @@
-import { timeStamp } from "node:console";
-import { getCharacter } from "../models/index.mts";
+import type { ServerResponse } from "node:http";
 
-const characterClients = new Map();
+interface SSEClientEntry {
+  res: ServerResponse;
+  playerId: string | undefined;
+  isDM: boolean;
+}
 
-/**
- * Add a client to the broadcastlis for a specific character
- * @param {string} characterId
- * @param {http.ServerResponse} res -- SSE
- * @param {string} playerId -- authenticated playerId or null
- * @param {boolean} idDM -- me...
- */
-export function addClient(characterId, res, playerId, idDM) {
+const characterClients = new Map<string, Set<SSEClientEntry>>();
+
+export function addClient(
+  characterId: string,
+  res: ServerResponse,
+  playerId: string | undefined,
+  isDM: boolean,
+): void {
   if (!characterClients.has(characterId)) {
     characterClients.set(characterId, new Set());
   }
 
-  const client = { res, playerId, idDM };
-  characterClients.get(characterId).add(client);
+  const client: SSEClientEntry = { res, playerId, isDM };
+  characterClients.get(characterId)!.add(client);
 
   res.on("close", () => {
     removeClient(characterId, res);
   });
 
   console.info(
-    `[SSE] Client added for character ${characterId}. Total: ${characterClients.get(characterId).size}`,
+    `[SSE] Client added for character ${characterId}. Total: ${characterClients.get(characterId)!.size}`,
   );
 }
 
-/**
- * Remove a client from the broadcast list
- */
-export function removeClient(characterId, res) {
+export function removeClient(characterId: string, res: ServerResponse): void {
   const clients = characterClients.get(characterId);
   if (!clients) return;
 
@@ -46,16 +46,14 @@ export function removeClient(characterId, res) {
   }
 
   console.info(
-    `[SSE] Client removed for characrer ${characterId}. Remaining: ${clients?.size || 0}`,
+    `[SSE] Client removed for character ${characterId}. Remaining: ${clients?.size || 0}`,
   );
 }
 
-/**
- * Broadcast an update to clients viewing this character
- * @param {string} characterId
- * @param {object} characterData
- */
-export function broadcastToCharacter(characterId, characterData) {
+export function broadcastToCharacter(
+  characterId: string,
+  characterData: Record<string, unknown>,
+): void {
   const clients = characterClients.get(characterId);
   if (!clients || clients.size === 0) return;
 
@@ -73,7 +71,7 @@ export function broadcastToCharacter(characterId, characterData) {
     } catch (error) {
       console.error(
         `[SSE] Failed to write to client for ${characterId}:`,
-        error.message,
+        (error as Error).message,
       );
       removeClient(characterId, client.res);
     }
@@ -84,7 +82,7 @@ export function broadcastToCharacter(characterId, characterData) {
   );
 }
 
-export function sendKeepAlive(characterId) {
+export function sendKeepAlive(characterId: string): void {
   const clients = characterClients.get(characterId);
 
   if (!clients) return;
@@ -92,9 +90,8 @@ export function sendKeepAlive(characterId) {
   clients.forEach((client) => {
     try {
       client.res.write(": keepalive\n\n");
-      // client.res.write("event: ping\ndata: {}\n\n");
     } catch (error) {
-      console.log("[SSE] needto remove client:", error);
+      console.log("[SSE] need to remove client:", error);
       removeClient(characterId, client.res);
     }
   });

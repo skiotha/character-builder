@@ -1,12 +1,18 @@
-import { getCharacter, updateCharacter } from "../models/storage.mts";
-import { validateCharacterUpdate } from "../models/validation.mts";
+import { getCharacter, updateCharacter } from "#models/storage";
+import { validateCharacterUpdate } from "#models/validation";
 import { validateDmToken } from "#auth";
-import { applyFieldUpdate } from "../models/schema-utils.mts";
-import { recalculateDerivedFields } from "../rules/derived.mts";
+import { applyFieldUpdate } from "#models/schema-utils";
+import { recalculateDerivedFields } from "#rules";
 import { broadcastToCharacter } from "#sse";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleUpdateCharacter(req, res, characterId) {
-  const playerId = req.headers["x-player-id"];
+export async function handleUpdateCharacter(
+  req: NagaraRequest,
+  res: ServerResponse,
+  characterId: string,
+): Promise<boolean> {
+  const playerId = req.headers["x-player-id"] as string | undefined;
 
   const dmId = req.headers["x-dm-id"];
   const isDM = validateDmToken(dmId);
@@ -39,7 +45,7 @@ export async function handleUpdateCharacter(req, res, characterId) {
 
       const userRole = isDM
         ? "dm"
-        : character.playerId === playerId
+        : (character as Record<string, unknown>).playerId === playerId
           ? "owner"
           : "public";
 
@@ -115,7 +121,7 @@ export async function handleUpdateCharacter(req, res, characterId) {
       console.error("PATCH error:", error);
       if (!res.headersSent) {
         res.writeHead(400);
-        res.end(JSON.stringify({ error: error.message }));
+        res.end(JSON.stringify({ error: (error as Error).message }));
       }
     }
   });

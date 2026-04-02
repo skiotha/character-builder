@@ -1,9 +1,14 @@
 import { renderCharacter } from "../templates/character.mts";
-import { sanitizeCharacterForRole } from "../models/sanitization.mts";
-import { renderCharacterView } from "../renderers/renderCharacterView.mts";
-import { recalculateDerivedFields } from "../rules/derived.mts";
+import { sanitizeCharacterForRole } from "#models/sanitization";
+import { renderCharacterView } from "#renderers";
+import { recalculateDerivedFields } from "#rules";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleGetCharacterView(req, res) {
+export async function handleGetCharacterView(
+  req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
   const character = req.character;
 
   if (!character) {
@@ -12,16 +17,18 @@ export async function handleGetCharacterView(req, res) {
     return true;
   }
 
-  const recomputedCharacter = recalculateDerivedFields(character);
+  const recomputedCharacter = recalculateDerivedFields(
+    character as Record<string, unknown>,
+  );
 
   const sanitizedCharacter = sanitizeCharacterForRole(
     recomputedCharacter,
-    req.characterPermissions.role,
+    req.characterPermissions!.role,
   );
 
   const viewHTML = renderCharacterView(
     sanitizedCharacter,
-    req.characterPermissions,
+    req.characterPermissions!,
   );
 
   res.writeHead(200, {

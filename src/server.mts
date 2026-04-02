@@ -1,8 +1,10 @@
 import https from "node:https";
 import http from "node:http";
+
 import app from "./app.mts";
-import { PORT, SSL, LOCAL_ADDRESS } from "#config";
 import { logServerEvent } from "#logger";
+
+import { PORT, SSL, LOCAL_ADDRESS } from "#config";
 
 const server =
   process.env.NODE_ENV === "production" && SSL
@@ -13,7 +15,7 @@ server.listen(PORT, LOCAL_ADDRESS, () => {
   console.log(`Nagara Character Builder listening on ${LOCAL_ADDRESS}:${PORT}`);
 });
 
-function handleShutdown() {
+function handleShutdown(): void {
   console.log("Starting graceful shutdown...");
 
   server.close((err) => {

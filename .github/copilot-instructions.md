@@ -11,7 +11,7 @@ All three share the same character data model. The website is the source of trut
 
 ## Stack & Conventions
 
-- **Runtime:** Node.js 24+ with `--experimental-strip-types`
+- **Runtime:** Node.js 24+ (native TypeScript strip-types, no flag needed)
 - **Language:** TypeScript (`.mts` files, `noEmit`, `strict`, `verbatimModuleSyntax`)
 - **Server:** Raw `node:http` / `node:https` — zero npm runtime dependencies
 - **Client:** Vanilla JavaScript SPA with native ES modules (no build step)
@@ -26,6 +26,8 @@ See `docs/architecture.md` for the full system diagram.
 
 Key layers:
 
+- `src/types.mts` — app infrastructure types (request, middleware, validation, storage)
+- `src/rpg-types.mts` — RPG domain types (Character, Effect, attributes, equipment)
 - `src/lib/` — config, logger, auth, utilities
 - `src/models/` — character schema, storage, validation, traversal
 - `src/rules/` — RPG rules engine (derived stats, effects, attributes)
@@ -57,15 +59,28 @@ All decisions are documented as ADRs in `docs/decisions/`. Key ones:
 - Use explicit type annotations on function parameters and return types
 - Define interfaces for data shapes (prefer `interface` over `type` for objects)
 - Use `import type` for type-only imports (`verbatimModuleSyntax` enforced)
-- Use Node.js subpath imports (`#config`, `#logger`, `#models`, etc.)
+- Use Node.js subpath imports (`#config`, `#logger`, `#models`, `#types`, etc.)
+- Use `#models/*` wildcard for direct model sub-module access (e.g. `#models/storage`)
 - Do not use `any` — use `unknown` and narrow
+
+### Import Ordering
+
+Imports are ordered by category, separated by blank lines:
+
+1. **`node:`** — Node.js built-in modules
+2. **Functions** — value imports (functions, namespace `* as` imports)
+3. **Constants** — all-caps / configuration values
+4. **`import type`** — type-only imports
+
+If an import line contains both functions and constants, order it by the
+highest-priority item (functions > constants).
 
 ### Testing
 
 - Mirror the malizia project's test structure (`test/*.test.mts`)
 - Use `node:test` (`describe`, `it`, `mock`) and `node:assert/strict`
 - Mock external dependencies (filesystem, HTTP) using `node:test` mock utilities
-- Tests run via: `node --experimental-strip-types --test test/**/*.test.mts`
+- Tests run via: `node --test test/**/*.test.mts`
 
 ### Server
 
@@ -99,8 +114,8 @@ See `docs/roadmap.md` for the full phased work plan. Quick reference:
 | Phase | Focus                            |
 | ----- | -------------------------------- |
 | 0     | Documentation & decisions (done) |
-| 1     | Project restructure              |
-| 2     | TypeScript migration             |
+| 1     | Project restructure (done)       |
+| 2     | TypeScript migration (done)      |
 | 3     | Schema-driven rendering          |
 | 4     | Testing                          |
 | 5     | Bug fixes & hardening            |

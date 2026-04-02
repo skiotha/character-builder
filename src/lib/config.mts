@@ -2,23 +2,25 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = join(__dirname, "..", "..");
+const __dirname: string = dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT: string = join(__dirname, "..", "..");
 
-const isDev = process.env.NODE_ENV !== "production";
+const isDev: boolean = process.env.NODE_ENV !== "production";
 
-const PORT = parseInt(process.env.PORT, 10) || (isDev ? 3000 : 443);
-const LOCAL_ADDRESS = process.env.LOCAL_ADDRESS || (isDev ? "127.0.0.1" : "0.0.0.0");
+const PORT: number =
+  parseInt(process.env.PORT ?? "", 10) || (isDev ? 3000 : 443);
+const LOCAL_ADDRESS: string =
+  process.env.LOCAL_ADDRESS || (isDev ? "127.0.0.1" : "0.0.0.0");
 
-const PUBLIC_DIR = join(PROJECT_ROOT, "public");
-const DATA_DIR = join(PROJECT_ROOT, "data");
+const PUBLIC_DIR: string = join(PROJECT_ROOT, "public");
+const DATA_DIR: string = join(PROJECT_ROOT, "data");
 
-const ENCODING = "utf8";
-const API_ROUTE = "/api/v1";
+const ENCODING: BufferEncoding = "utf8";
+const API_ROUTE: string = "/api/v1";
 
-const DM_TOKEN = process.env.NAGARA_DM_TOKEN;
+const DM_TOKEN: string | undefined = process.env.NAGARA_DM_TOKEN;
 
-const MIME_TYPES = {
+const MIME_TYPES: Record<string, string> = {
   default: "application/octet-stream",
   plain: "text/plain",
   html: "text/html; charset=UTF-8",
@@ -42,15 +44,19 @@ const MIME_TYPES = {
   stream: "text/event-stream",
 };
 
-const SSL =
-  isDev
-    ? null
-    : process.env.SSL_KEY && process.env.SSL_CERT
-      ? {
-          key: readFileSync(process.env.SSL_KEY),
-          cert: readFileSync(process.env.SSL_CERT),
-        }
-      : null;
+interface SSLOptions {
+  key: Buffer;
+  cert: Buffer;
+}
+
+const SSL: SSLOptions | null = isDev
+  ? null
+  : process.env.SSL_KEY && process.env.SSL_CERT
+    ? {
+        key: readFileSync(process.env.SSL_KEY),
+        cert: readFileSync(process.env.SSL_CERT),
+      }
+    : null;
 
 export {
   PORT,
@@ -64,3 +70,4 @@ export {
   PROJECT_ROOT,
   DM_TOKEN,
 };
+export type { SSLOptions };

@@ -35,7 +35,8 @@ npm run dev
 | Command | Description |
 |---------|-------------|
 | `npm start` | Start the server directly |
-| `npm run dev` | Start with auto-restart on crash (watcher) |
+| `npm run start:dev` | Start with auto-restart on crash (watcher) |
+| `npm run typecheck` | Run TypeScript type checker |
 | `npm test` | Run backend tests |
 
 ## Environment Variables
@@ -56,13 +57,15 @@ character-builder/
 ├── src/                     # Server source (TypeScript .mts)
 │   ├── server.mts           # HTTP/HTTPS bootstrap
 │   ├── app.mts              # Request routing (API + static files)
+│   ├── types.mts            # App infrastructure types
+│   ├── rpg-types.mts        # RPG domain types (Character, Effect, etc.)
 │   ├── lib/                 # Config, logger, auth, utilities
 │   ├── models/              # Character schema, storage, validation
 │   ├── routes/              # API handlers & route wiring
 │   ├── middleware/           # Auth & permission middleware
-│   ├── rules/               # RPG rules engine
-│   ├── renderers/           # Server-side HTML renderers
-│   ├── templates/           # HTML template definitions
+│   ├── rules/               # RPG rules engine (derived stats, effects)
+│   ├── renderers/           # Server-side HTML renderers (removing in Phase 3)
+│   ├── templates/           # HTML template definitions (removing in Phase 3)
 │   └── sse/                 # SSE broadcast
 ├── public/                  # Frontend SPA (vanilla JS .mjs)
 │   ├── views/               # Page views

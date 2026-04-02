@@ -1,12 +1,16 @@
 import { Buffer } from "node:buffer";
 import Stream from "node:stream";
+import type { IncomingMessage } from "node:http";
+import type { ParsedImage } from "#types";
 
-export function parseImage(req, boundary) {
+export function parseImage(
+  req: IncomingMessage,
+  boundary: string,
+): Promise<ParsedImage> {
   return new Promise((resolve, reject) => {
-    let buffers = [];
-    let fileData = null;
+    const buffers: Buffer[] = [];
 
-    req.on("data", (chunk) => buffers.push(chunk));
+    req.on("data", (chunk: Buffer) => buffers.push(chunk));
 
     req.on("end", () => {
       const buffer = Buffer.concat(buffers);
@@ -23,7 +27,7 @@ export function parseImage(req, boundary) {
       }
 
       // @TODO: dangerous probably
-      const fileSection = buffer.slice(startIdx, endIdx);
+      const fileSection = buffer.subarray(startIdx, endIdx);
 
       const headerEnd = fileSection.indexOf("\r\n\r\n");
       if (headerEnd === -1) {
@@ -31,11 +35,11 @@ export function parseImage(req, boundary) {
         return;
       }
 
-      const headers = fileSection.slice(0, headerEnd).toString();
+      const headers = fileSection.subarray(0, headerEnd).toString();
       const filenameMatch = headers.match(/filename="([^"]+)"/);
-      const filename = filenameMatch ? filenameMatch[1] : "upload.jpg";
+      const filename = filenameMatch ? filenameMatch[1]! : "upload.jpg";
 
-      const fileContent = fileSection.slice(headerEnd + 4);
+      const fileContent = fileSection.subarray(headerEnd + 4);
 
       resolve({
         filename,

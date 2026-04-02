@@ -1,6 +1,11 @@
-import * as nagara from "../models/abilities.mts";
+import * as nagara from "#models/abilities";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleGetAbilities(req, res) {
+export async function handleGetAbilities(
+  _req: NagaraRequest,
+  res: ServerResponse,
+): Promise<boolean> {
   try {
     const abilities = await nagara.getAbilities();
 

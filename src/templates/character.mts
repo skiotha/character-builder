@@ -1,4 +1,5 @@
-import { getWritableFieldPaths } from "../models/traversal.mts";
+// @ts-nocheck — This file is being removed in Phase 3 (ADR-009 schema-driven rendering)
+import { getWritableFieldPaths } from "#models/traversal";
 
 const TEXTS = {
   character: {
@@ -170,7 +171,10 @@ const TEXTS = {
   },
 };
 
-export function renderCharacter(character, { role = "public" } = {}) {
+export function renderCharacter(
+  character: Record<string, unknown>,
+  { role = "public" }: { role?: string } = {},
+): string {
   const ctx = createTemplateContext(character, role);
   // const ctx = createTemplateContext(character, "owner");
 

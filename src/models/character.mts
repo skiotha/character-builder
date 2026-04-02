@@ -5,23 +5,28 @@
 // ) {
 //   return {
 
+import type { SchemaField } from "#types";
+
 const rpgValidators = {
-  attributePointsValid: () => true,
+  attributePointsValid: (): boolean => true,
 
-  currentHealthValid: () => true,
+  currentHealthValid: (): boolean => true,
 
-  defenseValid: () => true,
+  defenseValid: (): boolean => true,
 
-  painThresholdValid: () => true,
+  painThresholdValid: (): boolean => true,
 
-  corruptionThresholdValid: () => true,
+  corruptionThresholdValid: (): boolean => true,
 };
 
-const capitalize = (value) => value;
+const capitalize = (value: string): string => value;
 
-const getAttributeOrder = (name) => 1;
+const getAttributeOrder = (name: string): number => 1;
 
-export const CHARACTER_SCHEMA = {
+export const CHARACTER_SCHEMA: Record<
+  string,
+  SchemaField | Record<string, unknown>
+> = {
   _config: {
     maxAttributesTotal: 80,
     defaultAttributes: 5,
@@ -459,7 +464,7 @@ export const CHARACTER_SCHEMA = {
   },
 };
 
-function createAttributeField(name) {
+function createAttributeField(name: string): SchemaField {
   return {
     type: "number",
     min: 5,

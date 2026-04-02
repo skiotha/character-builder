@@ -1,3 +1,4 @@
+// @ts-nocheck — This file is being removed in Phase 3 (ADR-009 schema-driven rendering)
 const TEXTS = {
   creation: {
     title: "NAGARA",
@@ -156,7 +157,7 @@ const TEXTS = {
   },
 };
 
-export function renderCreation() {
+export function renderCreation(): string {
   return `
     ${renderMainHeader()}
 

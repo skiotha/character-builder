@@ -1,14 +1,21 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 import {
   ensureBackupDirs,
   LIVE_DATA_DIR,
   BACKUP_CHAR_DIR,
   BACKUP_INDEX,
-} from "../models/storage.mts";
-import { ENCODING } from "#config";
-import fs from "node:fs/promises";
-import path from "node:path";
+} from "#models/storage";
 
-async function createCharacterBackup(characterId, note = "") {
+import { ENCODING } from "#config";
+
+import type { BackupRecord } from "#types";
+
+async function createCharacterBackup(
+  characterId: string,
+  note: string = "",
+): Promise<BackupRecord> {
   await ensureBackupDirs();
 
   const liveFilePath = path.join(LIVE_DATA_DIR, `${characterId}.json`);
@@ -19,7 +26,7 @@ async function createCharacterBackup(characterId, note = "") {
   const characterData = await fs.readFile(liveFilePath, ENCODING);
   await fs.writeFile(backupFilePath, characterData);
 
-  const backupRecord = {
+  const backupRecord: BackupRecord = {
     id: `backup_${timestamp}`,
     characterId: characterId,
     timestamp: new Date().toISOString(),
@@ -28,11 +35,11 @@ async function createCharacterBackup(characterId, note = "") {
     file: backupFileName,
   };
 
-  let index = [];
+  let index: BackupRecord[] = [];
   try {
     const indexData = await fs.readFile(BACKUP_INDEX, ENCODING);
-    index = JSON.parse(indexData);
-  } catch (error) {
+    index = JSON.parse(indexData) as BackupRecord[];
+  } catch {
     // doesn't exist
   }
   index.push(backupRecord);
@@ -41,9 +48,11 @@ async function createCharacterBackup(characterId, note = "") {
   return backupRecord;
 }
 
-async function restoreCharacterBackup(backupId) {
+async function restoreCharacterBackup(
+  backupId: string,
+): Promise<{ message: string; restoredTo: string }> {
   const indexData = await fs.readFile(BACKUP_INDEX, ENCODING);
-  const index = JSON.parse(indexData);
+  const index = JSON.parse(indexData) as BackupRecord[];
   const backupRecord = index.find((record) => record.id === backupId);
 
   if (!backupRecord) {
@@ -53,7 +62,7 @@ async function restoreCharacterBackup(backupId) {
   const backupFilePath = path.join(BACKUP_CHAR_DIR, backupRecord.file);
   const liveFilePath = path.join(
     LIVE_DATA_DIR,
-    `${backupRecord.characterId}.json`
+    `${backupRecord.characterId}.json`,
   );
 
   const backupData = await fs.readFile(backupFilePath, ENCODING);
@@ -68,9 +77,11 @@ async function restoreCharacterBackup(backupId) {
   };
 }
 
-async function listCharacterBackups(characterId = null) {
+async function listCharacterBackups(
+  characterId: string | null = null,
+): Promise<BackupRecord[]> {
   const indexData = await fs.readFile(BACKUP_INDEX, ENCODING);
-  let index = JSON.parse(indexData);
+  let index = JSON.parse(indexData) as BackupRecord[];
 
   if (characterId) {
     index = index.filter((record) => record.characterId === characterId);

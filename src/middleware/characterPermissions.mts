@@ -1,8 +1,15 @@
-import { getCharacter } from "../models/storage.mts";
+import { getCharacter } from "#models/storage";
 import { validateDmToken } from "#auth";
 import { extractCharacterIdFromPath } from "./index.mts";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function withCharacterPermissions(req, res, pathParts, next) {
+export async function withCharacterPermissions(
+  req: NagaraRequest,
+  res: ServerResponse,
+  pathParts: string[],
+  next: () => Promise<void>,
+): Promise<void> {
   try {
     const characterId = extractCharacterIdFromPath(pathParts);
     const character = await getCharacter(characterId);
@@ -16,20 +23,21 @@ export async function withCharacterPermissions(req, res, pathParts, next) {
     const dmToken = req.headers["x-dm-id"];
     const isDM = dmToken && validateDmToken(dmToken);
 
-    if (character.deleted && !isDM) {
+    if ((character as Record<string, unknown>).deleted && !isDM) {
       res.writeHead(404);
       res.end(JSON.stringify({ error: "Character not found" }));
       return;
     }
 
     const playerId = req.headers["x-player-id"];
-    const isOwner = character.playerId === playerId;
+    const isOwner =
+      (character as Record<string, unknown>).playerId === playerId;
 
     req.characterPermissions = {
       role: isDM ? "dm" : isOwner ? "owner" : "public",
     };
 
-    req.character = character;
+    req.character = character as Record<string, unknown>;
 
     if (!res.headersSent) {
       await next();
@@ -37,7 +45,7 @@ export async function withCharacterPermissions(req, res, pathParts, next) {
   } catch (error) {
     console.error("Permission middleware error:", error);
 
-    if (!res.headerSent) {
+    if (!res.headersSent) {
       res.writeHead(500);
       res.end(JSON.stringify({ error: "Internal server error" }));
     }

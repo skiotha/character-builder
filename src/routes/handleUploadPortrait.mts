@@ -1,8 +1,14 @@
 import { uploadPortrait } from "../lib/uploads.mts";
-import * as nagara from "../models/index.mts";
+import * as nagara from "#models";
 import { parseImage } from "../lib/multipart.mts";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleUploadPortrait(req, res, characterId) {
+export async function handleUploadPortrait(
+  req: NagaraRequest,
+  res: ServerResponse,
+  characterId: string,
+): Promise<boolean> {
   try {
     const character = await nagara.getCharacter(characterId);
     if (!character) {
@@ -11,7 +17,7 @@ export async function handleUploadPortrait(req, res, characterId) {
       return false;
     }
 
-    const contentType = req.headers["content-type"];
+    const contentType = req.headers["content-type"] || "";
     const boundaryMatch = contentType.match(/boundary=(.+)$/);
     if (!boundaryMatch) {
       res.writeHead(400);
@@ -19,15 +25,20 @@ export async function handleUploadPortrait(req, res, characterId) {
       return false;
     }
 
-    const { filename, stream } = await parseImage(req, boundaryMatch[1]);
+    const { filename, stream } = await parseImage(req, boundaryMatch[1]!);
 
     const portraitPath = await uploadPortrait(characterId, stream, filename);
 
-    character.portrait.path = portraitPath;
-    character.portrait.status = "uploaded";
-    character.lastModified = new Date().toISOString();
+    const charData = character as Record<string, Record<string, unknown>>;
+    (charData.portrait as Record<string, unknown>).path = portraitPath;
+    (charData.portrait as Record<string, unknown>).status = "uploaded";
+    (character as Record<string, unknown>).lastModified =
+      new Date().toISOString();
 
-    await nagara.updateCharacter(characterId, character);
+    await nagara.updateCharacter(
+      characterId,
+      character as Record<string, unknown>,
+    );
 
     res.writeHead(200);
     res.end(

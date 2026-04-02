@@ -1,7 +1,13 @@
 import { validateDmToken } from "#auth";
-import * as nagara from "../models/index.mts";
+import * as nagara from "#models";
+import type { ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
-export async function handleGetCharacters(req, res, url) {
+export async function handleGetCharacters(
+  req: NagaraRequest,
+  res: ServerResponse,
+  url: URL,
+): Promise<boolean> {
   const playerId = url.searchParams.get("playerId");
 
   if (!playerId) {

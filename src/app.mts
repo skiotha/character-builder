@@ -2,11 +2,10 @@ import fs from "node:fs/promises";
 import fss from "node:fs";
 import path from "node:path";
 import { URL } from "node:url";
-import { MIME_TYPES, PUBLIC_DIR, DATA_DIR, API_ROUTE, LOCAL_ADDRESS } from "#config";
-import { requireDmToken } from "./lib/auth.mts";
-import * as nagara from "./models/index.mts";
-import * as backup from "./lib/backup.mts";
 
+import { requireDmToken } from "#auth";
+import * as nagara from "#models";
+import * as backup from "./lib/backup.mts";
 import {
   handleValidateDM,
   handleGetAbilities,
@@ -15,25 +14,36 @@ import {
   handleUpdateCharacter,
   handleCreateCharacter,
   handleCharacterStream,
-} from "./routes/handlers.mts";
+} from "#routes";
 import {
   renderInitialView,
   renderCreationView,
   renderDashboardView,
   renderCharacterView,
-} from "./renderers/index.mts";
+} from "#renderers";
+import { createViewRoute, createCharacterRoute } from "./routes/routes.mts";
+
 import {
-  createViewRoute,
-  createCharacterRoute,
-} from "./routes/routes.mts";
+  MIME_TYPES,
+  PUBLIC_DIR,
+  DATA_DIR,
+  API_ROUTE,
+  LOCAL_ADDRESS,
+} from "#config";
+
+import type { IncomingMessage, ServerResponse } from "node:http";
+import type { NagaraRequest } from "#types";
 
 const getCharacterHandler = createCharacterRoute();
 const getViewHandler = createViewRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
-export default async function app(req, res) {
-  const url = new URL(req.url, `http://${LOCAL_ADDRESS}/`);
+export default async function app(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
+  const url = new URL(req.url!, `http://${LOCAL_ADDRESS}/`);
   const { pathname } = url;
 
   // Portrait uploads
@@ -43,7 +53,8 @@ export default async function app(req, res) {
 
   // API routes
   if (pathname.startsWith(API_ROUTE)) {
-    return handleApi(req, res, url);
+    await handleApi(req as NagaraRequest, res, url);
+    return;
   }
 
   // Asset files
@@ -55,20 +66,26 @@ export default async function app(req, res) {
   return serveClient(pathname, res);
 }
 
-async function serveClient(pathname, res) {
+async function serveClient(
+  pathname: string,
+  res: ServerResponse,
+): Promise<void> {
   try {
-    let filePath = pathname === "/" || pathname === "" ? "/index.html" : pathname;
+    let filePath =
+      pathname === "/" || pathname === "" ? "/index.html" : pathname;
 
-    const normalizedPath = path.normalize(filePath).replace(/^(\.\.[\/\\])+/, "");
+    const normalizedPath = path
+      .normalize(filePath)
+      .replace(/^(\.\.[\/\\])+/, "");
     const fullPath = path.join(PUBLIC_DIR, normalizedPath);
 
     const stat = await fs.stat(fullPath);
     if (!stat.isFile()) throw new Error("Not a file");
 
     const ext = path.extname(fullPath).slice(1);
-    const mimeType = MIME_TYPES[ext] || MIME_TYPES.default;
+    const mimeType = MIME_TYPES[ext] || MIME_TYPES["default"];
 
-    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Type", mimeType!);
     const content = await fs.readFile(fullPath);
     res.writeHead(200);
     res.end(content);
@@ -87,18 +104,24 @@ async function serveClient(pathname, res) {
   }
 }
 
-async function serveStaticFile(baseDir, relativePath, res) {
+async function serveStaticFile(
+  baseDir: string,
+  relativePath: string,
+  res: ServerResponse,
+): Promise<void> {
   try {
-    const normalizedPath = path.normalize(relativePath).replace(/^(\.\.[\/\\])+/, "");
+    const normalizedPath = path
+      .normalize(relativePath)
+      .replace(/^(\.\.[\/\\])+/, "");
     const fullPath = path.join(baseDir, normalizedPath);
 
     const stat = await fs.stat(fullPath);
     if (!stat.isFile()) throw new Error("Not a file");
 
     const ext = path.extname(fullPath).slice(1);
-    const mimeType = MIME_TYPES[ext] || MIME_TYPES.default;
+    const mimeType = MIME_TYPES[ext] || MIME_TYPES["default"];
 
-    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Type", mimeType!);
     res.setHeader("Cache-Control", "public, max-age=86400");
     const content = await fs.readFile(fullPath);
     res.writeHead(200);
@@ -109,7 +132,10 @@ async function serveStaticFile(baseDir, relativePath, res) {
   }
 }
 
-async function servePortrait(requestPath, res) {
+async function servePortrait(
+  requestPath: string,
+  res: ServerResponse,
+): Promise<void> {
   try {
     const relativePath = requestPath.replace("/uploads/portraits/", "");
 
@@ -131,10 +157,10 @@ async function servePortrait(requestPath, res) {
 
     const stats = await fs.stat(fullPath);
     const ext = path.extname(fullPath).toLowerCase().slice(1);
-    const contentType = MIME_TYPES[ext] || MIME_TYPES.default;
+    const contentType = MIME_TYPES[ext] || MIME_TYPES["default"];
 
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", contentType!);
     res.setHeader("Content-Length", stats.size);
 
     const stream = fss.createReadStream(fullPath);
@@ -156,7 +182,11 @@ async function servePortrait(requestPath, res) {
   }
 }
 
-async function handleApi(req, res, url) {
+async function handleApi(
+  req: NagaraRequest,
+  res: ServerResponse,
+  url: URL,
+): Promise<boolean | void> {
   const { pathname } = url;
 
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -175,10 +205,7 @@ async function handleApi(req, res, url) {
     return;
   }
 
-  const pathParts = pathname
-    .replace(API_ROUTE, "")
-    .split("/")
-    .filter(Boolean);
+  const pathParts = pathname.replace(API_ROUTE, "").split("/").filter(Boolean);
 
   try {
     // GET /api/v1/characters/:id/stream
@@ -188,7 +215,7 @@ async function handleApi(req, res, url) {
       pathParts[1] &&
       pathParts[2] === "stream"
     ) {
-      return handleCharacterStream(req, res, pathParts[1]);
+      return handleCharacterStream(req, res, pathParts[1]!);
     }
 
     // GET /api/v1/characters
@@ -212,7 +239,7 @@ async function handleApi(req, res, url) {
       pathParts[1] &&
       pathParts[2] === "portrait"
     ) {
-      return await handleUploadPortrait(req, res, pathParts[1]);
+      return await handleUploadPortrait(req, res, pathParts[1]!);
     }
 
     // GET /api/v1/view/dashboard
@@ -253,11 +280,7 @@ async function handleApi(req, res, url) {
     }
 
     // GET /api/v1/characters/:id
-    if (
-      req.method === "GET" &&
-      pathParts[0] === "characters" &&
-      pathParts[1]
-    ) {
+    if (req.method === "GET" && pathParts[0] === "characters" && pathParts[1]) {
       return await getCharacterHandler(req, res, pathParts);
     }
 
@@ -267,7 +290,7 @@ async function handleApi(req, res, url) {
       pathParts[0] === "characters" &&
       pathParts[1]
     ) {
-      return await handleUpdateCharacter(req, res, pathParts[1]);
+      return await handleUpdateCharacter(req, res, pathParts[1]!);
     }
 
     // DELETE /api/v1/characters/:id
@@ -276,11 +299,11 @@ async function handleApi(req, res, url) {
       pathParts[0] === "characters" &&
       pathParts[1]
     ) {
-      const characterId = pathParts[1];
+      const characterId = pathParts[1]!;
 
       try {
         const dmToken = req.headers["x-dm-id"];
-        const playerId = req.headers["x-player-id"];
+        const playerId = req.headers["x-player-id"] as string | undefined;
 
         if (!dmToken && !playerId) {
           res.writeHead(400);
@@ -288,11 +311,11 @@ async function handleApi(req, res, url) {
           return;
         }
 
-        let result;
+        let result: nagara.DeleteResult;
         if (dmToken) {
           result = await nagara.deleteCharacterAsDM(characterId, dmToken);
         } else {
-          result = await nagara.deleteCharacterAsPlayer(characterId, playerId);
+          result = await nagara.deleteCharacterAsPlayer(characterId, playerId!);
         }
 
         if (result.success) {
@@ -347,7 +370,7 @@ async function handleApi(req, res, url) {
           }
         } catch (error) {
           res.writeHead(400);
-          res.end(JSON.stringify({ error: error.message }));
+          res.end(JSON.stringify({ error: (error as Error).message }));
         }
       });
       return;
@@ -378,11 +401,11 @@ async function handleApi(req, res, url) {
       pathParts[1] === "characters" &&
       pathParts[2]
     ) {
-      const characterId = pathParts[2];
+      const characterId = pathParts[2]!;
       requireDmToken(req);
 
       let body = "";
-      req.on("data", (chunk) => (body += chunk));
+      req.on("data", (chunk: Buffer) => (body += chunk));
       req.on("end", async () => {
         try {
           const { note } = JSON.parse(body || "{}");
@@ -394,7 +417,7 @@ async function handleApi(req, res, url) {
           res.end(JSON.stringify(backupRecord));
         } catch (error) {
           res.writeHead(500);
-          res.end(JSON.stringify({ error: error.message }));
+          res.end(JSON.stringify({ error: (error as Error).message }));
         }
       });
       return;
@@ -423,7 +446,7 @@ async function handleApi(req, res, url) {
         res.end(JSON.stringify(backupList));
       } catch (error) {
         res.writeHead(500);
-        res.end(JSON.stringify({ error: error.message }));
+        res.end(JSON.stringify({ error: (error as Error).message }));
       }
       return;
     }
@@ -436,7 +459,7 @@ async function handleApi(req, res, url) {
     ) {
       requireDmToken(req);
       let body = "";
-      req.on("data", (chunk) => (body += chunk));
+      req.on("data", (chunk: Buffer) => (body += chunk));
       req.on("end", async () => {
         try {
           const { backupId } = JSON.parse(body);
@@ -446,7 +469,7 @@ async function handleApi(req, res, url) {
           res.end(JSON.stringify(result));
         } catch (error) {
           res.writeHead(400);
-          res.end(JSON.stringify({ error: error.message }));
+          res.end(JSON.stringify({ error: (error as Error).message }));
         }
       });
       return;
