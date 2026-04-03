@@ -1,0 +1,135 @@
+[
+  {
+    "id": "bloodthirst",
+    "name": "Bloodthirst",
+    "tags": ["combat", "control", "corruption"],
+    "levels": 1,
+    "description": "If the character, their enemy, or someone nearby has taken damage, the character cannot spare an enemy even if that enemy surrenders. Resisting the effect requires 1 experience and an Awareness check."
+  },
+  {
+    "id": "nymphomania",
+    "name": "Nymphomania",
+    "tags": ["corruption", "control", "social"],
+    "levels": 1,
+    "description": "The character must perform a cleansing rite every day regardless of current Corruption. For each day without the rite, they take a cumulative -1 penalty to all checks up to -5, and refusing another person’s offer to take part in the rite requires a Will check."
+  },
+  {
+    "id": "addiction",
+    "name": "Addiction",
+    "tags": ["control", "survival", "corruption"],
+    "levels": 1,
+    "description": "The character must receive a daily dose of the chosen substance costing 1 shilling, or half price for an Alchemist. For each day without a dose, they take a cumulative -1 penalty to all checks up to -5 and must pass a Will check or spend the day searching for the substance."
+  },
+  {
+    "id": "old-enemy",
+    "name": "Old Enemy",
+    "tags": ["social", "deception", "stealth"],
+    "levels": 1,
+    "description": "The character has a mortal enemy. At least once per chapter, that enemy’s influence appears through direct or indirect action against the character."
+  },
+  {
+    "id": "beastly",
+    "name": "Beastly",
+    "tags": ["transformation", "social", "deception"],
+    "levels": 1,
+    "description": "The character has noticeable bestial features. Hiding them requires a Dexterity check; after a failed Charm check, checks related to asking for help or protection must be repeated. Intimidation checks gain an extra attempt on failure."
+  },
+  {
+    "id": "damage",
+    "name": "Damage",
+    "tags": ["corruption", "magic", "control"],
+    "levels": 1,
+    "description": "After each removal of Corruption, the character cannot cast spells, though they can still use abilities, for a number of hours equal to the Corruption removed."
+  },
+  {
+    "id": "rules-of-honor",
+    "name": "Rules of Honor",
+    "tags": ["combat", "control", "social"],
+    "levels": 1,
+    "description": "The character cannot break their accepted code. They cannot flee a fight once it has begun, though they may avoid fights before they start."
+  },
+  {
+    "id": "terrible-secret",
+    "name": "Terrible Secret",
+    "tags": ["stealth", "deception", "social"],
+    "levels": 1,
+    "description": "The character has a secret whose revelation gives them the Pariah or Wanted sin. At least once per chapter, they risk exposure and make a Dexterity check with one extra attempt; if both attempts fail, evidence or a witness is left behind."
+  },
+  {
+    "id": "older-generation",
+    "name": "Older Generation",
+    "tags": ["survival", "control", "utility"],
+    "levels": 1,
+    "description": "The first attribute check of each day determines the character’s condition. If it fails, the character takes a -1 penalty to all checks until the end of the day."
+  },
+  {
+    "id": "impulsiveness",
+    "name": "Impulsiveness",
+    "tags": ["control", "corruption", "social"],
+    "levels": 1,
+    "description": "The player cannot take back an action already declared for the character. Trying to replay a moment or scene costs 1 experience or permanent Corruption."
+  },
+  {
+    "id": "demandingness",
+    "name": "Demandingness",
+    "tags": ["corruption", "control", "social"],
+    "levels": 1,
+    "description": "Simple cleansing rites no longer work on the character. Removing Corruption requires extreme or grotesque methods of cleansing."
+  },
+  {
+    "id": "mystic-mark",
+    "name": "Mystic Mark",
+    "tags": ["magic", "stealth", "social"],
+    "levels": 1,
+    "description": "One runic tattoo area is occupied by a mystic mark. In suitable situations, the character must pass a Dexterity or Charm check or draw dangerous attention as a possible monster."
+  },
+  {
+    "id": "seizures",
+    "name": "Seizures",
+    "tags": ["control", "survival", "combat"],
+    "levels": 1,
+    "description": "On a result of 20 on any check, the character either hands control to their partner for d4 turns or falls paralyzed for d4 turns. Afterward, they take a -1 penalty to all checks until the end of the fight."
+  },
+  {
+    "id": "nightmares",
+    "name": "Nightmares",
+    "tags": ["healing", "survival", "control"],
+    "levels": 1,
+    "description": "Each night the character makes a Will check. On a failure, they cannot recover health naturally until the next rest."
+  },
+  {
+    "id": "protege",
+    "name": "Protégé",
+    "tags": ["support", "social", "corruption"],
+    "levels": 1,
+    "description": "The character must care for a protégé who remains a burden throughout the adventure. If the protégé dies or disappears, this sin is replaced with Addiction, Nightmares, Wanted, or Old Enemy."
+  },
+  {
+    "id": "weakness",
+    "name": "Weakness",
+    "tags": ["survival", "resistance", "control"],
+    "levels": 1,
+    "description": "When the character is wounded or injured and risks losing consciousness, they make two checks instead of one and choose the worse result."
+  },
+  {
+    "id": "slowness",
+    "name": "Slowness",
+    "tags": ["mobility", "survival", "utility"],
+    "levels": 1,
+    "description": "During a chase, the character takes a -3 penalty to Speed on all related checks."
+  },
+  {
+    "id": "wanted",
+    "name": "Wanted",
+    "tags": ["stealth", "social", "deception"],
+    "levels": 1,
+    "description": "At least once per chapter, the character must make a Dexterity check to avoid being recognized as a wanted criminal. On a failure, they are exposed and risk being taken into custody."
+  },
+  {
+    "id": "pariah",
+    "name": "Pariah",
+    "tags": ["social", "wealth", "support"],
+    "levels": 1,
+    "description": "For social tasks with law-abiding members of civilization, the character makes two checks and chooses the worse result. When dealing with other disenfranchised people, they automatically succeed unless the demand or offer seems impossible or dangerous. They start play with 5 shillings instead of 5 talers."
+  }
+]

@@ -1,0 +1,373 @@
+[
+  {
+    "id": "blood-bond",
+    "name": "Blood Bond",
+    "tags": ["corruption", "transformation", "support"],
+    "levels": 1,
+    "description": "Lets the character spend experience to develop one exotic natural ability belonging to a chosen exotic race or species. When removing Corruption with help from a representative of that race or species, the cleansing bonus increases by +d2: roll d6 instead of d4."
+  },
+  {
+    "id": "cartographer",
+    "name": "Cartographer",
+    "tags": ["tracking", "survival", "utility"],
+    "levels": 3,
+    "description": "Lets the character join expeditions and ship crews without paying passage, and also work as a navigator or guide. Grants a +1 bonus on all checks related to navigation at sea, on land, and in dungeons."
+  },
+  {
+    "id": "enterprise",
+    "name": "Enterprise",
+    "tags": ["commerce", "utility", "support"],
+    "levels": 1,
+    "description": "Once per chapter, the character can make a Cunning or Charm check, depending on the business, and earn 10+5d10 talers beyond already paid expenses."
+  },
+  {
+    "id": "prostitution",
+    "name": "Prostitution",
+    "tags": ["social", "income", "corruption"],
+    "levels": 1,
+    "description": "Whenever the character removes Corruption with a member of civilization, they can test their Charm to demand payment: 1+d4 ortegs from a commoner, 1+d4 shillings from a soldier or merchant, or 1+d4 talers from an aristocrat. It also lets the character enter closed social gatherings without an invitation, but one runic tattoo slot is permanently occupied by a professional tattoo."
+  },
+  {
+    "id": "language-of-beasts",
+    "name": "Language of Beasts",
+    "tags": ["beasts", "communication", "utility"],
+    "levels": 1,
+    "description": "Lets the character speak with animals. They can answer questions about beings in their area, who passed by, and roughly how many there were, but they do not perform services."
+  },
+  {
+    "id": "powerful-voice",
+    "name": "Powerful Voice",
+    "tags": ["communication", "corruption", "support"],
+    "levels": 3,
+    "description": "The character’s direct commands to allies are heard in any commotion. Grants a +1 bonus on all Charm checks related to such commands, and lets the character remove temporary Corruption through the throat instead of the usual areas of mystical concentration."
+  },
+  {
+    "id": "escape-artist",
+    "name": "Escape Artist",
+    "tags": ["mobility", "utility", "escape"],
+    "levels": 1,
+    "description": "Lets the character slip free from grapples and traps, including snares and nets, and squeeze through narrow openings. In all escape situations, the character gets a second attempt regardless of attribute."
+  },
+  {
+    "id": "elven-tongue",
+    "name": "Elven Tongue",
+    "tags": ["communication", "stealth", "language"],
+    "levels": 1,
+    "description": "Lets the character use a wordless language conveyed by tongue movements during a kiss and teach it to others."
+  },
+  {
+    "id": "light-footed",
+    "name": "Light-Footed",
+    "tags": ["mobility", "tracking", "utility"],
+    "levels": 1,
+    "description": "Grants a +3 bonus to Speed in situations involving escape or pursuit."
+  },
+  {
+    "id": "open-to-the-new",
+    "name": "Open to the New",
+    "tags": ["corruption", "advancement", "support"],
+    "levels": 2,
+    "description": "Each time the character successfully removes temporary Corruption with a new helper, they gain 1 experience. A helper counts as new if they have not helped during the current chapter; at level 2, they count as new if they have not helped within the last week."
+  },
+  {
+    "id": "deceiver",
+    "name": "Deceiver",
+    "tags": ["deception", "perception", "social"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Charm and Awareness checks related to lies, including spotting someone else’s lies."
+  },
+  {
+    "id": "manipulator",
+    "name": "Manipulator",
+    "tags": ["social", "control", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus to Charm on checks based on flattery, threats, and other methods that are not lies, as long as the character had enough time to persuade the victim. Beliefs accepted this way remain with the victim even after they part ways with the character."
+  },
+  {
+    "id": "flirt",
+    "name": "Flirt",
+    "tags": ["social", "interrogation", "control"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Charm checks related to persuasion, interrogation, and goading. If the character gets what they want from a victim and gives nothing in return, the victim remembers it."
+  },
+  {
+    "id": "dark-blood",
+    "name": "Dark Blood",
+    "tags": ["corruption", "transformation", "magic"],
+    "levels": 1,
+    "description": "The character gains a stigma from the Beastly sin and can acquire and develop the exotic natural traits Natural Weapon, Armored, Mighty, Regeneration, and Wings."
+  },
+  {
+    "id": "cleansing",
+    "name": "Cleansing",
+    "tags": ["corruption", "healing", "protection"],
+    "levels": 1,
+    "description": "Each time the character removes temporary Corruption, they restore the same amount of Survivability. If Survivability was already full, then on the next cleansing check they may gain the same amount as temporary Survivability above the limit once, lasting until the next rest."
+  },
+  {
+    "id": "false-identity",
+    "name": "False Identity",
+    "tags": ["stealth", "deception", "utility"],
+    "levels": 1,
+    "description": "The character has a second identity with its own clothing, gear, and documents. No one except the character and the person who helped prepare it can uncover that identity."
+  },
+  {
+    "id": "contacts",
+    "name": "Contacts",
+    "tags": ["social", "support", "utility"],
+    "levels": 1,
+    "description": "With a successful Charm check, the character can recall an acquaintance able to help with a specific problem or pull them out of a difficult situation. If the character can get a message to them, that contact comes to help even from afar."
+  },
+  {
+    "id": "secret-knowledge",
+    "name": "Secret Knowledge",
+    "tags": ["alchemy", "artifacts", "knowledge"],
+    "levels": 1,
+    "description": "The character knows all formulas for alchemical remedies and all secrets of artifact creation available at their current Alchemist and Artifact Creation ranks, including forbidden and formerly secret recipes and designs."
+  },
+  {
+    "id": "natural-ingredients",
+    "name": "Natural Ingredients",
+    "tags": ["alchemy", "support", "crafting"],
+    "levels": 1,
+    "description": "Anything produced by the character’s body can be used as a catalyst in alchemical processes. This grants one extra chance to succeed on any Cunning check related to Alchemy and can replace doses for characters with the Addiction sin."
+  },
+  {
+    "id": "lockpicker",
+    "name": "Lockpicker",
+    "tags": ["locks", "stealth", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Dexterity or Speed checks related to entering locked places and hiding the fact that the character was inside them."
+  },
+  {
+    "id": "nimble-fingers",
+    "name": "Nimble Fingers",
+    "tags": ["stealth", "theft", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Dexterity checks related to theft and hiding items on the character’s person."
+  },
+  {
+    "id": "mirage",
+    "name": "Mirage",
+    "tags": ["illusion", "social", "utility"],
+    "levels": 1,
+    "description": "Lets the character create temporary illusions and overlay a false appearance onto small objects. With a successful Charm check, they can convince a victim to sell goods worth up to 100 illusory talers at a time; the images quickly fall apart once the character leaves the area where they were created."
+  },
+  {
+    "id": "poison-resistance",
+    "name": "Poison Resistance",
+    "tags": ["poison", "resistance", "protection"],
+    "levels": 1,
+    "description": "Any poison used against the character counts as one rank lower, and weak poison cannot deal more than 1 damage per turn. Against toxins with other harmful effects, the character gets a second chance to resist; the poison’s duration does not change."
+  },
+  {
+    "id": "natural-healing",
+    "name": "Natural Healing",
+    "tags": ["healing", "support", "magic"],
+    "levels": 1,
+    "description": "The character’s saliva and milk can restore d4 Survivability to others once per day. This healing counts as mystical for effects that can only be removed by mystical healing."
+  },
+  {
+    "id": "forged-in-flame",
+    "name": "Forged in Flame",
+    "tags": ["fire", "resistance", "protection"],
+    "levels": 1,
+    "description": "Grants mystical +1 protection against fire effects and a +1 bonus on all checks related to using fire or resisting it."
+  },
+  {
+    "id": "inheritance",
+    "name": "Inheritance",
+    "tags": ["equipment", "weapons", "armor"],
+    "levels": 1,
+    "description": "The character receives a family heirloom in the form of any weapon or armor, except an artifact."
+  },
+  {
+    "id": "privileges",
+    "name": "Privileges",
+    "tags": ["social", "utility", "wealth"],
+    "levels": 1,
+    "description": "Within their own society, the character may repeat any failed social check and does not have to roll at all unless the request is especially demanding or impossible. They also start with 50 talers."
+  },
+  {
+    "id": "safehouses",
+    "name": "Safehouses",
+    "tags": ["sanctuary", "equipment", "utility"],
+    "levels": 1,
+    "description": "The character knows the locations of one organization’s safehouses, where they can hide, wait things out, and replace or retrieve vital weapons, armor, and gear. With a successful Cunning check, they remember a convenient nearby safehouse and find either up to 10 talers in cash or items worth the same amount there."
+  },
+  {
+    "id": "water-off-a-goose",
+    "name": "Water off a Goose's Back",
+    "tags": ["corruption", "protection", "resistance"],
+    "levels": 1,
+    "description": "All effects of removing temporary Corruption are increased by +d2. While the character is already in the process of removing Corruption, they cannot gain either temporary or permanent Corruption."
+  },
+  {
+    "id": "bloodhound",
+    "name": "Bloodhound",
+    "tags": ["tracking", "perception", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Awareness and Cunning checks related to finding tracks or determining a person’s location."
+  },
+  {
+    "id": "pet",
+    "name": "Pet",
+    "tags": ["beasts", "support", "combat"],
+    "levels": 1,
+    "description": "The character has a tamed animal companion no larger than a wolfhound. It can help in combat, but it gains no experience and cannot learn new abilities."
+  },
+  {
+    "id": "servant",
+    "name": "Servant",
+    "tags": ["support", "utility", "corruption"],
+    "levels": 1,
+    "description": "The character has a personal servant who can be used to fight temporary Corruption. The servant can handle simple duties such as standing watch at night or delivering messages, but is useless in combat and provides no help in dangerous situations."
+  },
+  {
+    "id": "reliable-companion",
+    "name": "Reliable Companion",
+    "tags": ["telepathy", "corruption", "support"],
+    "levels": 1,
+    "description": "The character has an old friend or lover with whom they can exchange simple messages or emotions telepathically. Both roughly know where the other is and notice when the other is in trouble; intimacy with that companion grants up to d4 extra protection from temporary Corruption per day if the character had no temporary Corruption at the time."
+  },
+  {
+    "id": "shadow-creation",
+    "name": "Shadow Creation",
+    "tags": ["shadows", "stealth", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Dexterity checks related to hiding oneself."
+  },
+  {
+    "id": "medium",
+    "name": "Medium",
+    "tags": ["undead", "perception", "protection"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Awareness, Will, and Charm checks aimed at detecting, interacting with, and subjugating undead. The same bonus also applies when defending against non-physical abilities used by undead against the character."
+  },
+  {
+    "id": "forager",
+    "name": "Forager",
+    "tags": ["survival", "nature", "support"],
+    "levels": 1,
+    "description": "With a successful Awareness test, the character can find enough food and water for themselves while traveling through the wilderness. If they gather for a small group as well, that group cannot move while the foraging happens."
+  },
+  {
+    "id": "fortification",
+    "name": "Fortification",
+    "tags": ["corruption", "armor", "protection"],
+    "levels": 1,
+    "description": "Whenever the character removes temporary Corruption, their Armor increases by the same amount until the end of the day or until the first successful attack that pierces that Armor."
+  },
+  {
+    "id": "gambler",
+    "name": "Gambler",
+    "tags": ["knowledge", "perception", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Cunning checks in gambling and tactical games, and a +1 bonus on all Awareness checks made to catch a cheat."
+  },
+  {
+    "id": "cardsharp",
+    "name": "Cardsharp",
+    "tags": ["deception", "knowledge", "stealth"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Dexterity and Cunning checks related to cheating in games, plus an extra chance on a Dexterity check when the character tries to keep the cheating unnoticed."
+  },
+  {
+    "id": "wild-soul",
+    "name": "Wild Soul",
+    "tags": ["nature", "alchemy", "survival"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all checks related to the challenges of nature, including finding food and shelter, moving through dense growth, and spotting or avoiding natural traps. The same bonus also applies to all checks to use the Alchemist ability."
+  },
+  {
+    "id": "perfect-body",
+    "name": "Perfect Body",
+    "tags": ["corruption", "resistance", "advancement"],
+    "levels": 3,
+    "description": "Increases by 1 the number of attempts the character can make each day to remove temporary Corruption."
+  },
+  {
+    "id": "perfect-memory",
+    "name": "Perfect Memory",
+    "tags": ["knowledge", "utility", "research"],
+    "levels": 1,
+    "description": "Work involving reconnaissance, reports, bookkeeping, and similar tasks pays the character one and a half times as much. They may make two checks for any test related to memorizing something new and can recall any relevant episode from past adventures."
+  },
+  {
+    "id": "perfect-soul",
+    "name": "Perfect Soul",
+    "tags": ["corruption", "protection", "support"],
+    "levels": 1,
+    "description": "Lets the character remove temporary Corruption even with the most corrupted beings: cursed sorcerers, undead, demons, creatures of the Night, and the like."
+  },
+  {
+    "id": "archivist",
+    "name": "Archivist",
+    "tags": ["knowledge", "utility", "research"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all checks related to libraries, archives, and repositories."
+  },
+  {
+    "id": "augur",
+    "name": "Augur",
+    "tags": ["divination", "knowledge", "magic"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on checks related to the rituals Foresight, Divination, and White Smoke, the mystical power Hexcraft, and similar effects."
+  },
+  {
+    "id": "long-march",
+    "name": "Long March",
+    "tags": ["healing", "survival", "support"],
+    "levels": 1,
+    "description": "Lets the character recover health even during fast travel. They can share this knowledge with others, allowing them to recover health during difficult marches if they pass a Strength check."
+  },
+  {
+    "id": "actor",
+    "name": "Actor",
+    "tags": ["stealth", "deception", "performance"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Dexterity checks when the character impersonates someone, and a second chance to succeed when imitating a recognizable archetype rather than a specific person. When trying to impersonate someone of another race, every check must be repeated."
+  },
+  {
+    "id": "musician",
+    "name": "Musician",
+    "tags": ["social", "beasts", "performance"],
+    "levels": 3,
+    "description": "Grants a bonus on all Charm checks related to persuasion and lets the character calm an enraged animal with music, provided nothing is threatening it, by succeeding on a Charm check to prevent its attack."
+  },
+  {
+    "id": "pathfinder",
+    "name": "Pathfinder",
+    "tags": ["tracking", "perception", "survival"],
+    "levels": 1,
+    "description": "Lets the character repeat any failed Awareness check related to finding tracks, following them, finding a way to a place, or finding the road back."
+  },
+  {
+    "id": "packhorse",
+    "name": "Packhorse",
+    "tags": ["strong", "equipment", "utility"],
+    "levels": 1,
+    "description": "Lets the character carry one and a half times as many items as an ordinary person."
+  },
+  {
+    "id": "storyteller",
+    "name": "Storyteller",
+    "tags": ["social", "performance", "utility"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all Charm checks when the character needs to tell a more or less convincing tale and lets them earn money with that art."
+  },
+  {
+    "id": "gossip",
+    "name": "Gossip",
+    "tags": ["social", "communication", "perception"],
+    "levels": 3,
+    "description": "Grants a +1 bonus on all checks related to gathering, spreading, and judging the truth of rumors."
+  },
+  {
+    "id": "hardy",
+    "name": "Hardy",
+    "tags": ["resistance", "protection", "survival"],
+    "levels": 1,
+    "description": "In any situation that could destroy the character, they may make two checks instead of one and choose the better result."
+  }
+]
