@@ -206,14 +206,14 @@ export const rpgValidators = {
     return true;
   },
 
-  assetsValid: (assets) => {
-    if (!Array.isArray(assets)) assets = [assets];
+  affiliationsValid: (affiliations) => {
+    if (!Array.isArray(affiliations)) return false;
 
-    const invalidAssets = assets.filter(
-      (asset) => typeof asset !== "string" || asset.length > 200,
+    const invalid = affiliations.filter(
+      (a) => typeof a !== "object" || !a || typeof a.name !== "string" || a.name.length > 200,
     );
 
-    if (invalidAssets.length > 0) return false;
+    if (invalid.length > 0) return false;
 
     return true;
   },

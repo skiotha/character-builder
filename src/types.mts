@@ -1,5 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
+import type { FieldAccessMap } from "#rpg-types";
+
 export type {
   PrimaryAttributes,
   PrimaryAttributeName,
@@ -8,15 +10,25 @@ export type {
   CharacterAttributes,
   EffectModifier,
   Effect,
-  Trait,
+  AbilityTier,
+  LearnedAbility,
+  LearnedSpell,
+  LearnedRitual,
+  LearnedBoon,
+  LearnedSin,
+  Combat,
   Weapon,
   ArmorPiece,
+  Rune,
   CharacterEquipment,
+  Affiliation,
   JournalEntry,
   CharacterBackground,
   PortraitCrop,
   PortraitDimensions,
   CharacterPortrait,
+  RoleAccess,
+  FieldAccessMap,
   Character,
 } from "#rpg-types";
 
@@ -26,12 +38,6 @@ export type CharacterRole = "dm" | "owner" | "public";
 
 export interface CharacterPermissions {
   role: CharacterRole;
-}
-
-export interface FieldPermissions {
-  owner: boolean;
-  dm: boolean;
-  public: boolean;
 }
 
 // ── Request Extension ─────────────────────────────────────────────
@@ -108,7 +114,7 @@ export interface SchemaField {
   pattern?: RegExp;
   sanitize?: string;
   error?: string;
-  permissions?: FieldPermissions;
+  permissions?: FieldAccessMap;
   validate?: (value: unknown, allData: unknown) => boolean | string;
   ui?: SchemaFieldUI;
   [key: string]: unknown;

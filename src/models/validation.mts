@@ -172,7 +172,7 @@ export async function validateCharacterUpdate(
       // }
     }
 
-    if (update.field === "traits" && update.operation === "push") {
+    if (update.field === "abilities" && update.operation === "push") {
       const ability = update.value as Record<string, unknown>;
       const cost = (ability.cost as number[])[0]!;
       const unspent = (character as Record<string, Record<string, unknown>>)
@@ -217,6 +217,8 @@ export function skipOnCreation(fieldPath: string, userRole: string): boolean {
       "attributes.secondary.painThreshold",
       "attributes.secondary.corruptionThreshold",
       "attributes.secondary.defense",
+      "attributes.secondary.armor",
+      "attributes.secondary.corruptionMax",
     ];
 
     if (creationOverrides.includes(fieldPath)) {

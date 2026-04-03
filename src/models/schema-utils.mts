@@ -13,11 +13,12 @@ export function canAccessField(
   const fieldSchema = getFieldSchema(fieldPath);
   if (!fieldSchema) return false;
 
-  const perm =
+  const rolePerm =
     fieldSchema.permissions?.[userRole as keyof typeof fieldSchema.permissions];
-  if (perm === undefined) return false;
+  if (!rolePerm || typeof rolePerm !== "object") return false;
 
-  return operation === "write" ? perm === true : perm !== false;
+  const perm = rolePerm as { read: boolean; write: boolean };
+  return operation === "write" ? perm.write : perm.read;
 }
 
 export function validateFieldValue(

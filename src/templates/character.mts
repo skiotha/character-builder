@@ -147,8 +147,8 @@ const TEXTS = {
         mystic: {
           title: "Mystic",
           data: {
-            tradition: {
-              path: "tradition",
+            traditions: {
+              path: "traditions",
               placeholder: "Mage Circle",
             },
             shadow: {
@@ -160,8 +160,8 @@ const TEXTS = {
         social: {
           title: "Social",
           data: {
-            assets: {
-              path: "assets",
+            affiliations: {
+              path: "affiliations",
               placeholder: "Write down your contacts...",
             },
           },
@@ -467,8 +467,7 @@ function renderPortraitBlock(ctx) {
 }
 
 function renderAbilitiesBlock(ctx) {
-  const abilities =
-    ctx.character?.traits?.filter((t) => t.type === "ability") || [];
+  const abilities = ctx.character?.abilities || [];
 
   const abilitiesHtml =
     abilities.length > 0
@@ -489,7 +488,7 @@ function renderAbilitiesBlock(ctx) {
 }
 
 function renderAbilityItem(ability, index, ctx) {
-  const isEditable = ctx.isEditable(`traits[${index}]`);
+  const isEditable = ctx.isEditable(`abilities[${index}]`);
 
   return `
     <li class="ability" data-ability="${index}">
@@ -712,10 +711,10 @@ function renderInformationMysticBlock(ctx) {
       ${renderTextarea("Shadow", LOCATION, ctx)}
 
       <div class="input">
-        <label for="tradition">Mystical tradition</label>
+        <label for="traditions">Mystical tradition</label>
         <input
-          id="tradition"
-          name="tradition"
+          id="traditions"
+          name="traditions"
           type="text"
           placeholder="Mage Circle"
           inputmode="text"
@@ -747,7 +746,7 @@ function renderInformationSocialBlock(ctx) {
     <div id="social">
       <h4>${TEXTS.character.form.information.social.title}</h4>
 
-      ${renderTextarea("assets", LOCATION, ctx, "Membership")}
+      ${renderTextarea("affiliations", LOCATION, ctx, "Membership")}
     </div>
   `;
 }

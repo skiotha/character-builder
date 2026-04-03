@@ -119,8 +119,9 @@ See `docs/roadmap.md` for the full phased work plan. Quick reference:
 | 3     | Schema-driven rendering          |
 | 4     | Testing                          |
 | 5     | Bug fixes & hardening            |
-| 6     | Sibling project integration      |
-| 7     | Polish & beyond MVP              |
+| 6     | RPG Engine                       |
+| 7     | Sibling project integration      |
+| 8     | Polish & beyond MVP              |
 
 ## Sibling Projects
 

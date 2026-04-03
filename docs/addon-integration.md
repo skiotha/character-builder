@@ -72,7 +72,7 @@ These must be **stripped** before serialization. They either contain server-inte
 | `created`              | Informational; `lastModified` is sufficient   |
 | `portrait` (all of it) | Addon does not render images                  |
 | `background.kinkList`  | Not displayed in the addon                    |
-| `assets`               | Duplicate of tradition info / unused by addon |
+| `affiliations`         | Social data, unused by addon                  |
 | `balance`              | Website-only economy field (if it exists)     |
 
 ### 2.5 Fields to Keep
@@ -93,19 +93,28 @@ For clarity, the exported object should contain exactly:
     "primary":   { "accurate", "cunning", "discreet", "alluring",
                    "quick", "resolute", "vigilant", "strong" },
     "secondary": { "toughness": { "max", "current" },
-                   "painThreshold", "corruptionThreshold", "defense" }
+                   "painThreshold", "corruptionThreshold", "defense",
+                   "armor", "corruptionMax" }
   },
 
-  "traits":          [],
+  "abilities":       [],
+  "spells":          [],
+  "rituals":         [],
+  "boons":           [],
+  "sins":            [],
   "effects":         [],
-  "tradition":       "string",
+  "traditions":      [],
+
+  "combat": {
+    "attackAttribute", "baseDamage", "bonusDamage", "weapons"
+  },
 
   "equipment": {
     "money", "weapons", "ammunition",
     "armor": { "body", "plug" },
     "runes",
-    "professional": { "assassin", "utility" },
-    "inventory": { "self", "home" },
+    "assassin", "tools",
+    "inventory": { "carried", "home" },
     "artifacts"
   },
 

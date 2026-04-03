@@ -133,8 +133,8 @@ const TEXTS = {
         mystic: {
           title: "Mystic",
           data: {
-            tradition: {
-              path: "tradition",
+            traditions: {
+              path: "traditions",
               placeholder: "Mage Circle",
             },
             shadow: {
@@ -146,8 +146,8 @@ const TEXTS = {
         social: {
           title: "Social",
           data: {
-            assets: {
-              path: "assets",
+            affiliations: {
+              path: "affiliations",
               placeholder: "Write down your contacts...",
             },
           },
@@ -572,10 +572,10 @@ function renderInformationMysticBlock() {
       ${renderTextarea("Shadow", LOCATION)}
 
       <div class="input">
-        <label for="tradition">Mystical tradition</label>
+        <label for="traditions">Mystical tradition</label>
         <input
-          id="tradition"
-          name="tradition"
+          id="traditions"
+          name="traditions"
           type="text"
           placeholder="Mage Circle"
           inputmode="text"
@@ -607,7 +607,7 @@ function renderInformationSocialBlock() {
     <div id="social">
       <h4>${TEXTS.creation.form.information.social.title}</h4>
 
-      ${renderTextarea("assets", LOCATION, "Membership")}
+      ${renderTextarea("affiliations", LOCATION, "Membership")}
     </div>
   `;
 }

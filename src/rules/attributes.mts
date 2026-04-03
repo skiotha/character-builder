@@ -45,6 +45,26 @@ export const SECONDARY_FORMULAS: Record<string, SecondaryFormulaRule> = {
     },
     formula: (base) => base,
   },
+  armor: {
+    default: "equipment",
+    base: (char) => {
+      const equipment = char.equipment as Record<string, unknown> | undefined;
+      const armorObj = equipment?.armor as Record<string, unknown> | undefined;
+      const body = armorObj?.body as { defense?: number } | null | undefined;
+      return body?.defense ?? 0;
+    },
+    formula: (base) => base,
+  },
+  corruptionMax: {
+    default: "resolute",
+    base: (char, statOverride) => {
+      const stat = statOverride || "resolute";
+      const primary = (char.attributes as Record<string, unknown> | undefined)
+        ?.primary as Record<string, number> | undefined;
+      return primary?.[stat] ?? 0;
+    },
+    formula: (base) => base,
+  },
 };
 
 export function clampValues(character: Record<string, unknown>): void {

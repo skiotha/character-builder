@@ -14,15 +14,11 @@ export function recalculateDerivedFields(
 ): Record<string, unknown> {
   const result = structuredClone(character);
 
-  const traits = (result.traits || []) as Array<Record<string, unknown>>;
   const directEffects = (result.effects || []) as RuleEffect[];
 
-  const allEffects: RuleEffect[] = [
-    ...traits
-      .filter((t) => t.effects)
-      .flatMap((t) => t.effects as RuleEffect[]),
-    ...directEffects,
-  ].filter((effect) => !isExpired(effect));
+  const allEffects: RuleEffect[] = directEffects.filter(
+    (effect) => !isExpired(effect),
+  );
 
   allEffects.sort((a, b) => (a.priority || 10) - (b.priority || 10));
 
@@ -108,22 +104,27 @@ function enforceConsistency(
   equipment.weapons = equipment.weapons || [];
   equipment.armor = equipment.armor || {
     body: null,
-    plug: [],
+    plug: null,
   };
 
-  if (Array.isArray(character.traits)) {
-    const seen = new Set<string>();
-
-    character.traits = (
-      character.traits as Array<Record<string, unknown>>
-    ).filter((trait) => {
-      const key = `${trait.name as string}_${trait.type as string}`;
-
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  }
+  deriveCombat(character);
 
   return character;
+}
+
+function deriveCombat(character: Record<string, unknown>): void {
+  const combat = (character.combat || {}) as Record<string, unknown>;
+  character.combat = combat;
+
+  const equipment = character.equipment as Record<string, unknown> | undefined;
+  const weapons = (equipment?.weapons || []) as Array<Record<string, unknown>>;
+  const weaponSlots = (combat.weapons || []) as number[];
+
+  const primaryIndex = weaponSlots[0];
+  const primaryWeapon =
+    primaryIndex !== undefined ? weapons[primaryIndex] : undefined;
+
+  combat.attackAttribute = combat.attackAttribute || "accurate";
+  combat.baseDamage = (primaryWeapon?.damage as number) ?? 0;
+  combat.bonusDamage = combat.bonusDamage || [];
 }

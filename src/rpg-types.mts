@@ -21,8 +21,10 @@ export interface Toughness {
 export interface SecondaryAttributes {
   toughness: Toughness;
   defense: number;
+  armor: number;
   painThreshold: number;
   corruptionThreshold: number;
+  corruptionMax: number;
 }
 
 export interface CharacterAttributes {
@@ -30,7 +32,7 @@ export interface CharacterAttributes {
   secondary: SecondaryAttributes;
 }
 
-// ── Effects & Traits ──────────────────────────────────────────────
+// ── Effects ───────────────────────────────────────────────────────
 
 export interface EffectModifier {
   type: string;
@@ -48,26 +50,66 @@ export interface Effect {
   duration?: string | null;
 }
 
-export interface Trait {
-  name: string;
-  type: string;
-  description?: string;
-  effects?: Effect[];
-  cost?: number[];
+// ── Learned Abilities, Spells & Progression ──────────────────────
+
+export type AbilityTier = "novice" | "adept" | "master";
+
+export interface LearnedAbility {
+  id: string;
+  tier: AbilityTier;
+}
+
+export interface LearnedSpell {
+  id: string;
+  tier: AbilityTier;
+}
+
+export interface LearnedRitual {
+  id: string;
+  level: number;
+}
+
+export interface LearnedBoon {
+  id: string;
+  level: number;
+}
+
+export interface LearnedSin {
+  id: string;
+  level: number;
+}
+
+// ── Combat ────────────────────────────────────────────────────────
+
+export interface Combat {
+  attackAttribute: PrimaryAttributeName;
+  baseDamage: number;
+  bonusDamage: number[];
+  weapons: number[];
 }
 
 // ── Equipment ─────────────────────────────────────────────────────
 
 export interface Weapon {
   name?: string;
-  damage?: string;
+  type?: string;
+  subtype?: string;
+  damage?: number;
+  qualities?: string[];
   effects?: Effect[];
 }
 
 export interface ArmorPiece {
   name?: string;
   defense?: number;
+  qualities?: string[];
   [key: string]: unknown;
+}
+
+export interface Rune {
+  name: string;
+  description?: string;
+  qualities: string[];
 }
 
 export interface CharacterEquipment {
@@ -78,16 +120,21 @@ export interface CharacterEquipment {
     body: ArmorPiece | null;
     plug: ArmorPiece | null;
   };
-  runes: unknown[];
-  professional: {
-    assassin: unknown[];
-    utility: unknown[];
-  };
+  runes: Rune[];
+  assassin: unknown[];
+  tools: unknown[];
   inventory: {
-    self: unknown[];
+    carried: unknown[];
     home: unknown[];
   };
   artifacts: unknown[];
+}
+
+// ── Affiliations ──────────────────────────────────────────────────
+
+export interface Affiliation {
+  name: string;
+  reputation: number;
 }
 
 // ── Background ────────────────────────────────────────────────────
@@ -131,17 +178,32 @@ export interface CharacterPortrait {
   status: string;
 }
 
+// ── Permissions ───────────────────────────────────────────────────
+
+export interface RoleAccess {
+  read: boolean;
+  write: boolean;
+}
+
+export interface FieldAccessMap {
+  owner: RoleAccess;
+  dm: RoleAccess;
+  public: RoleAccess;
+}
+
 // ── Character ─────────────────────────────────────────────────────
 
 export interface Character {
   id: string;
   backupCode: string;
+  schemaVersion: number;
   playerId: string;
   player: string;
   characterName: string;
   created: string;
   lastModified: string;
   attributes: CharacterAttributes;
+  combat: Combat;
   experience: {
     total: number;
     unspent: number;
@@ -151,10 +213,14 @@ export interface Character {
     temporary: number;
   };
   location?: string;
-  traits: Trait[];
+  abilities: LearnedAbility[];
+  spells: LearnedSpell[];
+  rituals: LearnedRitual[];
+  boons: LearnedBoon[];
+  sins: LearnedSin[];
+  traditions: string[];
   effects: Effect[];
-  tradition?: string;
-  assets: unknown[];
+  affiliations: Affiliation[];
   background: CharacterBackground;
   equipment: CharacterEquipment;
   portrait: CharacterPortrait;

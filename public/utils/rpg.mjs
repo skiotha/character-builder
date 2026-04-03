@@ -38,33 +38,46 @@ const DEFAULT_CHARACTER = {
       painThreshold: 5,
       corruptionThreshold: 5,
       defense: 5,
+      armor: 0,
+      corruptionMax: 10,
     },
   },
 
-  traits: [],
-  tradition: "",
+  abilities: [],
+  spells: [],
+  rituals: [],
+  boons: [],
+  sins: [],
+  traditions: [],
 
   equipment: {
     money: 5,
     weapons: [],
     ammunition: [],
     armor: {
-      body: [],
-      plug: [],
+      body: null,
+      plug: null,
     },
     runes: [],
-    professional: {
-      assassin: [],
-      utility: [],
-    },
+    assassin: [],
+    tools: [],
     inventory: {
-      self: [],
+      carried: [],
       home: [],
     },
     artifacts: [],
   },
 
-  assets: [],
+  affiliations: [],
+
+  combat: {
+    attackAttribute: "accurate",
+    baseDamage: 0,
+    bonusDamage: [],
+    weapons: [],
+  },
+
+  schemaVersion: 1,
 
   location: "Nagara",
 

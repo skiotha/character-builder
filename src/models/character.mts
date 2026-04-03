@@ -23,6 +23,27 @@ const capitalize = (value: string): string => value;
 
 const getAttributeOrder = (name: string): number => 1;
 
+// ── Permission shorthands ──────────────────────────────────────
+
+const RW = { read: true, write: true };
+const RO = { read: true, write: false };
+const NO = { read: false, write: false };
+
+/** Owner + DM read/write, public read-only */
+const perm_default = { owner: RW, dm: RW, public: RO };
+
+/** Owner + DM read/write, public hidden */
+const perm_private = { owner: RW, dm: RW, public: NO };
+
+/** DM read/write only, owner + public read-only */
+const perm_dm_write = { owner: RO, dm: RW, public: RO };
+
+/** Server-controlled: everyone read-only (DM can read) */
+const perm_server = { owner: RO, dm: RO, public: NO };
+
+/** Attributes: owner read-only (values shown), DM read/write */
+const perm_attr = { owner: RO, dm: RW, public: RO };
+
 export const CHARACTER_SCHEMA: Record<
   string,
   SchemaField | Record<string, unknown>
@@ -37,34 +58,43 @@ export const CHARACTER_SCHEMA: Record<
     required: true,
     serverControlled: true,
     generated: true,
-    permissions: { owner: false, dm: true, public: false },
+    permissions: perm_server,
   },
 
   backupCode: {
     type: "string",
     serverControlled: true,
     generated: true,
-    permissions: { owner: true, dm: true, public: false },
+    permissions: { owner: RO, dm: RO, public: NO },
+  },
+
+  schemaVersion: {
+    type: "number",
+    required: true,
+    serverControlled: true,
+    generated: true,
+    default: 1,
+    permissions: perm_server,
   },
 
   created: {
     type: "string",
     generated: true,
     serverControlled: true,
-    permissions: { owner: false, dm: true, public: false },
+    permissions: perm_server,
   },
 
   lastModified: {
     type: "string",
     generated: true,
     serverControlled: true,
-    permissions: { owner: false, dm: true, public: false },
+    permissions: perm_server,
   },
 
   player: {
     type: "string",
     generated: true,
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_private,
   },
 
   characterName: {
@@ -75,29 +105,30 @@ export const CHARACTER_SCHEMA: Record<
     pattern: /^[A-Za-z\s\-']+$/,
     sanitize: "trim",
     error: "Character names must be 3-16 letters and spaces only",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
     ui: { label: "Character Name", placeholder: "Enter character name" },
   },
 
   playerId: {
     type: "string",
-    // required: true,
     immutable: true,
     serverControlled: true,
-    permissions: { owner: true, dm: true, public: false },
+    permissions: { owner: RO, dm: RO, public: NO },
   },
+
+  // ── Attributes ──────────────────────────────────────────────
 
   attributes: {
     type: "object",
     required: true,
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
     validate: rpgValidators.attributePointsValid,
     error: "Cannot exceed the attributes assign budget of 80",
 
     primary: {
       type: "object",
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
 
       accurate: createAttributeField("accurate"),
       cunning: createAttributeField("cunning"),
@@ -112,11 +143,11 @@ export const CHARACTER_SCHEMA: Record<
     secondary: {
       type: "object",
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
 
       toughness: {
         type: "object",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
 
         max: {
           type: "number",
@@ -125,7 +156,7 @@ export const CHARACTER_SCHEMA: Record<
           required: true,
           default: 10,
           derived: true,
-          permissions: { owner: true, dm: true, public: false },
+          permissions: perm_default,
           error: "Max toughness can't be lower than 10",
         },
 
@@ -136,9 +167,9 @@ export const CHARACTER_SCHEMA: Record<
           required: true,
           derived: true,
           validate: rpgValidators.currentHealthValid,
-          permissions: { owner: true, dm: true, public: false },
+          permissions: perm_default,
           error: "Current health must be between 0 and maximum health",
-          ui: { quickActions: ["heal", "damage "] },
+          ui: { quickActions: ["heal", "damage"] },
         },
       },
 
@@ -147,8 +178,17 @@ export const CHARACTER_SCHEMA: Record<
         required: true,
         derived: true,
         validate: rpgValidators.defenseValid,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Defense value is incorrect for this character",
+      },
+
+      armor: {
+        type: "number",
+        required: true,
+        default: 0,
+        derived: true,
+        permissions: perm_default,
+        error: "Armor value is incorrect for this character",
       },
 
       painThreshold: {
@@ -156,7 +196,7 @@ export const CHARACTER_SCHEMA: Record<
         required: true,
         derived: true,
         validate: rpgValidators.painThresholdValid,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Pain threshold is incorrect for this character",
       },
 
@@ -165,24 +205,67 @@ export const CHARACTER_SCHEMA: Record<
         required: true,
         derived: true,
         validate: rpgValidators.corruptionThresholdValid,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Corruption threshold is incorrect for this character",
+      },
+
+      corruptionMax: {
+        type: "number",
+        required: true,
+        derived: true,
+        permissions: perm_default,
+        error: "Corruption max is incorrect for this character",
       },
     },
   },
 
+  // ── Combat ──────────────────────────────────────────────────
+
+  combat: {
+    type: "object",
+    derived: true,
+    permissions: perm_default,
+
+    attackAttribute: {
+      type: "string",
+      derived: true,
+      default: "accurate",
+      permissions: perm_default,
+    },
+
+    baseDamage: {
+      type: "number",
+      derived: true,
+      default: 0,
+      permissions: perm_default,
+    },
+
+    bonusDamage: {
+      type: "array",
+      derived: true,
+      permissions: perm_default,
+    },
+
+    weapons: {
+      type: "array",
+      permissions: perm_default,
+    },
+  },
+
+  // ── Progression ─────────────────────────────────────────────
+
   experience: {
     type: "object",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
 
     total: {
       type: "number",
       min: 50,
       integer: true,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Experience cannot be negative",
-      ui: { label: "Total XP", help: "Total experience earned " },
+      ui: { label: "Total XP", help: "Total experience earned" },
     },
 
     unspent: {
@@ -190,7 +273,7 @@ export const CHARACTER_SCHEMA: Record<
       min: 0,
       integer: true,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Experience cannot be negative",
       ui: { label: "Unspent XP", help: "Experience available to spend" },
     },
@@ -198,14 +281,14 @@ export const CHARACTER_SCHEMA: Record<
 
   corruption: {
     type: "object",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
 
     permanent: {
       type: "number",
       min: 0,
       integer: true,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Permanent corruption can't be negative",
     },
 
@@ -214,47 +297,74 @@ export const CHARACTER_SCHEMA: Record<
       min: 0,
       integer: true,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Temporary corruption can't be negative",
     },
   },
 
   location: {
     type: "string",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
     error: "Location must be a string",
   },
 
-  traits: {
+  // ── Learned Abilities & Spells ──────────────────────────────
+
+  abilities: {
     type: "array",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
   },
+
+  spells: {
+    type: "array",
+    permissions: perm_default,
+  },
+
+  rituals: {
+    type: "array",
+    permissions: perm_default,
+  },
+
+  boons: {
+    type: "array",
+    permissions: perm_default,
+  },
+
+  sins: {
+    type: "array",
+    permissions: perm_private,
+  },
+
+  traditions: {
+    type: "array",
+    permissions: perm_default,
+    error: "Traditions must be an array of tradition IDs",
+  },
+
   effects: {
     type: "array",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_dm_write,
   },
 
-  tradition: {
-    type: "string",
-    permissions: { owner: true, dm: true, public: false },
-    error: "Mystical tradition needs to be a string",
-  },
+  // ── Affiliations ────────────────────────────────────────────
 
-  assets: {
+  affiliations: {
     type: "array",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
   },
+
+  // ── Background ──────────────────────────────────────────────
 
   background: {
     type: "object",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
 
     age: {
       type: "number",
       min: 0,
       integer: true,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Age must be a positive number",
       ui: { label: "Age" },
     },
@@ -263,159 +373,158 @@ export const CHARACTER_SCHEMA: Record<
       type: "string",
       required: true,
       sanitize: "trim",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Race must be a string",
       ui: { label: "Race", placeholder: "Elf" },
     },
 
     shadow: {
       type: "string",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Shadow description must be a string",
     },
 
     profession: {
       type: "string",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Profession description must be a string",
     },
 
     journal: {
       type: "object",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_private,
 
       open: {
         type: "array",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_private,
       },
 
       done: {
         type: "array",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_private,
       },
 
       rumours: {
         type: "array",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_private,
       },
     },
 
     notes: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_private,
     },
 
     kinkList: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_private,
       error: "Invalid kink format",
       ui: { hidden: true },
     },
   },
 
+  // ── Equipment ───────────────────────────────────────────────
+
   equipment: {
     type: "object",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
 
     money: {
       type: "number",
       min: 0,
       integer: false,
       required: true,
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
       error: "Money count must be a positive number",
     },
 
     weapons: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
     },
 
     ammunition: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
     },
 
     armor: {
       type: "object",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
 
       body: {
         type: "object",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
       },
 
       plug: {
         type: "object",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
       },
     },
 
     runes: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      max: 3,
+      permissions: perm_default,
     },
 
-    professional: {
-      type: "object",
-      permissions: { owner: true, dm: true, public: false },
+    assassin: {
+      type: "array",
+      permissions: perm_private,
+    },
 
-      assassin: {
-        type: "array",
-        permissions: { owner: true, dm: true, public: false },
-      },
-
-      utility: {
-        type: "array",
-        permissions: { owner: true, dm: true, public: false },
-      },
+    tools: {
+      type: "array",
+      permissions: perm_default,
     },
 
     inventory: {
       type: "object",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
 
-      self: {
+      carried: {
         type: "array",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
       },
 
       home: {
         type: "array",
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_private,
       },
     },
 
     artifacts: {
       type: "array",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
     },
   },
 
+  // ── Portrait ────────────────────────────────────────────────
+
   portrait: {
     type: "object",
-    permissions: { owner: true, dm: true, public: false },
+    permissions: perm_default,
 
     path: {
       type: "string",
       serverControlled: true,
-      // pattern: /^[A-Za-z\s\-']+$/,
       error: "Portrait path should be <pattern>",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: { owner: RO, dm: RO, public: RO },
     },
 
     crop: {
       x: {
         type: "number",
         integer: false,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Horizontal offset must be a float number",
       },
 
       y: {
         type: "number",
         integer: false,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Vertical offset must be a float number",
       },
 
@@ -423,27 +532,27 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         integer: false,
         min: 0.0,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Scale factor must be a positive float number",
       },
 
       rotation: {
         type: "number",
         integer: false,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Rotation degree must be a float number",
       },
     },
 
     dimensions: {
       type: "object",
-      permissions: { owner: true, dm: true, public: false },
+      permissions: perm_default,
 
       width: {
         type: "number",
         min: 0,
         integer: true,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Portrait width can't be negative",
       },
 
@@ -451,14 +560,15 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         min: 0,
         integer: true,
-        permissions: { owner: true, dm: true, public: false },
+        permissions: perm_default,
         error: "Portrait height can't be negative",
       },
     },
 
     status: {
       type: "string",
-      permissions: { owner: false, dm: true, public: false },
+      serverControlled: true,
+      permissions: { owner: RO, dm: RO, public: RO },
       error: "Portrait status needs to be one of three possible string values",
     },
   },
@@ -471,7 +581,7 @@ function createAttributeField(name: string): SchemaField {
     max: 15,
     integer: true,
     default: 5,
-    permissions: { owner: false, dm: true, public: false },
+    permissions: perm_attr,
     error: `${capitalize(name)} must be between 5 and 15`,
     ui: { label: capitalize(name), order: getAttributeOrder(name) },
   };

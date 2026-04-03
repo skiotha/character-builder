@@ -45,7 +45,9 @@ This is the **source of truth** — all other formats derive from it.
       },
       "painThreshold":       5,         // ceil(strong / 2)
       "corruptionThreshold": 5,         // ceil(resolute / 2)
-      "defense":             5          // = quick (before modifiers)
+      "defense":             5,         // = quick (before modifiers)
+      "armor":               0,         // derived from equipment.armor.body.defense
+      "corruptionMax":       10         // = resolute (before modifiers)
     }
   },
 
@@ -59,30 +61,44 @@ This is the **source of truth** — all other formats derive from it.
     "temporary": 0                      // min 0, integer
   },
 
-  // ── Abilities & Effects ──
-  "traits":    [],                      // array of trait objects
-  "effects":   [],                      // array of effect objects (see §1.1)
-  "tradition": "",                      // mystical tradition name
+  // ── Learned Abilities & Powers ──
+  "abilities": [],                      // array of { id: string, tier: "novice"|"adept"|"master" }
+  "spells":    [],                      // array of { id: string, tier: "novice"|"adept"|"master" }
+  "rituals":   [],                      // array of { id: string, level: number }
+  "boons":     [],                      // array of { id: string, level: number }
+  "sins":      [],                      // array of { id: string, level: number }
+
+  // ── Effects (runtime) ──
+  "effects":     [],                    // array of effect objects (see §1.1)
+
+  // ── Mystical Traditions ──
+  "traditions":  [],                    // array of tradition name strings
+
+  // ── Combat ──
+  "combat": {
+    "attackAttribute": "accurate",      // derived: primary attribute used for attacks
+    "baseDamage":      0,               // derived: base weapon damage
+    "bonusDamage":     [],              // derived: bonus damage dice
+    "weapons":         []               // slot indices into equipment.weapons[]
+  },
 
   // ── Equipment ──
   "equipment": {
     "money":      0,                    // non-negative number
-    "weapons":    [],
+    "weapons":    [],                   // array of Weapon objects
     "ammunition": [],
     "armor": {
-      "body": null,                     // object or null
-      "plug": []
+      "body": null,                     // ArmorPiece object or null
+      "plug": null                      // ArmorPiece object or null
     },
-    "runes":        [],
-    "professional": {
-      "assassin": [],
-      "utility":  []
-    },
+    "runes":      [],                   // array of Rune objects (max 3)
+    "assassin":   [],                   // specialist equipment (formerly professional.assassin)
+    "tools":      [],                   // utility tools (formerly professional.utility)
     "inventory": {
-      "self": [],
-      "home": []
+      "carried": [],                    // on-person items (formerly inventory.self)
+      "home":    []                     // stored items
     },
-    "artifacts": []
+    "artifacts":  []
   },
 
   // ── Background ──
@@ -103,8 +119,8 @@ This is the **source of truth** — all other formats derive from it.
   // ── Location ──
   "location": "",
 
-  // ── Assets ──
-  "assets": [],                         // not exported to addon
+  // ── Affiliations ──
+  "affiliations": [],                   // array of { name: string, reputation: number }
 
   // ── Portrait ──
   "portrait": {
@@ -145,29 +161,39 @@ This is the **source of truth** — all other formats derive from it.
 > **Known issue:** The current `applicator.mjs` uses `add`/`mul`/`set` instead
 > of the canonical types above. This must be aligned — see roadmap Phase 4.
 
-### 1.2 Trait Object
+### 1.2 Learned Ability / Spell / Ritual / Boon / Sin
 
+Abilities and spells use a tier model:
 ```jsonc
-{
-  "name":        "string",
-  "type":        "string",            // ability tier or trait category
-  "description": "string",
-  "effects":     []                   // array of Effect objects (§1.1)
-}
+{ "id": "string", "tier": "novice" | "adept" | "master" }
 ```
+
+Rituals, boons, and sins use a level model:
+```jsonc
+{ "id": "string", "level": 1 }
+```
+
+The `id` references the canonical definition in the corresponding reference
+data file (e.g. `data/abilities.en.json`).
 
 ---
 
 ## 2. Permission Model
 
-Each field in the schema has a `permissions` map:
+Each field in the schema has a `permissions` map with per-role read/write access:
 
 ```jsonc
-{ "owner": true | false, "dm": true | false, "public": true | false }
+{
+  "owner":  { "read": true, "write": true },
+  "dm":     { "read": true, "write": true },
+  "public": { "read": true, "write": false }
+}
 ```
 
-- `true` — can read and write
-- `false` — cannot read or write
+- `read: true` — role can see the field value
+- `write: true` — role can modify the field value
+- `read: false` — field is hidden from this role
+- `write: false` — field is read-only for this role
 
 Roles are determined per-request:
 - **dm**: `x-dm-id` header matches the server's `NAGARA_DM_TOKEN`
@@ -176,12 +202,10 @@ Roles are determined per-request:
 
 Fields marked `serverControlled: true` cannot be set by any client — they are generated and maintained by the server (id, backupCode, created, lastModified, portrait.path, portrait.status).
 
-> **Known limitation:** The current `true`/`false` permission model conflates
-> read and write access — a field is either fully accessible or fully hidden.
-> There is no way to express "public can see but not edit" or per-field write
-> restrictions independent of read. This model needs to be reworked before
-> the schema-driven rendering migration (ADR-009), which introduces
-> `editableBy` per field. See roadmap Phase 5.
+Common permission patterns:
+- **Read-write** (most owner fields): `{ read: true, write: true }` for owner/dm, `{ read: true, write: false }` for public
+- **Read-only** (derived/server-controlled): `{ read: true, write: false }` for all roles
+- **Private** (identity fields): `{ read: false, write: false }` for public
 
 ---
 

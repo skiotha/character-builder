@@ -91,32 +91,30 @@ has a written basis for its decisions.
 - Middleware chain type mismatch identified and documented — deferred to Phase 5
   (see Medium Priority).
 
-### Schema Review (gate before Phase 3)
+### Schema Review (gate before Phase 3) ✓ DONE
 
 Before extending the schema with UI metadata, review and stabilize its
 data structure. This requires domain context from the RPG rules.
 
-- [ ] Walk through every top-level section with RPG rules reference in hand:
-  - [ ] `attributes` — are primary/secondary groupings correct? Any missing
-        derived stats?
-  - [ ] `traits` / `effects` — is the trait→effect relationship modeled
-        correctly? Does the effect target path system make sense?
-  - [ ] `equipment` — are the sub-categories (`professional.assassin`,
-        `armor.plug`, etc.) the right abstraction? Any vestigial fields
-        from earlier iterations?
-  - [ ] `background` — does the grouping (journal, notes, kinkList) reflect
-        actual gameplay concepts? Is `kinkList` still the right name/shape?
-  - [ ] `corruption` / `experience` — are these complete? Any progression
-        mechanics not yet represented?
-  - [ ] `assets` — what are these in gameplay? Are they in the right place?
-- [ ] Identify fields that were added ad-hoc and may belong elsewhere
-- [ ] Identify fields that exist in the schema but are never populated
-- [ ] Check whether the `Character` interface (defined above) exposes any
-      structural awkwardness that should be resolved now
-- [ ] Rework permission model: replace boolean `true`/`false` with separate
-      `read`/`write` permissions (see data-contracts.md §2 known limitation)
-- [ ] Update `data-contracts.md` §1 to reflect any schema changes
-- [ ] Migrate existing character JSON files if schema shape changes
+- [x] Walk through every top-level section with RPG rules reference in hand:
+  - [x] `attributes` — added `armor` and `corruptionMax` derived stats
+  - [x] `traits` / `effects` — replaced `traits` with `abilities`, `spells`,
+        `rituals`, `boons`, `sins` (reference-based model)
+  - [x] `equipment` — flattened `professional` → `assassin`/`tools`,
+        renamed `inventory.self` → `carried`, armor body/plug are object|null
+  - [x] `background` — reviewed, no changes needed
+  - [x] `corruption` / `experience` — reviewed, no changes needed
+  - [x] `assets` → renamed to `affiliations` (array of `{ name, reputation }`)
+- [x] Identify fields that were added ad-hoc and may belong elsewhere
+- [x] Identify fields that exist in the schema but are never populated
+- [x] Check whether the `Character` interface exposes any structural awkwardness
+- [x] Rework permission model: replaced boolean `true`/`false` with separate
+      `{ read, write }` permissions per role
+- [x] Update `data-contracts.md` §1 to reflect schema changes
+- [x] Migrate existing character JSON files to new schema shape
+- [x] Added `combat` section (derived from equipped weapons)
+- [x] Added `traditions` (array, replaces singular `tradition`)
+- [x] Added `schemaVersion` field
 
 > **Why here:** Phase 3 bakes the schema into the UI via metadata. Any
 > structural changes after that point require updating both the data schema
@@ -267,8 +265,8 @@ Schema structure reviewed and stabilized for Phase 3.
 - [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
       storage (`storage.mjs`). Handler should call service, service calls storage
 - [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical
-      `setBase`/`addFlat`/`multiply`/`cap` (per data-contracts.md §1.1)
-- [ ] Add `schemaVersion` field to character model and default character generation
+      `setBase`/`addFlat`/`multiply`/`cap` — moved to Phase 6 (RPG Engine)
+- [ ] Add `schemaVersion` bumping on schema changes
 - [ ] Implement CORS origin whitelisting (ADR-007)
 - [ ] Fix `rpgValidators` — all currently return `true`. Implement real
       attribute budget validation, health range checks, etc.
@@ -291,7 +289,102 @@ Schema structure reviewed and stabilized for Phase 3.
 
 ---
 
-## Phase 6 — Sibling Project Integration
+## Phase 6 — RPG Engine
+
+**Goal:** Build the rules engine into a proper effect resolution pipeline.
+Normalize reference data, create missing reference files, align the applicator,
+and wire abilities/spells/equipment into derived combat stats.
+
+**Basis:** [deferred-tasks.md](deferred-tasks.md) (detailed task specs),
+[data-contracts.md](data-contracts.md) §1.1 (canonical effect shape)
+
+> **Why here:** Phases 3-5 work fine with stub combat/effect values. But
+> Phase 7 (sibling integration) needs the addon export to contain real
+> computed data. This phase delivers the engine that produces it.
+
+### Gate: Architecture Assessment
+
+Before writing code, review and decide:
+
+- [ ] Define the effect target vocabulary — what dotted paths are valid
+      targets? (e.g., `attributes.secondary.defense`, `combat.baseDamage`)
+      This determines what the applicator can process.
+- [ ] Define the Tier B flag vocabulary — what structured non-modifier
+      effect types exist? (e.g., `advantage`, `immunity`, `freeAttack`)
+      These don't flow through the modifier pipeline but the UI/addon
+      can interpret them.
+- [ ] Decide on effect resolution architecture: where does ability ID lookup
+      happen, where are tier effects collected, in what order are they applied?
+- [ ] Update `docs/deferred-tasks.md` with architectural decisions
+- [ ] Update `docs/data-contracts.md` §1.1 with final vocabulary
+
+### Step 1 — Reference Data Files
+
+Create missing reference data for equipment pick-lists and validation.
+
+- [ ] `data/weapons.en.json` — weapon catalog with type, damage, qualities
+- [ ] `data/weapons.ru.json` — Russian localization
+- [ ] `data/armor.en.json` — armor catalog with slot, defense, qualities
+- [ ] `data/armor.ru.json` — Russian localization
+- [ ] `data/runes.en.json` — rune catalog with description, qualities
+- [ ] `data/runes.ru.json` — Russian localization
+- [ ] Decide on `data/traditions.en.json` — separate file vs. filtered
+      ability IDs
+
+### Step 2 — Effect Normalization
+
+Categorize and rewrite reference data effects to canonical form.
+
+- [ ] Categorize all ~507 ability tier effects into Tier A/B/C
+- [ ] Categorize all ~147 spell tier effects into Tier A/B/C
+- [ ] Convert Tier A effects to canonical `{ target, modifier }` shape
+- [ ] Add structured effects to boons/sins/rituals where applicable
+- [ ] Retire `data/abilities.normalized-effects.json` (replaced by canonical
+      effects in `abilities.en.json`)
+
+### Step 3 — Applicator Alignment
+
+- [ ] Change modifier types: `add`/`mul`/`set` → `setBase`/`addFlat`/
+      `multiply`/`cap` in `src/rules/applicator.mts`
+- [ ] Add handler for Tier B flag types (advantage, etc.)
+- [ ] Add handler for `remove` modifier (weapon quality removal)
+- [ ] Update `applyEquipmentBonuses` for new equipment structure
+      (flattened `assassin`/`tools`, singular armor body/plug)
+
+### Step 4 — Effect Resolution Pipeline
+
+Wire ability/spell lookups into the rules engine.
+
+- [ ] Build a lookup function: `(id, tier) → canonical Effect[]`
+      reads from `abilities.en.json` / `spells.en.json` at runtime
+- [ ] In `recalculateDerivedFields`, resolve `character.abilities[]` and
+      `character.spells[]` into Effect objects and feed through applicator
+- [ ] Remove any remaining `traits`-based effect resolution code
+
+### Step 5 — Combat Derivation
+
+Complete the `deriveCombat()` function.
+
+- [ ] Multi-weapon damage: primary → `baseDamage`, secondary → `bonusDamage`
+- [ ] Attack attribute resolution from ability effects (`setBase`)
+- [ ] Bonus damage dice from ability effects (`addFlat` on `combat.bonusDamage`)
+- [ ] Weapon effect application (weapon-mounted effects fed to applicator)
+
+### Step 6 — Validation & Docs
+
+- [ ] Verify all derived stats compute correctly with real ability data
+- [ ] Update `docs/data-contracts.md` with final effect vocabulary
+- [ ] Update `docs/deferred-tasks.md` to mark completed items
+- [ ] Run full test suite — add engine-specific tests if Phase 4 tests
+      don't cover new behavior
+
+**Deliverable:** Rules engine processes canonical effects. Derived stats
+(combat, secondary attributes) reflect equipped weapons and learned abilities.
+Reference data is complete and normalized.
+
+---
+
+## Phase 7 — Sibling Project Integration
 
 **Goal:** Implement the endpoints and features required by the addon and
 Discord bot.
@@ -337,7 +430,7 @@ Discord bot.
 
 ---
 
-## Phase 7 — Polish & Beyond MVP
+## Phase 8 — Polish & Beyond MVP
 
 **Goal:** Quality-of-life improvements. Not blockers, but make the project more maintainable and pleasant to use.
 
@@ -386,7 +479,10 @@ Realistic session-by-session flow:
 | 6       | 3     | Dashboard + landing migration, cleanup             |
 | 7       | 4     | Testing (test the final architecture)              |
 | 8       | 4 + 5 | Tests + bug fixes (test what you fix)              |
-| 9+      | 6     | Sibling integration, guided by docs                |
+| 9       | 6     | RPG Engine architecture gate + reference data      |
+| 10      | 6     | Effect normalization + applicator alignment        |
+| 11      | 6     | Effect resolution pipeline + combat derivation     |
+| 12+     | 7     | Sibling integration, guided by docs                |
 
 Each session must leave the project in a **working state**. No half-done
 restructures or broken imports across sessions.

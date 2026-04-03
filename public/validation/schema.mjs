@@ -145,9 +145,9 @@ export const SCHEMA = {
     },
   },
 
-  tradition: {
-    type: "string",
-    message: "Tradition must be one of seven available options",
+  traditions: {
+    type: "array",
+    message: "Traditions must be an array of tradition names",
   },
 
   background: {
@@ -181,9 +181,9 @@ export const SCHEMA = {
     },
   },
 
-  assets: {
-    validate: rpgValidators.assetsValid,
-    message: "Assets are too long, or are not an array",
+  affiliations: {
+    validate: rpgValidators.affiliationsValid,
+    message: "Affiliations are too long, or are not an array",
   },
 
   equipment: {
