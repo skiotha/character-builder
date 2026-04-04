@@ -22,6 +22,7 @@ import {
   renderCharacterView,
 } from "#renderers";
 import { createViewRoute, createCharacterRoute } from "./routes/routes.mts";
+import { getSerializedSchema } from "#models/schema-serializer";
 
 import {
   MIME_TYPES,
@@ -230,6 +231,27 @@ async function handleApi(
     // GET /api/v1/abilities
     if (req.method === "GET" && pathParts[0] === "abilities") {
       return await handleGetAbilities(req, res);
+    }
+
+    // GET /api/v1/schema
+    if (req.method === "GET" && pathParts[0] === "schema") {
+      const { json, etag } = getSerializedSchema();
+
+      const ifNoneMatch = req.headers["if-none-match"];
+      if (ifNoneMatch === etag) {
+        res.writeHead(304);
+        res.end();
+        return;
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=86400",
+        ETag: etag,
+        "Content-Length": Buffer.byteLength(json),
+      });
+      res.end(json);
+      return;
     }
 
     // POST /api/v1/characters/:id/portrait

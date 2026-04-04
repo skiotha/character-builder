@@ -7,6 +7,7 @@ const state = {
   player: null,
   characters: [],
   currentCharacter: null,
+  schema: null,
   templates: new Map(),
   cacheVersion: "1.0",
   userRole: "public",
@@ -139,6 +140,14 @@ function getCachedTemplate(name) {
   return null;
 }
 
+function setSchema(schema) {
+  state.schema = schema;
+}
+
+function getSchema() {
+  return state.schema;
+}
+
 export {
   subscribe,
   getTemplate,
@@ -148,4 +157,6 @@ export {
   setCurrentCharacter,
   setState,
   setPlayerRole,
+  setSchema,
+  getSchema,
 };

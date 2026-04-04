@@ -127,63 +127,75 @@ Schema structure reviewed and stabilized for Phase 3.
 
 ## Phase 3 — Schema-Driven Rendering
 
-**Goal:** Replace server-rendered HTML templates with schema-driven client rendering. Single rendering path for initial load and SSE updates.
+**Goal:** Replace server-rendered HTML templates with schema-driven client
+rendering. Single rendering path for initial load and SSE updates.
 
 **Basis:** [ADR-009](decisions/009-schema-driven-rendering.md)
 (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md))
 
-### Step 1 — Schema & Renderer Foundation
+**Detailed plan:** [phase3-plan.md](phase3-plan.md) — session-by-session
+breakdown with file references, verification steps, and session closeout
+checklists.
 
-- [ ] Extend `CHARACTER_SCHEMA` with UI metadata (`section`, `label`, `order`,
-      `editableBy`, `hidden`, `displayAs`, `hint`)
-- [ ] Define section registry (visual grouping and sort order)
-- [ ] Add `GET /api/v1/schema` endpoint (serves schema, ETag-cacheable)
-- [ ] Build generic client form renderer: `(schema, data, role) → DOM`
-  - [ ] Iterates schema fields grouped by section
-  - [ ] Generates inputs with `data-path`, `data-behavior`, `data-role-allowed`
-  - [ ] Respects `hidden`, `editableBy`, `displayAs` metadata
-  - [ ] Supports component overrides for non-standard sections
+### Step 1 — Schema & Renderer Foundation (Session 1) ✓ DONE
 
-### Step 2 — Character View Migration
+- [x] Expand `SchemaFieldUI` in `src/types.mts` with `section`, `displayAs`,
+      `component`, `options`
+- [x] Define section registry (visual grouping and sort order)
+- [x] Add `ui` metadata to every field in `CHARACTER_SCHEMA`
+- [x] Build `serializeSchema()` (JSON-safe schema representation)
+- [x] Add `GET /api/v1/schema` endpoint (ETag-cacheable)
+- [x] Build generic client form renderer: `(schema, data, role, mode) → DOM`
+  - [x] Iterates schema fields grouped by section
+  - [x] Generates inputs with `data-path`, `data-behavior`, `data-role-allowed`
+  - [x] Respects `hidden`, permissions, `displayAs` metadata
+  - [x] Supports component overrides for non-standard sections
+- [x] Implement `public/components/form-field.mjs`
+- [x] Add `getSchema()` to `public/api.mjs` + schema state
+- [x] Stub component override registry
 
-- [ ] Refactor `character-view.mjs` to fetch JSON + schema, render client-side
-- [ ] Build component overrides for portrait, abilities, and sin sections
-- [ ] Verify SSE updates work through same rendering pipeline
+### Step 2 — Character View Migration (Session 2)
+
+- [ ] Implement component overrides (portrait, abilities, sins, spells,
+      boons, equipment)
+- [ ] Rewrite `character-view.mjs` to fetch JSON + schema, render client-side
+- [ ] Wire SSE updates through same rendering pipeline
+- [ ] Decouple `editable.mjs` from `template-engine.mjs`
+      (move `updateFieldValue()` to `public/utils/dom.mjs`)
 - [ ] Verify role-based editability (owner vs DM vs public)
 - [ ] Remove `GET /api/v1/view/character/:id` endpoint
-- [ ] Remove `server/nagara/templates/character.mjs`
-- [ ] Remove `server/nagara/renderers/renderCharacterView.mjs`
+- [ ] Remove `src/templates/character.mts`
+- [ ] Remove `src/renderers/renderCharacterView.mts`
+- [ ] Remove `src/routes/characterViewRoutes.mts` +
+      `src/routes/handleGetCharacterView.mts`
 
-### Step 3 — Creation View Migration
+### Step 3 — Creation View Migration (Session 3)
 
-- [ ] Refactor `creation-view.mjs` to reuse form renderer in creation mode
-  - [ ] All owner-editable fields become required inputs
-  - [ ] Attribute budget tracking wired to renderer output
+- [ ] Extend form renderer for `mode: "create"`
+- [ ] Wire attribute budget calculator (80-point system)
+- [ ] Wire secondary attribute auto-calculation
+- [ ] Update `FormValidator` for renderer-generated DOM
+- [ ] Rewrite `creation-view.mjs` to reuse form renderer in creation mode
 - [ ] Remove `GET /api/v1/view/creation` endpoint
-- [ ] Remove `server/nagara/templates/creation.mjs`
-- [ ] Remove `server/nagara/renderers/renderCreationView.mjs`
+- [ ] Remove `src/templates/creation.mts`
+- [ ] Remove `src/renderers/renderCreationView.mts`
 
-### Step 4 — Dashboard & Landing Page Migration
+### Step 4 — Dashboard, Landing & Final Cleanup (Session 4)
 
-- [ ] Refactor `dashboard-view.mjs` to fetch JSON character list, render
-      client-side (dedicated render function, not schema-driven)
-- [ ] Refactor `initial-view.mjs` to render client-side (static content)
+- [ ] Rewrite `dashboard-view.mjs` — JSON character list, client-rendered
+      cards (dedicated render function, not schema-driven)
+- [ ] Rewrite `initial-view.mjs` — client-rendered static content
 - [ ] Remove `GET /api/v1/view/dashboard` and `GET /api/v1/view/initial`
-      endpoints
-- [ ] Remove `server/nagara/templates/dashboard.mjs` and `initial.mjs`
-- [ ] Remove `server/nagara/renderers/renderDashboardView.mjs` and
-      `renderInitialView.mjs`
+- [ ] Delete `src/templates/` directory
+- [ ] Delete `src/renderers/` directory
+- [ ] Remove `#renderers` subpath import from `package.json`
+- [ ] Delete `public/template-engine.mjs`
+- [ ] Remove `fetchView()` from `public/api.mjs`
+- [ ] Remove template caching from `public/state.mjs`
+- [ ] Remove `public/validation/schema.mjs` (replaced by served schema)
 
-### Step 5 — Cleanup
-
-- [ ] Remove `server/nagara/templates/` directory
-- [ ] Remove `server/nagara/renderers/` directory (or repurpose for
-      non-view server rendering if any remains)
-- [ ] Remove `client/template-engine.mjs` (server-HTML hydration)
-- [ ] Remove view route handlers and view route wiring
-- [ ] Verify all views render correctly, SSE works, behaviors attach
-
-**Deliverable:** Server is a pure JSON API. Client renders all views from data. One rendering path for both initial load and real-time updates.
+**Deliverable:** Server is a pure JSON API. Client renders all views from
+data. One rendering path for both initial load and real-time updates.
 
 ---
 
@@ -276,6 +288,10 @@ Schema structure reviewed and stabilized for Phase 3.
 
 ### Low Priority
 
+- [ ] Document CSS & HTML conventions as ADR: semantic HTML, type-based
+      selectors with native nesting, `@scope` / `@layer`, field wrapper
+      pattern (div.input with label + control). Schema-driven renderer DOM
+      must stay compatible with existing CSS selectors.
 - [ ] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character`, remove
       unused `timeStamp` import
 - [ ] Replace `buffer.slice` with `buffer.subarray` in multipart parser

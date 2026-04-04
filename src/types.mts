@@ -90,12 +90,22 @@ export interface CharacterIndex {
 // ── Schema Field Descriptor ───────────────────────────────────────
 
 export interface SchemaFieldUI {
+  section?: string;
   label?: string;
   placeholder?: string;
   help?: string;
   order?: number;
   hidden?: boolean;
+  displayAs?: "input" | "number" | "select" | "textarea" | "readonly";
+  component?: string;
+  options?: unknown[];
   quickActions?: string[];
+}
+
+export interface SchemaSection {
+  id: string;
+  label: string;
+  order: number;
 }
 
 export interface SchemaField {

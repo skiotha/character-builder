@@ -5,7 +5,7 @@
 // ) {
 //   return {
 
-import type { SchemaField } from "#types";
+import type { SchemaField, SchemaSection } from "#types";
 
 const rpgValidators = {
   attributePointsValid: (): boolean => true,
@@ -19,9 +19,42 @@ const rpgValidators = {
   corruptionThresholdValid: (): boolean => true,
 };
 
-const capitalize = (value: string): string => value;
+const capitalize = (value: string): string =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
-const getAttributeOrder = (name: string): number => 1;
+const PRIMARY_ATTRIBUTE_ORDER: Record<string, number> = {
+  accurate: 1,
+  cunning: 2,
+  discreet: 3,
+  alluring: 4,
+  quick: 5,
+  resolute: 6,
+  vigilant: 7,
+  strong: 8,
+};
+
+const getAttributeOrder = (name: string): number =>
+  PRIMARY_ATTRIBUTE_ORDER[name] ?? 99;
+
+// ── Section Registry ───────────────────────────────────────────
+
+export const SCHEMA_SECTIONS: SchemaSection[] = [
+  { id: "portrait", label: "Portrait", order: 1 },
+  { id: "attributes.primary", label: "Primary Attributes", order: 2 },
+  { id: "attributes.secondary", label: "Secondary Attributes", order: 3 },
+  { id: "combat", label: "Combat", order: 4 },
+  { id: "experience", label: "Experience", order: 5 },
+  { id: "corruption", label: "Corruption", order: 6 },
+  { id: "abilities", label: "Abilities", order: 7 },
+  { id: "spells", label: "Spells", order: 8 },
+  { id: "rituals", label: "Rituals", order: 9 },
+  { id: "traditions", label: "Traditions", order: 10 },
+  { id: "sins", label: "Sins", order: 11 },
+  { id: "boons", label: "Boons", order: 12 },
+  { id: "information", label: "Information", order: 13 },
+  { id: "equipment", label: "Equipment", order: 14 },
+  { id: "background", label: "Background", order: 15 },
+];
 
 // ── Permission shorthands ──────────────────────────────────────
 
@@ -59,6 +92,7 @@ export const CHARACTER_SCHEMA: Record<
     serverControlled: true,
     generated: true,
     permissions: perm_server,
+    ui: { hidden: true },
   },
 
   backupCode: {
@@ -66,6 +100,7 @@ export const CHARACTER_SCHEMA: Record<
     serverControlled: true,
     generated: true,
     permissions: { owner: RO, dm: RO, public: NO },
+    ui: { hidden: true },
   },
 
   schemaVersion: {
@@ -75,6 +110,7 @@ export const CHARACTER_SCHEMA: Record<
     generated: true,
     default: 1,
     permissions: perm_server,
+    ui: { hidden: true },
   },
 
   created: {
@@ -82,6 +118,7 @@ export const CHARACTER_SCHEMA: Record<
     generated: true,
     serverControlled: true,
     permissions: perm_server,
+    ui: { hidden: true },
   },
 
   lastModified: {
@@ -89,12 +126,14 @@ export const CHARACTER_SCHEMA: Record<
     generated: true,
     serverControlled: true,
     permissions: perm_server,
+    ui: { hidden: true },
   },
 
   player: {
     type: "string",
     generated: true,
     permissions: perm_private,
+    ui: { hidden: true },
   },
 
   characterName: {
@@ -106,7 +145,13 @@ export const CHARACTER_SCHEMA: Record<
     sanitize: "trim",
     error: "Character names must be 3-16 letters and spaces only",
     permissions: perm_default,
-    ui: { label: "Character Name", placeholder: "Enter character name" },
+    ui: {
+      section: "information",
+      label: "Character Name",
+      placeholder: "Enter character name",
+      order: 1,
+      displayAs: "input",
+    },
   },
 
   playerId: {
@@ -114,6 +159,7 @@ export const CHARACTER_SCHEMA: Record<
     immutable: true,
     serverControlled: true,
     permissions: { owner: RO, dm: RO, public: NO },
+    ui: { hidden: true },
   },
 
   // ── Attributes ──────────────────────────────────────────────
@@ -158,6 +204,13 @@ export const CHARACTER_SCHEMA: Record<
           derived: true,
           permissions: perm_default,
           error: "Max toughness can't be lower than 10",
+          ui: {
+            section: "attributes.secondary",
+            label: "Toughness",
+            placeholder: "10",
+            order: 1,
+            displayAs: "readonly",
+          },
         },
 
         current: {
@@ -169,7 +222,13 @@ export const CHARACTER_SCHEMA: Record<
           validate: rpgValidators.currentHealthValid,
           permissions: perm_default,
           error: "Current health must be between 0 and maximum health",
-          ui: { quickActions: ["heal", "damage"] },
+          ui: {
+            section: "attributes.secondary",
+            label: "Health",
+            order: 2,
+            displayAs: "number",
+            quickActions: ["heal", "damage"],
+          },
         },
       },
 
@@ -180,6 +239,13 @@ export const CHARACTER_SCHEMA: Record<
         validate: rpgValidators.defenseValid,
         permissions: perm_default,
         error: "Defense value is incorrect for this character",
+        ui: {
+          section: "attributes.secondary",
+          label: "Defense",
+          placeholder: "10",
+          order: 3,
+          displayAs: "readonly",
+        },
       },
 
       armor: {
@@ -189,6 +255,12 @@ export const CHARACTER_SCHEMA: Record<
         derived: true,
         permissions: perm_default,
         error: "Armor value is incorrect for this character",
+        ui: {
+          section: "attributes.secondary",
+          label: "Armor",
+          order: 4,
+          displayAs: "readonly",
+        },
       },
 
       painThreshold: {
@@ -198,6 +270,13 @@ export const CHARACTER_SCHEMA: Record<
         validate: rpgValidators.painThresholdValid,
         permissions: perm_default,
         error: "Pain threshold is incorrect for this character",
+        ui: {
+          section: "attributes.secondary",
+          label: "Pain Threshold",
+          placeholder: "10",
+          order: 5,
+          displayAs: "readonly",
+        },
       },
 
       corruptionThreshold: {
@@ -207,6 +286,13 @@ export const CHARACTER_SCHEMA: Record<
         validate: rpgValidators.corruptionThresholdValid,
         permissions: perm_default,
         error: "Corruption threshold is incorrect for this character",
+        ui: {
+          section: "attributes.secondary",
+          label: "Corruption Threshold",
+          placeholder: "10",
+          order: 6,
+          displayAs: "readonly",
+        },
       },
 
       corruptionMax: {
@@ -215,6 +301,12 @@ export const CHARACTER_SCHEMA: Record<
         derived: true,
         permissions: perm_default,
         error: "Corruption max is incorrect for this character",
+        ui: {
+          section: "attributes.secondary",
+          label: "Corruption Max",
+          order: 7,
+          displayAs: "readonly",
+        },
       },
     },
   },
@@ -231,6 +323,12 @@ export const CHARACTER_SCHEMA: Record<
       derived: true,
       default: "accurate",
       permissions: perm_default,
+      ui: {
+        section: "combat",
+        label: "Attack Attribute",
+        order: 1,
+        displayAs: "readonly",
+      },
     },
 
     baseDamage: {
@@ -238,17 +336,35 @@ export const CHARACTER_SCHEMA: Record<
       derived: true,
       default: 0,
       permissions: perm_default,
+      ui: {
+        section: "combat",
+        label: "Base Damage",
+        order: 2,
+        displayAs: "readonly",
+      },
     },
 
     bonusDamage: {
       type: "array",
       derived: true,
       permissions: perm_default,
+      ui: {
+        section: "combat",
+        label: "Bonus Damage",
+        order: 3,
+        displayAs: "readonly",
+      },
     },
 
     weapons: {
       type: "array",
       permissions: perm_default,
+      ui: {
+        section: "combat",
+        label: "Weapon Slots",
+        order: 4,
+        component: "weapon-slots",
+      },
     },
   },
 
@@ -265,7 +381,13 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Experience cannot be negative",
-      ui: { label: "Total XP", help: "Total experience earned" },
+      ui: {
+        section: "experience",
+        label: "Total XP",
+        help: "Total experience earned",
+        order: 1,
+        displayAs: "number",
+      },
     },
 
     unspent: {
@@ -275,7 +397,13 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Experience cannot be negative",
-      ui: { label: "Unspent XP", help: "Experience available to spend" },
+      ui: {
+        section: "experience",
+        label: "Unspent XP",
+        help: "Experience available to spend",
+        order: 2,
+        displayAs: "number",
+      },
     },
   },
 
@@ -290,6 +418,12 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Permanent corruption can't be negative",
+      ui: {
+        section: "corruption",
+        label: "Permanent",
+        order: 1,
+        displayAs: "number",
+      },
     },
 
     temporary: {
@@ -299,6 +433,12 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Temporary corruption can't be negative",
+      ui: {
+        section: "corruption",
+        label: "Temporary",
+        order: 2,
+        displayAs: "number",
+      },
     },
   },
 
@@ -306,6 +446,12 @@ export const CHARACTER_SCHEMA: Record<
     type: "string",
     permissions: perm_default,
     error: "Location must be a string",
+    ui: {
+      section: "information",
+      label: "Location",
+      order: 10,
+      displayAs: "input",
+    },
   },
 
   // ── Learned Abilities & Spells ──────────────────────────────
@@ -313,37 +459,73 @@ export const CHARACTER_SCHEMA: Record<
   abilities: {
     type: "array",
     permissions: perm_default,
+    ui: {
+      section: "abilities",
+      label: "Abilities",
+      component: "ability-list",
+    },
   },
 
   spells: {
     type: "array",
     permissions: perm_default,
+    ui: {
+      section: "spells",
+      label: "Spells",
+      component: "spell-list",
+    },
   },
 
   rituals: {
     type: "array",
     permissions: perm_default,
+    ui: {
+      section: "rituals",
+      label: "Rituals",
+      component: "ritual-list",
+    },
   },
 
   boons: {
     type: "array",
     permissions: perm_default,
+    ui: {
+      section: "boons",
+      label: "Boons",
+      component: "boon-list",
+    },
   },
 
   sins: {
     type: "array",
     permissions: perm_private,
+    ui: {
+      section: "sins",
+      label: "Sins",
+      component: "sin-list",
+    },
   },
 
   traditions: {
     type: "array",
     permissions: perm_default,
     error: "Traditions must be an array of tradition IDs",
+    ui: {
+      section: "traditions",
+      label: "Traditions",
+      component: "tradition-list",
+    },
   },
 
   effects: {
     type: "array",
     permissions: perm_dm_write,
+    ui: {
+      section: "combat",
+      label: "Active Effects",
+      order: 5,
+      component: "effect-list",
+    },
   },
 
   // ── Affiliations ────────────────────────────────────────────
@@ -351,6 +533,12 @@ export const CHARACTER_SCHEMA: Record<
   affiliations: {
     type: "array",
     permissions: perm_default,
+    ui: {
+      section: "information",
+      label: "Affiliations",
+      order: 8,
+      component: "affiliation-list",
+    },
   },
 
   // ── Background ──────────────────────────────────────────────
@@ -366,7 +554,13 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Age must be a positive number",
-      ui: { label: "Age" },
+      ui: {
+        section: "information",
+        label: "Age",
+        placeholder: "35",
+        order: 2,
+        displayAs: "number",
+      },
     },
 
     race: {
@@ -375,24 +569,45 @@ export const CHARACTER_SCHEMA: Record<
       sanitize: "trim",
       permissions: perm_default,
       error: "Race must be a string",
-      ui: { label: "Race", placeholder: "Elf" },
+      ui: {
+        section: "information",
+        label: "Race",
+        placeholder: "Elf",
+        order: 3,
+        displayAs: "input",
+      },
     },
 
     shadow: {
       type: "string",
       permissions: perm_default,
       error: "Shadow description must be a string",
+      ui: {
+        section: "information",
+        label: "Shadow",
+        placeholder: "Describe shadow...",
+        order: 6,
+        displayAs: "textarea",
+      },
     },
 
     profession: {
       type: "string",
       permissions: perm_default,
       error: "Profession description must be a string",
+      ui: {
+        section: "information",
+        label: "Profession",
+        placeholder: "Profession",
+        order: 4,
+        displayAs: "input",
+      },
     },
 
     journal: {
       type: "object",
       permissions: perm_private,
+      ui: { hidden: true },
 
       open: {
         type: "array",
@@ -413,6 +628,12 @@ export const CHARACTER_SCHEMA: Record<
     notes: {
       type: "array",
       permissions: perm_private,
+      ui: {
+        section: "background",
+        label: "Notes",
+        order: 1,
+        component: "notes-list",
+      },
     },
 
     kinkList: {
@@ -436,16 +657,35 @@ export const CHARACTER_SCHEMA: Record<
       required: true,
       permissions: perm_default,
       error: "Money count must be a positive number",
+      ui: {
+        section: "information",
+        label: "Reales",
+        placeholder: "5",
+        order: 5,
+        displayAs: "number",
+      },
     },
 
     weapons: {
       type: "array",
       permissions: perm_default,
+      ui: {
+        section: "equipment",
+        label: "Weapons",
+        order: 1,
+        component: "equipment-list",
+      },
     },
 
     ammunition: {
       type: "array",
       permissions: perm_default,
+      ui: {
+        section: "equipment",
+        label: "Ammunition",
+        order: 2,
+        component: "equipment-list",
+      },
     },
 
     armor: {
@@ -455,11 +695,23 @@ export const CHARACTER_SCHEMA: Record<
       body: {
         type: "object",
         permissions: perm_default,
+        ui: {
+          section: "equipment",
+          label: "Body Armor",
+          order: 3,
+          component: "armor-slot",
+        },
       },
 
       plug: {
         type: "object",
         permissions: perm_default,
+        ui: {
+          section: "equipment",
+          label: "Plug Armor",
+          order: 4,
+          component: "armor-slot",
+        },
       },
     },
 
@@ -467,16 +719,34 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       max: 3,
       permissions: perm_default,
+      ui: {
+        section: "equipment",
+        label: "Runes",
+        order: 5,
+        component: "equipment-list",
+      },
     },
 
     assassin: {
       type: "array",
       permissions: perm_private,
+      ui: {
+        section: "equipment",
+        label: "Assassin Tools",
+        order: 6,
+        component: "equipment-list",
+      },
     },
 
     tools: {
       type: "array",
       permissions: perm_default,
+      ui: {
+        section: "equipment",
+        label: "Tools",
+        order: 7,
+        component: "equipment-list",
+      },
     },
 
     inventory: {
@@ -486,17 +756,35 @@ export const CHARACTER_SCHEMA: Record<
       carried: {
         type: "array",
         permissions: perm_default,
+        ui: {
+          section: "equipment",
+          label: "Carried Items",
+          order: 8,
+          component: "equipment-list",
+        },
       },
 
       home: {
         type: "array",
         permissions: perm_private,
+        ui: {
+          section: "equipment",
+          label: "Home Storage",
+          order: 9,
+          component: "equipment-list",
+        },
       },
     },
 
     artifacts: {
       type: "array",
       permissions: perm_default,
+      ui: {
+        section: "equipment",
+        label: "Artifacts",
+        order: 10,
+        component: "equipment-list",
+      },
     },
   },
 
@@ -505,12 +793,18 @@ export const CHARACTER_SCHEMA: Record<
   portrait: {
     type: "object",
     permissions: perm_default,
+    ui: {
+      section: "portrait",
+      label: "Portrait",
+      component: "portrait",
+    },
 
     path: {
       type: "string",
       serverControlled: true,
       error: "Portrait path should be <pattern>",
       permissions: { owner: RO, dm: RO, public: RO },
+      ui: { hidden: true },
     },
 
     crop: {
@@ -519,6 +813,7 @@ export const CHARACTER_SCHEMA: Record<
         integer: false,
         permissions: perm_default,
         error: "Horizontal offset must be a float number",
+        ui: { hidden: true },
       },
 
       y: {
@@ -526,6 +821,7 @@ export const CHARACTER_SCHEMA: Record<
         integer: false,
         permissions: perm_default,
         error: "Vertical offset must be a float number",
+        ui: { hidden: true },
       },
 
       scale: {
@@ -534,6 +830,7 @@ export const CHARACTER_SCHEMA: Record<
         min: 0.0,
         permissions: perm_default,
         error: "Scale factor must be a positive float number",
+        ui: { hidden: true },
       },
 
       rotation: {
@@ -541,6 +838,7 @@ export const CHARACTER_SCHEMA: Record<
         integer: false,
         permissions: perm_default,
         error: "Rotation degree must be a float number",
+        ui: { hidden: true },
       },
     },
 
@@ -554,6 +852,7 @@ export const CHARACTER_SCHEMA: Record<
         integer: true,
         permissions: perm_default,
         error: "Portrait width can't be negative",
+        ui: { hidden: true },
       },
 
       height: {
@@ -562,6 +861,7 @@ export const CHARACTER_SCHEMA: Record<
         integer: true,
         permissions: perm_default,
         error: "Portrait height can't be negative",
+        ui: { hidden: true },
       },
     },
 
@@ -570,6 +870,7 @@ export const CHARACTER_SCHEMA: Record<
       serverControlled: true,
       permissions: { owner: RO, dm: RO, public: RO },
       error: "Portrait status needs to be one of three possible string values",
+      ui: { hidden: true },
     },
   },
 };
@@ -583,6 +884,12 @@ function createAttributeField(name: string): SchemaField {
     default: 5,
     permissions: perm_attr,
     error: `${capitalize(name)} must be between 5 and 15`,
-    ui: { label: capitalize(name), order: getAttributeOrder(name) },
+    ui: {
+      section: "attributes.primary",
+      label: capitalize(name),
+      placeholder: "5",
+      order: getAttributeOrder(name),
+      displayAs: "number",
+    },
   };
 }

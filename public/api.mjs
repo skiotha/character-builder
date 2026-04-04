@@ -182,6 +182,30 @@ export async function getAbilities() {
   }
 }
 
+let cachedSchemaETag = null;
+let cachedSchema = null;
+
+export async function getSchema() {
+  const headers = {};
+  if (cachedSchemaETag) {
+    headers["If-None-Match"] = cachedSchemaETag;
+  }
+
+  const response = await fetch(`${API_BASE}/schema`, { headers });
+
+  if (response.status === 304 && cachedSchema) {
+    return cachedSchema;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch schema: ${response.status}`);
+  }
+
+  cachedSchema = await response.json();
+  cachedSchemaETag = response.headers.get("ETag");
+  return cachedSchema;
+}
+
 export async function validateDM(dmToken) {
   try {
     const response = await fetch(`${API_BASE}/dm/validate`, {
