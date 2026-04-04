@@ -302,21 +302,56 @@ and wire abilities/spells/equipment into derived combat stats.
 > Phase 7 (sibling integration) needs the addon export to contain real
 > computed data. This phase delivers the engine that produces it.
 
-### Gate: Architecture Assessment
+### Gate: Architecture Assessment ✓ DONE
 
-Before writing code, review and decide:
+Architectural decisions recorded as ADRs:
 
-- [ ] Define the effect target vocabulary — what dotted paths are valid
-      targets? (e.g., `attributes.secondary.defense`, `combat.baseDamage`)
-      This determines what the applicator can process.
-- [ ] Define the Tier B flag vocabulary — what structured non-modifier
-      effect types exist? (e.g., `advantage`, `immunity`, `freeAttack`)
-      These don't flow through the modifier pipeline but the UI/addon
-      can interpret them.
-- [ ] Decide on effect resolution architecture: where does ability ID lookup
-      happen, where are tier effects collected, in what order are they applied?
+- [x] Effect resolution pipeline architecture — explicit phases, typed state,
+      unified effect collection. See [ADR-010](decisions/010-effect-resolution-pipeline.md).
+- [x] Typed effect targets — discriminated union replacing dotted-path strings.
+      See [ADR-011](decisions/011-typed-effect-targets.md).
+- [x] Effect target vocabulary defined: `secondary`, `combat`, `weaponQuality`,
+      `armorQuality`, `flag`, `check` (ADR-011)
+- [x] Tier B flag vocabulary defined: `advantage`, `disadvantage`, `immunity`,
+      `freeAttack`, `extraAction`, `reaction`, `specialAttack`, `statusEffect`,
+      `statusRemoval` (ADR-011)
+- [x] Effect resolution architecture decided: `collectAllEffects` → group by
+      phase → apply in fixed order (ADR-010)
 - [ ] Update `docs/deferred-tasks.md` with architectural decisions
 - [ ] Update `docs/data-contracts.md` §1.1 with final vocabulary
+
+### Step 0 — Engine Foundation Rework
+
+Rewrite the rules engine foundation per ADR-010 and ADR-011 before building
+features on top. This replaces the existing `Record<string, unknown>` +
+dotted-path + numeric-priority approach.
+
+**Basis:** [ADR-010](decisions/010-effect-resolution-pipeline.md),
+[ADR-011](decisions/011-typed-effect-targets.md)
+
+- [ ] Define `EffectTarget` union type, `EffectPhase` enum, `ResolvedEffect`
+      interface in `src/rpg-types.mts`
+- [ ] Define `ReferenceData` interface and implement startup loader
+      (`src/rules/registry.mts`)
+- [ ] Rewrite `src/rules/attributes.mts` — `SECONDARY_FORMULAS` functions
+      receive typed `PrimaryAttributes` instead of `Record<string, unknown>`
+- [ ] Rewrite `src/rules/applicator.mts` — typed `Character` state, exhaustive
+      `switch (target.kind)`, correct modifier verbs (`setBase`/`addFlat`/
+      `multiply`/`cap`)
+- [ ] Rewrite `src/rules/derived.mts` — typed pipeline:
+      `collectAllEffects` → `groupByPhase` → phase stages → `deriveCombatStats`
+      → `enforceConstraints`. No more `Record<string, unknown>`.
+- [ ] Implement `collectAllEffects` in `src/rules/effects.mts` — merges all
+      sources (abilities, spells, equipment, temporary) into one array
+- [ ] Implement target deserialization (JSON → `EffectTarget`) with startup
+      validation
+- [ ] Eliminate the `"rules."` prefix convention for setBase detection
+- [ ] Separate `enforceConsistency()` into distinct stages:
+      `deriveCombatStats`, `clampValues`, `enforceConstraints`
+- [ ] Pipeline tests: typed inputs → assert typed outputs per phase
+
+> **Note:** This step can use synthetic/mock effects before reference data
+> normalization (Step 2) is done. The pipeline and the data are independent.
 
 ### Step 1 — Reference Data Files
 
@@ -344,21 +379,25 @@ Categorize and rewrite reference data effects to canonical form.
 
 ### Step 3 — Applicator Alignment
 
-- [ ] Change modifier types: `add`/`mul`/`set` → `setBase`/`addFlat`/
-      `multiply`/`cap` in `src/rules/applicator.mts`
-- [ ] Add handler for Tier B flag types (advantage, etc.)
+> Most of this step is handled by Step 0 (foundation rework). What remains
+> is wiring the new applicator to handle equipment-specific edge cases.
+
+- [x] Change modifier types: `add`/`mul`/`set` → `setBase`/`addFlat`/
+      `multiply`/`cap` — done in Step 0
+- [x] Add handler for Tier B flag types (advantage, etc.) — done in Step 0
 - [ ] Add handler for `remove` modifier (weapon quality removal)
 - [ ] Update `applyEquipmentBonuses` for new equipment structure
       (flattened `assassin`/`tools`, singular armor body/plug)
 
 ### Step 4 — Effect Resolution Pipeline
 
-Wire ability/spell lookups into the rules engine.
+Wire ability/spell lookups into the rules engine. The pipeline structure
+(from Step 0) is already in place; this step populates it with real data.
 
-- [ ] Build a lookup function: `(id, tier) → canonical Effect[]`
+- [ ] Build a lookup function: `(id, tier) → ResolvedEffect[]`
       reads from `abilities.en.json` / `spells.en.json` at runtime
-- [ ] In `recalculateDerivedFields`, resolve `character.abilities[]` and
-      `character.spells[]` into Effect objects and feed through applicator
+- [ ] In `recalculate()`, resolve `character.abilities[]` and
+      `character.spells[]` via `collectAllEffects` (Step 0 skeleton)
 - [ ] Remove any remaining `traits`-based effect resolution code
 
 ### Step 5 — Combat Derivation

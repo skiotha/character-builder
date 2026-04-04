@@ -3,6 +3,15 @@
 > Tasks identified during the schema review gate (April 2026) and deferred
 > to future sessions. Each section is self-contained and can be tackled
 > independently.
+>
+> **Architectural decisions (April 2026):**
+> - [ADR-010](decisions/010-effect-resolution-pipeline.md) — Effect resolution
+>   pipeline: explicit phases, typed state, unified effect collection
+> - [ADR-011](decisions/011-typed-effect-targets.md) — Typed effect targets:
+>   discriminated union replacing dotted-path strings
+>
+> These ADRs define the foundation that the tasks below build upon. See
+> roadmap Phase 6 Step 0 for the implementation plan.
 
 ---
 
@@ -19,7 +28,7 @@ expect a canonical shape:
   "id":       "string",
   "source":   "ability" | "spell" | "item" | "ritual" | "rule",
   "name":     "string",
-  "target":   "attributes.secondary.defense",  // dotted path
+  "target":   { "kind": "secondary", "stat": "defense" },  // typed target per ADR-011
   "modifier": {
     "type":  "setBase" | "addFlat" | "multiply" | "cap",
     "value": "resolute" | 5                     // attribute name or number
@@ -60,26 +69,28 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
 
 **Tier A — Fully Mechanical** (can be expressed as canonical Effect objects):
 - Attribute substitution: "Use Discreet instead of Quick for Defense"
-  → `{ target: "attributes.secondary.defense", modifier: { type: "setBase", value: "discreet" } }`
+  → `{ target: { kind: "secondary", stat: "defense" }, modifier: { type: "setBase", value: "discreet" } }`
 - Flat bonuses: "+1d4 damage", "+2 to Cunning checks"
-  → `{ target: "combat.bonusDamage", modifier: { type: "addFlat", value: 4 } }`
+  → `{ target: { kind: "combat", field: "bonusDamage" }, modifier: { type: "addFlat", value: 4 } }`
 - Multipliers: "Double your Pain Threshold"
-  → `{ target: "attributes.secondary.painThreshold", modifier: { type: "multiply", value: 2 } }`
+  → `{ target: { kind: "secondary", stat: "painThreshold" }, modifier: { type: "multiply", value: 2 } }`
 - Caps: "Defense cannot exceed 10"
-  → `{ target: "attributes.secondary.defense", modifier: { type: "cap", value: 10 } }`
+  → `{ target: { kind: "secondary", stat: "defense" }, modifier: { type: "cap", value: 10 } }`
 - Remove weapon quality: "Unwieldy quality removed from battle heels"
-  → `{ target: "equipment.weapons[].qualities", modifier: { type: "remove", value: "unwieldy" } }` (example target/modifier, the shape is TBD but need a `remove` modifier type)
+  → `{ target: { kind: "weaponQuality", action: "remove", quality: "unwieldy", weaponFilter: "battle-heels" }, modifier: { type: "remove" } }`
 
-**Tier B — Structured Flags** (machine-readable but not a dotted-path modifier):
-- Advantage/disadvantage on checks
-- Free attack triggers
-- Extra actions under conditions
-- Immunity to specific effects
+**Tier B — Structured Flags** (machine-readable but not a numeric modifier).
+Uses the `flag` target kind per [ADR-011](decisions/011-typed-effect-targets.md):
+- Advantage/disadvantage on checks → `{ kind: "flag", flag: "advantage", scope: "..." }`
+- Free attack triggers → `{ kind: "flag", flag: "freeAttack" }`
+- Extra actions under conditions → `{ kind: "flag", flag: "extraAction" }`
+- Immunity to specific effects → `{ kind: "flag", flag: "immunity" }`
+- Reactions, special attacks, status effects, status removal
 
-> **Note:** Tier B has no defined vocabulary yet. The flag types (e.g.,
-> `advantage`, `immunity`, `freeAttack`) and their target identifiers must be
-> decided during the Phase 6 architecture gate before any normalization begins.
-> See roadmap Phase 6 — Gate: Architecture Assessment.
+> **Vocabulary defined** in [ADR-011](decisions/011-typed-effect-targets.md):
+> `advantage`, `disadvantage`, `immunity`, `freeAttack`, `extraAction`,
+> `reaction`, `specialAttack`, `statusEffect`, `statusRemoval`.
+> Extensible — new flags can be added to the union type.
 
 **Tier C — Narrative Only** (description text, not reducible):
 - RP guidance, situational judgment calls
@@ -114,9 +125,13 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
    - `src/rules/applicator.mts` currently uses `add`/`mul`/`set`
    - Must change to `setBase`/`addFlat`/`multiply`/`cap`
    - Add handler for `advantage` flag type
-   - Already tracked in roadmap Phase 5
+   - **Subsumed by roadmap Phase 6 Step 0 (foundation rework) per
+     [ADR-010](decisions/010-effect-resolution-pipeline.md) and
+     [ADR-011](decisions/011-typed-effect-targets.md)**
 
 7. **Wire effect resolution into `deriveCombat` and `recalculateDerivedFields`**
+   - **Pipeline structure comes from Phase 6 Step 0 (`collectAllEffects`,
+     phase-based processing). This task populates it with real data.**
    - When a character has `abilities: [{ id: "twin-attack", tier: "adept" }]`:
      1. Look up `twin-attack` in `abilities.en.json`
      2. Get the `adept` tier's canonical effects
@@ -140,9 +155,8 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
         "description": "Allows moving past enemies without provoking free attacks.",
         "effects": [
           {
-            "tier": "B", // example
-            "type": "immunity",
-            "target": "freeAttack.movement",
+            "tier": "B",
+            "target": { "kind": "flag", "flag": "immunity", "scope": "freeAttack.movement" },
             "description": "Quick check to avoid free attacks when moving."
           }
         ]
@@ -151,11 +165,10 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
         "description": "Removes unwieldy from battle heels.",
         "effects": [
           {
-            "tier": "A", // example
-            "target": "equipment.weapons[].qualities",
-            "modifier": { "type": "remove", "value": "unwieldy" },
-            "description": "Remove unwieldy from battle heels.",
-            "condition": { "weapon": "battle-heels" }
+            "tier": "A",
+            "target": { "kind": "weaponQuality", "action": "remove", "quality": "unwieldy", "weaponFilter": "battle-heels" },
+            "modifier": { "type": "remove" },
+            "description": "Remove unwieldy from battle heels."
           }
         ]
       },
@@ -163,10 +176,9 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
         "description": "Use enemy as cover, gain advantage.",
         "effects": [
           {
-            "tier": "B", // example
-            "type": "advantage",
-            "target": "attacks",
-            "condition": "sharing tile with enemy"
+            "tier": "B",
+            "target": { "kind": "flag", "flag": "advantage", "scope": "attacks" },
+            "description": "Advantage on next attack when sharing tile with enemy."
           }
         ]
       }
@@ -187,8 +199,8 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
     "description": "Grants +1 bonus on navigation checks...",
     "effects": [
       {
-        "tier": "A", // example
-        "target": "checks.navigation",
+        "tier": "A",
+        "target": { "kind": "check", "attribute": "vigilant", "checkType": "navigation" },
         "modifier": { "type": "addFlat", "value": 1 }
       }
     ]
@@ -457,7 +469,7 @@ combat.weapons = [0]
 `attackAttribute` defaults to `"accurate"` but abilities can change it:
 - Certain abilities substitute a different attribute for attacks
   (e.g., "use Discreet instead of Accurate for melee attacks")
-- This is a **Tier A** canonical effect: `{ target: "combat.attackAttribute", modifier: { type: "setBase", value: "discreet" } }`
+- This is a **Tier A** canonical effect: `{ target: { kind: "combat", field: "attackAttribute" }, modifier: { type: "setBase", value: "discreet" } }`
 - **Depends on effect normalization** (Task 1) — can remain hardcoded "accurate" until then
 
 #### 3c. Bonus damage from abilities
@@ -471,7 +483,7 @@ These should push additional die sizes into `bonusDamage[]`.
 Flow:
 1. Character has `abilities: [{ id: "steel-fist", tier: "master" }]`
 2. Look up `steel-fist` master tier in `abilities.en.json`
-3. Find canonical effect `{ target: "combat.bonusDamage", modifier: { type: "addFlat", value: 4 } }`
+3. Find canonical effect `{ target: { kind: "combat", field: "bonusDamage" }, modifier: { type: "addFlat", value: 4 } }`
 4. Push `4` into `bonusDamage` array
 
 **Depends on effect normalization** (Task 1) — leave `bonusDamage` empty until effects are canonical.

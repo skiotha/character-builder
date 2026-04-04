@@ -50,6 +50,8 @@ All decisions are documented as ADRs in `docs/decisions/`. Key ones:
 - **ADR-005:** SSE for real-time updates (not WebSockets).
 - **ADR-007:** Strict CORS with explicit origin whitelist.
 - **ADR-008:** TypeScript via Node.js strip-types (no build step).
+- **ADR-010:** Effect resolution pipeline — explicit phases (`setBase` → formulas → `addFlat` → `multiply` → `cap` → flags), typed `Character` state, unified effect collection from all sources.
+- **ADR-011:** Typed effect targets — discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | check`) replacing dotted-path strings. Exhaustive switch/case handling.
 
 ## Coding Guidelines
 
