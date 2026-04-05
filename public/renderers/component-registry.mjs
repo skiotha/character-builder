@@ -53,9 +53,7 @@ function stubComponent(path, fieldSchema, value, role) {
 // ── Register stubs for unimplemented component overrides ──────
 
 const STUB_COMPONENTS = [
-  "spell-list",
   "ritual-list",
-  "boon-list",
   "tradition-list",
   "weapon-slots",
   "effect-list",

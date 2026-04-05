@@ -176,7 +176,7 @@ checklists.
 ### Step 2.5 — Renderer Restructuring & CSS Compatibility
 
 The schema-driven renderer produces 15 flat sections; CSS expects 5 semantic
-groups (`attributes`, `sins`, `portrait`, `abilities`, `information`) with
+groups (`attributes`, `talents`, `portrait`, `traits`, `information`) with
 internal sub-structure. A two-level section hierarchy (parent/child) is
 needed to produce DOM that matches the CSS grid. Also restores lost `<nav>`
 and `div#character-name`. See [phase3-plan.md § Session 2.5](phase3-plan.md)

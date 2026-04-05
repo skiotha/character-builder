@@ -45,11 +45,11 @@ export const SCHEMA_SECTIONS: SchemaSection[] = [
   { id: "combat", label: "Combat", order: 4 },
   { id: "experience", label: "Experience", order: 5 },
   { id: "corruption", label: "Corruption", order: 6 },
-  { id: "abilities", label: "Abilities", order: 7 },
+  { id: "traits", label: "Traits", order: 7 },
   { id: "spells", label: "Spells", order: 8 },
   { id: "rituals", label: "Rituals", order: 9 },
   { id: "traditions", label: "Traditions", order: 10 },
-  { id: "sins", label: "Sins", order: 11 },
+  { id: "talents", label: "Talents", order: 11 },
   { id: "boons", label: "Boons", order: 12 },
   { id: "information", label: "Information", order: 13 },
   { id: "equipment", label: "Equipment", order: 14 },
@@ -460,7 +460,7 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_default,
     ui: {
-      section: "abilities",
+      section: "traits",
       label: "Abilities",
       component: "ability-list",
     },
@@ -470,9 +470,9 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_default,
     ui: {
-      section: "spells",
+      section: "traits",
       label: "Spells",
-      component: "spell-list",
+      component: "ability-list",
     },
   },
 
@@ -490,9 +490,9 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_default,
     ui: {
-      section: "boons",
+      section: "talents",
       label: "Boons",
-      component: "boon-list",
+      component: "sin-list",
     },
   },
 
@@ -500,7 +500,7 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_private,
     ui: {
-      section: "sins",
+      section: "talents",
       label: "Sins",
       component: "sin-list",
     },

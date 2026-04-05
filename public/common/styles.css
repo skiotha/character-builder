@@ -417,7 +417,7 @@
     border-color: var(--color-main);
   }
 
-  section#sins {
+  section#talents {
     dl,
     dd,
     dt {
@@ -922,8 +922,8 @@
 
       display: grid;
       grid-template-areas:
-        "attributes sins portrait information information"
-        "abilities abilities abilities information information";
+        "attributes talents portrait information information"
+        "traits traits traits information information";
       gap: var(--md-pad);
 
       margin-block-end: var(--md-pad);
@@ -951,7 +951,7 @@
       }
     }
 
-    section#sins {
+    section#talents {
       display: flex;
       flex-direction: column;
 
@@ -1211,8 +1211,8 @@
       }
     }
 
-    section#abilities {
-      grid-area: abilities;
+    section#traits {
+      grid-area: traits;
 
       h3 {
         anchor-name: --abilities-header;

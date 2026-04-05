@@ -117,10 +117,10 @@ and client renderer — without breaking any existing functionality. All additiv
     { id: "attributes.secondary", label: "Secondary Attributes", order: 3  },
     { id: "combat",               label: "Combat",               order: 4  },
     { id: "experience",           label: "Experience",           order: 5  },
-    { id: "abilities",            label: "Abilities",            order: 6  },
+    { id: "traits",               label: "Traits",               order: 6  },
     { id: "spells",               label: "Spells",               order: 7  },
     { id: "traditions",           label: "Traditions",           order: 8  },
-    { id: "sins",                 label: "Sins",                 order: 9  },
+    { id: "talents",              label: "Talents",              order: 9  },
     { id: "boons",                label: "Boons",                order: 10 },
     { id: "information",          label: "Information",          order: 11 },
     { id: "equipment",            label: "Equipment",            order: 12 },
@@ -136,7 +136,7 @@ and client renderer — without breaking any existing functionality. All additiv
   - Server-controlled fields: `ui: { hidden: true }`
   - Primary attributes: `ui: { section: "attributes.primary", label: "…", order: N, displayAs: "number" }`
   - Secondary (derived) attributes: `ui: { section: "attributes.secondary", displayAs: "readonly" }`
-  - Array fields (abilities, spells, sins): `ui: { section: "abilities", component: "ability-list" }`
+  - Array fields (abilities, spells, sins): `ui: { section: "traits", component: "ability-list" }`
   - Use the template `TEXTS` objects as the canonical source for labels and
     section assignments.
 
@@ -345,8 +345,8 @@ defines a 5-area named grid:
 
 ```
 grid-template-areas:
-  "attributes sins portrait information information"
-  "abilities abilities abilities information information";
+  "attributes talents portrait information information"
+  "traits traits traits information information";
 ```
 
 Each area corresponds to a semantic `<section>` with internal sub-structure:
@@ -354,9 +354,9 @@ Each area corresponds to a semantic `<section>` with internal sub-structure:
 | CSS target | Expected DOM | Schema equivalent |
 |---|---|---|
 | `section#attributes` | `h3` + `output` + `div#primary` (8 inputs) + `div#secondary` (6 outputs) | `attributes.primary` + `attributes.secondary` |
-| `section#sins` | `h3` + `ul` of sin items | `sins` |
+| `section#talents` | `h3` + `ul` of sin/boon items | `sins` + `boons` |
 | `section#portrait` | label + file input + preview | `portrait` |
-| `section#abilities` | `h3` + `output` + `ul` of ability items | `abilities` + `spells` + `rituals` + `traditions` + `boons` |
+| `section#traits` | `h3` + `output` + `ul` of ability items | `abilities` + `spells` |
 | `section#information` | `h3` + `div#main` (personal + equipment) + `div#mystic` + `div#social` | `information` + `equipment` + `combat` + `experience` + `corruption` + `background` |
 
 The character view also has:
@@ -384,9 +384,9 @@ Top-level sections (rendered as `<section id="...">` with `grid-area`):
 | ID | Label | Grid area | Children |
 |---|---|---|---|
 | `attributes` | Attributes | `attributes` | `attributes.primary`, `attributes.secondary` |
-| `sins` | Sins | `sins` | (direct fields) |
+| `talents` | Talents | `talents` | (direct fields: sins, boons) |
 | `portrait` | Portrait | `portrait` | (component override) |
-| `abilities` | Abilities | `abilities` | `spells`, `rituals`, `traditions`, `boons` |
+| `traits` | Traits | `traits` | (direct fields: abilities, spells) |
 | `information` | Information | `information` | `combat`, `experience`, `corruption`, `equipment`, `background` |
 
 Child sections render as `<div>` or sub-`<section>` inside their parent,
