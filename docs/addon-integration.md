@@ -97,11 +97,9 @@ For clarity, the exported object should contain exactly:
                    "armor", "corruptionMax" }
   },
 
-  "abilities":       [],
-  "spells":          [],
+  "traits":          [],
   "rituals":         [],
-  "boons":           [],
-  "sins":            [],
+  "talents":         [],
   "effects":         [],
   "traditions":      [],
 

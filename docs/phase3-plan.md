@@ -118,10 +118,8 @@ and client renderer — without breaking any existing functionality. All additiv
     { id: "combat",               label: "Combat",               order: 4  },
     { id: "experience",           label: "Experience",           order: 5  },
     { id: "traits",               label: "Traits",               order: 6  },
-    { id: "spells",               label: "Spells",               order: 7  },
     { id: "traditions",           label: "Traditions",           order: 8  },
     { id: "talents",              label: "Talents",              order: 9  },
-    { id: "boons",                label: "Boons",                order: 10 },
     { id: "information",          label: "Information",          order: 11 },
     { id: "equipment",            label: "Equipment",            order: 12 },
     { id: "background",           label: "Background",           order: 13 },
@@ -136,7 +134,7 @@ and client renderer — without breaking any existing functionality. All additiv
   - Server-controlled fields: `ui: { hidden: true }`
   - Primary attributes: `ui: { section: "attributes.primary", label: "…", order: N, displayAs: "number" }`
   - Secondary (derived) attributes: `ui: { section: "attributes.secondary", displayAs: "readonly" }`
-  - Array fields (abilities, spells, sins): `ui: { section: "traits", component: "ability-list" }`
+  - Array fields (traits, talents): `ui: { section: "traits", component: "trait-list" }`
   - Use the template `TEXTS` objects as the canonical source for labels and
     section assignments.
 
@@ -226,12 +224,12 @@ SSE updates flow through the new pipeline.
 - [x] Implement `public/components/portrait.mjs`:
   - Portrait preview with crop transform OR upload placeholder
   - Reuse pan/zoom logic from `public/behaviors/portraitHandler.mjs`
-- [x] Implement `public/components/ability-list.mjs`:
-  - Learned abilities with tier/level display
-  - Add/remove ability UI; fetches library from `GET /api/v1/abilities`
-- [x] Implement `public/components/sin-list.mjs`:
-  - Sin slots, add/remove (DM/owner only)
-- [ ] Implement spell-list, boon-list, ritual-list components
+- [x] Implement `public/components/trait-list.mjs`:
+  - Learned traits with tier/level display
+  - Add/remove trait UI; fetches library from `GET /api/v1/abilities`
+- [x] Implement `public/components/talent-list.mjs`:
+  - Talent slots, add/remove (DM/owner only)
+- [ ] Implement ritual-list component
   (possibly generic "reference-list" pattern)
 - [ ] Implement equipment section components (weapons, armor, inventory)
 
@@ -266,10 +264,10 @@ SSE updates flow through the new pipeline.
 - [x] All fields display with correct values
 - [x] Editable fields: click → edit → blur → PATCH → SSE broadcast
 - [x] Portrait displays with correct crop transform
-- [~] Abilities, sins display correctly — **N/A:** no existing characters have
-  abilities or sins. Add/remove UI was never functional pre-schema-renderer.
-  Components render correct empty states ("No abilities learned", "No sins").
-  Will verify with real data when ability/sin management is implemented.
+- [~] Traits, talents display correctly — **N/A:** no existing characters have
+  traits or talents. Add/remove UI was never functional pre-schema-renderer.
+  Components render correct empty states ("No traits learned", "No talents").
+  Will verify with real data when trait/talent management is implemented.
 - [x] SSE real-time updates (two tabs: edit in one, see update in other)
 - [ ] Role-based editability (owner, DM, public) — **deferred:** DM login
   requires env file; owner editability verified, DM/public deferred to Phase 5
@@ -281,7 +279,7 @@ SSE updates flow through the new pipeline.
 
 1. **CSS / DOM structural mismatch (critical).** The schema-driven renderer
    produces 15 flat `<section>` elements where the existing CSS expects 5
-   semantic groups (`attributes`, `sins`, `portrait`, `abilities`,
+   semantic groups (`attributes`, `talents`, `portrait`, `traits`,
    `information`) each with internal sub-structure (`div#primary`,
    `div#secondary`, `div#main`, `div#mystic`, `div#social`). The CSS uses
    a named 5-area grid (`grid-template-areas`) and anchor positioning
@@ -354,9 +352,9 @@ Each area corresponds to a semantic `<section>` with internal sub-structure:
 | CSS target | Expected DOM | Schema equivalent |
 |---|---|---|
 | `section#attributes` | `h3` + `output` + `div#primary` (8 inputs) + `div#secondary` (6 outputs) | `attributes.primary` + `attributes.secondary` |
-| `section#talents` | `h3` + `ul` of sin/boon items | `sins` + `boons` |
+| `section#talents` | `h3` + `ul` of talent items | `talents` |
 | `section#portrait` | label + file input + preview | `portrait` |
-| `section#traits` | `h3` + `output` + `ul` of ability items | `abilities` + `spells` |
+| `section#traits` | `h3` + `output` + `ul` of trait items | `traits` |
 | `section#information` | `h3` + `div#main` (personal + equipment) + `div#mystic` + `div#social` | `information` + `equipment` + `combat` + `experience` + `corruption` + `background` |
 
 The character view also has:
@@ -384,9 +382,9 @@ Top-level sections (rendered as `<section id="...">` with `grid-area`):
 | ID | Label | Grid area | Children |
 |---|---|---|---|
 | `attributes` | Attributes | `attributes` | `attributes.primary`, `attributes.secondary` |
-| `talents` | Talents | `talents` | (direct fields: sins, boons) |
+| `talents` | Talents | `talents` | (direct field: talents) |
 | `portrait` | Portrait | `portrait` | (component override) |
-| `traits` | Traits | `traits` | (direct fields: abilities, spells) |
+| `traits` | Traits | `traits` | (direct field: traits) |
 | `information` | Information | `information` | `combat`, `experience`, `corruption`, `equipment`, `background` |
 
 Child sections render as `<div>` or sub-`<section>` inside their parent,

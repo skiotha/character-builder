@@ -1,17 +1,17 @@
 /**
- * Ability list component override.
- * Renders the character's learned abilities with tier indicators,
+ * Trait list component override.
+ * Renders the character's learned traits with tier indicators,
  * or an empty add-button slot when the list is empty.
  *
- * Character data shape: abilities = LearnedAbility[]
- *   LearnedAbility = { id: string, tier: "novice" | "adept" | "master" }
+ * Character data shape: traits = LearnedTrait[]
+ *   LearnedTrait = { id: string, tier: "novice" | "adept" | "master", source: "ability" | "spell" }
  *
  * Reference data (full name, descriptions) is fetched lazily from
  * GET /api/v1/abilities and cached in module scope.
  *
- * @param {string} path - Schema field path (e.g. "abilities")
+ * @param {string} path - Schema field path (e.g. "traits")
  * @param {object} fieldSchema - Serialized schema field descriptor
- * @param {Array} value - Array of learned abilities or undefined
+ * @param {Array} value - Array of learned traits or undefined
  * @param {string} role - "dm" | "owner" | "public"
  * @returns {HTMLElement}
  */
@@ -24,15 +24,15 @@ const TIER_ICONS = {
 };
 
 /** @type {Map<string, object>|null} */
-let abilityLibrary = null;
+let traitLibrary = null;
 let libraryPromise = null;
 
 /**
- * Fetch and cache the full ability reference library.
+ * Fetch and cache the full trait reference library.
  * @returns {Promise<Map<string, object>>}
  */
 async function ensureLibrary() {
-  if (abilityLibrary) return abilityLibrary;
+  if (traitLibrary) return traitLibrary;
   if (libraryPromise) return libraryPromise;
 
   libraryPromise = fetch("/api/v1/abilities")
@@ -41,14 +41,14 @@ async function ensureLibrary() {
       return res.json();
     })
     .then((data) => {
-      abilityLibrary = new Map();
-      for (const ability of data) {
-        abilityLibrary.set(ability.id, ability);
+      traitLibrary = new Map();
+      for (const trait of data) {
+        traitLibrary.set(trait.id, trait);
       }
-      return abilityLibrary;
+      return traitLibrary;
     })
     .catch((err) => {
-      console.error("[ability-list] Failed to load library:", err);
+      console.error("[trait-list] Failed to load library:", err);
       libraryPromise = null;
       return new Map();
     });
@@ -56,60 +56,51 @@ async function ensureLibrary() {
   return libraryPromise;
 }
 
-export function renderAbilityList(path, fieldSchema, value, role) {
-  const container = document.createElement("div");
-  container.classList.add("ability-list");
-  container.dataset.path = path;
-
-  const abilities = Array.isArray(value) ? value : [];
+export function renderTraitList(path, fieldSchema, value, role) {
+  const traits = Array.isArray(value) ? value : [];
   const writable = isWritable(fieldSchema, role);
 
-  if (abilities.length === 0) {
-    container.appendChild(renderEmptyState(writable, 0));
-  } else {
-    const list = document.createElement("ul");
+  const list = document.createElement("ul");
+  list.dataset.path = path;
 
-    for (let i = 0; i < abilities.length; i++) {
-      list.appendChild(renderAbilityItem(abilities[i], i));
-    }
+  for (let i = 0; i < traits.length; i++) {
+    list.appendChild(renderTraitItem(traits[i], i));
+  }
 
-    if (writable) {
-      list.appendChild(renderAddSlot(abilities.length));
-    }
-
-    container.appendChild(list);
+  if (writable) {
+    list.appendChild(renderAddSlot(traits.length));
   }
 
   // Kick off library fetch to enrich names asynchronously
-  if (abilities.length > 0) {
-    ensureLibrary().then((lib) => enrichAbilityNames(container, lib));
+  if (traits.length > 0) {
+    ensureLibrary().then((lib) => enrichTraitNames(list, lib));
   }
 
-  return container;
+  return list;
 }
 
 /**
- * Render a single ability item with tier indicators.
- * @param {{ id: string, tier: string }} ability
+ * Render a single trait item with tier indicators.
+ * @param {{ id: string, tier: string, source: string }} trait
  * @param {number} index
  * @returns {HTMLLIElement}
  */
-function renderAbilityItem(ability, index) {
+function renderTraitItem(trait, index) {
   const li = document.createElement("li");
-  li.classList.add("ability");
-  li.dataset.ability = String(index);
-  li.dataset.abilityId = ability.id;
+  li.classList.add("trait");
+  li.dataset.trait = String(index);
+  li.dataset.traitId = trait.id;
 
   const heading = document.createElement("h4");
-  heading.classList.add("ability-name");
+  heading.classList.add("trait-name");
   // Display id as title-case until library resolves the real name
-  heading.textContent = formatId(ability.id);
+  heading.textContent = formatId(trait.id);
   li.appendChild(heading);
 
   const tierList = document.createElement("ol");
-  tierList.classList.add("ability-tiers");
+  tierList.classList.add("trait-tiers");
 
-  const activeTierIndex = TIER_ORDER.indexOf(ability.tier);
+  const activeTierIndex = TIER_ORDER.indexOf(trait.tier);
 
   for (let t = 0; t < TIER_ORDER.length; t++) {
     const tierName = TIER_ORDER[t];
@@ -143,39 +134,21 @@ function renderAbilityItem(ability, index) {
 }
 
 /**
- * Render an empty state with an add button.
- * @param {boolean} writable
- * @param {number} index
- * @returns {HTMLElement}
- */
-function renderEmptyState(writable, index) {
-  if (!writable) {
-    const empty = document.createElement("p");
-    empty.classList.add("empty-state");
-    empty.textContent = "No abilities learned";
-    return empty;
-  }
-  const list = document.createElement("ul");
-  list.appendChild(renderAddSlot(index));
-  return list;
-}
-
-/**
- * Render an add-ability button slot.
+ * Render an add-trait button slot.
  * @param {number} index
  * @returns {HTMLLIElement}
  */
 function renderAddSlot(index) {
   const li = document.createElement("li");
-  li.id = "ability-add";
-  li.classList.add("ability");
-  li.dataset.ability = String(index);
+  li.id = "trait-add";
+  li.classList.add("trait");
+  li.dataset.trait = String(index);
 
   const button = document.createElement("button");
-  button.id = `ability_${index}`;
+  button.id = `trait_${index}`;
   button.type = "button";
-  button.dataset.action = "ability-add";
-  button.setAttribute("aria-label", "Add ability");
+  button.dataset.action = "trait-add";
+  button.setAttribute("aria-label", "Add trait");
 
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   icon.setAttribute("role", "img");
@@ -190,20 +163,20 @@ function renderAddSlot(index) {
 }
 
 /**
- * After the ability library loads, update displayed names and tier descriptions.
+ * After the trait library loads, update displayed names and tier descriptions.
  * @param {HTMLElement} container
  * @param {Map<string, object>} lib
  */
-function enrichAbilityNames(container, lib) {
-  const items = container.querySelectorAll("li.ability[data-ability-id]");
+function enrichTraitNames(container, lib) {
+  const items = container.querySelectorAll("li.trait[data-trait-id]");
 
   for (const item of items) {
-    const id = item.dataset.abilityId;
+    const id = item.dataset.traitId;
     const ref = lib.get(id);
     if (!ref) continue;
 
     // Update name
-    const heading = item.querySelector(".ability-name");
+    const heading = item.querySelector(".trait-name");
     if (heading && ref.name) {
       heading.textContent = ref.name;
     }

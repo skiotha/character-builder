@@ -39,21 +39,59 @@ const getAttributeOrder = (name: string): number =>
 // ── Section Registry ───────────────────────────────────────────
 
 export const SCHEMA_SECTIONS: SchemaSection[] = [
-  { id: "portrait", label: "Portrait", order: 1 },
-  { id: "attributes.primary", label: "Primary Attributes", order: 2 },
-  { id: "attributes.secondary", label: "Secondary Attributes", order: 3 },
-  { id: "combat", label: "Combat", order: 4 },
-  { id: "experience", label: "Experience", order: 5 },
-  { id: "corruption", label: "Corruption", order: 6 },
-  { id: "traits", label: "Traits", order: 7 },
-  { id: "spells", label: "Spells", order: 8 },
-  { id: "rituals", label: "Rituals", order: 9 },
-  { id: "traditions", label: "Traditions", order: 10 },
-  { id: "talents", label: "Talents", order: 11 },
-  { id: "boons", label: "Boons", order: 12 },
-  { id: "information", label: "Information", order: 13 },
-  { id: "equipment", label: "Equipment", order: 14 },
-  { id: "background", label: "Background", order: 15 },
+  // ── Parents (6) ─────────────────────────────────────────────
+  { id: "attributes", label: "Attributes", order: 1 },
+  { id: "talents", label: "Talents", order: 2 },
+  { id: "portrait", label: "Portrait", order: 3 },
+  { id: "experience", label: "Experience", order: 4 },
+  { id: "traits", label: "Traits", order: 5 },
+  { id: "information", label: "Information", order: 6 },
+
+  // ── Children of attributes ──────────────────────────────────
+  {
+    id: "attributes.primary",
+    label: "Primary",
+    order: 1,
+    parent: "attributes",
+    displayId: "primary",
+  },
+  {
+    id: "attributes.secondary",
+    label: "Secondary",
+    order: 2,
+    parent: "attributes",
+    displayId: "secondary",
+  },
+
+  // ── Children of information ─────────────────────────────────
+  {
+    id: "information.personal",
+    label: "",
+    order: 1,
+    parent: "information",
+    displayId: "personal",
+  },
+  {
+    id: "information.equipment",
+    label: "",
+    order: 2,
+    parent: "information",
+    displayId: "equipment",
+  },
+  {
+    id: "information.combat",
+    label: "Combat",
+    order: 3,
+    parent: "information",
+    displayId: "combat",
+  },
+  {
+    id: "information.corruption",
+    label: "Corruption",
+    order: 4,
+    parent: "information",
+    displayId: "corruption",
+  },
 ];
 
 // ── Permission shorthands ──────────────────────────────────────
@@ -151,6 +189,7 @@ export const CHARACTER_SCHEMA: Record<
       placeholder: "Enter character name",
       order: 1,
       displayAs: "input",
+      component: "character-name",
     },
   },
 
@@ -324,7 +363,7 @@ export const CHARACTER_SCHEMA: Record<
       default: "accurate",
       permissions: perm_default,
       ui: {
-        section: "combat",
+        section: "information.combat",
         label: "Attack Attribute",
         order: 1,
         displayAs: "readonly",
@@ -337,7 +376,7 @@ export const CHARACTER_SCHEMA: Record<
       default: 0,
       permissions: perm_default,
       ui: {
-        section: "combat",
+        section: "information.combat",
         label: "Base Damage",
         order: 2,
         displayAs: "readonly",
@@ -349,7 +388,7 @@ export const CHARACTER_SCHEMA: Record<
       derived: true,
       permissions: perm_default,
       ui: {
-        section: "combat",
+        section: "information.combat",
         label: "Bonus Damage",
         order: 3,
         displayAs: "readonly",
@@ -360,7 +399,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_default,
       ui: {
-        section: "combat",
+        section: "information.combat",
         label: "Weapon Slots",
         order: 4,
         component: "weapon-slots",
@@ -382,11 +421,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Experience cannot be negative",
       ui: {
-        section: "experience",
-        label: "Total XP",
-        help: "Total experience earned",
-        order: 1,
-        displayAs: "number",
+        hidden: true,
       },
     },
 
@@ -419,7 +454,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Permanent corruption can't be negative",
       ui: {
-        section: "corruption",
+        section: "information.corruption",
         label: "Permanent",
         order: 1,
         displayAs: "number",
@@ -434,7 +469,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Temporary corruption can't be negative",
       ui: {
-        section: "corruption",
+        section: "information.corruption",
         label: "Temporary",
         order: 2,
         displayAs: "number",
@@ -447,32 +482,22 @@ export const CHARACTER_SCHEMA: Record<
     permissions: perm_default,
     error: "Location must be a string",
     ui: {
-      section: "information",
+      section: "information.personal",
       label: "Location",
       order: 10,
       displayAs: "input",
     },
   },
 
-  // ── Learned Abilities & Spells ──────────────────────────────
+  // ── Learned Traits & Talents ─────────────────────────────────
 
-  abilities: {
+  traits: {
     type: "array",
     permissions: perm_default,
     ui: {
       section: "traits",
-      label: "Abilities",
-      component: "ability-list",
-    },
-  },
-
-  spells: {
-    type: "array",
-    permissions: perm_default,
-    ui: {
-      section: "traits",
-      label: "Spells",
-      component: "ability-list",
+      label: "Traits",
+      component: "trait-list",
     },
   },
 
@@ -480,29 +505,17 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_default,
     ui: {
-      section: "rituals",
-      label: "Rituals",
-      component: "ritual-list",
+      hidden: true,
     },
   },
 
-  boons: {
-    type: "array",
-    permissions: perm_default,
-    ui: {
-      section: "talents",
-      label: "Boons",
-      component: "sin-list",
-    },
-  },
-
-  sins: {
+  talents: {
     type: "array",
     permissions: perm_private,
     ui: {
       section: "talents",
-      label: "Sins",
-      component: "sin-list",
+      label: "Talents",
+      component: "talent-list",
     },
   },
 
@@ -511,9 +524,7 @@ export const CHARACTER_SCHEMA: Record<
     permissions: perm_default,
     error: "Traditions must be an array of tradition IDs",
     ui: {
-      section: "traditions",
-      label: "Traditions",
-      component: "tradition-list",
+      hidden: true,
     },
   },
 
@@ -521,7 +532,7 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_dm_write,
     ui: {
-      section: "combat",
+      section: "information.combat",
       label: "Active Effects",
       order: 5,
       component: "effect-list",
@@ -534,10 +545,7 @@ export const CHARACTER_SCHEMA: Record<
     type: "array",
     permissions: perm_default,
     ui: {
-      section: "information",
-      label: "Affiliations",
-      order: 8,
-      component: "affiliation-list",
+      hidden: true,
     },
   },
 
@@ -555,7 +563,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Age must be a positive number",
       ui: {
-        section: "information",
+        section: "information.personal",
         label: "Age",
         placeholder: "35",
         order: 2,
@@ -570,7 +578,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Race must be a string",
       ui: {
-        section: "information",
+        section: "information.personal",
         label: "Race",
         placeholder: "Elf",
         order: 3,
@@ -583,11 +591,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Shadow description must be a string",
       ui: {
-        section: "information",
-        label: "Shadow",
-        placeholder: "Describe shadow...",
-        order: 6,
-        displayAs: "textarea",
+        hidden: true,
       },
     },
 
@@ -596,7 +600,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Profession description must be a string",
       ui: {
-        section: "information",
+        section: "information.personal",
         label: "Profession",
         placeholder: "Profession",
         order: 4,
@@ -629,10 +633,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_private,
       ui: {
-        section: "background",
-        label: "Notes",
-        order: 1,
-        component: "notes-list",
+        hidden: true,
       },
     },
 
@@ -658,7 +659,7 @@ export const CHARACTER_SCHEMA: Record<
       permissions: perm_default,
       error: "Money count must be a positive number",
       ui: {
-        section: "information",
+        section: "information.personal",
         label: "Reales",
         placeholder: "5",
         order: 5,
@@ -670,7 +671,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_default,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Weapons",
         order: 1,
         component: "equipment-list",
@@ -681,7 +682,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_default,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Ammunition",
         order: 2,
         component: "equipment-list",
@@ -696,7 +697,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "object",
         permissions: perm_default,
         ui: {
-          section: "equipment",
+          section: "information.equipment",
           label: "Body Armor",
           order: 3,
           component: "armor-slot",
@@ -707,7 +708,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "object",
         permissions: perm_default,
         ui: {
-          section: "equipment",
+          section: "information.equipment",
           label: "Plug Armor",
           order: 4,
           component: "armor-slot",
@@ -720,7 +721,7 @@ export const CHARACTER_SCHEMA: Record<
       max: 3,
       permissions: perm_default,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Runes",
         order: 5,
         component: "equipment-list",
@@ -731,7 +732,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_private,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Assassin Tools",
         order: 6,
         component: "equipment-list",
@@ -742,7 +743,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_default,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Tools",
         order: 7,
         component: "equipment-list",
@@ -757,7 +758,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "array",
         permissions: perm_default,
         ui: {
-          section: "equipment",
+          section: "information.equipment",
           label: "Carried Items",
           order: 8,
           component: "equipment-list",
@@ -768,7 +769,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "array",
         permissions: perm_private,
         ui: {
-          section: "equipment",
+          section: "information.equipment",
           label: "Home Storage",
           order: 9,
           component: "equipment-list",
@@ -780,7 +781,7 @@ export const CHARACTER_SCHEMA: Record<
       type: "array",
       permissions: perm_default,
       ui: {
-        section: "equipment",
+        section: "information.equipment",
         label: "Artifacts",
         order: 10,
         component: "equipment-list",

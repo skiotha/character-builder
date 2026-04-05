@@ -7,8 +7,9 @@
  */
 
 import { renderPortrait } from "../components/portrait.mjs";
-import { renderAbilityList } from "../components/ability-list.mjs";
-import { renderSinList } from "../components/sin-list.mjs";
+import { renderTraitList } from "../components/trait-list.mjs";
+import { renderTalentList } from "../components/talent-list.mjs";
+import { renderCharacterName } from "../components/character-name.mjs";
 
 const registry = new Map();
 
@@ -70,5 +71,6 @@ for (const name of STUB_COMPONENTS) {
 // ── Register real component implementations ───────────────────
 
 registerComponent("portrait", renderPortrait);
-registerComponent("ability-list", renderAbilityList);
-registerComponent("sin-list", renderSinList);
+registerComponent("trait-list", renderTraitList);
+registerComponent("talent-list", renderTalentList);
+registerComponent("character-name", renderCharacterName);

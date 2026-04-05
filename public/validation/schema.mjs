@@ -194,8 +194,8 @@ export const SCHEMA = {
     },
   },
 
-  //   abilities: {
-  //     validate: (abilities) => validateAbilities(abilities),
+  //   traits: {
+  //     validate: (traits) => validateTraits(traits),
   //   },
 
   //   corruption: {

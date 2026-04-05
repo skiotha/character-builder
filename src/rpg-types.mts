@@ -50,18 +50,18 @@ export interface Effect {
   duration?: string | null;
 }
 
-// ── Learned Abilities, Spells & Progression ──────────────────────
+// ── Learned Traits, Talents & Progression ────────────────────────
 
 export type AbilityTier = "novice" | "adept" | "master";
 
-export interface LearnedAbility {
-  id: string;
-  tier: AbilityTier;
-}
+export type TraitSource = "ability" | "spell";
 
-export interface LearnedSpell {
+export type TalentSource = "sin" | "boon";
+
+export interface LearnedTrait {
   id: string;
   tier: AbilityTier;
+  source: TraitSource;
 }
 
 export interface LearnedRitual {
@@ -69,14 +69,10 @@ export interface LearnedRitual {
   level: number;
 }
 
-export interface LearnedBoon {
+export interface LearnedTalent {
   id: string;
   level: number;
-}
-
-export interface LearnedSin {
-  id: string;
-  level: number;
+  source: TalentSource;
 }
 
 // ── Combat ────────────────────────────────────────────────────────
@@ -213,11 +209,9 @@ export interface Character {
     temporary: number;
   };
   location?: string;
-  abilities: LearnedAbility[];
-  spells: LearnedSpell[];
+  traits: LearnedTrait[];
   rituals: LearnedRitual[];
-  boons: LearnedBoon[];
-  sins: LearnedSin[];
+  talents: LearnedTalent[];
   traditions: string[];
   effects: Effect[];
   affiliations: Affiliation[];

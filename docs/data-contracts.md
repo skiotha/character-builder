@@ -61,12 +61,10 @@ This is the **source of truth** — all other formats derive from it.
     "temporary": 0                      // min 0, integer
   },
 
-  // ── Learned Abilities & Powers ──
-  "abilities": [],                      // array of { id: string, tier: "novice"|"adept"|"master" }
-  "spells":    [],                      // array of { id: string, tier: "novice"|"adept"|"master" }
+  // ── Learned Traits & Talents ──
+  "traits":     [],                    // array of { id: string, tier: "novice"|"adept"|"master", source: "ability"|"spell" }
   "rituals":   [],                      // array of { id: string, level: number }
-  "boons":     [],                      // array of { id: string, level: number }
-  "sins":      [],                      // array of { id: string, level: number }
+  "talents":   [],                      // array of { id: string, level: number, source: "sin"|"boon" }
 
   // ── Effects (runtime) ──
   "effects":     [],                    // array of effect objects (see §1.1)
@@ -161,20 +159,25 @@ This is the **source of truth** — all other formats derive from it.
 > **Known issue:** The current `applicator.mjs` uses `add`/`mul`/`set` instead
 > of the canonical types above. This must be aligned — see roadmap Phase 4.
 
-### 1.2 Learned Ability / Spell / Ritual / Boon / Sin
+### 1.2 Learned Trait / Talent / Ritual
 
-Abilities and spells use a tier model:
+Traits (abilities and spells) use a tier model with a source discriminator:
 ```jsonc
-{ "id": "string", "tier": "novice" | "adept" | "master" }
+{ "id": "string", "tier": "novice" | "adept" | "master", "source": "ability" | "spell" }
 ```
 
-Rituals, boons, and sins use a level model:
+Talents (sins and boons) use a level model with a source discriminator:
+```jsonc
+{ "id": "string", "level": 1, "source": "sin" | "boon" }
+```
+
+Rituals use a level model:
 ```jsonc
 { "id": "string", "level": 1 }
 ```
 
 The `id` references the canonical definition in the corresponding reference
-data file (e.g. `data/abilities.en.json`).
+data file (e.g. `data/abilities.en.json` for traits with `source: "ability"`).
 
 ---
 

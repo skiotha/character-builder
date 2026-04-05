@@ -160,7 +160,7 @@ export async function validateCharacterUpdate(
       continue;
     }
 
-    if (operation === "increment" && field === "abilities") {
+    if (operation === "increment" && field === "traits") {
       // const requiredXP = calculateXPForNextRank(character);
       // if (value < requiredXP) {
       //   errors.push({
@@ -172,9 +172,9 @@ export async function validateCharacterUpdate(
       // }
     }
 
-    if (update.field === "abilities" && update.operation === "push") {
-      const ability = update.value as Record<string, unknown>;
-      const cost = (ability.cost as number[])[0]!;
+    if (update.field === "traits" && update.operation === "push") {
+      const trait = update.value as Record<string, unknown>;
+      const cost = (trait.cost as number[])[0]!;
       const unspent = (character as Record<string, Record<string, unknown>>)
         .experience?.unspent as number;
 

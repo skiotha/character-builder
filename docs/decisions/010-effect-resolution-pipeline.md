@@ -8,7 +8,7 @@
 
 ## Context
 
-The RPG rules engine is the core business system of the character builder. Every character sheet must compute derived attributes (toughness, defense, pain threshold, etc.) and combat stats (attack attribute, base damage, bonus damage) from the character's primary attributes, equipped items, and learned abilities.
+The RPG rules engine is the core business system of the character builder. Every character sheet must compute derived attributes (toughness, defense, pain threshold, etc.) and combat stats (attack attribute, base damage, bonus damage) from the character's primary attributes, equipped items, and learned traits.
 
 ### Current State
 
@@ -113,7 +113,7 @@ The canonical modifier types map directly to phases:
 | `cap`         | `CAP`           |
 | Tier B flags  | `FLAG`          |
 
-Within each phase, effects are applied in source order (abilities first, then spells, then equipment, then temporary). The `priority` field is removed from the interface — it served as a workaround for the lack of phases.
+Within each phase, effects are applied in source order (traits first, then equipment, then temporary). The `priority` field is removed from the interface — it served as a workaround for the lack of phases.
 
 ### 3. Unified Effect Collection
 
@@ -124,20 +124,17 @@ function collectAllEffects(
   character: Character,
   refs: ReferenceData,
 ): ResolvedEffect[] {
-  const fromAbilities = character.abilities.flatMap(a =>
-    lookupEffects(refs.abilities, a.id, a.tier)
-  );
-  const fromSpells = character.spells.flatMap(s =>
-    lookupEffects(refs.spells, s.id, s.tier)
+  const fromTraits = character.traits.flatMap(t =>
+    lookupEffects(t.source === "ability" ? refs.abilities : refs.spells, t.id, t.tier)
   );
   const fromEquipment = collectEquipmentEffects(character.equipment);
   const fromTemporary = character.effects.filter(e => !isExpired(e));
 
-  return [...fromAbilities, ...fromSpells, ...fromEquipment, ...fromTemporary];
+  return [...fromTraits, ...fromEquipment, ...fromTemporary];
 }
 ```
 
-This makes "all active effects on this character" inspectable and testable in one place. Sources can be extended later (boon effects, sin effects, ritual effects) without changing the pipeline.
+This makes "all active effects on this character" inspectable and testable in one place. Sources can be extended later (talent effects, ritual effects) without changing the pipeline.
 
 ### 4. Pipeline Structure
 
@@ -192,7 +189,7 @@ The pipeline requires reference data to resolve ability/spell IDs to effects. Re
 interface ReferenceData {
   abilities: AbilityDefinition[];  // from data/abilities.en.json
   spells: SpellDefinition[];       // from data/spells.en.json
-  // Future: weapons, armor, runes, boons, sins, rituals
+  // Future: weapons, armor, runes, talents, rituals
 }
 ```
 

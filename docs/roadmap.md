@@ -102,7 +102,8 @@ data structure. This requires domain context from the RPG rules.
 - [x] Walk through every top-level section with RPG rules reference in hand:
   - [x] `attributes` — added `armor` and `corruptionMax` derived stats
   - [x] `traits` / `effects` — replaced `traits` with `abilities`, `spells`,
-        `rituals`, `boons`, `sins` (reference-based model)
+        `rituals`, `boons`, `sins` (reference-based model); later merged
+        abilities+spells→traits, sins+boons→talents with source discriminators
   - [x] `equipment` — flattened `professional` → `assassin`/`tools`,
         renamed `inventory.self` → `carried`, armor body/plug are object|null
   - [x] `background` — reviewed, no changes needed
@@ -159,8 +160,8 @@ checklists.
 
 ### Step 2 — Character View Migration (Session 2) ✓ DONE
 
-- [x] Implement component overrides (portrait, abilities, sins — core set;
-      spells, boons, equipment remain stubs)
+- [x] Implement component overrides (portrait, traits, talents — core set;
+      equipment remain stubs)
 - [x] Rewrite `character-view.mjs` to fetch JSON + schema, render client-side
 - [x] Wire SSE updates through same rendering pipeline
 - [x] Decouple `editable.mjs` from `template-engine.mjs`
@@ -337,7 +338,7 @@ data. One rendering path for both initial load and real-time updates.
 
 **Goal:** Build the rules engine into a proper effect resolution pipeline.
 Normalize reference data, create missing reference files, align the applicator,
-and wire abilities/spells/equipment into derived combat stats.
+and wire traits/equipment into derived combat stats.
 
 **Basis:** [deferred-tasks.md](deferred-tasks.md) (detailed task specs),
 [data-contracts.md](data-contracts.md) §1.1 (canonical effect shape)
@@ -386,7 +387,7 @@ dotted-path + numeric-priority approach.
       `collectAllEffects` → `groupByPhase` → phase stages → `deriveCombatStats`
       → `enforceConstraints`. No more `Record<string, unknown>`.
 - [ ] Implement `collectAllEffects` in `src/rules/effects.mts` — merges all
-      sources (abilities, spells, equipment, temporary) into one array
+      sources (traits, equipment, temporary) into one array
 - [ ] Implement target deserialization (JSON → `EffectTarget`) with startup
       validation
 - [ ] Eliminate the `"rules."` prefix convention for setBase detection
@@ -417,7 +418,7 @@ Categorize and rewrite reference data effects to canonical form.
 - [ ] Categorize all ~507 ability tier effects into Tier A/B/C
 - [ ] Categorize all ~147 spell tier effects into Tier A/B/C
 - [ ] Convert Tier A effects to canonical `{ target, modifier }` shape
-- [ ] Add structured effects to boons/sins/rituals where applicable
+- [ ] Add structured effects to talents/rituals where applicable
 - [ ] Retire `data/abilities.normalized-effects.json` (replaced by canonical
       effects in `abilities.en.json`)
 
@@ -440,8 +441,8 @@ Wire ability/spell lookups into the rules engine. The pipeline structure
 
 - [ ] Build a lookup function: `(id, tier) → ResolvedEffect[]`
       reads from `abilities.en.json` / `spells.en.json` at runtime
-- [ ] In `recalculate()`, resolve `character.abilities[]` and
-      `character.spells[]` via `collectAllEffects` (Step 0 skeleton)
+- [ ] In `recalculate()`, resolve `character.traits[]`
+      via `collectAllEffects` (Step 0 skeleton)
 - [ ] Remove any remaining `traits`-based effect resolution code
 
 ### Step 5 — Combat Derivation
@@ -462,7 +463,7 @@ Complete the `deriveCombat()` function.
       don't cover new behavior
 
 **Deliverable:** Rules engine processes canonical effects. Derived stats
-(combat, secondary attributes) reflect equipped weapons and learned abilities.
+(combat, secondary attributes) reflect equipped weapons and learned traits.
 Reference data is complete and normalized.
 
 ---

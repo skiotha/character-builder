@@ -25,6 +25,21 @@ export async function renderCharacter(container, params) {
 
     container.setAttribute("id", "character-view");
     container.innerHTML = "";
+
+    // Nav for anchor positioning (character-name uses --main)
+    const nav = document.createElement("nav");
+    const ul = document.createElement("ul");
+    for (const label of ["BIO", "INVENTORY", "DESCRIPTION"]) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.textContent = label;
+      a.href = "#";
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+    nav.appendChild(ul);
+    container.appendChild(nav);
+
     container.appendChild(form);
 
     setCurrentCharacter(characterData);

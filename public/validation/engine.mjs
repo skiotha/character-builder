@@ -141,7 +141,7 @@ export const rpgValidators = {
   //     if (!ability.prerequisites) return true;
 
   //     return ability.prerequisites.every((prereq) =>
-  //       character.abilities.some((ab) => ab.id === prereq),
+  //       character.traits.some((ab) => ab.id === prereq),
   //     );
   //   },
 
@@ -155,7 +155,7 @@ export const rpgValidators = {
   //   },
 
   currentHealthValid: (currentToughness, allData) => {
-    const maxHealth = allData?.abilities?.secondary?.toughness?.max;
+    const maxHealth = allData?.attributes?.secondary?.toughness?.max;
 
     if (maxHealth === undefined) return true;
 

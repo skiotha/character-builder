@@ -949,6 +949,14 @@
         align-self: center;
         justify-self: end;
       }
+
+      #primary {
+        grid-area: primary;
+      }
+
+      #secondary {
+        grid-area: secondary;
+      }
     }
 
     section#talents {
@@ -1017,7 +1025,7 @@
             column-gap: 1ch;
           }
 
-          &#sin-add {
+          &#talent-add {
             grid-template-areas: "icon";
             grid-template-columns: 1fr;
             grid-template-rows: 1fr;
@@ -1036,7 +1044,7 @@
       }
     }
 
-    div#primary {
+    #primary {
       margin-inline-start: var(--sm-pad);
 
       & > div {
@@ -1049,7 +1057,7 @@
       }
     }
 
-    div#secondary {
+    #secondary {
       & > div {
         margin-inline-start: var(--block-align-pad);
         margin-block-start: var(--block-align-pad);
@@ -1215,13 +1223,13 @@
       grid-area: traits;
 
       h3 {
-        anchor-name: --abilities-header;
+        anchor-name: --traits-header;
       }
 
       output {
         position: absolute;
         inset-inline-start: anchor(--attributes-output start, 0%);
-        inset-block-start: anchor(--abilities-header start, 0%);
+        inset-block-start: anchor(--traits-header start, 0%);
 
         line-height: 1.5;
       }
@@ -1232,7 +1240,7 @@
 
         display: flex;
 
-        li.ability {
+        li.trait {
           inline-size: 15rem;
           block-size: 18rem;
 
@@ -1310,7 +1318,7 @@
             all: revert;
           }
 
-          &#ability-add {
+          &#trait-add {
             button {
               inline-size: 100%;
               block-size: 1000%;
@@ -1333,8 +1341,8 @@
       display: grid;
       grid-template-areas:
         "title submit"
-        "personal mystic"
-        "personal social";
+        "personal combat"
+        "equipment corruption";
       grid-template-rows: repeat(3, min-content);
 
       h3 {
@@ -1345,18 +1353,15 @@
         max-inline-size: fit-content;
       }
 
-      div#main {
+      /* div#main removed — personal/equipment are direct children now */
+
+      div#personal {
         grid-area: personal;
 
         display: flex;
-        flex-direction: column;
+        column-gap: var(--sm-pad);
 
         margin-block-start: var(--sm-pad);
-      }
-
-      div#personal {
-        display: flex;
-        column-gap: var(--sm-pad);
 
         /* debug */
         max-inline-size: min-content;
@@ -1374,6 +1379,8 @@
       }
 
       div#equipment {
+        grid-area: equipment;
+
         margin-block-start: var(--sm-pad);
         max-inline-size: calc(4 * 9rem);
 
@@ -1407,8 +1414,8 @@
         }
       }
 
-      div#mystic {
-        grid-area: mystic;
+      section#combat {
+        grid-area: combat;
 
         margin-block-start: var(--sm-pad);
 
@@ -1429,8 +1436,8 @@
         }
       }
 
-      div#social {
-        grid-area: social;
+      section#corruption {
+        grid-area: corruption;
 
         margin-block-start: var(--sm-pad);
         display: flex;
@@ -1531,6 +1538,14 @@
 
       h3 {
         grid-area: title;
+      }
+
+      #primary {
+        grid-area: primary;
+      }
+
+      #secondary {
+        grid-area: secondary;
       }
     }
 

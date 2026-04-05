@@ -1,5 +1,5 @@
 /* 
 if OKAY send
-{ field: 'abilities', operation: 'push , value: ability } +
+{ field: 'traits', operation: 'push', value: trait } +
  { field:'experience.unspent', operation: 'increment', value: -cost}
 */

@@ -150,3 +150,14 @@ The same standards-first rationale applies: the user base is on modern browsers,
 ## Follow-Up
 
 The existing stylesheets (`public/common/styles.css` and view-specific styles) predate this ADR and were written without a formal conventions guide. They should not be treated as reference implementations of these principles. A thorough audit of the existing HTML and CSS is planned for Phase 8 (Polish) of the roadmap to bring the codebase into alignment with this decision.
+
+## Addendum: Heading → Element Convention (Session 2.5)
+
+**Date:** 2026-04-05
+
+When the schema-driven renderer produces nested sections (parent → child), the element type of each child is determined by whether it carries its own heading:
+
+- **Child with a heading** (`label` is non-empty) → `<section>` with `<h4>`.
+- **Pure layout grouping** (`label` is empty) → `<div>`.
+
+This aligns with the HTML specification's guidance that `<section>` elements should typically have a heading. Layout-only wrappers that exist for grid/flex placement use `<div>` to avoid implying semantic boundaries where none exist.

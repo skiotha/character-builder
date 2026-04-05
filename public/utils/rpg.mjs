@@ -43,11 +43,9 @@ const DEFAULT_CHARACTER = {
     },
   },
 
-  abilities: [],
-  spells: [],
+  traits: [],
   rituals: [],
-  boons: [],
-  sins: [],
+  talents: [],
   traditions: [],
 
   equipment: {

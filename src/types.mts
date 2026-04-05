@@ -11,11 +11,11 @@ export type {
   EffectModifier,
   Effect,
   AbilityTier,
-  LearnedAbility,
-  LearnedSpell,
+  TraitSource,
+  TalentSource,
+  LearnedTrait,
   LearnedRitual,
-  LearnedBoon,
-  LearnedSin,
+  LearnedTalent,
   Combat,
   Weapon,
   ArmorPiece,
@@ -106,6 +106,8 @@ export interface SchemaSection {
   id: string;
   label: string;
   order: number;
+  parent?: string;
+  displayId?: string;
 }
 
 export interface SchemaField {

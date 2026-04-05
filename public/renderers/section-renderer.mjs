@@ -2,33 +2,81 @@ import { renderField } from "../components/form-field.mjs";
 import { getComponent } from "./component-registry.mjs";
 
 /**
- * Render a single section: heading + fields.
+ * Render a parent section: <section> with <h3>, direct fields, then children.
  *
- * @param {object} sectionConfig - { id, label, order }
- * @param {object[]} fields - Array of { path, schema } for fields in this section
+ * @param {object} config - Parent section config { id, label, order }
+ * @param {object[]} directFields - Fields where ui.section === config.id
+ * @param {object[]} children - Child section configs (sorted by order)
+ * @param {Map} sectionFields - Map of sectionId → field array
  * @param {object} data - Full character data
  * @param {string} role - "dm" | "owner" | "public"
  * @returns {HTMLElement}
  */
-export function renderSection(sectionConfig, fields, data, role) {
+export function renderParentSection(
+  config,
+  directFields,
+  children,
+  sectionFields,
+  data,
+  role,
+) {
   const section = document.createElement("section");
-  section.classList.add("schema-section");
-  section.dataset.section = sectionConfig.id;
 
-  // const heading = document.createElement("h2"); // @TODO: -- was, confirm
-  // Add ID for CSS targeting (skip portrait — its component owns section#portrait)
-  if (sectionConfig.id !== "portrait") {
-    section.id = sectionConfig.id.replace(/\./g, "-");
+  // Portrait component owns the section — skip ID on parent
+  if (config.id !== "portrait") {
+    section.id = config.id;
   }
 
   const heading = document.createElement("h3");
-  heading.textContent = sectionConfig.label;
+  heading.textContent = config.label;
   section.appendChild(heading);
 
-  const content = document.createElement("div");
-  content.classList.add("section-content");
+  // Render direct fields (fields assigned to the parent, not to a child)
+  renderFields(section, directFields, data, role);
 
-  // Sort fields by ui.order (fallback to 999)
+  // Render children in order
+  for (const childConfig of children) {
+    const childFields = sectionFields.get(childConfig.id) || [];
+    if (childFields.length === 0) continue;
+
+    const childEl = renderChildSection(childConfig, childFields, data, role);
+    section.appendChild(childEl);
+  }
+
+  return section;
+}
+
+/**
+ * Render a child section.
+ * - If config.label is non-empty → <section> with <h4>
+ * - If config.label is empty → <div> (pure layout grouping)
+ * ID comes from config.displayId, falling back to last segment of config.id.
+ *
+ * @param {object} config - Child section config { id, label, order, parent, displayId }
+ * @param {object[]} fields - Fields in this child section
+ * @param {object} data - Full character data
+ * @param {string} role - "dm" | "owner" | "public"
+ * @returns {HTMLElement}
+ */
+function renderChildSection(config, fields, data, role) {
+  const hasHeading = config.label && config.label.length > 0;
+  const el = document.createElement(hasHeading ? "section" : "div");
+
+  el.id = config.displayId || config.id.split(".").pop();
+
+  if (hasHeading) {
+    const heading = document.createElement("h4");
+    heading.textContent = config.label;
+    el.appendChild(heading);
+  }
+
+  renderFields(el, fields, data, role);
+  return el;
+}
+
+// ── Shared field rendering ────────────────────────────────────
+
+function renderFields(container, fields, data, role) {
   const sorted = [...fields].sort(
     (a, b) => (a.schema.ui?.order ?? 999) - (b.schema.ui?.order ?? 999),
   );
@@ -36,21 +84,17 @@ export function renderSection(sectionConfig, fields, data, role) {
   for (const { path, schema } of sorted) {
     const value = getNestedValue(data, path);
 
-    // Component override takes priority
     const componentName = schema.ui?.component;
     if (componentName) {
       const componentFn = getComponent(componentName);
       if (componentFn) {
-        content.appendChild(componentFn(path, schema, value, role));
+        container.appendChild(componentFn(path, schema, value, role));
         continue;
       }
     }
 
-    content.appendChild(renderField(path, schema, value, role));
+    container.appendChild(renderField(path, schema, value, role));
   }
-
-  section.appendChild(content);
-  return section;
 }
 
 // ── Utility ───────────────────────────────────────────────────
