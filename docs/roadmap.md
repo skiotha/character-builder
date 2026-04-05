@@ -157,20 +157,35 @@ checklists.
 - [x] Add `getSchema()` to `public/api.mjs` + schema state
 - [x] Stub component override registry
 
-### Step 2 — Character View Migration (Session 2)
+### Step 2 — Character View Migration (Session 2) ✓ DONE
 
 - [x] Implement component overrides (portrait, abilities, sins — core set;
       spells, boons, equipment remain stubs)
-- [ ] Rewrite `character-view.mjs` to fetch JSON + schema, render client-side
-- [ ] Wire SSE updates through same rendering pipeline
+- [x] Rewrite `character-view.mjs` to fetch JSON + schema, render client-side
+- [x] Wire SSE updates through same rendering pipeline
 - [x] Decouple `editable.mjs` from `template-engine.mjs`
       (move `updateFieldValue()` to `public/utils/dom.mjs`)
-- [ ] Verify role-based editability (owner vs DM vs public)
-- [ ] Remove `GET /api/v1/view/character/:id` endpoint
-- [ ] Remove `src/templates/character.mts`
-- [ ] Remove `src/renderers/renderCharacterView.mts`
-- [ ] Remove `src/routes/characterViewRoutes.mts` +
+- [~] Verify role-based editability — owner verified; DM/public deferred
+      (DM login requires local env file, tracked in Phase 5)
+- [x] Remove `GET /api/v1/view/character/:id` endpoint
+- [x] Remove `src/templates/character.mts`
+- [x] Remove `src/renderers/renderCharacterView.mts`
+- [x] Remove `src/routes/characterViewRoutes.mts` +
       `src/routes/handleGetCharacterView.mts`
+
+### Step 2.5 — Renderer Restructuring & CSS Compatibility
+
+The schema-driven renderer produces 15 flat sections; CSS expects 5 semantic
+groups (`attributes`, `sins`, `portrait`, `abilities`, `information`) with
+internal sub-structure. A two-level section hierarchy (parent/child) is
+needed to produce DOM that matches the CSS grid. Also restores lost `<nav>`
+and `div#character-name`. See [phase3-plan.md § Session 2.5](phase3-plan.md)
+for full details.
+
+- [ ] Restructure section registry with parent/child model
+- [ ] Two-pass rendering in form renderer
+- [ ] CSS compatibility pass (targeted, documented adjustments only)
+- [ ] Restore `<nav>` and `div#character-name`
 
 ### Step 3 — Creation View Migration (Session 3)
 
@@ -279,6 +294,8 @@ data. One rendering path for both initial load and real-time updates.
       `boolean | void` to paper over this — revert once the design is fixed.
 - [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
       storage (`storage.mjs`). Handler should call service, service calls storage
+- [ ] Verify role-based editability (owner, DM, public) in character view —
+      deferred from Phase 3 Step 2 (DM login requires local env file)
 - [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical
       `setBase`/`addFlat`/`multiply`/`cap` — moved to Phase 6 (RPG Engine)
 - [ ] Add `schemaVersion` bumping on schema changes
@@ -296,6 +313,13 @@ data. One rendering path for both initial load and real-time updates.
       `@layer`, field wrapper pattern (div.input with label + control).
       Schema-driven renderer DOM must stay compatible with existing CSS
       selectors.
+- [ ] Fix client router: navigating back to `#` (empty hash) does not
+      re-render the landing page — likely missing `hashchange` listener
+      or `isNavigating` guard not resetting properly
+- [ ] DM login fails with 400 in development when env file is missing —
+      `config/nagara.development.env` is gitignored and must be created
+      locally with `NAGARA_DM_TOKEN=<value>`. Bare `node src/server.mts`
+      doesn't load it (needs `--env-file` flag or `npm run start:dev`)
 - [ ] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character`, remove
       unused `timeStamp` import
 - [ ] Replace `buffer.slice` with `buffer.subarray` in multipart parser

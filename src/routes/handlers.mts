@@ -5,5 +5,4 @@ export { handleUpdateCharacter } from "./handleUpdateCharacter.mts";
 export { handleCreateCharacter } from "./handleCreateCharacter.mts";
 export { handleValidateDM } from "./handleValidateDM.mts";
 export { handleGetCharacter } from "./handleGetCharacter.mts";
-export { handleGetCharacterView } from "./handleGetCharacterView.mts";
 export { handleCharacterStream } from "./handleStreamCharacter.mts";

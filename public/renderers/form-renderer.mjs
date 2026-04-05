@@ -11,7 +11,7 @@ import { renderSection } from "./section-renderer.mjs";
  */
 export function renderCharacterForm(schema, data, role, mode) {
   const form = document.createElement("form");
-  form.classList.add("character-form");
+  form.id = "character-form";
   form.dataset.mode = mode;
   form.dataset.role = role;
 

@@ -15,7 +15,13 @@ export function renderSection(sectionConfig, fields, data, role) {
   section.classList.add("schema-section");
   section.dataset.section = sectionConfig.id;
 
-  const heading = document.createElement("h2");
+  // const heading = document.createElement("h2"); // @TODO: -- was, confirm
+  // Add ID for CSS targeting (skip portrait — its component owns section#portrait)
+  if (sectionConfig.id !== "portrait") {
+    section.id = sectionConfig.id.replace(/\./g, "-");
+  }
+
+  const heading = document.createElement("h3");
   heading.textContent = sectionConfig.label;
   section.appendChild(heading);
 

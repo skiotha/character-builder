@@ -19,9 +19,8 @@ import {
   renderInitialView,
   renderCreationView,
   renderDashboardView,
-  renderCharacterView,
 } from "#renderers";
-import { createViewRoute, createCharacterRoute } from "./routes/routes.mts";
+import { createCharacterRoute } from "./routes/routes.mts";
 import { getSerializedSchema } from "#models/schema-serializer";
 
 import {
@@ -36,7 +35,6 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NagaraRequest } from "#types";
 
 const getCharacterHandler = createCharacterRoute();
-const getViewHandler = createViewRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
@@ -289,16 +287,6 @@ async function handleApi(
       pathParts[1] === "creation"
     ) {
       return await renderCreationView(req, res);
-    }
-
-    // GET /api/v1/view/character/:id
-    if (
-      req.method === "GET" &&
-      pathParts[0] === "view" &&
-      pathParts[1] === "character" &&
-      pathParts[2]
-    ) {
-      return await getViewHandler(req, res, pathParts);
     }
 
     // GET /api/v1/characters/:id

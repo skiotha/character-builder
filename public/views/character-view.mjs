@@ -1,7 +1,12 @@
 import * as api from "api";
 import * as sse from "../sse/characterStream.mjs";
 import { enhanceElement, cleanupBehaviors } from "../behaviors/index.mjs";
-import { subscribeField, setPlayerRole } from "../state.mjs";
+import { renderCharacterForm } from "../renderers/form-renderer.mjs";
+import {
+  subscribeField,
+  setPlayerRole,
+  setCurrentCharacter,
+} from "../state.mjs";
 import { updateFieldValue } from "../utils/dom.mjs";
 
 export async function renderCharacter(container, params) {
@@ -10,20 +15,25 @@ export async function renderCharacter(container, params) {
 
     const characterId = params.id;
 
-    const html = await api.fetchView("character", characterId);
+    const [schema, characterData] = await Promise.all([
+      api.getSchema(),
+      api.getCharacter(characterId),
+    ]);
 
-    const fragment = document.createRange().createContextualFragment(html);
+    const role = characterData._permissions?.role || "public";
+    const form = renderCharacterForm(schema, characterData, role, "view");
 
     container.setAttribute("id", "character-view");
     container.innerHTML = "";
-    container.appendChild(fragment);
+    container.appendChild(form);
 
-    setRole(container);
-    attachCharacterViewListeners(container);
+    setCurrentCharacter(characterData);
+    setPlayerRole(role);
+    bindFieldsToState(container);
     enhanceElement(container);
     sse.connectCharacterStream(characterId);
   } catch (error) {
-    console.error("Failed to render character cretaion view:", error);
+    console.error("Failed to render character view:", error);
     container.innerHTML = `
       <div class="error">
         <h2>Failed to load</h2>
@@ -32,25 +42,11 @@ export async function renderCharacter(container, params) {
     `;
   }
   return () => {
-    setRole();
+    setPlayerRole("public");
     detachCharacterViewListeners(container);
     cleanupBehaviors(container);
     sse.disconnectCharacterStream();
   };
-}
-
-function setRole(container) {
-  if (!container) setPlayerRole("public");
-
-  const form = container.querySelector("form");
-
-  if (form && form.dataset.role) {
-    setPlayerRole(form.dataset.role);
-  }
-}
-
-function attachCharacterViewListeners(container) {
-  bindFieldsToState(container);
 }
 
 function detachCharacterViewListeners(container) {
@@ -60,21 +56,6 @@ function detachCharacterViewListeners(container) {
       delete field._unsubscribe;
     }
   });
-}
-
-function showErrorMessage(form, message) {
-  const existingError = form.querySelector(".error-message");
-  if (existingError) existingError.remove();
-
-  const errorEL = document.createElement("div");
-  errorEL.className = "error-message";
-  errorEL.textContent = `Error: ${message}`;
-
-  form.appendChild(errorEL);
-}
-
-function showBusyIndicator(field) {
-  return true;
 }
 
 function bindFieldsToState(container) {

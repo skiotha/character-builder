@@ -14,7 +14,7 @@ export function renderField(path, fieldSchema, value, role) {
   const writable = isWritable(fieldSchema, role);
 
   const wrapper = document.createElement("div");
-  wrapper.classList.add("form-field");
+  wrapper.classList.add(displayAs === "textarea" ? "textarea" : "input");
   wrapper.dataset.fieldPath = path;
 
   const labelEl = document.createElement("label");
