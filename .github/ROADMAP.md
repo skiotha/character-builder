@@ -2,16 +2,17 @@
 
 > Summary. For the full detailed plan, see [`docs/roadmap.md`](../docs/roadmap.md).
 
-| Phase | Goal                                       | Status      |
-| ----- | ------------------------------------------ | ----------- |
-| **0** | Documentation & Decisions                  | ✅ Done     |
-| **1** | Project Restructure (ADR-006)              | ✅ Done     |
-| **2** | TypeScript Migration (ADR-008)             | ✅ Done     |
-| **3** | Schema-Driven Rendering (ADR-009)          | Not started |
-| **4** | Testing (`node:test`, malizia conventions) | Not started |
-| **5** | Bug Fixes & Hardening                      | Not started |
-| **6** | Sibling Project Integration (addon, bot)   | Not started |
-| **7** | Polish & Beyond MVP                        | Not started |
+| Phase | Goal                                       | Status         |
+| ----- | ------------------------------------------ | -------------- |
+| **0** | Documentation & Decisions                  | ✅ Done        |
+| **1** | Project Restructure (ADR-006)              | ✅ Done        |
+| **2** | TypeScript Migration (ADR-008)             | ✅ Done        |
+| **3** | Schema-Driven Rendering (ADR-009)          | 🔄 In progress |
+| **4** | Testing (`node:test`, malizia conventions) | Not started    |
+| **5** | Bug Fixes & Hardening                      | Not started    |
+| **6** | RPG Engine (ADR-010, ADR-011)              | Not started    |
+| **7** | Sibling Project Integration (addon, bot)   | Not started    |
+| **8** | Polish & Beyond MVP                        | Not started    |
 
 ## Key Documents
 

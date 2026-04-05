@@ -191,23 +191,27 @@ and client renderer — without breaking any existing functionality. All additiv
 - [x] `npm run typecheck` passes
 - [x] Server starts; existing views still work (nothing removed)
 - [x] `GET /api/v1/schema` returns well-formed JSON with all fields and sections
-- [ ] Form renderer can be tested in browser console:
+- [x] Form renderer can be tested in browser console:
   `renderCharacterForm(schema, charData, "owner", "view")` returns valid DOM
 - [x] No regressions in existing HTML views
 
 ### Session Closeout
 
-- [ ] Update `docs/roadmap.md`: check off Step 1 items that are done
-- [ ] Update `docs/phase3-plan.md`: record actual decisions, deviations,
+- [x] Update `docs/roadmap.md`: check off Step 1 items that are done
+- [x] Update `docs/phase3-plan.md`: record actual decisions, deviations,
   and anything discovered during implementation
-- [ ] Update `/memories/repo/character-builder.md` with new file locations,
+- [x] Update `/memories/repo/character-builder.md` with new file locations,
   subpath imports, and any convention changes
-- [ ] Create `/memories/repo/phase3-progress.md` summarizing:
+- [x] Create `/memories/repo/phase3-progress.md` summarizing:
   - Session 1 deliverables and their file locations
   - Schema endpoint details (path, response shape, caching)
   - Form renderer API (`renderCharacterForm` signature, component registry)
   - Any open questions or deviations from this plan
   - What Session 2 should start with
+
+> **Note:** Progress info was recorded directly in
+> `/memories/repo/character-builder.md` rather than a separate
+> `phase3-progress.md` file — keeps all repo context in one place.
 
 ---
 
@@ -219,13 +223,13 @@ SSE updates flow through the new pipeline.
 
 ### 2a. Component Overrides
 
-- [ ] Implement `public/components/portrait.mjs`:
+- [x] Implement `public/components/portrait.mjs`:
   - Portrait preview with crop transform OR upload placeholder
   - Reuse pan/zoom logic from `public/behaviors/portraitHandler.mjs`
-- [ ] Implement `public/components/ability-list.mjs`:
+- [x] Implement `public/components/ability-list.mjs`:
   - Learned abilities with tier/level display
   - Add/remove ability UI; fetches library from `GET /api/v1/abilities`
-- [ ] Implement `public/components/sin-list.mjs`:
+- [x] Implement `public/components/sin-list.mjs`:
   - Sin slots, add/remove (DM/owner only)
 - [ ] Implement spell-list, boon-list, ritual-list components
   (possibly generic "reference-list" pattern)
@@ -241,7 +245,7 @@ SSE updates flow through the new pipeline.
   - Connect SSE stream
 - [ ] Wire SSE updates through new pipeline:
   - `setCurrentCharacter(newData)` → `notifyChangedPaths()` → subscriptions
-- [ ] Decouple `editable.mjs` from `template-engine.mjs`:
+- [x] Decouple `editable.mjs` from `template-engine.mjs`:
   - Move `updateFieldValue()` to `public/utils/dom.mjs`
   - Update imports in `editable.mjs` and anywhere else that uses it
 

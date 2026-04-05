@@ -159,11 +159,11 @@ checklists.
 
 ### Step 2 — Character View Migration (Session 2)
 
-- [ ] Implement component overrides (portrait, abilities, sins, spells,
-      boons, equipment)
+- [x] Implement component overrides (portrait, abilities, sins — core set;
+      spells, boons, equipment remain stubs)
 - [ ] Rewrite `character-view.mjs` to fetch JSON + schema, render client-side
 - [ ] Wire SSE updates through same rendering pipeline
-- [ ] Decouple `editable.mjs` from `template-engine.mjs`
+- [x] Decouple `editable.mjs` from `template-engine.mjs`
       (move `updateFieldValue()` to `public/utils/dom.mjs`)
 - [ ] Verify role-based editability (owner vs DM vs public)
 - [ ] Remove `GET /api/v1/view/character/:id` endpoint

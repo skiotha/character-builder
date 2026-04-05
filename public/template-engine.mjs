@@ -50,22 +50,6 @@ function evalCondition(expression, data) {
   }
 }
 
-export function updateFieldValue(field, newValue) {
-  const tagName = field.tagName.toUpperCase();
-  const type = field.type;
-
-  if (tagName === "INPUT" || tagName === "SELECT" || tagName === "TEXTAREA") {
-    if (type === "number") {
-      field.value = newValue ?? 0;
-    } else if (type === "checkbox") {
-      field.checked = Boolean(newValue);
-    } else {
-      field.value = newValue ?? "";
-    }
-  } else {
-    field.textContent = newValue ?? "";
-  }
-
-  field.classList.add("updated");
-  setTimeout(() => field.classList.remove("updated"), 200);
-}
+// Re-export from canonical location for backwards compatibility.
+// This file is deleted in Phase 3 Session 4.
+export { updateFieldValue } from "./utils/dom.mjs";

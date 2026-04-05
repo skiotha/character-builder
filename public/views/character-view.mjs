@@ -2,7 +2,7 @@ import * as api from "api";
 import * as sse from "../sse/characterStream.mjs";
 import { enhanceElement, cleanupBehaviors } from "../behaviors/index.mjs";
 import { subscribeField, setPlayerRole } from "../state.mjs";
-import { updateFieldValue } from "../template-engine.mjs";
+import { updateFieldValue } from "../utils/dom.mjs";
 
 export async function renderCharacter(container, params) {
   try {

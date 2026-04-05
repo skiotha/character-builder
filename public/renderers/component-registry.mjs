@@ -6,6 +6,10 @@
  * Session 1: all stubs. Real implementations arrive in Session 2.
  */
 
+import { renderPortrait } from "../components/portrait.mjs";
+import { renderAbilityList } from "../components/ability-list.mjs";
+import { renderSinList } from "../components/sin-list.mjs";
+
 const registry = new Map();
 
 /**
@@ -46,15 +50,12 @@ function stubComponent(path, fieldSchema, value, role) {
   return el;
 }
 
-// ── Register stubs for all known component overrides ──────────
+// ── Register stubs for unimplemented component overrides ──────
 
 const STUB_COMPONENTS = [
-  "portrait",
-  "ability-list",
   "spell-list",
   "ritual-list",
   "boon-list",
-  "sin-list",
   "tradition-list",
   "weapon-slots",
   "effect-list",
@@ -67,3 +68,9 @@ const STUB_COMPONENTS = [
 for (const name of STUB_COMPONENTS) {
   registerComponent(name, stubComponent);
 }
+
+// ── Register real component implementations ───────────────────
+
+registerComponent("portrait", renderPortrait);
+registerComponent("ability-list", renderAbilityList);
+registerComponent("sin-list", renderSinList);

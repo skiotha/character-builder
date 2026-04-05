@@ -1,5 +1,5 @@
 import * as nagara from "state";
-import { updateFieldValue } from "../template-engine.mjs";
+import { updateFieldValue } from "../utils/dom.mjs";
 
 const { protocol, hostname, port } = window.location;
 const base = `${protocol}//${hostname}${port ? ":" + port : ""}`;
