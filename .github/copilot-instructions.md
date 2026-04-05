@@ -52,6 +52,7 @@ All decisions are documented as ADRs in `docs/decisions/`. Key ones:
 - **ADR-008:** TypeScript via Node.js strip-types (no build step).
 - **ADR-010:** Effect resolution pipeline — explicit phases (`setBase` → formulas → `addFlat` → `multiply` → `cap` → flags), typed `Character` state, unified effect collection from all sources.
 - **ADR-011:** Typed effect targets — discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | check`) replacing dotted-path strings. Exhaustive switch/case handling.
+- **ADR-012:** Standards-first HTML, CSS & Web Platform conventions. Semantic markup, `@layer`/`@scope`/native nesting, native widgets over custom JS, modern CSS and Web APIs preferred.
 
 ## Coding Guidelines
 
@@ -115,6 +116,22 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Always check `res.headersSent` before writing response headers
 - Use `crypto.timingSafeEqual()` for secret comparison (DM token)
 - Enforce request body size limits on all endpoints accepting a body
+
+### HTML & CSS (ADR-012)
+
+- Semantic HTML first — use the most specific element (`<section>`, `<nav>`, `<dl>`, `<dialog>`, etc.) before reaching for `<div>` or `<span>`
+- Native platform widgets over custom JS: `<dialog>`, `<details>/<summary>`, Popover API, customizable `<select>` (`appearance: base-select`)
+- Field wrapper pattern: a containing element groups a `<label>` with its associated control
+- CSS layers via `@layer` — separate concerns (reset, base, layout, theme, animation, responsive) in a fixed cascade order
+- Use `@scope` for component-level isolation instead of BEM prefixes
+- Use CSS native nesting — no flat repeated parent selectors
+- Selectors: type-based + nesting by default. Classes for shared visuals (`.input`, `.stat`) or JS behavior hooks (`.editable`). IDs for unique styled entities
+- No utility classes (`.flex`, `.mt-4`, etc.)
+- Modern CSS features freely used: `oklch()`, anchor positioning, `@starting-style`, view transitions, container queries, `@property`, subgrid
+- Interactive elements must be visually distinct (hover/focus states, color-coding, cursor) with clean microanimations
+- All interactive elements must be keyboard-operable with visible focus styles
+- Existing stylesheets predate ADR-012 and are not reference implementations — do not assume current patterns are correct
+- Modern JS/Web APIs preferred when W3C/WHATWG-approved, even with intermediate browser support
 
 ### Data
 

@@ -18,4 +18,4 @@
 - [Architecture](../docs/architecture.md) — system overview, layers, data flow
 - [Data Contracts](../docs/data-contracts.md) — character schema, API contracts
 - [Addon Integration](../docs/addon-integration.md) — addon-authored requirements
-- [Design Decisions](../docs/decisions/) — ADR files (001–009)
+- [Design Decisions](../docs/decisions/) — ADR files (001–012)

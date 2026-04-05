@@ -5,7 +5,8 @@
 > then migrate views one at a time, then cleanup.
 >
 > **Basis:** [ADR-009](decisions/009-schema-driven-rendering.md)
-> (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md))
+> (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md)).
+> DOM conventions follow [ADR-012](decisions/012-standards-first-html-css.md).
 
 ---
 

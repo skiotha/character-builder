@@ -24,6 +24,9 @@ touching code.
 - [x] `docs/decisions/007-strict-cors.md`
 - [x] `docs/decisions/008-typescript-strip-types.md`
 - [x] `docs/decisions/009-schema-driven-rendering.md`
+- [x] `docs/decisions/010-effect-resolution-pipeline.md`
+- [x] `docs/decisions/011-typed-effect-targets.md`
+- [x] `docs/decisions/012-standards-first-html-css.md`
 - [x] `docs/roadmap.md` — this file
 - [x] `.github/ROADMAP.md` — summary
 - [x] `.github/copilot-instructions.md` — agent configuration
@@ -288,10 +291,11 @@ data. One rendering path for both initial load and real-time updates.
 
 ### Low Priority
 
-- [ ] Document CSS & HTML conventions as ADR: semantic HTML, type-based
-      selectors with native nesting, `@scope` / `@layer`, field wrapper
-      pattern (div.input with label + control). Schema-driven renderer DOM
-      must stay compatible with existing CSS selectors.
+- [x] Document CSS & HTML conventions as ADR ([ADR-012](decisions/012-standards-first-html-css.md)):
+      semantic HTML, type-based selectors with native nesting, `@scope` /
+      `@layer`, field wrapper pattern (div.input with label + control).
+      Schema-driven renderer DOM must stay compatible with existing CSS
+      selectors.
 - [ ] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character`, remove
       unused `timeStamp` import
 - [ ] Replace `buffer.slice` with `buffer.subarray` in multipart parser
