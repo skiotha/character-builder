@@ -77,12 +77,34 @@ Imports are ordered by category, separated by blank lines:
 If an import line contains both functions and constants, order it by the
 highest-priority item (functions > constants).
 
+### Commands
+
+```bash
+npm run start:dev        # Dev server with file watcher
+npm run typecheck        # TypeScript type-check (tsc --noEmit)
+npm test                 # Run all tests: node --test test/**/*.test.mts
+node --test test/foo.test.mts  # Run a single test file
+```
+
 ### Testing
 
 - Mirror the malizia project's test structure (`test/*.test.mts`)
 - Use `node:test` (`describe`, `it`, `mock`) and `node:assert/strict`
 - Mock external dependencies (filesystem, HTTP) using `node:test` mock utilities
 - Tests run via: `node --test test/**/*.test.mts`
+- `noUncheckedIndexedAccess` is enabled — array/index accesses return `T | undefined`. Use `!` non-null assertion on values you know exist (e.g. `mock.calls[0]!`) rather than adding unnecessary guards in test code.
+
+### Static File Serving & URL Mapping
+
+The server maps URLs to the filesystem as follows:
+
+| URL prefix | Filesystem root | Notes |
+| --- | --- | --- |
+| `/assets/**` | `public/assets/` | Fonts, icons, images. Stripped of `/assets/` prefix. |
+| `/uploads/portraits/**` | `data/uploads/portraits/` | Character portrait images. |
+| `/**` (everything else) | `public/` | SPA client files (`.html`, `.mjs`, `.css`). Falls back to `index.html` for client-side routing. |
+
+When rewriting or moving static file references, update both the HTML/CSS/JS `href`/`src` attributes **and** ensure the files exist at the corresponding filesystem path.
 
 ### Server
 
