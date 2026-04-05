@@ -404,19 +404,19 @@ session — we avoid speculative generalization.
 
 ### Tasks
 
-- [ ] Restructure `SCHEMA_SECTIONS` to include `parent` property
-- [ ] Add top-level parent sections to the registry
-- [ ] Update `SchemaSection` interface in `src/types.mts`
-- [ ] Update form renderer: two-pass rendering (parents → children)
-- [ ] Update section renderer: handle child sections as sub-elements
-- [ ] Remove `.schema-section` class from sections (use type selectors)
-- [ ] Generate `<nav>` with section jump links in character-view.mjs
-- [ ] Generate `div#character-name` in character-view.mjs
-- [ ] CSS compatibility pass: targeted adjustments to make the new DOM
+- [x] Restructure `SCHEMA_SECTIONS` to include `parent` property
+- [x] Add top-level parent sections to the registry
+- [x] Update `SchemaSection` interface in `src/types.mts`
+- [x] Update form renderer: two-pass rendering (parents → children)
+- [x] Update section renderer: handle child sections as sub-elements
+- [x] Remove `.schema-section` class from sections (use type selectors)
+- [x] Generate `<nav>` with section jump links in character-view.mjs
+- [x] Generate `div#character-name` in character-view.mjs
+- [x] CSS compatibility pass: targeted adjustments to make the new DOM
       work with existing CSS selectors (documented, not sporadic patches)
-- [ ] Verify character view renders with correct layout at 1920px
-- [ ] Verify creation view (still server-rendered) is unaffected
-- [ ] `npm run typecheck` passes
+- [x] Verify character view renders with correct layout at 1920px
+- [x] Verify creation view (still server-rendered) is unaffected
+- [x] `npm run typecheck` passes
 
 ### CSS Approach
 
@@ -601,8 +601,8 @@ tracking and form validation.
 | `public/renderers/form-renderer.mjs` | 1 |
 | `public/renderers/section-renderer.mjs` | 1 (if separate) |
 | `public/components/portrait.mjs` | 2 |
-| `public/components/ability-list.mjs` | 2 |
-| `public/components/sin-list.mjs` | 2 |
+| `public/components/trait-list.mjs` | 2 |
+| `public/components/talent-list.mjs` | 2 |
 
 ### Client — to modify
 

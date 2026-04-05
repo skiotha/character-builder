@@ -132,7 +132,7 @@ Uses the `flag` target kind per [ADR-011](decisions/011-typed-effect-targets.md)
 7. **Wire effect resolution into `deriveCombat` and `recalculateDerivedFields`**
    - **Pipeline structure comes from Phase 6 Step 0 (`collectAllEffects`,
      phase-based processing). This task populates it with real data.**
-   - When a character has `abilities: [{ id: "twin-attack", tier: "adept" }]`:
+   - When a character has `traits: [{ id: "twin-attack", tier: "adept", source: "ability" }]`:
      1. Look up `twin-attack` in `abilities.en.json`
      2. Get the `adept` tier's canonical effects
      3. Feed them through the applicator
@@ -481,7 +481,7 @@ Some abilities grant extra damage dice at higher tiers. For example:
 These should push additional die sizes into `bonusDamage[]`.
 
 Flow:
-1. Character has `abilities: [{ id: "steel-fist", tier: "master" }]`
+1. Character has `traits: [{ id: "steel-fist", tier: "master", source: "ability" }]`
 2. Look up `steel-fist` master tier in `abilities.en.json`
 3. Find canonical effect `{ target: { kind: "combat", field: "bonusDamage" }, modifier: { type: "addFlat", value: 4 } }`
 4. Push `4` into `bonusDamage` array

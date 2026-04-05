@@ -174,7 +174,7 @@ checklists.
 - [x] Remove `src/routes/characterViewRoutes.mts` +
       `src/routes/handleGetCharacterView.mts`
 
-### Step 2.5 — Renderer Restructuring & CSS Compatibility
+### Step 2.5 — Renderer Restructuring & CSS Compatibility ✓ DONE
 
 The schema-driven renderer produces 15 flat sections; CSS expects 5 semantic
 groups (`attributes`, `talents`, `portrait`, `traits`, `information`) with
@@ -183,10 +183,17 @@ needed to produce DOM that matches the CSS grid. Also restores lost `<nav>`
 and `div#character-name`. See [phase3-plan.md § Session 2.5](phase3-plan.md)
 for full details.
 
-- [ ] Restructure section registry with parent/child model
-- [ ] Two-pass rendering in form renderer
-- [ ] CSS compatibility pass (targeted, documented adjustments only)
-- [ ] Restore `<nav>` and `div#character-name`
+- [x] Restructure section registry with parent/child model
+- [x] Two-pass rendering in form renderer
+- [x] CSS compatibility pass (targeted, documented adjustments only)
+- [x] Restore `<nav>` and `div#character-name`
+
+> **Also completed alongside 2.5:** Merged character data fields —
+> `abilities`+`spells` → `traits` (with `source` discriminator),
+> `sins`+`boons` → `talents` (with `source` discriminator). Component
+> files renamed: `ability-list.mjs` → `trait-list.mjs`,
+> `sin-list.mjs` → `talent-list.mjs`. Schema, validation, CSS, character
+> data, and docs updated to match.
 
 ### Step 3 — Creation View Migration (Session 3)
 
