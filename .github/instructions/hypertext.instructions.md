@@ -2,7 +2,7 @@
 applyTo: "**/*.html, public/components/*.mjs, public/renderers/*.mjs"
 ---
 
-### HTML & JS (ADR-012)
+# HTML & JS instructions (ADR-012)
 
 - Semantic HTML first — use the most specific element (`<section>`, `<nav>`, `<dl>`, `<dialog>`, etc.) before reaching for `<div>` or `<span>`
 - Native platform widgets over custom JS: `<dialog>`, `<details>/<summary>`, Popover API, customizable `<select>` (`appearance: base-select`)

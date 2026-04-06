@@ -2,7 +2,7 @@
 applyTo: "**/*.ts, **/*.mts"
 ---
 
-### TypeScript
+# TypeScript instructions
 
 - Use `.mts` extension for all server files
 - Use explicit type annotations on function parameters and return types

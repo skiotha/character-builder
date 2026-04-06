@@ -2,7 +2,7 @@
 applyTo: "**/*.css"
 ---
 
-### CSS (ADR-012)
+# CSS instructions (ADR-012)
 
 - Native platform widgets over custom JS: `<dialog>`, `<details>/<summary>`, Popover API, customizable `<select>` (`appearance: base-select`)
 - CSS layers via `@layer` — separate concerns (reset, base, layout, theme, animation, responsive) in a fixed cascade order
