@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.html, public/components/*.mjs, public/renderers/*.mjs"
+applyTo: "**/*.html, public/**/*.mjs"
 ---
 
 # HTML & JS instructions (ADR-012)
