@@ -1,0 +1,20 @@
+---
+tags: [meta, changelog]
+---
+# Changelog
+
+For notable changes.
+
+## [1.0.0] - 2026-04-09
+
+### Added
+- Create rules vault: assert format, add RU l10n, WoW version.
+
+### Changed
+- Court MT changed to Tribe in the version.
+
+### Fixed
+- Various typos across all files.
+
+### Removed
+- Nagara-specific Corruption handling mechanics entirely removed.

@@ -1,3 +1,13 @@
+---
+title: Gallery of Sins
+lang: ru
+slug: gallery-of-sins
+version: 1
+tags:
+  - reference
+translation_status: complete
+last_updated: 2026-04-09
+---
 # Грехи
 
 ## Галерея грехов

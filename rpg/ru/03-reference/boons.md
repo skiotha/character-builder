@@ -1,3 +1,13 @@
+---
+title: Gallery of Boons
+lang: ru
+slug: gallery-of-boons
+version: 1
+tags:
+  - reference
+translation_status: complete
+last_updated: 2026-04-09
+---
 # Блага
 
 ## Галерея благ

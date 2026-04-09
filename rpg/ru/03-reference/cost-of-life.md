@@ -1,3 +1,13 @@
+---
+title: Cost of Life
+lang: ru
+slug: cost-of-life
+version: 1
+tags:
+  - reference
+translation_status: complete
+last_updated: 2026-04-09
+---
 # Стоимость жизни
 
 Короткая сводка, чтобы тебе начать представлять себе стоимость денег в системе Нажары!

@@ -1,3 +1,13 @@
+---
+title: Introduction
+lang: ru
+slug: introduction
+version: 1
+tags:
+  - core
+translation_status: complete
+last_updated: 2026-04-09
+---
 # О Нажаре
 
 ## Ролевые системы

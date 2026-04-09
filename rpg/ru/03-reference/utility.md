@@ -1,3 +1,13 @@
+---
+title: Gallery of Profession Items
+lang: ru
+slug: gallery-of-profession-items
+version: 1
+tags:
+  - reference
+translation_status: complete
+last_updated: 2026-04-09
+---
 # Профессиональный и технический инвентарь
 
 ## Ловушки
