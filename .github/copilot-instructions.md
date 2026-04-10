@@ -37,6 +37,7 @@ Key layers:
 - `src/sse/` — SSE broadcast channels
 - `public/` — static client files (SPA, styles, assets)
 - `data/` — runtime data (outside source tree, gitignored)
+- `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
 ## Key Design Decisions
 
@@ -121,6 +122,7 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Client JS: `public/**/*.mjs` (plain JS, no TypeScript)
 - Config: `config/*.env`, `config/*.mts`
 - Scripts: `scripts/*.mts`
+- RPG rules: `rpg/{locale}/**/*.md` (Obsidian Markdown vault)
 
 ## Roadmap
 

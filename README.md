@@ -50,37 +50,6 @@ npm run dev
 | `SSL_KEY` | Prod only | — | Path to SSL private key |
 | `SSL_CERT` | Prod only | — | Path to SSL certificate |
 
-## Project Structure
-
-```
-character-builder/
-├── src/                     # Server source (TypeScript .mts)
-│   ├── server.mts           # HTTP/HTTPS bootstrap
-│   ├── app.mts              # Request routing (API + static files)
-│   ├── types.mts            # App infrastructure types
-│   ├── rpg-types.mts        # RPG domain types (Character, Effect, etc.)
-│   ├── lib/                 # Config, logger, auth, utilities
-│   ├── models/              # Character schema, storage, validation
-│   ├── routes/              # API handlers & route wiring
-│   ├── middleware/           # Auth & permission middleware
-│   ├── rules/               # RPG rules engine (derived stats, effects)
-│   ├── renderers/           # Server-side HTML renderers (removing in Phase 3)
-│   ├── templates/           # HTML template definitions (removing in Phase 3)
-│   └── sse/                 # SSE broadcast
-├── public/                  # Frontend SPA (vanilla JS .mjs)
-│   ├── views/               # Page views
-│   ├── components/          # UI components
-│   ├── behaviors/           # Declarative element behaviors
-│   ├── common/              # Shared styles & icons
-│   ├── validation/          # Form validation
-│   └── assets/              # Fonts, icons, favicons
-├── data/                    # Runtime data (gitignored)
-├── config/                  # Environment configuration
-├── scripts/                 # Watcher, utilities
-├── test/                    # Tests
-└── docs/                    # Architecture, contracts, decisions
-```
-
 ## API
 
 All API routes are under `/api/v1/`.

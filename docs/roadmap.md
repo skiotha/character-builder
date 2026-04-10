@@ -44,6 +44,7 @@ has a written basis for its decisions.
 
 - [x] Create target directory structure (`src/`, `public/`, `data/`, `config/`,
       `scripts/`, `test/`)
+      _(`rpg/` added later as the canonical RPG rules vault — see §3.9 in architecture.md)_
 - [x] Move server source: `server/nagara/*` → `src/`
 - [x] Move server bootstrap: `server/server.mjs` → `src/server.mts`,
       `server/config.mjs` → `src/lib/config.mts`, etc.

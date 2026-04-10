@@ -18,3 +18,9 @@ For notable changes.
 
 ### Removed
 - Nagara-specific Corruption handling mechanics entirely removed.
+
+## [1.0.1] - 2026-04-10
+
+### Added
+- en/index.md stub for EN translation.
+- README.md stub.

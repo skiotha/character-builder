@@ -37,6 +37,12 @@ The Nagara Character Builder is a web application for creating and managing RPG 
 │   │   data/characters/*.json   data/index.json                │      │
 │   │   data/uploads/portraits/  data/backups/                  │      │
 │   └───────────────────────────────────────────────────────────┘      │
+│                                                                      │
+│   ┌───────────────────────────────────────────────────────────┐      │
+│   │                    RPG Rules Vault                        │      │
+│   │   rpg/{locale}/01-core/     rpg/{locale}/03-reference/    │      │
+│   │   rpg/{locale}/02-lore/     rpg/_meta/                    │      │
+│   └───────────────────────────────────────────────────────────┘      │
 └──────────────────────────────────────────────────────────────────────┘
 
          ▲ paste-import       sync script ▲       ▲ API calls
@@ -150,6 +156,16 @@ Vanilla JavaScript SPA served as static files.
 - **Behaviors:** Declarative behavior system (editable, selectable, copyable, etc.) attached to elements via data attributes
 - **SSE client:** Connects to character stream, updates local state on events — same rendering pipeline as initial load
 - **Import maps:** Module aliases (`@state`, `@api`, `@router`) in the HTML
+
+### 3.9 RPG Rules Vault
+
+Canonical RPG rules authored as Markdown in an Obsidian vault (`rpg/`).
+
+- **Structure:** `rpg/{locale}/{section}/{topic}.md` — locale-first, numbered sections for reading order
+- **Sections:** `01-core/` (mechanics), `02-lore/` (world lore), `03-reference/` (exhaustive galleries)
+- **Metadata:** `rpg/_meta/` holds the changelog; `rpg/.obsidian/` is gitignored
+- **Relationship to `data/*.json`:** The Markdown files are human-authored prose (rules as written). The JSON files in `data/` are machine-readable structured data (rules as encoded for the engine). Both are committed to the repo, but serve different audiences and have different lifecycles.
+- **Localizations:** `rpg/ru/` is the canonical authoring language. `rpg/en/` is pending translation.
 
 ## 4. Data Flow
 
