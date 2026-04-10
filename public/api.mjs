@@ -103,6 +103,8 @@ export async function getCharacter(characterId) {
 }
 
 export async function createCharacter(characterData) {
+  const headers = { "Content-Type": "application/json" };
+
   const playerToken = nagara.getPlayerToken();
   if (playerToken) {
     headers["x-player-id"] = playerToken;
@@ -116,19 +118,23 @@ export async function createCharacter(characterData) {
   try {
     const response = await fetch(`${API_BASE}/characters`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(characterData),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to create character: ${response.status}`);
+      const body = await response.json().catch(() => null);
+      const message = body?.error || `Failed to create character: ${response.status}`;
+      const err = new Error(message);
+      err.details = body?.details;
+      err.warnings = body?.warnings;
+      throw err;
     }
 
     return await response.json();
   } catch (error) {
     console.error("Error creating character: ", error);
+    if (error.details) console.error("Validation details:", error.details);
     throw error;
   }
 }

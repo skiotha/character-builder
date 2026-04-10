@@ -69,6 +69,7 @@ export function renderCharacterForm(schema, data, role, mode) {
       sectionFields,
       data,
       role,
+      mode,
     );
     form.appendChild(sectionEl);
   }

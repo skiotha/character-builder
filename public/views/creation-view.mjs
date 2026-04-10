@@ -1,15 +1,21 @@
 import * as api from "api";
-import * as nagara from "state";
+import {
+  getPlayerToken,
+  getState,
+  setCurrentCharacter,
+  setCharacters,
+  setPlayerToken,
+} from "../state.mjs";
 import { navigate } from "router";
 import { initPortraitUpload } from "../behaviors/portraitHandler.mjs";
-import { enhanceElement } from "../behaviors/index.mjs";
-
-import { SCHEMA } from "../validation/schema.mjs";
-import { FormValidator } from "../validation/ui.mjs";
+import { renderCharacterForm } from "../renderers/form-renderer.mjs";
 import {
+  DEFAULT_CHARACTER,
   SECONDARY_ATTRIBUTES_RULES,
   PRIMARY_TO_SECONDARY,
 } from "../utils/rpg.mjs";
+
+const BUDGET = 80;
 
 let portraitManager = null;
 let isSubmitting = false;
@@ -18,18 +24,70 @@ export async function renderCreation(container, params) {
   try {
     container.innerHTML = "<div>Loading create screen</div>";
 
-    const html = await api.fetchView("creation");
-
-    const fragment = document.createRange().createContextualFragment(html);
+    const schema = await api.getSchema();
+    const form = renderCharacterForm(
+      schema,
+      DEFAULT_CHARACTER,
+      "owner",
+      "create",
+    );
 
     container.setAttribute("id", "creation-view");
     container.innerHTML = "";
-    container.appendChild(fragment);
 
+    const nav = document.createElement("nav");
+    const ul = document.createElement("ul");
+    for (const label of ["BIO", "INVENTORY", "DESCRIPTION"]) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.textContent = label;
+      a.href = "#";
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+    nav.appendChild(ul);
+    container.appendChild(nav);
+    container.appendChild(form);
+
+    // Hidden submit button — enables implicit submission (Enter key)
+    const submitBtn = document.createElement("button");
+    submitBtn.type = "submit";
+    submitBtn.hidden = true;
+    form.appendChild(submitBtn);
+
+    // Inject budget output into section#attributes (between heading and children)
+    const attributesSection = form.querySelector("section#attributes");
+    if (attributesSection) {
+      const budgetOutput = document.createElement("output");
+      budgetOutput.id = "balance";
+      budgetOutput.name = "balance";
+      budgetOutput.value = String(BUDGET);
+      budgetOutput.textContent = String(BUDGET);
+
+      const heading = attributesSection.querySelector(":scope > h3");
+      if (heading) {
+        heading.after(budgetOutput);
+      } else {
+        attributesSection.prepend(budgetOutput);
+      }
+    }
+
+    // Wire attribute budget + secondary calculation
+    const budgetHandler = createBudgetHandler(form);
+    budgetHandler();
+
+    const primaryContainer = form.querySelector("#primary");
+    if (primaryContainer) {
+      primaryContainer.addEventListener("input", budgetHandler);
+    }
+
+    // Wire portrait
     portraitManager = initPortraitUpload(container);
-    attachCreationViewListeners(container, portraitManager);
+
+    // Wire submission
+    form.addEventListener("submit", handleFormSubmit);
   } catch (error) {
-    console.error("Failed to render character cretaion view:", error);
+    console.error("Failed to render character creation view:", error);
     container.innerHTML = `
       <div class="error">
         <h2>Failed to load</h2>
@@ -40,297 +98,241 @@ export async function renderCreation(container, params) {
 
   return () => {
     container.removeAttribute("id");
-    portraitManager.cleanup();
-    detachCreationViewListeners(container);
+    if (portraitManager) portraitManager.cleanup();
+    const form = container.querySelector("form#character-form");
+    if (form) form.removeEventListener("submit", handleFormSubmit);
   };
 }
 
-function attachCreationViewListeners(container, portraitManager) {
-  const form = container.querySelector("form#creation-form");
+// ── Attribute budget + secondary calculation ──────────────────
 
-  if (form) {
-    form.addEventListener("submit", handleFormSubmit);
-
-    const attributesContainer = form.querySelector("div#primary");
-
-    const handleUpdatePrimaryAttribute = createAttributeBudgetHandler(form);
-
-    handleUpdatePrimaryAttribute();
-
-    form.addEventListener("reset", () => {
-      window.requestAnimationFrame(handleUpdatePrimaryAttribute);
-      // setTimeout(handleUpdatePrimaryAttribute, 0);
-    });
-
-    if (attributesContainer)
-      attributesContainer.addEventListener(
-        "input",
-        handleUpdatePrimaryAttribute,
-      );
-  }
-
-  enhanceElement(container);
-}
-
-function detachCreationViewListeners(container) {
-  const form = container.querySelector("form#creation-form");
-
-  if (form) {
-    form.removeEventListener("submit", handleFormSubmit);
-  }
-}
-
-function createAttributeBudgetHandler(form) {
-  const primaryInputs = Array.from(form.elements).filter((element) =>
-    element.name?.startsWith("attributes.primary."),
+function createBudgetHandler(form) {
+  const primaryInputs = form.querySelectorAll(
+    'input[name^="attributes.primary."]',
   );
-  const secondaryInputs = Array.from(form.elements).filter((element) =>
-    element.name?.startsWith("attributes.secondary."),
-  );
-  const budgetOutput = form.elements["balance"];
+  const budgetOutput = form.querySelector("output#balance");
 
-  const primaryById = new Map();
-  const secondaryById = new Map();
+  return function budgetHandler() {
+    let total = 0;
+    for (const input of primaryInputs) {
+      const v = input.valueAsNumber;
+      total += isNaN(v) ? 0 : v;
+    }
 
-  primaryInputs.forEach((input) => primaryById.set(input.id, input));
-  secondaryInputs.forEach((input) => secondaryById.set(input.id, input));
+    const remaining = BUDGET - total;
 
-  if (!primaryInputs.length || !secondaryInputs.length || !budgetOutput) {
-    console.warn("Something's amiss with attributes HTML elements!");
-    return () => {};
-  }
-
-  return function (event) {
-    const totalUsed = primaryInputs.reduce((sum, input) => {
-      const value = input.valueAsNumber;
-      return sum + (isNaN(value) ? 0 : value);
-    }, 0);
-
-    const remaining = 80 - totalUsed;
-
-    window.requestAnimationFrame(() => {
-      budgetOutput.value = remaining;
-
+    if (budgetOutput) {
+      budgetOutput.value = String(remaining);
+      budgetOutput.textContent = String(remaining);
       budgetOutput.classList.toggle("over-budget", remaining < 0);
       budgetOutput.classList.toggle("exact-budget", remaining === 0);
+    }
 
-      updateSecondaryAttributes(primaryById, secondaryById, event?.target?.id);
-    });
+    updateSecondaryAttributes(form);
   };
 }
 
-function updateSecondaryAttributes(
-  primaryMap,
-  secondaryMap,
-  changedPrimaryId = null,
-) {
-  const primariesToUpdate = changedPrimaryId
-    ? [changedPrimaryId]
-    : Object.keys(PRIMARY_TO_SECONDARY);
+function updateSecondaryAttributes(form) {
+  for (const [primaryName, secondaryIds] of Object.entries(
+    PRIMARY_TO_SECONDARY,
+  )) {
+    const primaryInput = form.querySelector(
+      `input[name="attributes.primary.${primaryName}"]`,
+    );
+    if (!primaryInput) continue;
 
-  primariesToUpdate.forEach((primaryId) => {
-    const primaryValue = primaryMap.get(primaryId)?.valueAsNumber || 0;
-    const dependentSecondaries = PRIMARY_TO_SECONDARY[primaryId] || [];
+    const primaryValue = primaryInput.valueAsNumber;
 
-    dependentSecondaries.forEach((secondaryId) => {
+    for (const secondaryId of secondaryIds) {
       const rule = SECONDARY_ATTRIBUTES_RULES[secondaryId];
-      const secondaryInput = secondaryMap.get(secondaryId);
+      if (!rule) continue;
 
-      if (rule && secondaryInput) {
-        const newValue = rule.calculate(primaryValue);
-        secondaryInput.valueAsNumber = newValue;
+      const newValue = rule.calculate(primaryValue);
+
+      // Secondary fields may be <input readonly> or <output>
+      const el = form.querySelector(
+        `[data-path="attributes.secondary.${secondaryId}"]`,
+      );
+      if (!el) continue;
+
+      if ("valueAsNumber" in el) {
+        el.valueAsNumber = newValue;
+      } else {
+        el.value = String(newValue);
+        el.textContent = String(newValue);
       }
-    });
-  });
+    }
+  }
 }
 
-const handleFormSubmit = async (e) => {
-  if (isSubmitting) {
-    console.warn("Form is already being submitted");
-    return;
-  }
+// ── Form submission ───────────────────────────────────────────
 
+const handleFormSubmit = async (e) => {
   e.preventDefault();
+  if (isSubmitting) return;
   isSubmitting = true;
 
+  const form = e.target;
+
   try {
-    const state = nagara.getState();
-    // const formData = new FormData(e.target);
+    // HTML5 constraint validation
+    if (!form.reportValidity()) return;
 
-    const formValidator = new FormValidator(e.target, SCHEMA);
-    // formValidator.debugSchemaPaths();
-    const { errors, isValid } = formValidator.validateAll();
-
-    if (!isValid) {
-      // showErrorMessage(e.target, "Please fix the errors before saving");
-      console.warn("=== VALIDATION ERRORS ===");
-      console.warn(errors);
+    // Budget check
+    const primaryInputs = form.querySelectorAll(
+      'input[name^="attributes.primary."]',
+    );
+    let total = 0;
+    for (const input of primaryInputs) {
+      const v = input.valueAsNumber;
+      total += isNaN(v) ? 0 : v;
+    }
+    if (total > BUDGET) {
+      showErrorMessage(
+        form,
+        `Attribute points exceed budget (${total}/${BUDGET})`,
+      );
       return;
     }
 
-    const validatedCharacterData = formValidator.getFormData();
+    // Collect form data (editable fields only)
+    const characterData = collectFormData(form);
 
-    const characterData = await prepareCharacterData(
-      validatedCharacterData,
-      state,
-    );
+    // Inject server-required derived values computed from primaries
+    injectDerivedAttributes(characterData);
 
-    const character = await createCharacter(characterData, state.playerToken);
+    // Attach player ID
+    const playerToken = getPlayerToken();
+    if (playerToken) {
+      characterData.playerId = playerToken;
+    }
 
-    await updateAppStateAfterCreation(character, state);
+    // Attach portrait crop data
+    if (portraitManager) {
+      const portraitData = portraitManager.getPortraitData();
+      if (portraitData?.crop && portraitData?.originalSize) {
+        characterData.portrait = {
+          crop: portraitData.crop,
+          dimensions: portraitData.originalSize,
+        };
+      }
+    }
 
-    console.log("Character created:", character);
+    // Submit
+    const character = await api.createCharacter(characterData);
 
-    await uploadCharacterPortraitIfExists(character.id);
+    // Update app state
+    const state = getState();
+    if (character.playerId && !state.playerToken) {
+      await setPlayerToken(character.playerId);
+    }
+    setCurrentCharacter(character);
+    setCharacters([...state.characters, character]);
+
+    // Upload portrait if exists
+    if (portraitManager) {
+      const portraitData = portraitManager.getPortraitData();
+      if (portraitData?.file) {
+        try {
+          await uploadPortrait(character.id, portraitData.file);
+        } catch (err) {
+          console.warn("Portrait upload failed (character was created):", err);
+        }
+      }
+    }
 
     navigate(`/character/${character.id}`);
   } catch (error) {
     console.error("Failed to create character:", error);
-    showErrorMessage(e.target, error.message);
+    showErrorMessage(form, error.message);
   } finally {
     isSubmitting = false;
   }
 };
 
-async function prepareCharacterData(formData, state) {
-  const payload = formData;
+// ── Data collection ───────────────────────────────────────────
 
-  if (state.playerToken) {
-    payload.playerId = state.playerToken;
-  }
+function injectDerivedAttributes(data) {
+  const primary = data.attributes?.primary ?? {};
 
-  const portraitData = portraitManager.getPortraitData();
+  const toughness = Math.max(primary.strong || 0, 10);
+  const painThreshold = Math.ceil((primary.strong || 0) * 0.5);
+  const corruptionThreshold = Math.ceil((primary.resolute || 0) * 0.5);
+  const defense = primary.quick || 0;
 
-  if (portraitData?.crop && portraitData?.originalSize) {
-    payload.portrait = {
-      crop: portraitData.crop,
-      dimensions: portraitData.originalSize,
-    };
-  }
+  data.attributes = data.attributes || {};
+  data.attributes.secondary = {
+    toughness: { max: toughness, current: toughness },
+    painThreshold,
+    corruptionThreshold,
+    defense,
+    armor: 0,
+    corruptionMax: corruptionThreshold,
+  };
 
-  return payload;
+  // experience.total is hidden (not in the form) but required by server
+  data.experience = data.experience || {};
+  data.experience.total = 50;
 }
 
-async function createCharacter(characterData, playerToken) {
-  const response = await fetch("/api/v1/characters", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(playerToken && { "x-player-id": playerToken }),
-    },
-    body: JSON.stringify(characterData),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `Failed to create character: ${response.status} ${errorText}`,
-    );
-  }
-
-  return await response.json();
-}
-
-async function updateAppStateAfterCreation(character, currentState) {
-  console.log("from character", character.playerId);
-  console.log("from state", currentState.playerToken);
-  if (character.playerId && !currentState.playerToken) {
-    await nagara.setPlayerToken(character.playerId);
-  }
-
-  console.log("After", nagara.getState());
-  nagara.setCurrentCharacter(character);
-
-  const updatedCharacters = [...currentState.characters, character];
-  nagara.setCharacters(updatedCharacters);
-}
-
-async function uploadCharacterPortraitIfExists(characterId) {
-  const portraitData = portraitManager.getPortraitData();
-
-  if (!portraitData?.file) {
-    console.warn("No portrait file to upload");
-    return;
-  }
-
-  try {
-    console.log("Uploading portrait file, please stand by...");
-    const result = await uploadCharacterPortrait(
-      characterId,
-      portraitData.file,
-    );
-    console.log("Portrait uploaded:", result.message);
-
-    if (result.portraitPath) {
-      updateCharacterPortraitPath(characterId, result.portraitPath);
-    }
-  } catch (error) {
-    console.warn("Portrait upload failed (but character was created:", error);
-  }
-}
-
-async function uploadCharacterPortrait(characterId, portraitFile) {
-  if (!portraitFile) throw new Error("No portrait file provided");
-
-  const formData = new FormData();
-  formData.append("portrait", portraitFile);
-
-  const response = await fetch(
-    `/api/v1/characters/${characterId}/portrait`,
-    {
-      method: "POST",
-      body: formData,
-    },
+function collectFormData(form) {
+  const data = {};
+  const fields = form.querySelectorAll(
+    "input[name]:not([readonly]), select[name]:not([readonly]), textarea[name]:not([readonly])",
   );
+
+  for (const field of fields) {
+    const path = field.name;
+    if (!path) continue;
+
+    const keys = path.split(".");
+    let current = data;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      current[keys[i]] = current[keys[i]] || {};
+      current = current[keys[i]];
+    }
+
+    const lastKey = keys[keys.length - 1];
+    if (field.type === "number") {
+      const n = field.valueAsNumber;
+      if (!Number.isNaN(n)) current[lastKey] = n;
+    } else {
+      const v = field.value;
+      if (v !== "") current[lastKey] = v;
+    }
+  }
+
+  return data;
+}
+
+// ── Portrait upload ───────────────────────────────────────────
+
+async function uploadPortrait(characterId, file) {
+  const formData = new FormData();
+  formData.append("portrait", file);
+
+  const response = await fetch(`/api/v1/characters/${characterId}/portrait`, {
+    method: "POST",
+    body: formData,
+  });
 
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Portrait upload failed: ${response.status} ${errorText}`);
   }
 
-  return await response.json();
+  return response.json();
 }
 
-function updateCharacterPortraitPath(charcterId, portraitPath) {
-  const state = nagara.getState();
-  const updatedCharacters = state.characters.map((char) => {
-    char.id === charcterId
-      ? { ...char, portrait: { ...char.portrait, path: portraitPath } }
-      : char;
-  });
-  nagara.setCharacters(updatedCharacters);
-
-  if (state.currentCharacter?.id === charcterId) {
-    nagara.setCurrentCharacter({
-      ...state.currentCharacter,
-      portrait: { ...state.currentCharacter.portrait, path: portraitPath },
-    });
-  }
-}
-
-function transformFormData(formData) {
-  const result = {};
-
-  for (const [key, value] of formData.entries()) {
-    const keys = key.split(".");
-    let current = result;
-    for (let i = 0; i < keys.length - 1; i++) {
-      current[keys[i]] = current[keys[i]] || {};
-      current = current[keys[i]];
-    }
-    current[keys[keys.length - 1]] = value;
-  }
-
-  return result;
-}
+// ── UI helpers ────────────────────────────────────────────────
 
 function showErrorMessage(form, message) {
-  const existingError = form.querySelector(".error-message");
-  if (existingError) existingError.remove();
+  const existing = form.querySelector(".error-message");
+  if (existing) existing.remove();
 
-  const errorEL = document.createElement("div");
-  errorEL.className = "error-message";
-  errorEL.textContent = `Error: ${message}`;
-
-  form.appendChild(errorEL);
+  const el = document.createElement("div");
+  el.className = "error-message";
+  el.textContent = `Error: ${message}`;
+  form.appendChild(el);
 }

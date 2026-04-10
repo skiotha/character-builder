@@ -5,13 +5,14 @@
  * @param {object} fieldSchema - Serialized schema field descriptor
  * @param {*} value - Current value for this field
  * @param {string} role - "dm" | "owner" | "public"
+ * @param {string} mode - "view" | "create"
  * @returns {HTMLElement}
  */
-export function renderField(path, fieldSchema, value, role) {
+export function renderField(path, fieldSchema, value, role, mode) {
   const ui = fieldSchema.ui || {};
   const displayAs = ui.displayAs || inferDisplayAs(fieldSchema);
   const label = ui.label || labelFromPath(path);
-  const writable = isWritable(fieldSchema, role);
+  const writable = isWritable(fieldSchema, role, mode);
 
   const wrapper = document.createElement("div");
   wrapper.classList.add(displayAs === "textarea" ? "textarea" : "input");
@@ -22,7 +23,7 @@ export function renderField(path, fieldSchema, value, role) {
   labelEl.textContent = label;
   wrapper.appendChild(labelEl);
 
-  const control = createControl(displayAs, path, fieldSchema, value, writable);
+  const control = createControl(displayAs, path, fieldSchema, value, writable, mode);
   wrapper.appendChild(control);
 
   return wrapper;
@@ -30,22 +31,22 @@ export function renderField(path, fieldSchema, value, role) {
 
 // ── Control creation by display type ──────────────────────────
 
-function createControl(displayAs, path, fieldSchema, value, writable) {
+function createControl(displayAs, path, fieldSchema, value, writable, mode) {
   switch (displayAs) {
     case "textarea":
-      return createTextarea(path, fieldSchema, value, writable);
+      return createTextarea(path, fieldSchema, value, writable, mode);
     case "select":
-      return createSelect(path, fieldSchema, value, writable);
+      return createSelect(path, fieldSchema, value, writable, mode);
     case "readonly":
       return createReadonly(path, fieldSchema, value);
     case "number":
-      return createNumberInput(path, fieldSchema, value, writable);
+      return createNumberInput(path, fieldSchema, value, writable, mode);
     default:
-      return createTextInput(path, fieldSchema, value, writable);
+      return createTextInput(path, fieldSchema, value, writable, mode);
   }
 }
 
-function createTextInput(path, fieldSchema, value, writable) {
+function createTextInput(path, fieldSchema, value, writable, mode) {
   const input = document.createElement("input");
   input.type = "text";
   input.id = `field-${path}`;
@@ -61,12 +62,12 @@ function createTextInput(path, fieldSchema, value, writable) {
   if (fieldSchema.required) input.required = true;
 
   applyPlaceholder(input, fieldSchema);
-  applyEditBehavior(input, writable, fieldSchema);
+  applyEditBehavior(input, writable, fieldSchema, mode);
 
   return input;
 }
 
-function createNumberInput(path, fieldSchema, value, writable) {
+function createNumberInput(path, fieldSchema, value, writable, mode) {
   const input = document.createElement("input");
   input.type = "number";
   input.id = `field-${path}`;
@@ -79,12 +80,12 @@ function createNumberInput(path, fieldSchema, value, writable) {
   if (fieldSchema.integer) input.step = "1";
 
   applyPlaceholder(input, fieldSchema);
-  applyEditBehavior(input, writable, fieldSchema);
+  applyEditBehavior(input, writable, fieldSchema, mode);
 
   return input;
 }
 
-function createTextarea(path, fieldSchema, value, writable) {
+function createTextarea(path, fieldSchema, value, writable, mode) {
   const textarea = document.createElement("textarea");
   textarea.id = `field-${path}`;
   textarea.name = path;
@@ -97,12 +98,12 @@ function createTextarea(path, fieldSchema, value, writable) {
     textarea.maxLength = fieldSchema.maxLength;
 
   applyPlaceholder(textarea, fieldSchema);
-  applyEditBehavior(textarea, writable, fieldSchema);
+  applyEditBehavior(textarea, writable, fieldSchema, mode);
 
   return textarea;
 }
 
-function createSelect(path, fieldSchema, value, writable) {
+function createSelect(path, fieldSchema, value, writable, mode) {
   const select = document.createElement("select");
   select.id = `field-${path}`;
   select.name = path;
@@ -117,7 +118,7 @@ function createSelect(path, fieldSchema, value, writable) {
     select.appendChild(option);
   }
 
-  applyEditBehavior(select, writable, fieldSchema);
+  applyEditBehavior(select, writable, fieldSchema, mode);
 
   return select;
 }
@@ -140,20 +141,29 @@ function applyPlaceholder(el, fieldSchema) {
   if (ph !== undefined) el.placeholder = ph;
 }
 
-function applyEditBehavior(el, writable, fieldSchema) {
-  if (writable) {
-    el.dataset.behavior = "edit-enabled";
-    const roles = getAllowedWriteRoles(fieldSchema);
-    if (roles.length) el.dataset.roleAllowed = roles.join(" ");
-  } else {
+function applyEditBehavior(el, writable, fieldSchema, mode) {
+  if (!writable) {
     el.setAttribute("readonly", "");
     el.setAttribute("aria-disabled", "true");
+    return;
   }
+
+  if (mode === "create") return;
+
+  // View mode: attach inline-edit behavior marker
+  el.dataset.behavior = "edit-enabled";
+  const roles = getAllowedWriteRoles(fieldSchema);
+  if (roles.length) el.dataset.roleAllowed = roles.join(" ");
 }
 
-function isWritable(fieldSchema, role) {
-  if (fieldSchema.serverControlled || fieldSchema.immutable) return false;
+function isWritable(fieldSchema, role, mode) {
+  if (fieldSchema.serverControlled) return false;
   if (fieldSchema.derived) return false;
+
+  if (mode === "create") return true;
+
+  // View mode: check immutable and role permissions
+  if (fieldSchema.immutable) return false;
   if (!fieldSchema.permissions) return false;
 
   const rolePerms = fieldSchema.permissions[role];

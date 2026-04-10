@@ -56,7 +56,7 @@ async function ensureLibrary() {
   return libraryPromise;
 }
 
-export function renderTraitList(path, fieldSchema, value, role) {
+export function renderTraitList(path, fieldSchema, value, role, mode) {
   const traits = Array.isArray(value) ? value : [];
   const writable = isWritable(fieldSchema, role);
 

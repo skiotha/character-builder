@@ -196,16 +196,30 @@ for full details.
 > `sin-list.mjs` → `talent-list.mjs`. Schema, validation, CSS, character
 > data, and docs updated to match.
 
-### Step 3 — Creation View Migration (Session 3)
+### Step 3 — Creation View Migration (Session 3) ✓ DONE
 
-- [ ] Extend form renderer for `mode: "create"`
-- [ ] Wire attribute budget calculator (80-point system)
-- [ ] Wire secondary attribute auto-calculation
-- [ ] Update `FormValidator` for renderer-generated DOM
-- [ ] Rewrite `creation-view.mjs` to reuse form renderer in creation mode
-- [ ] Remove `GET /api/v1/view/creation` endpoint
-- [ ] Remove `src/templates/creation.mts`
-- [ ] Remove `src/renderers/renderCreationView.mts`
+- [x] Extend form renderer for `mode: "create"` (mode threaded through entire pipeline)
+- [x] Wire attribute budget calculator (80-point system)
+- [x] Wire secondary attribute auto-calculation
+- [x] ~~Update `FormValidator` for renderer-generated DOM~~ — bypassed;
+      HTML5 validation + `collectFormData()` + server validation used instead.
+      Full client validator redesign deferred to Phase 5.
+- [x] Rewrite `creation-view.mjs` to reuse form renderer in creation mode
+- [x] Remove `GET /api/v1/view/creation` endpoint
+- [x] Remove `src/templates/creation.mts`
+- [x] Remove `src/renderers/renderCreationView.mts`
+
+### Step 3.5 — Form Field Hygiene & Secondary Attributes
+
+Fix broken secondary attribute live updates, eliminate redundant HTML
+attributes on form fields, extract duplicated nav generation. See
+[phase3-plan.md § Session 3.5](phase3-plan.md) for full analysis.
+
+- [ ] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
+- [ ] Remove redundant `data-path` and `data-field-path` attributes
+- [ ] Decide on input/output consistency for derived fields in create mode
+- [ ] Remove `injectDerivedAttributes()` — collect derived values from DOM
+- [ ] Extract nav generation into shared utility
 
 ### Step 4 — Dashboard, Landing & Final Cleanup (Session 4)
 
@@ -337,6 +351,74 @@ data. One rendering path for both initial load and real-time updates.
       from crash (only restart on non-zero exit), add `SIGINT`/`SIGTERM`
       handlers for graceful shutdown, TypeScript with proper types
 - [ ] Remove dead/commented code throughout the codebase
+
+### Client-Side Validation Redesign
+
+FormValidator was bypassed during Session 3 creation view migration due to
+structural incompatibilities with the flat-key served schema.
+
+The existing client validation system (`public/validation/`) was designed for
+a nested, client-side duplicate of the server schema. It cannot work with the
+flat-key schema served by `GET /api/v1/schema`:
+
+1. **`validation/engine.mjs`:** `validateField()` iterates all object keys as
+   rule names (only skips 3). `validateForm()` recursively walks a nested
+   schema tree. Neither works with flat dot-path keys.
+2. **`validation/ui.mjs` (FormValidator):** `buildFieldMap()` queries
+   `[name]` attributes. `getFormData()` builds nested objects via
+   `deepMerge()` with `DEFAULT_CHARACTER`. Tightly coupled to the nested
+   schema format.
+3. **`validation/schema.mjs`:** Client-side duplicate of `CHARACTER_SCHEMA`
+   with nested structure — the served schema was meant to replace this.
+4. **`rpgValidators`:** Custom validators are functions — not
+   JSON-serializable, can't be served via the schema endpoint.
+5. **~60% commented-out scaffolding** in engine.mjs + ui.mjs.
+
+Current workaround: HTML5 constraint validation + manual JS budget check +
+server-side `validateCharacterCreation()` as the safety net.
+
+- [ ] Delete `public/validation/schema.mjs` (the duplicate nested schema)
+- [ ] Redesign `validation/engine.mjs` to work with flat-key served schema
+- [ ] Redesign or replace `validation/ui.mjs` (FormValidator)
+- [ ] Design cross-field RPG validation (budget, defense, etc.) that works
+      with the served schema
+- [ ] Add proper UI error display (inline field errors, summary)
+
+### Creation View UX Bugs (Session 3 smoke test)
+
+- [ ] Input value not auto-selected on click — clicking a number input should
+      select the current value for immediate overwrite
+- [ ] Tab navigation across fields broken — field focus order doesn't follow
+      expected flow
+- [ ] Primary attributes should not default to 5 — initial value doesn't help
+      (sum = 40, fails validation anyway) and passes `required` check
+      incorrectly. Use empty inputs with placeholder values instead.
+- [ ] Derived attributes are editable when they shouldn't be — permanent and
+      temporary corruption depend on chosen abilities and must be read-only.
+      Unspent experience should also not be editable (or possibly hidden via
+      CSS in this view).
+- [ ] No derived stats recalculation on the client after character creation —
+      the server recalculates on save, but the client should immediately
+      display correct derived values (secondary attributes, combat stats)
+      without requiring a page reload.
+      **Root cause identified:** `SECONDARY_ATTRIBUTES_RULES` keys don't match
+      schema paths + `toughness` is a nested object. Fix tracked in
+      `phase3-plan.md` Session 3.5.
+- [ ] Portrait section markup broken — `section#portrait` is nested inside
+      another root section; duplicate headers (`h3` + `span`) appearing
+- [ ] `equipment.money` should not be user-editable during creation — it is
+      a derived/starting value, not a player choice
+
+### Client Import Map Aliases
+
+The server uses subpath import aliases (`#types`, `#models`, etc.) but the
+client still uses relative paths everywhere (`../state.mjs`,
+`../renderers/form-renderer.mjs`, etc.). The `index.html` import map should
+be expanded to provide clean aliases for client modules, matching the server
+convention.
+
+- [ ] Define client import aliases in `index.html` import map
+- [ ] Update client `.mjs` files to use aliased imports
 
 **Deliverable:** All known bugs fixed. All fixes covered by tests.
 

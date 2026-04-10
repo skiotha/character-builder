@@ -10,6 +10,7 @@ import { getComponent } from "./component-registry.mjs";
  * @param {Map} sectionFields - Map of sectionId → field array
  * @param {object} data - Full character data
  * @param {string} role - "dm" | "owner" | "public"
+ * @param {string} mode - "view" | "create"
  * @returns {HTMLElement}
  */
 export function renderParentSection(
@@ -19,6 +20,7 @@ export function renderParentSection(
   sectionFields,
   data,
   role,
+  mode,
 ) {
   const section = document.createElement("section");
 
@@ -32,14 +34,20 @@ export function renderParentSection(
   section.appendChild(heading);
 
   // Render direct fields (fields assigned to the parent, not to a child)
-  renderFields(section, directFields, data, role);
+  renderFields(section, directFields, data, role, mode);
 
   // Render children in order
   for (const childConfig of children) {
     const childFields = sectionFields.get(childConfig.id) || [];
     if (childFields.length === 0) continue;
 
-    const childEl = renderChildSection(childConfig, childFields, data, role);
+    const childEl = renderChildSection(
+      childConfig,
+      childFields,
+      data,
+      role,
+      mode,
+    );
     section.appendChild(childEl);
   }
 
@@ -56,9 +64,10 @@ export function renderParentSection(
  * @param {object[]} fields - Fields in this child section
  * @param {object} data - Full character data
  * @param {string} role - "dm" | "owner" | "public"
+ * @param {string} mode - "view" | "create"
  * @returns {HTMLElement}
  */
-function renderChildSection(config, fields, data, role) {
+function renderChildSection(config, fields, data, role, mode) {
   const hasHeading = config.label && config.label.length > 0;
   const el = document.createElement(hasHeading ? "section" : "div");
 
@@ -70,13 +79,13 @@ function renderChildSection(config, fields, data, role) {
     el.appendChild(heading);
   }
 
-  renderFields(el, fields, data, role);
+  renderFields(el, fields, data, role, mode);
   return el;
 }
 
 // ── Shared field rendering ────────────────────────────────────
 
-function renderFields(container, fields, data, role) {
+function renderFields(container, fields, data, role, mode) {
   const sorted = [...fields].sort(
     (a, b) => (a.schema.ui?.order ?? 999) - (b.schema.ui?.order ?? 999),
   );
@@ -88,12 +97,12 @@ function renderFields(container, fields, data, role) {
     if (componentName) {
       const componentFn = getComponent(componentName);
       if (componentFn) {
-        container.appendChild(componentFn(path, schema, value, role));
+        container.appendChild(componentFn(path, schema, value, role, mode));
         continue;
       }
     }
 
-    container.appendChild(renderField(path, schema, value, role));
+    container.appendChild(renderField(path, schema, value, role, mode));
   }
 }
 

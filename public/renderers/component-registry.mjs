@@ -1,7 +1,7 @@
 /**
  * Component override registry.
  * Maps component names (from schema ui.component) to render functions.
- * Each function: (path, fieldSchema, value, role) → HTMLElement
+ * Each function: (path, fieldSchema, value, role, mode) → HTMLElement
  *
  * Session 1: all stubs. Real implementations arrive in Session 2.
  */
@@ -16,7 +16,7 @@ const registry = new Map();
 /**
  * Register a component override renderer.
  * @param {string} name - Component name matching schema ui.component value
- * @param {Function} renderFn - (path, fieldSchema, value, role) → HTMLElement
+ * @param {Function} renderFn - (path, fieldSchema, value, role, mode) → HTMLElement
  */
 export function registerComponent(name, renderFn) {
   registry.set(name, renderFn);
@@ -42,7 +42,7 @@ export function hasComponent(name) {
 
 // ── Stub placeholder for unimplemented components ─────────────
 
-function stubComponent(path, fieldSchema, value, role) {
+function stubComponent(path, fieldSchema, value, role, mode) {
   const el = document.createElement("div");
   el.classList.add("component-stub");
   el.dataset.component = fieldSchema.ui?.component || "unknown";

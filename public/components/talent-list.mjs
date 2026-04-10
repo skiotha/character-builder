@@ -16,7 +16,7 @@
  * @param {string} role - "dm" | "owner" | "public"
  * @returns {HTMLElement}
  */
-export function renderTalentList(path, fieldSchema, value, role) {
+export function renderTalentList(path, fieldSchema, value, role, mode) {
   const talents = Array.isArray(value) ? value : [];
   const writable = isWritable(fieldSchema, role);
 

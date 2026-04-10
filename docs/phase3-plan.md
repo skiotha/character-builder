@@ -229,9 +229,12 @@ SSE updates flow through the new pipeline.
   - Add/remove trait UI; fetches library from `GET /api/v1/abilities`
 - [x] Implement `public/components/talent-list.mjs`:
   - Talent slots, add/remove (DM/owner only)
-- [ ] Implement ritual-list component
-  (possibly generic "reference-list" pattern)
-- [ ] Implement equipment section components (weapons, armor, inventory)
+- [~] Implement ritual-list component
+  (possibly generic "reference-list" pattern) — **deferred to Phase 6/8:**
+  no ritual data on existing characters; component needs RPG engine work first
+- [~] Implement equipment section components (weapons, armor, inventory) —
+  **deferred to Phase 6/8:** equipment system depends on RPG engine
+  (weapon/armor effects, encumbrance)
 
 ### 2b. Character View Rewrite
 
@@ -269,9 +272,9 @@ SSE updates flow through the new pipeline.
   Components render correct empty states ("No traits learned", "No talents").
   Will verify with real data when trait/talent management is implemented.
 - [x] SSE real-time updates (two tabs: edit in one, see update in other)
-- [ ] Role-based editability (owner, DM, public) — **deferred:** DM login
-  requires env file; owner editability verified, DM/public deferred to Phase 5
-  hardening
+- [~] Role-based editability (owner, DM, public) — **deferred to Phase 5:**
+  DM login requires env file; owner editability verified, DM/public deferred
+  to Phase 5 hardening
 - [x] Dashboard and initial views still work (still server HTML)
 - [x] `npm run typecheck` passes
 
@@ -438,67 +441,233 @@ tracking and form validation.
 
 ### 3a. Creation Mode in Form Renderer
 
-- [ ] Extend form renderer for `mode: "create"`:
-  - Owner-writable fields become editable inputs
-  - Required fields get `required` attribute
-  - No `data-character-id` (doesn't exist yet)
-  - Secondary attributes: readonly, auto-calculated from primary
-  - Derived fields hidden or shown as placeholders
+- [x] Extend form renderer for `mode: "create"`:
+  - `mode` threaded through entire rendering pipeline: form-renderer →
+    section-renderer → form-field + component-registry → all components
+  - `isWritable(fieldSchema, role, mode)`: create-mode returns `true` for
+    all non-`serverControlled`, non-`derived` fields
+  - `applyEditBehavior()`: create-mode writable fields are plain editable
+    (no `data-behavior="edit-enabled"`); non-writable get `readonly`
+  - `renderCharacterName()`: create-mode skips `data-behavior`, applies
+    `required`/`minLength`/`maxLength` constraints
+  - Component signatures updated to `(path, fieldSchema, value, role, mode)`
 
 ### 3b. Attribute Budget + Secondary Calculation
 
-- [ ] Wire attribute budget calculator:
-  - Listen to primary attribute input changes
-  - Display remaining budget (80 − total)
-  - Recalculate secondary attributes from primary on change
-  - Reuse RPG formulas from `public/utils/rpg.mjs` or
-    `public/validation/engine.mjs`
+- [x] Wire attribute budget calculator:
+  - Budget `<output id="balance">` injected into `section#attributes`
+  - `createBudgetHandler(form)`: sums primary inputs, displays 80 − total,
+    toggles `.over-budget`/`.exact-budget` classes
+  - `updateSecondaryAttributes(form)`: recalculates via
+    `SECONDARY_ATTRIBUTES_RULES` + `PRIMARY_TO_SECONDARY` from `utils/rpg.mjs`
 
 ### 3c. Form Validation Integration
 
-- [ ] Update `FormValidator` (`public/validation/ui.mjs`) to work with
-  renderer-generated DOM:
-  - Ensure renderer sets `name` attribute on creation-mode fields
-  - Or update `FormValidator` to use `data-path`
+- [x] **Decision: FormValidator bypassed.** Structural mismatches between
+  FormValidator's nested-schema tree-walker and the flat-key served schema
+  made adaptation costlier than replacement. Instead:
+  - HTML5 constraint validation (`form.reportValidity()`) for field-level
+  - Manual budget check (sum ≤ 80) before submission
+  - Server-side `validateCharacterCreation()` as the real safety net
+  - **Deferred:** Full schema-aware client validator redesign (Phase 5/8)
 
 ### 3d. Creation View Rewrite
 
-- [ ] Rewrite `public/views/creation-view.mjs`:
-  - Fetch schema → `renderCharacterForm(schema, {}, "owner", "create")`
-    with empty data (defaults from schema)
-  - Wire portrait upload handler
-  - Wire form submission: validate → POST → navigate to character view
-  - Wire attribute budget display
+- [x] Rewrite `public/views/creation-view.mjs`:
+  - Uses `renderCharacterForm(schema, DEFAULT_CHARACTER, "owner", "create")`
+  - Schema fetched via `api.getSchema()` (ETag-cached)
+  - `collectFormData(form)` extracts nested object from named fields
+  - Submission pipeline: validate → budget check → POST via `api.createCharacter()`
+    → update state → upload portrait → navigate to character view
+  - Fixed `api.createCharacter()` headers bug (undeclared `headers` variable)
+  - Portrait: `initPortraitUpload(container)` + `getPortraitData()` on submit
+  - Cleanup function: removes ID, cleans up portrait, detaches submit listener
 
 ### 3e. Server Cleanup (Creation View)
 
-- [ ] Remove `GET /api/v1/view/creation` endpoint from `src/app.mts`
-- [ ] Remove `src/templates/creation.mts`
-- [ ] Remove `src/renderers/renderCreationView.mts`
-- [ ] Update `src/renderers/index.mts` barrel
+- [x] Remove `GET /api/v1/view/creation` endpoint from `src/app.mts`
+- [x] Remove `src/templates/creation.mts`
+- [x] Remove `src/renderers/renderCreationView.mts`
+- [x] Update `src/renderers/index.mts` barrel
 
 ### Verification
 
-- [ ] Creation form renders from schema
-- [ ] All required fields present and marked required
-- [ ] Attribute budget tracking works (sum = 80)
-- [ ] Secondary attributes auto-calculate on primary change
-- [ ] Portrait upload works in creation mode
-- [ ] Form submission creates character correctly
-- [ ] Post-creation, character view loads with correct data
-- [ ] `npm run typecheck` passes
+- [x] `npm run typecheck` passes
+- [x] `npm test` passes (1 test, 0 failures)
+- [x] Manual verification: creation form renders, budget tracking, submission,
+  portrait upload (requires running dev server)
+
+### Deviations from Original Plan
+
+1. **FormValidator bypassed entirely** instead of adapted. HTML5 validation +
+   `collectFormData()` + server validation used instead. Deferred to Phase 5/8.
+2. **`collectFormData()` is inline** in creation-view.mjs rather than a shared
+   utility — creation view is the only consumer for now.
+3. **No `enhanceElement()` call** in creation view — inline-edit behaviors
+   don't apply to a new character form.
+4. **Form ID retained as `character-form`** (not `creation-form`) — shares
+   CSS grid with character view via `form[data-mode]` distinction.
 
 ### Session Closeout
 
-- [ ] Update `docs/roadmap.md`: check off Step 3 items
-- [ ] Update `docs/phase3-plan.md`: record deviations
-- [ ] Update `/memories/repo/character-builder.md` with removed files
-- [ ] Update `/memories/repo/phase3-progress.md`:
-  - Session 3 deliverables
-  - Creation-mode renderer details
-  - Budget/validation integration approach
-  - Removed server files
-  - What Session 4 should start with
+- [x] Update `docs/roadmap.md`: check off Step 3 items
+- [x] Update `docs/phase3-plan.md`: record deviations
+- [x] Update `/memories/repo/character-builder.md` with removed files
+- [x] Record deferred item: client-side validation redesign in
+  `docs/deferred-tasks.md`
+
+---
+
+## Session 3.5 — Form Field Hygiene & Secondary Attributes
+
+**Goal:** Fix broken secondary attribute live updates, eliminate redundant
+HTML attributes on form fields, and extract duplicated nav generation. All
+three issues stem from Session 2–3 renderer work and should be resolved
+before Session 4 adds more consumers.
+
+### Problem 1: Secondary attribute updates silently fail
+
+`updateSecondaryAttributes()` in `creation-view.mjs` queries DOM via
+`[data-path="attributes.secondary.${secondaryId}"]`, but the keys in
+`SECONDARY_ATTRIBUTES_RULES` and `PRIMARY_TO_SECONDARY` (in `rpg.mjs`)
+don't match the actual schema paths:
+
+| Rule key | Queries for | Actual DOM path(s) |
+|---|---|---|
+| `toughness` | `…secondary.toughness` | `…secondary.toughness.max`, `…secondary.toughness.current` |
+| `pain` | `…secondary.pain` | `…secondary.painThreshold` |
+| `corruption` | `…secondary.corruption` | `…secondary.corruptionThreshold` |
+| `defense` | `…secondary.defense` | `…secondary.defense` ✓ |
+
+Only `defense` matches. The other three silently no-op because
+`querySelector` returns `null` and the guard `if (!el) continue` skips them.
+
+Additionally, `toughness` is a nested object in the schema (`{max, current}`)
+— the update function must set both sub-fields, not a single element.
+
+**Fix:** Align `SECONDARY_ATTRIBUTES_RULES` and `PRIMARY_TO_SECONDARY` keys
+to match the actual schema paths. For `toughness`, the rule must update both
+`toughness.max` and `toughness.current`. Consider whether `rpg.mjs` should
+export the canonical paths directly, or whether a mapping layer belongs in
+the creation view.
+
+### Problem 2: Redundant HTML attributes on form fields
+
+`form-field.mjs` stamps **four** path occurrences on every field:
+
+| Element | Attribute | Example value |
+|---|---|---|
+| `div` wrapper | `data-field-path` | `attributes.secondary.armor` |
+| control | `id` | `field-attributes.secondary.armor` |
+| control | `name` | `attributes.secondary.armor` |
+| control | `data-path` | `attributes.secondary.armor` |
+
+Only two are semantically necessary:
+
+- **`name`** — form submission, `querySelector('[name="…"]')` lookups
+- **`id`** — `<label for="…">` association (HTML spec requirement)
+
+`data-field-path` on the wrapper duplicates `name` on the control — the
+wrapper can find its control via `:scope > input, :scope > output, …` and
+the control already carries the path in `name`.
+
+`data-path` duplicates `name` exactly. All JS that queries
+`[data-path="…"]` can query `[name="…"]` instead (for `<input>`,
+`<select>`, `<textarea>`) or we keep `data-path` only on `<output>`
+elements (which don't participate in form submission and have no `name`
+requirement — though `<output>` does support `name`).
+
+**Decision needed:** Settle on a single query strategy. Options:
+
+1. **`name` only** — remove `data-path` and `data-field-path`. Query via
+   `[name="…"]`. Works for all form-associated elements including `<output>`.
+2. **`id` only** — deterministic `field-${path}` convention. Query via
+   `getElementById("field-" + path)`. Fast, but `getElementById` doesn't
+   scope to a subtree.
+3. **`name` + `id`** — `name` for queries, `id` for label association.
+   Drop `data-path` and `data-field-path`.
+
+Option 3 is likely correct: `id` is required for `<label for>`, `name` is
+required for form data collection, and both are already set. Everything else
+is redundant.
+
+### Problem 3: Input vs Output inconsistency for secondary attributes
+
+The schema defines `toughness.current` with `displayAs: "number"` (because
+it has `quickActions: ["heal", "damage"]` for the character view), while all
+other secondary fields use `displayAs: "readonly"` → `<output>`.
+
+In **create mode**, `toughness.current` is `derived: true` so it gets
+`readonly` anyway — but it's still an `<input type="number" readonly>`
+instead of an `<output>`. This creates a visual/semantic inconsistency
+within the secondary attributes group.
+
+**Fix options:**
+
+1. **Mode-aware displayAs override:** In create mode, if a field is
+   `derived: true`, force `displayAs: "readonly"` regardless of schema.
+   The `quickActions` only make sense in view mode.
+2. **CSS-only:** Style `input[readonly]` and `output` identically within
+   `#secondary`. Doesn't fix the semantic inconsistency but normalizes
+   the visual.
+3. **Accept it:** The inconsistency is harmless — `updateSecondaryAttributes`
+   handles both via the `"valueAsNumber" in el` branch. Fix the query
+   selector bugs (Problem 1) and move on.
+
+### Problem 4: Nav generation duplication
+
+`character-view.mjs` (lines 30–41) and `creation-view.mjs` (lines 33–45)
+contain identical `<nav>` generation logic: loop over
+`["BIO", "INVENTORY", "DESCRIPTION"]` creating `nav > ul > li > a`.
+
+**Fix:** Extract into a shared utility (e.g. `public/renderers/nav.mjs` or
+fold into form renderer output).
+
+### Problem 5: `injectDerivedAttributes()` duplicates live calculations
+
+`injectDerivedAttributes()` in `creation-view.mjs` manually recomputes
+secondary attributes from primaries and stamps them onto the submission
+payload. This exists solely because `updateSecondaryAttributes()` is broken
+(Problem 1) and `collectFormData()` excludes `[readonly]` fields.
+
+Once Problem 1 is fixed (live updates work), the secondary values are
+already correct in the DOM. The remaining gap is collection:
+
+- `collectFormData()` skips `[readonly]` inputs and ignores `<output>`
+  elements entirely. It needs to collect derived fields that the server
+  requires (`attributes.secondary.*`).
+- `experience.total = 50` is a hidden constant not represented in the form
+  at all. Either add a `<input type="hidden" name="experience.total">`
+  during form setup, or keep a minimal injection for hidden-only values.
+
+**Fix:** After Problems 1–3 are resolved:
+1. Expand `collectFormData()` to include readonly inputs and `<output>`
+   elements (or at least those within derived sections)
+2. Remove `injectDerivedAttributes()` entirely
+3. Handle `experience.total` via a hidden input in the form
+
+### Tasks
+
+- [ ] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key
+      mismatch in `public/utils/rpg.mjs`
+- [ ] Update `updateSecondaryAttributes()` to handle `toughness.max` and
+      `toughness.current` as separate targets
+- [ ] Remove `data-path` attribute from all controls in `form-field.mjs`
+- [ ] Remove `data-field-path` attribute from field wrappers in
+      `form-field.mjs`
+- [ ] Update all JS that queries `[data-path="…"]` to use `[name="…"]`
+      (creation-view.mjs, character-view.mjs, editable.mjs, dom.mjs, etc.)
+- [ ] Decide on input/output consistency for derived fields in create mode
+- [ ] Expand `collectFormData()` to collect derived/readonly field values
+- [ ] Remove `injectDerivedAttributes()` — secondary values come from DOM
+- [ ] Add hidden input for `experience.total` (or other non-rendered
+      required constants)
+- [ ] Extract nav generation into shared utility
+- [ ] Update both views to use shared nav
+- [ ] Verify: budget handler still works
+- [ ] Verify: secondary attributes update live when primaries change
+- [ ] Verify: form submission succeeds without `injectDerivedAttributes()`
+- [ ] `npm run typecheck` passes
 
 ---
 

@@ -15,9 +15,10 @@
  * @param {object} fieldSchema - Serialized schema field descriptor
  * @param {*} value - Portrait data object or null/undefined
  * @param {string} role - "dm" | "owner" | "public"
+ * @param {string} mode - "view" | "create"
  * @returns {HTMLElement}
  */
-export function renderPortrait(path, fieldSchema, value, role) {
+export function renderPortrait(path, fieldSchema, value, role, mode) {
   const section = document.createElement("section");
   section.id = "portrait";
   section.dataset.path = path;
