@@ -77,7 +77,7 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
 - Caps: "Defense cannot exceed 10"
   → `{ target: { kind: "secondary", stat: "defense" }, modifier: { type: "cap", value: 10 } }`
 - Remove weapon quality: "Unwieldy quality removed from battle heels"
-  → `{ target: { kind: "weaponQuality", action: "remove", quality: "unwieldy", weaponFilter: "battle-heels" }, modifier: { type: "remove" } }`
+  → `{ target: { kind: "weaponQuality", action: "remove", quality: "unwieldy", weaponFilter: "heels" }, modifier: { type: "remove" } }`
 
 **Tier B — Structured Flags** (machine-readable but not a numeric modifier).
 Uses the `flag` target kind per [ADR-011](decisions/011-typed-effect-targets.md):
@@ -166,7 +166,7 @@ Uses the `flag` target kind per [ADR-011](decisions/011-typed-effect-targets.md)
         "effects": [
           {
             "tier": "A",
-            "target": { "kind": "weaponQuality", "action": "remove", "quality": "unwieldy", "weaponFilter": "battle-heels" },
+            "target": { "kind": "weaponQuality", "action": "remove", "quality": "unwieldy", "weaponFilter": "heels" },
             "modifier": { "type": "remove" },
             "description": "Remove unwieldy from battle heels."
           }
@@ -270,7 +270,7 @@ UI weapon selector and validates weapon properties.
     "qualities": ["massive"]
   },
   {
-    "id": "battle-heels",
+    "id": "heels",
     "name": "Battle Heels",
     "type": "light",
     "damage": 4,

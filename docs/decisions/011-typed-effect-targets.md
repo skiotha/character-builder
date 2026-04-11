@@ -106,7 +106,7 @@ interface WeaponQualityTarget {
   kind: 'weaponQuality';
   action: 'add' | 'remove';
   quality: string;
-  weaponFilter?: string;  // e.g., "battle-heels" — applies only to this weapon id
+  weaponFilter?: string;  // e.g., "heels" — applies only to this weapon id
 }
 
 /** Adds or removes a quality from armor */
@@ -193,7 +193,7 @@ In JSON reference data files (`abilities.en.json`, `spells.en.json`), effects st
       "modifier": { "type": "setBase", "value": "discreet" }
     },
     {
-      "target": { "kind": "weaponQuality", "action": "remove", "quality": "unwieldy", "weaponFilter": "battle-heels" },
+      "target": { "kind": "weaponQuality", "action": "remove", "quality": "unwieldy", "weaponFilter": "heels" },
       "modifier": { "type": "remove" }
     },
     {
