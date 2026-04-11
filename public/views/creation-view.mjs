@@ -9,6 +9,7 @@ import {
 import { navigate } from "router";
 import { initPortraitUpload } from "../behaviors/portraitHandler.mjs";
 import { renderCharacterForm } from "../renderers/form-renderer.mjs";
+import { createViewNav } from "../utils/dom.mjs";
 import {
   DEFAULT_CHARACTER,
   SECONDARY_ATTRIBUTES_RULES,
@@ -35,18 +36,7 @@ export async function renderCreation(container, params) {
     container.setAttribute("id", "creation-view");
     container.innerHTML = "";
 
-    const nav = document.createElement("nav");
-    const ul = document.createElement("ul");
-    for (const label of ["BIO", "INVENTORY", "DESCRIPTION"]) {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.textContent = label;
-      a.href = "#";
-      li.appendChild(a);
-      ul.appendChild(li);
-    }
-    nav.appendChild(ul);
-    container.appendChild(nav);
+    container.appendChild(createViewNav());
     container.appendChild(form);
 
     // Hidden submit button — enables implicit submission (Enter key)
@@ -60,7 +50,6 @@ export async function renderCreation(container, params) {
     if (attributesSection) {
       const budgetOutput = document.createElement("output");
       budgetOutput.id = "balance";
-      budgetOutput.name = "balance";
       budgetOutput.value = String(BUDGET);
       budgetOutput.textContent = String(BUDGET);
 
@@ -80,6 +69,13 @@ export async function renderCreation(container, params) {
     if (primaryContainer) {
       primaryContainer.addEventListener("input", budgetHandler);
     }
+
+    // Hidden input for experience.total (not rendered by schema, required by server)
+    const expInput = document.createElement("input");
+    expInput.type = "hidden";
+    expInput.name = "experience.total";
+    expInput.value = "50";
+    form.appendChild(expInput);
 
     // Wire portrait
     portraitManager = initPortraitUpload(container);
@@ -149,18 +145,14 @@ function updateSecondaryAttributes(form) {
 
       const newValue = rule.calculate(primaryValue);
 
-      // Secondary fields may be <input readonly> or <output>
+      // Secondary fields are <output> elements with name attributes
       const el = form.querySelector(
-        `[data-path="attributes.secondary.${secondaryId}"]`,
+        `[name="attributes.secondary.${secondaryId}"]`,
       );
       if (!el) continue;
 
-      if ("valueAsNumber" in el) {
-        el.valueAsNumber = newValue;
-      } else {
-        el.value = String(newValue);
-        el.textContent = String(newValue);
-      }
+      el.value = String(newValue);
+      el.textContent = String(newValue);
     }
   }
 }
@@ -195,11 +187,8 @@ const handleFormSubmit = async (e) => {
       return;
     }
 
-    // Collect form data (editable fields only)
+    // Collect form data
     const characterData = collectFormData(form);
-
-    // Inject server-required derived values computed from primaries
-    injectDerivedAttributes(characterData);
 
     // Attach player ID
     const playerToken = getPlayerToken();
@@ -252,38 +241,12 @@ const handleFormSubmit = async (e) => {
 
 // ── Data collection ───────────────────────────────────────────
 
-function injectDerivedAttributes(data) {
-  const primary = data.attributes?.primary ?? {};
-
-  const toughness = Math.max(primary.strong || 0, 10);
-  const painThreshold = Math.ceil((primary.strong || 0) * 0.5);
-  const corruptionThreshold = Math.ceil((primary.resolute || 0) * 0.5);
-  const defense = primary.quick || 0;
-
-  data.attributes = data.attributes || {};
-  data.attributes.secondary = {
-    toughness: { max: toughness, current: toughness },
-    painThreshold,
-    corruptionThreshold,
-    defense,
-    armor: 0,
-    corruptionMax: corruptionThreshold,
-  };
-
-  // experience.total is hidden (not in the form) but required by server
-  data.experience = data.experience || {};
-  data.experience.total = 50;
-}
-
 function collectFormData(form) {
   const data = {};
-  const fields = form.querySelectorAll(
-    "input[name]:not([readonly]), select[name]:not([readonly]), textarea[name]:not([readonly])",
-  );
 
-  for (const field of fields) {
+  for (const field of form.elements) {
     const path = field.name;
-    if (!path) continue;
+    if (!path || field.type === "submit") continue;
 
     const keys = path.split(".");
     let current = data;
@@ -294,9 +257,16 @@ function collectFormData(form) {
     }
 
     const lastKey = keys[keys.length - 1];
-    if (field.type === "number") {
-      const n = field.valueAsNumber;
+    const tag = field.tagName;
+
+    if (field.type === "number" || field.type === "hidden") {
+      const n = Number(field.value);
       if (!Number.isNaN(n)) current[lastKey] = n;
+    } else if (tag === "OUTPUT") {
+      const v = field.value;
+      if (v === "") continue;
+      const n = Number(v);
+      current[lastKey] = Number.isNaN(n) ? v : n;
     } else {
       const v = field.value;
       if (v !== "") current[lastKey] = v;

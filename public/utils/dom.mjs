@@ -24,3 +24,24 @@ export function updateFieldValue(field, newValue) {
   field.classList.add("updated");
   setTimeout(() => field.classList.remove("updated"), 200);
 }
+
+const VIEW_NAV_LABELS = ["BIO", "INVENTORY", "DESCRIPTION"];
+
+/**
+ * Build the shared `<nav>` used by character and creation views.
+ * @returns {HTMLElement}
+ */
+export function createViewNav() {
+  const nav = document.createElement("nav");
+  const ul = document.createElement("ul");
+  for (const label of VIEW_NAV_LABELS) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.textContent = label;
+    a.href = "#";
+    li.appendChild(a);
+    ul.appendChild(li);
+  }
+  nav.appendChild(ul);
+  return nav;
+}

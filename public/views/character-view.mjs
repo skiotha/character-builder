@@ -7,7 +7,7 @@ import {
   setPlayerRole,
   setCurrentCharacter,
 } from "../state.mjs";
-import { updateFieldValue } from "../utils/dom.mjs";
+import { updateFieldValue, createViewNav } from "../utils/dom.mjs";
 
 export async function renderCharacter(container, params) {
   try {
@@ -27,18 +27,7 @@ export async function renderCharacter(container, params) {
     container.innerHTML = "";
 
     // Nav for anchor positioning (character-name uses --main)
-    const nav = document.createElement("nav");
-    const ul = document.createElement("ul");
-    for (const label of ["BIO", "INVENTORY", "DESCRIPTION"]) {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.textContent = label;
-      a.href = "#";
-      li.appendChild(a);
-      ul.appendChild(li);
-    }
-    nav.appendChild(ul);
-    container.appendChild(nav);
+    container.appendChild(createViewNav());
 
     container.appendChild(form);
 

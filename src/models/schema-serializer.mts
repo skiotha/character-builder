@@ -68,8 +68,16 @@ function walkSchema(
 ): void {
   for (const [key, value] of Object.entries(node)) {
     if (key === "_config") continue;
-    if (SCHEMA_PROPS.has(key)) continue;
     if (value === null || typeof value !== "object") continue;
+
+    // Skip known schema property keys — unless the value looks like
+    // a child schema field (object with its own `type` string).
+    // Handles name collisions like `toughness.max` vs the `max` constraint.
+    if (SCHEMA_PROPS.has(key)) {
+      if (Array.isArray(value)) continue;
+      const candidate = value as Record<string, unknown>;
+      if (typeof candidate.type !== "string") continue;
+    }
 
     const child = value as Record<string, unknown>;
     const childPath = prefix ? `${prefix}.${key}` : key;

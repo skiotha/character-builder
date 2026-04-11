@@ -648,26 +648,26 @@ already correct in the DOM. The remaining gap is collection:
 
 ### Tasks
 
-- [ ] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key
+- [x] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key
       mismatch in `public/utils/rpg.mjs`
-- [ ] Update `updateSecondaryAttributes()` to handle `toughness.max` and
+- [x] Update `updateSecondaryAttributes()` to handle `toughness.max` and
       `toughness.current` as separate targets
 - [ ] Remove `data-path` attribute from all controls in `form-field.mjs`
 - [ ] Remove `data-field-path` attribute from field wrappers in
       `form-field.mjs`
 - [ ] Update all JS that queries `[data-path="…"]` to use `[name="…"]`
       (creation-view.mjs, character-view.mjs, editable.mjs, dom.mjs, etc.)
-- [ ] Decide on input/output consistency for derived fields in create mode
-- [ ] Expand `collectFormData()` to collect derived/readonly field values
-- [ ] Remove `injectDerivedAttributes()` — secondary values come from DOM
-- [ ] Add hidden input for `experience.total` (or other non-rendered
+- [x] Decide on input/output consistency for derived fields in create mode
+- [x] Expand `collectFormData()` to collect derived/readonly field values
+- [x] Remove `injectDerivedAttributes()` — secondary values come from DOM
+- [x] Add hidden input for `experience.total` (or other non-rendered
       required constants)
-- [ ] Extract nav generation into shared utility
-- [ ] Update both views to use shared nav
-- [ ] Verify: budget handler still works
-- [ ] Verify: secondary attributes update live when primaries change
-- [ ] Verify: form submission succeeds without `injectDerivedAttributes()`
-- [ ] `npm run typecheck` passes
+- [x] Extract nav generation into shared utility
+- [x] Update both views to use shared nav
+- [x] Verify: budget handler still works
+- [x] Verify: secondary attributes update live when primaries change
+- [x] Verify: form submission succeeds without `injectDerivedAttributes()`
+- [x] `npm run typecheck` passes
 
 ---
 

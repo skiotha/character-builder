@@ -95,15 +95,19 @@ const DEFAULT_CHARACTER = {
 };
 
 const SECONDARY_ATTRIBUTES_RULES = {
-  toughness: {
+  "toughness.max": {
     dependsOn: "strong",
     calculate: (primaryValue) => Math.max(primaryValue || 0, 10),
   },
-  pain: {
+  "toughness.current": {
+    dependsOn: "strong",
+    calculate: (primaryValue) => Math.max(primaryValue || 0, 10),
+  },
+  painThreshold: {
     dependsOn: "strong",
     calculate: (primaryValue) => Math.ceil((primaryValue || 0) * 0.5),
   },
-  corruption: {
+  corruptionThreshold: {
     dependsOn: "resolute",
     calculate: (primaryValue) => Math.ceil((primaryValue || 0) * 0.5),
   },
@@ -114,8 +118,8 @@ const SECONDARY_ATTRIBUTES_RULES = {
 };
 
 const PRIMARY_TO_SECONDARY = {
-  strong: ["toughness", "pain"],
-  resolute: ["corruption"],
+  strong: ["toughness.max", "toughness.current", "painThreshold"],
+  resolute: ["corruptionThreshold"],
   quick: ["defense"],
 };
 

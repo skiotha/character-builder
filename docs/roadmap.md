@@ -215,11 +215,11 @@ Fix broken secondary attribute live updates, eliminate redundant HTML
 attributes on form fields, extract duplicated nav generation. See
 [phase3-plan.md § Session 3.5](phase3-plan.md) for full analysis.
 
-- [ ] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
+- [x] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
 - [ ] Remove redundant `data-path` and `data-field-path` attributes
-- [ ] Decide on input/output consistency for derived fields in create mode
-- [ ] Remove `injectDerivedAttributes()` — collect derived values from DOM
-- [ ] Extract nav generation into shared utility
+- [x] Decide on input/output consistency for derived fields in create mode
+- [x] Remove `injectDerivedAttributes()` — collect derived values from DOM
+- [x] Extract nav generation into shared utility
 
 ### Step 4 — Dashboard, Landing & Final Cleanup (Session 4)
 
@@ -408,6 +408,28 @@ server-side `validateCharacterCreation()` as the safety net.
       another root section; duplicate headers (`h3` + `span`) appearing
 - [ ] `equipment.money` should not be user-editable during creation — it is
       a derived/starting value, not a player choice
+
+### Array-Typed Derived Fields in Form Collection
+
+`collectFormData()` iterates `form.elements` and coerces values to numbers
+or strings. Fields whose schema type is `"array"` (e.g. `combat.bonusDamage`)
+render as `<output>` with an empty or comma-separated string value — the
+collector cannot reconstruct the original array from that.
+
+**Temporary fix (Session 3.5a):** skip `<output>` elements with empty values
+so array-typed fields fall through to server defaults.
+
+**Proper fix (Phase 6):** These fields should have `type: "number"` in the
+schema, not `type: "array"`. The array lives in the character's `effects`
+list; the derived scalar is a reduction:
+`effects.filter(e => e.target === 'combat.bonusDamage').reduce((sum, e) => sum + e.value, 0)`.
+Once the effect resolution pipeline (Phase 6 Step 0) produces typed scalar
+derived values, `combat.bonusDamage` becomes a plain number and the form
+collector handles it naturally.
+
+- [x] Temporary: skip empty `<output>` values in `collectFormData()`
+- [ ] Permanent: change `combat.bonusDamage` schema type from `"array"` to
+      `"number"` once the effect resolution pipeline computes the total
 
 ### Client Import Map Aliases
 

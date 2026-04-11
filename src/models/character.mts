@@ -265,7 +265,7 @@ export const CHARACTER_SCHEMA: Record<
             section: "attributes.secondary",
             label: "Health",
             order: 2,
-            displayAs: "number",
+            displayAs: "readonly",
             quickActions: ["heal", "damage"],
           },
         },
