@@ -1,127 +1,112 @@
 import * as api from "api";
-import { getState, setCharacters } from "state";
+import { setCharacters } from "state";
 import { navigate } from "router";
+import {
+  createCharacterCard,
+  createNewCharacterCard,
+} from "../components/character-card.mjs";
+
+const MAX_CHARACTERS = 6;
 
 export async function renderDashboard(container, params) {
   try {
-    const state = getState();
-
-    // if (!state.playerToken) {
-    //   console.warn("No player token found, redirecting to initial view");
-    //   navigate("/");
-    //   return () => {};
-    // }
-
     container.innerHTML = "<div>Loading dashboard</div>";
-    const html = await api.fetchView("dashboard");
 
-    const fragment = document.createRange().createContextualFragment(html);
+    const characters = await api.getCharacters();
+    setCharacters(characters);
 
-    const dataScript = fragment.querySelector(
-      'script[type="application/json"]',
-    );
-    if (dataScript) {
-      const characters = JSON.parse(dataScript.textContent);
-      setCharacters(characters);
-
-      dataScript.remove();
-    }
-
-    container.setAttribute("id", "dashboard-view");
+    container.id = "dashboard-view";
     container.innerHTML = "";
-    container.appendChild(fragment);
+    container.appendChild(buildWelcomeBlock());
+    container.appendChild(buildCharacterGrid(characters));
 
-    console.log(getState());
-
-    attachDashboardViewListeners(container);
+    attachListeners(container);
 
     return () => {
-      console.log("Dashboard cleanup");
       container.removeAttribute("id");
-      detachDashboardViewListeners(container);
+      detachListeners(container);
     };
   } catch (error) {
-    console.error("Error rendering dashboard: ", error);
+    console.error("Error rendering dashboard:", error);
 
-    container.innerHTML = `
-      <div class="error-state">
-        <h2>Error Loading Dashboard</h2>
-        <p>${error.message}</p>
-        <button id="retry" class="btn-primary">Retry</button>
-        <button id="go-home" class="btn-secondary">Go Home</button>
-      </div>
-    `;
+    container.innerHTML = "";
+    const errorBlock = document.createElement("div");
+    errorBlock.classList.add("error-state");
 
-    container.querySelector("#retry").addEventListener("click", () => {
-      renderDashboard(container, params);
-    });
+    const heading = document.createElement("h2");
+    heading.textContent = "Error Loading Dashboard";
+    errorBlock.appendChild(heading);
 
+    const message = document.createElement("p");
+    message.textContent = error.message;
+    errorBlock.appendChild(message);
+
+    const retry = document.createElement("button");
+    retry.textContent = "Retry";
+    retry.addEventListener("click", () => renderDashboard(container, params));
+    errorBlock.appendChild(retry);
+
+    container.appendChild(errorBlock);
     return () => {};
   }
 }
 
-function attachDashboardViewListeners(container) {
-  const editBtns = container.querySelectorAll("button[data-action=edit]");
-  const viewBtns = container.querySelectorAll("button[data-action=view]");
-  const createBtns = document.querySelectorAll("button[data-action=create]");
+function buildWelcomeBlock() {
+  const article = document.createElement("article");
 
-  if (!!createBtns.length) {
-    createBtns.forEach((btn) =>
-      btn.addEventListener("click", handleCreateClick),
-    );
-  }
+  const h1 = document.createElement("h1");
+  h1.textContent = "NAGARA";
+  article.appendChild(h1);
 
-  if (!!editBtns.length) {
-    editBtns.forEach((btn) => btn.addEventListener("click", handleEditClick));
-  }
+  const p = document.createElement("p");
+  p.innerHTML =
+    "All your characters are here. Click on any one or <em>Create</em> new.";
+  article.appendChild(p);
 
-  if (!!viewBtns.length) {
-    viewBtns.forEach((btn) => btn.addEventListener("click", handleViewClick));
-  }
+  return article;
 }
 
-function detachDashboardViewListeners(container) {
-  const editBtns = container.querySelectorAll("button[data-action=edit]");
-  const viewBtns = container.querySelectorAll("button[data-action=view]");
-  const createBtns = document.querySelectorAll("button[data-action=create]");
+function buildCharacterGrid(characters) {
+  const ul = document.createElement("ul");
+  ul.setAttribute("role", "grid");
+  ul.setAttribute("aria-label", "Character list");
 
-  if (!!createBtns.length) {
-    createBtns.forEach((btn) =>
-      btn.removeEventListener("click", handleCreateClick),
-    );
+  for (const character of characters) {
+    ul.appendChild(createCharacterCard(character));
   }
 
-  if (!!editBtns.length) {
-    editBtns.forEach((btn) =>
-      btn.removeEventListener("click", handleEditClick),
-    );
+  if (characters.length < MAX_CHARACTERS) {
+    ul.appendChild(createNewCharacterCard());
   }
 
-  if (!!viewBtns.length) {
-    viewBtns.forEach((btn) =>
-      btn.removeEventListener("click", handleViewClick),
-    );
-  }
+  return ul;
 }
 
-const handleEditClick = () => {
-  console.log("Editing!");
-  navigate("character/new");
-};
+function attachListeners(container) {
+  container.addEventListener("click", handleContainerClick);
+}
 
-const handleViewClick = (e) => {
-  e.preventDefault();
+function detachListeners(container) {
+  container.removeEventListener("click", handleContainerClick);
+}
 
-  const characterId = e.target.closest("button").dataset.characterId;
+function handleContainerClick(e) {
+  const button = e.target.closest("button[data-action]");
+  if (!button) return;
 
-  if (characterId) {
+  const action = button.dataset.action;
+
+  if (action === "create") {
+    navigate("character/new");
+    return;
+  }
+
+  const characterId = button.dataset.characterId;
+  if (!characterId) return;
+
+  if (action === "view") {
     navigate(`character/${characterId}`);
-  } else {
-    console.error("Failed to find character's ID!");
+  } else if (action === "edit") {
+    navigate("character/new");
   }
-};
-
-const handleCreateClick = () => {
-  console.log("to creation");
-  navigate("character/new");
-};
+}

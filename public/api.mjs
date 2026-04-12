@@ -39,38 +39,6 @@ export async function getCharacters() {
   }
 }
 
-export async function fetchView(view, characterId = undefined) {
-  const headers = {};
-
-  const playerToken = nagara.getPlayerToken();
-  if (playerToken) {
-    headers["x-player-id"] = playerToken;
-  }
-
-  const dmToken = nagara.getDMToken();
-  if (dmToken) {
-    headers["x-dm-id"] = dmToken;
-  }
-
-  try {
-    const response = await fetch(
-      `${API_BASE}/view/${view}${characterId ? `/${characterId}` : ""}`,
-      {
-        headers,
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch the view: ${response.status}`);
-    }
-
-    return await response.text();
-  } catch (error) {
-    console.error("Error fetching the view: ", error);
-    throw error;
-  }
-}
-
 export async function getCharacter(characterId) {
   try {
     const headers = {};
@@ -124,7 +92,8 @@ export async function createCharacter(characterData) {
 
     if (!response.ok) {
       const body = await response.json().catch(() => null);
-      const message = body?.error || `Failed to create character: ${response.status}`;
+      const message =
+        body?.error || `Failed to create character: ${response.status}`;
       const err = new Error(message);
       err.details = body?.details;
       err.warnings = body?.warnings;

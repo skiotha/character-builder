@@ -1,6 +1,9 @@
 import { validateDM, validateToken } from "./api.mjs";
-import { getNestedValue } from "./template-engine.mjs";
 import { flatten } from "./utils/flatten.mjs";
+
+function getNestedValue(obj, path) {
+  return path.split(".").reduce((o, k) => o?.[k], obj);
+}
 
 const state = {
   playerToken: null,
@@ -8,8 +11,6 @@ const state = {
   characters: [],
   currentCharacter: null,
   schema: null,
-  templates: new Map(),
-  cacheVersion: "1.0",
   userRole: "public",
 };
 
@@ -64,18 +65,6 @@ function setCharacters(characters) {
   notify("characters", characters);
 }
 
-function getTemplate(name) {
-  if (state.templates.has(name)) return state.templates.get(name);
-
-  const cached = getCachedTemplate(name);
-  if (cached) {
-    state.templates.set(name, cached);
-    return cached;
-  }
-
-  return null;
-}
-
 function subscribe(key, callback) {
   if (!subscribers.has(key)) subscribers.set(key, new Set());
 
@@ -124,22 +113,6 @@ function notifyChangedPaths(oldChar, newChar) {
   });
 }
 
-function cacheTemplate(name, template) {
-  const cache = JSON.parse(localStorage.getItem(TEMPLATE_CACHE_KEY) || "{}");
-  cache[name] = { template, timestamp: Date.now() };
-  localStorage.setItem(TEMPLATE_CACHE_KEY, JSON.stringify(cache));
-}
-
-function getCachedTemplate(name) {
-  const cache = JSON.parse(localStorage.getItem(TEMPLATE_CACHE_KEY) || "{}");
-  const cached = cache[name];
-
-  if (cached && Date.now() - cached.timestamp < 24 * 60 * 60 * 1000)
-    return cached.template;
-
-  return null;
-}
-
 function setSchema(schema) {
   state.schema = schema;
 }
@@ -150,7 +123,6 @@ function getSchema() {
 
 export {
   subscribe,
-  getTemplate,
   setCharacters,
   setPlayerToken,
   getState,

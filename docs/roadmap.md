@@ -225,20 +225,22 @@ attributes on form fields, extract duplicated nav generation. See
 
 ### Step 4 — Dashboard, Landing & Final Cleanup (Session 4)
 
-- [ ] Rewrite `dashboard-view.mjs` — JSON character list, client-rendered
+- [x] Rewrite `dashboard-view.mjs` — JSON character list, client-rendered
       cards (dedicated render function, not schema-driven)
-- [ ] Rewrite `initial-view.mjs` — client-rendered static content
-- [ ] Remove `GET /api/v1/view/dashboard` and `GET /api/v1/view/initial`
-- [ ] Delete `src/templates/` directory
-- [ ] Delete `src/renderers/` directory
-- [ ] Remove `#renderers` subpath import from `package.json`
-- [ ] Delete `public/template-engine.mjs`
-- [ ] Remove `fetchView()` from `public/api.mjs`
-- [ ] Remove template caching from `public/state.mjs`
-- [ ] Remove `public/validation/schema.mjs` (replaced by served schema)
+- [x] Rewrite `initial-view.mjs` — client-rendered static content
+- [x] Remove `GET /api/v1/view/dashboard` and `GET /api/v1/view/initial`
+- [x] Delete `src/templates/` directory
+- [x] Delete `src/renderers/` directory
+- [x] Remove `#renderers` subpath import from `package.json`
+- [x] Delete `public/template-engine.mjs`
+- [x] Remove `fetchView()` from `public/api.mjs`
+- [x] Remove template caching from `public/state.mjs`
+- [x] Remove `public/validation/schema.mjs` (replaced by served schema)
 
 **Deliverable:** Server is a pure JSON API. Client renders all views from
 data. One rendering path for both initial load and real-time updates.
+
+**Phase 3 complete.**
 
 ---
 
@@ -644,6 +646,25 @@ Discord bot.
 - [ ] Static data endpoints: `/api/v1/spells`, `/api/v1/rituals`, etc.
       (for addon build script)
 - [ ] GitHub Actions CI: run `npm run typecheck` and `npm test` on push
+
+### Client Code Hygiene
+
+Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
+
+- [ ] Extract inline error-state DOM blocks from render functions —
+      `dashboard-view.mjs` and `initial-view.mjs` build error markup
+      inline inside `try/catch` blocks. The named builder functions
+      (`buildWelcomeBlock`, `buildCharacterGrid`, etc.) are fine — the
+      issue is the error-path DOM construction cluttering the view body.
+      Audit all views for similar patterns and extract into shared helpers.
+- [ ] Extract displayable text constants for l10n — hardcoded English
+      strings (headings, descriptions, button labels, contact data) in all
+      client views and components. Define a text/locale system (at minimum
+      EN + RU) and centralize all user-visible strings.
+- [ ] Deduplicate `getNestedValue` — four independent copies exist in
+      `state.mjs`, `section-renderer.mjs`, `validation/engine.mjs` (×2).
+      Extract a single version into `public/utils/object.mjs` and import
+      everywhere.
 
 ### HTML Attribute Audit
 

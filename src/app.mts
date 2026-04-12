@@ -15,7 +15,6 @@ import {
   handleCreateCharacter,
   handleCharacterStream,
 } from "#routes";
-import { renderInitialView, renderDashboardView } from "#renderers";
 import { createCharacterRoute } from "./routes/routes.mts";
 import { getSerializedSchema } from "#models/schema-serializer";
 
@@ -256,24 +255,6 @@ async function handleApi(
       pathParts[2] === "portrait"
     ) {
       return await handleUploadPortrait(req, res, pathParts[1]!);
-    }
-
-    // GET /api/v1/view/dashboard
-    if (
-      req.method === "GET" &&
-      pathParts[0] === "view" &&
-      pathParts[1] === "dashboard"
-    ) {
-      return await renderDashboardView(req, res);
-    }
-
-    // GET /api/v1/view/initial
-    if (
-      req.method === "GET" &&
-      pathParts[0] === "view" &&
-      pathParts[1] === "initial"
-    ) {
-      return await renderInitialView(req, res);
     }
 
     // GET /api/v1/characters/:id

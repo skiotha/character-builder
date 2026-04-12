@@ -37,7 +37,6 @@
     "#models": "./src/models/index.mts",
     "#models/*": "./src/models/*.mts",
     "#rules": "./src/rules/index.mts",
-    "#renderers": "./src/renderers/index.mts",
     "#middleware": "./src/middleware/index.mts",
     "#routes": "./src/routes/handlers.mts",
     "#sse": "./src/sse/broadcast.mts"
