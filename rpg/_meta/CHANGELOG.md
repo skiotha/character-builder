@@ -24,3 +24,8 @@ For notable changes.
 ### Added
 - en/index.md stub for EN translation.
 - README.md stub.
+
+## [1.0.2] - 2026-04-12
+
+### Changed
+- Changed "Очаровательность" to "Обаяние" in RU translation.
