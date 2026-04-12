@@ -16,7 +16,6 @@ export function renderField(path, fieldSchema, value, role, mode) {
 
   const wrapper = document.createElement("div");
   wrapper.classList.add(displayAs === "textarea" ? "textarea" : "input");
-  wrapper.dataset.fieldPath = path;
 
   const labelEl = document.createElement("label");
   labelEl.setAttribute("for", `field-${path}`);

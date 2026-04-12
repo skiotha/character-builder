@@ -209,14 +209,16 @@ for full details.
 - [x] Remove `src/templates/creation.mts`
 - [x] Remove `src/renderers/renderCreationView.mts`
 
-### Step 3.5 — Form Field Hygiene & Secondary Attributes
+### Step 3.5 — Form Field Hygiene & Secondary Attributes ✓ DONE
 
 Fix broken secondary attribute live updates, eliminate redundant HTML
 attributes on form fields, extract duplicated nav generation. See
 [phase3-plan.md § Session 3.5](phase3-plan.md) for full analysis.
 
 - [x] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
-- [ ] Remove redundant `data-path` and `data-field-path` attributes
+- [x] Remove dead `data-field-path` wrapper attribute; keep `data-path`
+      (serves discovery + path-carrying roles on form controls and component
+      containers). `id`/`for` verbosity deferred to Phase 8 HTML audit.
 - [x] Decide on input/output consistency for derived fields in create mode
 - [x] Remove `injectDerivedAttributes()` — collect derived values from DOM
 - [x] Extract nav generation into shared utility
@@ -642,6 +644,15 @@ Discord bot.
 - [ ] Static data endpoints: `/api/v1/spells`, `/api/v1/rituals`, etc.
       (for addon build script)
 - [ ] GitHub Actions CI: run `npm run typecheck` and `npm test` on push
+
+### HTML Attribute Audit
+
+- [ ] Review `id` / `for` verbosity on form fields — currently
+      `id="field-attributes.primary.strong"` (full dotted path). Evaluate
+      shorter IDs (e.g. tail-only) once all components are implemented and
+      collision risk is fully known. Check for duplicate IDs across the
+      rendered DOM.
+- [ ] Audit remaining `data-*` attributes for dead or redundant usage
 
 ### Responsive Design & Styling
 

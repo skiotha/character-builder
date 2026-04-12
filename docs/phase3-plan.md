@@ -652,11 +652,15 @@ already correct in the DOM. The remaining gap is collection:
       mismatch in `public/utils/rpg.mjs`
 - [x] Update `updateSecondaryAttributes()` to handle `toughness.max` and
       `toughness.current` as separate targets
-- [ ] Remove `data-path` attribute from all controls in `form-field.mjs`
-- [ ] Remove `data-field-path` attribute from field wrappers in
+- [x] ~~Remove `data-path` attribute from all controls~~ — kept.
+      `data-path` serves dual roles (discovery selector + path value carrier)
+      and is the only path marker on non-form component containers (`<ul>`,
+      `<section>`). Not redundant with `name`.
+- [x] Remove `data-field-path` attribute from field wrappers in
       `form-field.mjs`
-- [ ] Update all JS that queries `[data-path="…"]` to use `[name="…"]`
-      (creation-view.mjs, character-view.mjs, editable.mjs, dom.mjs, etc.)
+- [x] ~~Update all JS that queries `[data-path="…"]` to use `[name="…"]`~~
+      — not needed. `data-path` is retained; queries remain as-is.
+      `id`/`for` verbosity deferred to Phase 8 (Polish) HTML audit.
 - [x] Decide on input/output consistency for derived fields in create mode
 - [x] Expand `collectFormData()` to collect derived/readonly field values
 - [x] Remove `injectDerivedAttributes()` — secondary values come from DOM
