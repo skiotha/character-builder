@@ -74,19 +74,23 @@ incompatible with `node:test`.
 
 ---
 
-## Session 1 — Pure Utilities
+## Session 1 — Pure Utilities ✓ DONE
 
 **Goal:** Test all pure utility functions with zero external dependencies.
 Establish test conventions, fixtures, and verify `npm test` works.
 
-**Create:**
-- `test/helpers/fixtures.mts`
-- `test/traversal.test.mts`
-- `test/utils.test.mts`
-- `test/general.test.mts`
+**Result:** 50 tests across 3 test files + 1 helper. All passing, typecheck clean.
 
-**Delete:**
+**Created:**
+- `test/helpers/fixtures.mts` — `makeCharacter()`, `makePrimaryAttributes()`, `simpleMerge()`
+- `test/traversal.test.mts` — 26 tests (getNestedValue, setNestedValue, deepMerge, getAllFieldPaths, getFieldPathsByProperty, getWritableFieldPaths)
+- `test/utils.test.mts` — 14 tests (generateId, generateBackupCode, validateCharacter, filterServerControlledFields)
+- `test/general.test.mts` — 6 tests (scaleCropForContainer) + 4 skipped
+
+**Deleted:**
 - `test/character-creation.test.mts` (incompatible with `node:test`)
+
+**Bug discovered:** `FIELDS_WITH_VALIDATION` inversion — `getFieldPathsByProperty("validate", undefined)` collects fields WITHOUT a validate function. Cross-field validation never runs. Tracked in roadmap Phase 5.
 
 ### `test/helpers/fixtures.mts`
 

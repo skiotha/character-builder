@@ -252,7 +252,12 @@ data. One rendering path for both initial load and real-time updates.
 breakdown covering pure utilities, validation, auth, rules engine baseline,
 storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 
-- [ ] Create `test/` directory at project root
+- [x] Create `test/` directory at project root *(Session 1)*
+- [x] `test/helpers/fixtures.mts` — character fixture factory *(Session 1)*
+- [x] `test/traversal.test.mts` — traversal utilities (26 cases) *(Session 1)*
+- [x] `test/utils.test.mts` — utility functions (14 cases) *(Session 1)*
+- [x] `test/general.test.mts` — `scaleCropForContainer` (6 cases) *(Session 1)*
+- [x] Deleted old `test/character-creation.test.mts` (incompatible) *(Session 1)*
 - [ ] `test/rules.test.mts` — derived stats, effect application, attribute formulas
   - [ ] Toughness = max(strong, 10)
   - [ ] Pain threshold = ceil(strong / 2)
@@ -293,8 +298,6 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
   - [ ] Role-based editability gating
   - [ ] Hidden field exclusion
   - [ ] Component overrides for custom sections
-- [ ] Update `npm test` script: `node --experimental-strip-types --test test/**/*.test.mts`
-- [ ] Remove old `server/tests/character-creation.test.mjs`
 
 **Deliverable:** Full test suite. `npm test` runs green.
 
@@ -306,6 +309,14 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 
 ### High Priority
 
+- [ ] Fix `FIELDS_WITH_VALIDATION` inversion bug — `getFieldPathsByProperty("validate", undefined)`
+      matches fields where `field["validate"] === undefined`, i.e. fields **without**
+      a validate function. `validateCrossFieldRules()` iterates these but its own
+      `if (schema?.validate)` guard means cross-field validation **never runs**.
+      Currently harmless (all `rpgValidators` are stubs) but will silently swallow
+      real validation once validators are implemented. Fix: collect fields that
+      actually have a `validate` function, or remove the pre-filtered list and let
+      `validateCrossFieldRules` iterate all paths.
 - [ ] Re-enable `validateCharacterCreation()` in `createCharacter()` service
       (currently commented out in `index.mjs`)
 - [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
