@@ -138,7 +138,7 @@ rendering. Single rendering path for initial load and SSE updates.
 **Basis:** [ADR-009](decisions/009-schema-driven-rendering.md)
 (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md))
 
-**Detailed plan:** [phase3-plan.md](phase3-plan.md) — session-by-session
+**Detailed plan:** [phase3-plan.md](../.github/plans/phase3-plan.md) — session-by-session
 breakdown with file references, verification steps, and session closeout
 checklists.
 
@@ -181,7 +181,7 @@ The schema-driven renderer produces 15 flat sections; CSS expects 5 semantic
 groups (`attributes`, `talents`, `portrait`, `traits`, `information`) with
 internal sub-structure. A two-level section hierarchy (parent/child) is
 needed to produce DOM that matches the CSS grid. Also restores lost `<nav>`
-and `div#character-name`. See [phase3-plan.md § Session 2.5](phase3-plan.md)
+and `div#character-name`. See [phase3-plan.md § Session 2.5](../.github/plans/phase3-plan.md)
 for full details.
 
 - [x] Restructure section registry with parent/child model
@@ -213,7 +213,7 @@ for full details.
 
 Fix broken secondary attribute live updates, eliminate redundant HTML
 attributes on form fields, extract duplicated nav generation. See
-[phase3-plan.md § Session 3.5](phase3-plan.md) for full analysis.
+[phase3-plan.md § Session 3.5](../.github/plans/phase3-plan.md) for full analysis.
 
 - [x] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
 - [x] Remove dead `data-field-path` wrapper attribute; keep `data-path`
@@ -247,6 +247,10 @@ data. One rendering path for both initial load and real-time updates.
 ## Phase 4 — Testing
 
 **Goal:** Comprehensive test suite using `node:test` + `node:assert/strict`. Same conventions as malizia.
+
+**Detailed plan:** [phase4-plan.md](../.github/plans/phase4-plan.md) — 8-session
+breakdown covering pure utilities, validation, auth, rules engine baseline,
+storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 
 - [ ] Create `test/` directory at project root
 - [ ] `test/rules.test.mts` — derived stats, effect application, attribute formulas
@@ -407,7 +411,7 @@ server-side `validateCharacterCreation()` as the safety net.
       without requiring a page reload.
       **Root cause identified:** `SECONDARY_ATTRIBUTES_RULES` keys don't match
       schema paths + `toughness` is a nested object. Fix tracked in
-      `phase3-plan.md` Session 3.5.
+      [phase3-plan.md](../.github/plans/phase3-plan.md) Session 3.5.
 - [ ] Portrait section markup broken — `section#portrait` is nested inside
       another root section; duplicate headers (`h3` + `span`) appearing
 - [ ] `equipment.money` should not be user-editable during creation — it is

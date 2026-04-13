@@ -1,12 +1,12 @@
 # Phase 3 — Schema-Driven Rendering: Session Plan
 
-> Detailed implementation plan for [Phase 3](roadmap.md#phase-3--schema-driven-rendering).
+> Detailed implementation plan for [Phase 3](../../docs/roadmap.md#phase-3--schema-driven-rendering).
 > Each session leaves the app in a working state. Foundation first (additive),
 > then migrate views one at a time, then cleanup.
 >
-> **Basis:** [ADR-009](decisions/009-schema-driven-rendering.md)
-> (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md)).
-> DOM conventions follow [ADR-012](decisions/012-standards-first-html-css.md).
+> **Basis:** [ADR-009](../../docs/decisions/009-schema-driven-rendering.md)
+> (supersedes [ADR-004](../../docs/decisions/004-hybrid-spa-server-views.md)).
+> DOM conventions follow [ADR-012](../../docs/decisions/012-standards-first-html-css.md).
 
 ---
 
