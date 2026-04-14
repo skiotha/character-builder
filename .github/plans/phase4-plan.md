@@ -344,15 +344,30 @@ npm run typecheck
 
 ---
 
-## Session 3 — Auth, Sanitization, Schema Serializer
+## Session 3 — Auth, Sanitization, Schema Serializer ✓ DONE
 
 **Goal:** Test authentication, role-based data stripping, and schema
 serialization contract.
 
-**Create:**
-- `test/auth.test.mts`
-- `test/sanitization.test.mts`
-- `test/schema-serializer.test.mts`
+**Result:** 32 tests across 3 files (13 auth + 5 sanitization + 14 schema-serializer).
+All 170 total tests passing, typecheck clean.
+
+**Infrastructure changes:**
+- `package.json` engine bumped to `>=25.0.0` (user runs Node 25.x.x)
+- `npm test` script now includes `--experimental-test-module-mocks` flag
+- First `mock.module()` usage in the test suite — mocks `#config` subpath import
+  to control `DM_TOKEN` for auth tests. Uses `.restore()` + re-mock for the
+  "no DM_TOKEN configured" describe block.
+
+**Bug documented (not fixed):**
+- `auth.mts` uses `===` instead of `crypto.timingSafeEqual()` for DM token
+  comparison — timing side-channel vulnerability. Roadmap Phase 5 High Priority
+  item annotated with cross-reference.
+
+**Created:**
+- `test/auth.test.mts` — 13 tests (validateDmToken, requireDmToken, no-DM_TOKEN edge case)
+- `test/sanitization.test.mts` — 5 tests (sanitizeCharacterForRole)
+- `test/schema-serializer.test.mts` — 14 tests (serializeSchema, getSerializedSchema)
 
 ### `test/auth.test.mts` — `src/lib/auth.mts`
 

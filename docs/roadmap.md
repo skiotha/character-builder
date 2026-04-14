@@ -258,6 +258,9 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [x] `test/utils.test.mts` — utility functions (14 cases) *(Session 1)*
 - [x] `test/general.test.mts` — `scaleCropForContainer` (6 cases) *(Session 1)*
 - [x] Deleted old `test/character-creation.test.mts` (incompatible) *(Session 1)*
+- [x] `test/auth.test.mts` — auth token validation (13 cases) *(Session 3)*
+- [x] `test/sanitization.test.mts` — role-based data stripping (5 cases) *(Session 3)*
+- [x] `test/schema-serializer.test.mts` — schema serialization contract (14 cases) *(Session 3)*
 - [ ] `test/rules.test.mts` — derived stats, effect application, attribute formulas
   - [ ] Toughness = max(strong, 10)
   - [ ] Pain threshold = ceil(strong / 2)
@@ -267,13 +270,13 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
   - [ ] Equipment bonus application
   - [ ] Expired effect filtering
   - [ ] Consistency enforcement (toughness.current ≤ max, XP ≥ 0)
-- [ ] `test/validation.test.mts` — character creation/update validation
-  - [ ] Valid character passes
-  - [ ] Missing required fields rejected
-  - [ ] Attribute budget enforcement
-  - [ ] Field type validation
-  - [ ] Permission checks (owner vs DM vs public)
-  - [ ] Server-controlled field rejection
+- [x] `test/validation.test.mts` — character creation/update validation (87 cases) *(Session 2)*
+  - [x] Valid character passes
+  - [x] Missing required fields rejected
+  - [x] Attribute budget enforcement
+  - [x] Field type validation
+  - [x] Permission checks (owner vs DM vs public)
+  - [x] Server-controlled field rejection
 - [ ] `test/storage.test.mts` — file-based storage operations
   - [ ] Save and retrieve character
   - [ ] Index consistency (byId, byBackupCode, byPlayer, all)
@@ -323,7 +326,10 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       (currently commented out in `index.mjs`)
 - [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
 - [ ] Re-enable file upload size check (commented out in `fileUploader.mjs`)
-- [ ] Use `crypto.timingSafeEqual()` for DM token comparison
+- [ ] Use `crypto.timingSafeEqual()` for DM token comparison —
+      `auth.mts` uses `===` for both `validateDmToken` and `requireDmToken`.
+      Timing-safe comparison is required to prevent timing side-channel attacks.
+      **Bug documented in Phase 4 Session 3** — auth tests label this as a bug.
 - [ ] Fix `validateRPGRules` attribute budget check — only rejects `> 80` but
       should also reject `< 80`. There is no RPG reason to allow character
       creation with unused attribute points. Fix: change condition to `!== 80`

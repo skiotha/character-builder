@@ -20,13 +20,13 @@
     "email": "skiotha.bl@gmail.com"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=25.0.0"
   },
   "scripts": {
     "start": "node src/server.mts",
     "start:dev": "node --env-file-if-exists=config/nagara.development.env scripts/watcher.mts",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node --test test/**/*.test.mts"
+    "test": "node --experimental-test-module-mocks --test test/**/*.test.mts"
   },
   "imports": {
     "#config": "./src/lib/config.mts",
