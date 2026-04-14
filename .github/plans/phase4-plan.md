@@ -429,7 +429,7 @@ npm run typecheck
 
 ---
 
-## Session 4 — Rules Engine (Current-State Baseline)
+## Session 4 — Rules Engine (Current-State Baseline) ✓ DONE
 
 **Goal:** Document current rules engine behavior as a regression baseline
 before Phase 6 rewrites it. Tests use current (pre-ADR-010/011) API.
@@ -538,6 +538,28 @@ npm run typecheck
 
 **Estimated scope:** ~50–70 test cases across 3 files.
 Tests in `test/rules/` subdirectory — verify glob pattern discovers them.
+
+### Session 4 Results ✅
+
+**Completed 2025-07-15.**
+
+- `test/rules/attributes.test.mts` — 36 test cases ✅
+- `test/rules/applicator.test.mts` — 16 test cases ✅
+- `test/rules/derived.test.mts` — 23 test cases ✅
+- **Total:** 75 new test cases (245 total, up from 170)
+- `npm test` — 245/245 pass, 0 fail
+- `npm run typecheck` — clean
+
+**Bugs discovered and documented (engine-weak-points #18–#23):**
+
+| # | Severity | Summary | Queued |
+|---|----------|---------|--------|
+| 18 | CRITICAL | Crash on undefined effect target (`target!` on undefined) | Phase 5 High |
+| 19 | HIGH | `EffectModifier.value: number` wrong for setBase (carries strings) | Phase 6 Step 0 |
+| 20 | HIGH | Rules modules bypass rpg-types (local untyped interfaces) | Phase 6 Step 0 |
+| 21 | MEDIUM | Double toughness clamping (clampValues + enforceConsistency) | Phase 6 Step 0 |
+| 22 | MEDIUM | Nested effects on RuleEffect never unwound | Phase 6 Step 0 |
+| 23 | MEDIUM | `attackAttribute` `\|\|` prevents effect overrides | Phase 6 Step 0 |
 
 ---
 

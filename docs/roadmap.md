@@ -261,15 +261,9 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [x] `test/auth.test.mts` — auth token validation (13 cases) *(Session 3)*
 - [x] `test/sanitization.test.mts` — role-based data stripping (5 cases) *(Session 3)*
 - [x] `test/schema-serializer.test.mts` — schema serialization contract (14 cases) *(Session 3)*
-- [ ] `test/rules.test.mts` — derived stats, effect application, attribute formulas
-  - [ ] Toughness = max(strong, 10)
-  - [ ] Pain threshold = ceil(strong / 2)
-  - [ ] Corruption threshold = ceil(resolute / 2)
-  - [ ] Defense = quick
-  - [ ] Effect pipeline: setBase, addFlat, multiply, cap
-  - [ ] Equipment bonus application
-  - [ ] Expired effect filtering
-  - [ ] Consistency enforcement (toughness.current ≤ max, XP ≥ 0)
+- [x] `test/rules/attributes.test.mts` — secondary formulas + clampValues (36 cases) *(Session 4)*
+- [x] `test/rules/applicator.test.mts` — effect application + equipment bonuses (16 cases) *(Session 4)*
+- [x] `test/rules/derived.test.mts` — full pipeline, expiry, priority, combat (23 cases) *(Session 4)*
 - [x] `test/validation.test.mts` — character creation/update validation (87 cases) *(Session 2)*
   - [x] Valid character passes
   - [x] Missing required fields rejected
@@ -339,6 +333,12 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       that are both `serverControlled: true` and have a `default` value leak
       into the generated character. Fix: add `continue` after the
       `SERVER_CONTROLLED_FIELDS` check so traversal skips to the next field.
+- [ ] Fix crash on undefined effect target — `src/rules/derived.mts` passes
+      `effect.target!` to `applyEffect` when `target` is `undefined`, causing
+      a `TypeError` at runtime (`undefined.split(".")`). Guard `!effect.target
+      ?.startsWith("rules.")` evaluates `true` when target is missing. Fix:
+      add `effect.target &&` guard before calling `applyEffect`.
+      **Bug #18 documented in Phase 4 Session 4** — engine-weak-points tracker.
 - [ ] Fix `validateCharacterUpdate` XP check for `push` on `traits` — multiple
       bugs make it unreachable and incorrect:
       1. `validateFieldValue` rejects the push value before the XP check runs
@@ -548,6 +548,22 @@ dotted-path + numeric-priority approach.
       (`src/rules/registry.mts`)
 - [ ] Rewrite `src/rules/attributes.mts` — `SECONDARY_FORMULAS` functions
       receive typed `PrimaryAttributes` instead of `Record<string, unknown>`
+- [ ] Fix `EffectModifier.value: number` in rpg-types.mts — `setBase` effects
+      carry attribute name strings (e.g., `"discreet"`). Type must be
+      `number | string` or use per-phase modifier types. **Bug #19**
+- [ ] Fix rules modules bypassing rpg-types — `applicator.mts` and
+      `derived.mts` define local `Modifier`/`RuleEffect` types with
+      `value: unknown` instead of importing from rpg-types. **Bug #20**
+- [ ] Fix double toughness clamping — `clampValues()` and
+      `enforceConsistency()` both clamp `toughness.current` identically.
+      Remove duplicate from `enforceConsistency()`. **Bug #21**
+- [ ] Fix nested effects never unwound — `recalculateDerivedFields` only
+      collects `character.effects[]` top-level. Any effect with child
+      `effects[]` sub-array is silently ignored. **Bug #22**
+- [ ] Fix `attackAttribute` `||` operator — `deriveCombat()` uses `||`
+      which prevents effect overrides from setting falsy values and
+      overwrites any effect-set value with the existing character data.
+      Use `??` nullish coalescing or derive from ability data. **Bug #23**
 - [ ] Rewrite `src/rules/applicator.mts` — typed `Character` state, exhaustive
       `switch (target.kind)`, correct modifier verbs (`setBase`/`addFlat`/
       `multiply`/`cap`)
