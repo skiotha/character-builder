@@ -1132,28 +1132,27 @@
     }
   },
   {
-    "id": "exceptional-attribute",
-    "name": "Исключительный Атрибут",
+    "id": "exceptional-attribute-quick",
+    "name": "Исключительный Атрибут: Скорость",
     "category": "ability",
-    "description": "Длительная тренировка, пробивающая обычный предел одного выбранного атрибута.",
-    "tags": [
-      "сообразительность",
-      "сила",
-      "скорость",
-      "аккуратность",
-      "воля",
-      "бдительность",
-      "очаровательность",
-      "сноровка"
-    ],
+    "description": "Длительная тренировка, пробивающая обычный предел Скорости.",
+    "tags": ["скорость"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
-        "description": "Повышает один выбранный атрибут на единицу.",
+        "description": "Повышает атрибут Скорости.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Один атрибут может быть повышен на единицу."
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "quick"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Скорость повышена на единицу."
           }
         ]
       },
@@ -1161,8 +1160,16 @@
         "description": "Доводит суммарное повышение выбранного атрибута до двух единиц.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Один атрибут может быть повышен суммарно на две единицы."
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "quick"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Скорость повышена на две единицы."
           }
         ]
       },
@@ -1170,8 +1177,443 @@
         "description": "Доводит суммарное повышение выбранного атрибута до трех единиц.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Один атрибут может быть повышен суммарно на три единицы."
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "quick"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Скорость повышена на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-cunning",
+    "name": "Исключительный Атрибут: Сообразительность",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Сообразительности.",
+    "tags": ["сообразительность"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Сообразительности на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "cunning"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сообразительности может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Сообразительности до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "cunning"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сообразительности может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Сообразительности до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "cunning"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сообразительности может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-strong",
+    "name": "Исключительный Атрибут: Сила",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Силы.",
+    "tags": ["сила"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Силы на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "strong"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Силы может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Силы до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "strong"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Силы может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Силы до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "strong"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Силы может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-discreet",
+    "name": "Исключительный Атрибут: Сноровка",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Сноровки.",
+    "tags": ["сноровка"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Сноровки на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "discreet"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сноровки может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Сноровки до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "discreet"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сноровки может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Сноровки до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "discreet"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Сноровки может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-resolute",
+    "name": "Исключительный Атрибут: Воля",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Воли.",
+    "tags": ["воля"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Воли на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "resolute"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Воли может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Воли до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "resolute"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Воли может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Воли до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "resolute"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Воли может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-appealing",
+    "name": "Исключительный Атрибут: Обаяние",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Обаяния.",
+    "tags": ["обаяние"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Обаяния на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "appealing"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Обаяния может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Обаяния до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "appealing"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Обаяния может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Обаяния до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "appealing"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Обаяния может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-accurate",
+    "name": "Исключительный Атрибут: Аккуратность",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Аккуратности.",
+    "tags": ["аккуратность"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Аккуратности на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "accurate"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Аккуратности может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Аккуратности до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "accurate"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Аккуратности может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Аккуратности до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "accurate"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Аккуратности может быть повышен суммарно на три единицы."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "exceptional-attribute-vigilant",
+    "name": "Исключительный Атрибут: Бдительность",
+    "category": "ability",
+    "description": "Длительная тренировка, пробивающая обычный предел Бдительности.",
+    "tags": ["бдительность"],
+    "source": "03-reference/abilities",
+    "tiers": {
+      "novice": {
+        "description": "Повышает атрибут Бдительности на единицу.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "vigilant"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Бдительности может быть повышен на единицу."
+          }
+        ]
+      },
+      "adept": {
+        "description": "Доводит суммарное повышение атрибута Бдительности до двух единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "vigilant"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Бдительности может быть повышен суммарно на две единицы."
+          }
+        ]
+      },
+      "master": {
+        "description": "Доводит суммарное повышение атрибута Бдительности до трех единиц.",
+        "effects": [
+          {
+            "tier": "A",
+            "target": {
+              "kind": "primary",
+              "stat": "vigilant"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "description": "Атрибут Бдительности может быть повышен суммарно на три единицы."
           }
         ]
       }
