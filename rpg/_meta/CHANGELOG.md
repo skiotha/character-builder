@@ -29,3 +29,8 @@ For notable changes.
 
 ### Changed
 - Changed "Очаровательность" to "Обаяние" in RU translation.
+
+## [1.0.3] - 2026-04-14
+
+### Fixed
+- Typo in 03/spells.
