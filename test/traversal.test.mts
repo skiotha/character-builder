@@ -192,6 +192,32 @@ describe("getFieldPathsByProperty", () => {
     const paths = getFieldPathsByProperty("custom", true, schema);
     assert.deepStrictEqual(paths, ["foo"]);
   });
+
+  it("finds fields that have a validate function (propertyValue: undefined)", () => {
+    const paths = getFieldPathsByProperty("validate", undefined);
+    assert.ok(
+      paths.includes("attributes"),
+      "attributes has rpgValidators.attributePointsValid",
+    );
+    assert.ok(
+      paths.includes("attributes.secondary.toughness.current"),
+      "toughness.current has rpgValidators.currentHealthValid",
+    );
+    assert.ok(
+      paths.includes("attributes.secondary.defense"),
+      "defense has rpgValidators.defenseValid",
+    );
+    assert.ok(
+      paths.includes("attributes.secondary.painThreshold"),
+      "painThreshold has rpgValidators.painThresholdValid",
+    );
+    assert.ok(
+      paths.includes("attributes.secondary.corruptionThreshold"),
+      "corruptionThreshold has rpgValidators.corruptionThresholdValid",
+    );
+    // Exactly the 5 schema fields with validate functions
+    assert.equal(paths.length, 5);
+  });
 });
 
 // ── getWritableFieldPaths ─────────────────────────────────────────

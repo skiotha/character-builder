@@ -187,10 +187,33 @@ npm run typecheck           # No type errors in test files
 
 ---
 
-## Session 2 — Validation & Schema
+## Session 2 — Validation & Schema ✓ DONE
 
 **Goal:** Test the full validation layer — field validation, character creation
 validation, character update validation, and schema utility functions.
+
+**Result:** 87 tests in `test/validation.test.mts`. All 138 total tests passing, typecheck clean.
+
+**Bug fixed:** `FIELDS_WITH_VALIDATION` inversion — `getFieldPathsByProperty`
+comparison logic fixed (existence check when `propertyValue===undefined`,
+removed `= true` default param). Regression test added to `test/traversal.test.mts`.
+
+**Bugs documented (not fixed):**
+- `generateDefaultCharacter` leaks `serverControlled` defaults (`schemaVersion`) — empty if-block without `continue`
+- `validateCharacterUpdate` push/traits XP check — unreachable dead code (type mismatch blocks it)
+- `validateCharacterUpdate` push/traits XP check — reads wrong cost (`cost[0]` always, no tier awareness)
+- `validateCharacterUpdate` increment/traits — commented-out code referencing non-existent `calculateXPForNextRank()`
+- All tracked in [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening)
+
+**Plan deviations:**
+- `push` on `traits` XP tests rewritten to document actual buggy behavior instead of testing
+  the intended happy/sad paths (which can't run due to type mismatch upstream)
+- `validateFieldValue` with custom `validate` returning error string — **not testable** without
+  mocking because all 5 `rpgValidators` are stubs returning `true`. Track for Session 4+ or
+  Phase 6 when real validators exist.
+
+**Created:**
+- `test/validation.test.mts` — 87 tests across 11 describe blocks
 
 **Create:**
 - `test/validation.test.mts`
@@ -216,6 +239,8 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - Unknown field path → `{ valid: false, error: "Unknown field" }`
 - Custom `validate` function returning `true` → valid
 - Custom `validate` function returning error string → invalid
+  **⚠ NOT TESTABLE** — all 5 `rpgValidators` are stubs returning `true`.
+  Deferred until real validators exist (Phase 6).
 
 ### `validateCharacterCreation` (from `validation.mts`)
 
@@ -231,6 +256,9 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - Attribute budget exactly 80 → pass
 - Attribute budget 81 → `BUSINESS_RULE` error
 - All attributes at default 5 (total 40) → pass (under budget is OK)
+  **⚠ BUG DOCUMENTED** — under-budget creation should be rejected. No RPG
+  reason to allow unused attribute points. `validateRPGRules` only checks
+  `> 80`, not `!== 80`. See [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening).
 - Single attribute at max 15, others compensate to total 80 → pass
 - Negative `experience.unspent` in merged data → `BUSINESS_RULE` error
 - Output: `validatedData` has `playerId`, `player`, `created`, `lastModified`
@@ -249,7 +277,11 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - Derived field → `FORBIDDEN`
 - Immutable field → `FORBIDDEN`
 - `push` on `traits` with insufficient XP → `INSUFFICIENT_XP`
+  **⚠ UNREACHABLE** — `validateFieldValue` rejects the push value before the
+  XP check runs (type mismatch: object vs `"array"`). Test documents the
+  actual bug behavior instead. See [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening).
 - `push` on `traits` with sufficient XP → allowed
+  **⚠ UNREACHABLE** — same type mismatch prevents reaching XP check.
 
 ### `skipOnCreation` (from `validation.mts`)
 
@@ -296,6 +328,9 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - `playerId` and `player` set from arguments
 - `created` and `lastModified` are ISO strings
 - Server-controlled defaults not leaked to user-settable portion
+  **⚠ BUG DOCUMENTED** — `generateDefaultCharacter` has an empty if-block
+  for `serverControlled`, so `schemaVersion` (which has both `serverControlled: true`
+  and a `default`) leaks through. Test documents actual behavior.
 
 ### Session 2 verification
 

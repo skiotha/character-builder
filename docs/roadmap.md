@@ -309,7 +309,7 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 
 ### High Priority
 
-- [ ] Fix `FIELDS_WITH_VALIDATION` inversion bug — `getFieldPathsByProperty("validate", undefined)`
+- [x] Fix `FIELDS_WITH_VALIDATION` inversion bug — `getFieldPathsByProperty("validate", undefined)`
       matches fields where `field["validate"] === undefined`, i.e. fields **without**
       a validate function. `validateCrossFieldRules()` iterates these but its own
       `if (schema?.validate)` guard means cross-field validation **never runs**.
@@ -317,11 +317,36 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       real validation once validators are implemented. Fix: collect fields that
       actually have a `validate` function, or remove the pre-filtered list and let
       `validateCrossFieldRules` iterate all paths.
+      **Fixed in Phase 4 Session 2** — `getFieldPathsByProperty` now uses
+      existence check when `propertyValue` is `undefined`. Regression test added.
 - [ ] Re-enable `validateCharacterCreation()` in `createCharacter()` service
       (currently commented out in `index.mjs`)
 - [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
 - [ ] Re-enable file upload size check (commented out in `fileUploader.mjs`)
 - [ ] Use `crypto.timingSafeEqual()` for DM token comparison
+- [ ] Fix `validateRPGRules` attribute budget check — only rejects `> 80` but
+      should also reject `< 80`. There is no RPG reason to allow character
+      creation with unused attribute points. Fix: change condition to `!== 80`
+      (or add a second check for `< 80` with a distinct error message).
+- [ ] Fix `generateDefaultCharacter()` — `serverControlled` check is an empty
+      `if`-block with no `continue`/`return`, so fields like `schemaVersion`
+      that are both `serverControlled: true` and have a `default` value leak
+      into the generated character. Fix: add `continue` after the
+      `SERVER_CONTROLLED_FIELDS` check so traversal skips to the next field.
+- [ ] Fix `validateCharacterUpdate` XP check for `push` on `traits` — multiple
+      bugs make it unreachable and incorrect:
+      1. `validateFieldValue` rejects the push value before the XP check runs
+         (trait object is `typeof "object"` but schema `type` is `"array"` →
+         type mismatch → early `VALIDATION` error)
+      2. If reached, `(trait.cost as number[])[0]` always reads the novice
+         cost regardless of which tier is being learned
+      3. No `cost` property exists on trait objects — costs come from reference
+         data lookup, not inline data
+      4. XP costs are per-tier (novice=10, adept=20, master=30) but the code
+         has no concept of tiers
+      Fix: remove the XP check from validation.mts entirely. XP cost
+      validation belongs in the RPG rules layer (Phase 6) where reference
+      data is available and tier-aware cost calculation lives.
 
 ### Medium Priority
 
@@ -344,6 +369,12 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [ ] Implement CORS origin whitelisting (ADR-007)
 - [ ] Fix `rpgValidators` — all currently return `true`. Implement real
       attribute budget validation, health range checks, etc.
+- [ ] Fix `validateCharacterUpdate` `increment` on `traits` — commented-out
+      block references `calculateXPForNextRank()` which does not exist.
+      Remove the dead commented-out code or implement properly in Phase 6.
+- [ ] Remove dead `xp.mts` — contains only a comment describing intended
+      client flow, no implementation. Either implement XP calculation in
+      Phase 6 or delete the file.
 - [ ] Add write serialization for storage — per-character write lock to
       prevent concurrent writes from corrupting JSON files (see ADR-002
       consequences)

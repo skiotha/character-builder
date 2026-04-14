@@ -4,7 +4,7 @@ import { CHARACTER_SCHEMA } from "./character.mts";
 
 export function getFieldPathsByProperty(
   propertyName: string,
-  propertyValue: unknown = true,
+  propertyValue: unknown,
   schema: Record<string, unknown> = CHARACTER_SCHEMA,
   path: string = "",
 ): string[] {
@@ -16,7 +16,12 @@ export function getFieldPathsByProperty(
     const currentPath = path ? `${path}.${key}` : key;
     const field = fieldSchema as Record<string, unknown>;
 
-    if (field[propertyName] === propertyValue) {
+    const matches =
+      propertyValue === undefined
+        ? field[propertyName] !== undefined
+        : field[propertyName] === propertyValue;
+
+    if (matches) {
       results.push(currentPath);
     }
 
