@@ -4,7 +4,7 @@ Web application for creating and managing RPG characters in the Nagara system.
 
 > Extracted from [Gjyr/ahani_server](https://github.com/Gjyr/ahani_server) into a standalone project.
 
-Part of the [nagara](https://github.com/nagara) project family alongside:
+Part of the **Nagara** project family alongside:
 - **addon** — World of Warcraft addon (Lua)
 - **malizia** — Discord bot (TypeScript)
 
