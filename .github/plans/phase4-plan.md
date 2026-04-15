@@ -624,10 +624,6 @@ resilient — isolates top-level side effects in both `storage.mts` and
 **`getAllCharacters`:**
 - Returns all characters
 
-**`markCharacterAsDeleted`:**
-- Sets `deleted: true`, `deletedAt` in index
-- Non-existent ID → no crash (index entry doesn't exist)
-
 **`hardDeleteCharacter`:**
 - Removes character file
 - Removes from all 4 index maps
@@ -670,6 +666,37 @@ npm run typecheck
 After tests: clean up temp directories (automated in teardown).
 
 **Estimated scope:** ~50–60 test cases across 2 test files + 1 helper.
+
+### Session 5 Results ✅
+
+**Completed 2026-04-15.**
+
+- `test/helpers/temp-dir.mts` — reusable temp directory helper ✅
+- `test/storage.test.mts` — 37 test cases ✅
+- `test/data-contracts.test.mts` — 25 test cases ✅
+- **Total:** 62 new test cases (307 total, up from 245)
+- `npm test` — 307/307 pass, 0 fail
+- `npm run typecheck` — clean
+
+**Bugs fixed during session:**
+
+| Fix | Files | Detail |
+|-----|-------|--------|
+| saveCharacter index entry | storage.mts | Added `deleted`/`deletedAt` to inline index entry (was missing vs `updateIndexMetadata`) |
+| Double-write on soft delete | index.mts | Removed redundant `markCharacterAsDeleted` call from `deleteCharacterAsPlayer` |
+| Incomplete fixture | fixtures.mts | Extended `background` to full 7-field shape |
+
+**Dead code removed:**
+
+| Item | Files | Detail |
+|------|-------|--------|
+| `markCharacterAsDeleted` | storage.mts | Index-only update with no production callers after double-write fix. Soft delete fully handled by `saveCharacter` in `deleteCharacterAsPlayer`. Function, export, and 2 tests removed. |
+
+**New Phase 5 tracking items:**
+
+| Item | Location | Detail |
+|------|----------|--------|
+| `byId` index-entry builder duplication | storage.mts, roadmap.md | `updateIndexMetadata()` and `saveCharacter()` build identical object literal |
 
 ---
 

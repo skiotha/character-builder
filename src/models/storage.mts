@@ -61,6 +61,7 @@ async function writeCharacterFile(
 async function updateIndexMetadata(
   character: Record<string, unknown>,
 ): Promise<void> {
+  // @TODO Phase 5: extract shared byId entry builder — duplicated in saveCharacter
   characterIndex.byId[character.id as string] = {
     name: character.characterName as string,
     playerId: character.playerId as string,
@@ -69,7 +70,6 @@ async function updateIndexMetadata(
     deleted: (character.deleted as boolean) || false,
     deletedAt: character.deletedAt as string | undefined,
   };
-  // @TODO finish
 
   await saveIndex();
 }
@@ -88,6 +88,8 @@ async function saveCharacter(
     playerId: character.playerId as string,
     backupCode: character.backupCode as string,
     created: character.created as string,
+    deleted: (character.deleted as boolean) || false,
+    deletedAt: character.deletedAt as string | undefined,
   };
 
   characterIndex.byBackupCode[character.backupCode as string] =
@@ -201,13 +203,7 @@ async function getAllCharacters(): Promise<Record<string, unknown>[]> {
   return characters;
 }
 
-async function markCharacterAsDeleted(characterId: string): Promise<void> {
-  if (characterIndex.byId[characterId]) {
-    characterIndex.byId[characterId]!.deleted = true;
-    characterIndex.byId[characterId]!.deletedAt = new Date().toISOString();
-    await saveIndex();
-  }
-}
+
 
 async function hardDeleteCharacter(characterId: string): Promise<boolean> {
   try {
@@ -267,6 +263,5 @@ export {
   LIVE_DATA_DIR,
   BACKUP_CHAR_DIR,
   BACKUP_INDEX,
-  markCharacterAsDeleted,
   hardDeleteCharacter,
 };

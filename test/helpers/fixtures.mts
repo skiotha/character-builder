@@ -75,7 +75,15 @@ function makeCharacter(
     },
     experience: { total: 50, unspent: 50 },
     corruption: { permanent: 0, temporary: 0 },
-    background: { age: 30, race: "Human" },
+    background: {
+      age: 30,
+      race: "Human",
+      shadow: "",
+      profession: "",
+      journal: { open: [], done: [], rumours: [] },
+      notes: [],
+      kinkList: [],
+    },
     equipment: {
       money: 5,
       weapons: [],

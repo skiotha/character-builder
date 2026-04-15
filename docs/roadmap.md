@@ -271,15 +271,15 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
   - [x] Field type validation
   - [x] Permission checks (owner vs DM vs public)
   - [x] Server-controlled field rejection
-- [ ] `test/storage.test.mts` — file-based storage operations
-  - [ ] Save and retrieve character
-  - [ ] Index consistency (byId, byBackupCode, byPlayer, all)
-  - [ ] Update with metadata change triggers index update
-  - [ ] Soft delete and hard delete
-  - [ ] Player lookup returns only non-deleted characters
-- [ ] `test/data-contracts.test.mts` — Discord bot integration foundation
-  - [ ] Character shape matches data-contracts §1
-  - [ ] Sanitized-for-public strips sensitive + deletion metadata
+- [x] `test/storage.test.mts` — file-based storage operations (37 cases) *(Session 5)*
+  - [x] Save and retrieve character
+  - [x] Index consistency (byId, byBackupCode, byPlayer, all)
+  - [x] Update with metadata change triggers index update
+  - [x] Soft delete and hard delete
+  - [x] Player lookup returns only non-deleted characters
+- [x] `test/data-contracts.test.mts` — Discord bot integration foundation (25 cases) *(Session 5)*
+  - [x] Character shape matches data-contracts §1
+  - [x] Sanitized-for-public strips sensitive + deletion metadata
 - [ ] `test/api.test.mts` — HTTP integration tests
   - [ ] GET /characters — list
   - [ ] POST /characters — create
@@ -373,6 +373,9 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [ ] Remove duplicate `deepMerge`/`isObject` in `index.mts` — copy-pasted
       from `traversal.mts` but lacks `skipUndefined` support. Service layer
       should import from `#models/traversal` instead.
+- [ ] Extract shared `byId` index-entry builder in `storage.mts` —
+      `updateIndexMetadata()` and `saveCharacter()` build the same object
+      literal. Factor into a helper to keep in sync.
 - [ ] Verify role-based editability (owner, DM, public) in character view —
       deferred from Phase 3 Step 2 (DM login requires local env file)
 - [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical

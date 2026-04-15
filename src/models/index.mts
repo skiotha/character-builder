@@ -90,8 +90,6 @@ async function deleteCharacterAsPlayer(
 
   await storage.saveCharacter(updatedCharacter);
 
-  await storage.markCharacterAsDeleted(characterId);
-
   return {
     success: true,
     type: "soft",
