@@ -325,28 +325,31 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       All 6 body-reading sites (`handleCreateCharacter`, `handleUpdateCharacter`,
       `parseImage` in multipart, recover/backup-create/backup-restore in `app.mts`)
       accumulate the full request body into memory with zero size limit.
-      **Bug #25-related — engine-weak-points tracker.**
+      **Bug #25-related — api-infra-bugs tracker.**
 - [ ] Re-enable file upload size check (commented out in `fileUploader.mjs`)
 - [ ] Add auth to portrait upload — `handleUploadPortrait` has zero auth
       checks (no `x-player-id`, no `x-dm-id`, no ownership check). Any anonymous
       client knowing a character UUID can overwrite any character's portrait.
       Fix: wrap with `withCharacterPermissions` or add inline ownership/DM check.
-      **Bug #25 — engine-weak-points tracker.**
+      **Bug #25 — api-infra-bugs tracker.**
 - [ ] Re-enable SSE stream auth + sanitize broadcast payload —
       `handleStreamCharacter` has auth checks (401 + 403) explicitly commented
       out. `broadcast.mts` sends full unsanitized character data (including
       `backupCode`, `playerId`) to all subscribers. Fix: re-enable auth
       (consider EventSource header limitations — may need query-param token)
       and apply `sanitizeCharacterForRole` to broadcast payload.
-      **Bug #26 — engine-weak-points tracker.**
+      **Bug #26 — api-infra-bugs tracker.**
 - [ ] Use `crypto.timingSafeEqual()` for DM token comparison —
       `auth.mts` uses `===` for both `validateDmToken` and `requireDmToken`.
       Timing-safe comparison is required to prevent timing side-channel attacks.
       **Bug documented in Phase 4 Session 3** — auth tests label this as a bug.
-- [ ] Fix `validateRPGRules` attribute budget check — only rejects `> 80` but
-      should also reject `< 80`. There is no RPG reason to allow character
-      creation with unused attribute points. Fix: change condition to `!== 80`
-      (or add a second check for `< 80` with a distinct error message).
+- [ ] Fix `validateRPGRules` attribute budget check — `src/models/schema-utils.mts`
+      `validateRPGRules()` condition `if (primaryTotal > 80)` only rejects
+      over-budget but should also reject `< 80`. There is no RPG reason to
+      allow character creation with unused attribute points (e.g., total 40
+      out of 80). Fix: change condition to `!== 80` (or add a second check
+      for `< 80` with a distinct error message).
+      **Bug #17 — api-infra-bugs tracker.**
 - [ ] Fix `generateDefaultCharacter()` — `serverControlled` check is an empty
       `if`-block with no `continue`/`return`, so fields like `schemaVersion`
       that are both `serverControlled: true` and have a `default` value leak
@@ -410,10 +413,14 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       prevent concurrent writes from corrupting JSON files (see ADR-002
       consequences)
 - [ ] Consistent sanitization across all response paths — currently only
-      `GET /characters/:id` calls `sanitizeCharacterForRole`. List, update
-      response, recover, and SSE broadcast all return raw character data
-      including `backupCode` and `playerId`.
-      **Bug #27 — engine-weak-points tracker.**
+      `GET /characters/:id` calls `sanitizeCharacterForRole`. Five endpoints
+      return raw character data including `backupCode` and `playerId`:
+      `GET /characters` player list (`handleGetCharacters.mts` line 30),
+      `GET /characters` DM list (line 18), `PATCH /characters/:id`
+      (`handleUpdateCharacter.mts` line 96), `POST /recover` (`app.mts`
+      line 338), SSE broadcast (`broadcast.mts` line 62). Exception: POST
+      create 201 response should include `backupCode` (owner needs it).
+      **Bug #27 — api-infra-bugs tracker.**
 
 ### Low Priority
 
@@ -437,14 +444,21 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       from crash (only restart on non-zero exit), add `SIGINT`/`SIGTERM`
       handlers for graceful shutdown, TypeScript with proper types
 - [ ] Remove dead/commented code throughout the codebase
-- [ ] Resolve `handleGetCharacters` `@TODO: disable dm handing` —
-      decide whether DM listing stays in this endpoint or moves. Apply
-      sanitization regardless (see Medium Priority sanitization item).
-      **Bug #28 — engine-weak-points tracker.**
-- [ ] Harden recovery endpoint — expand backup code keyspace (currently
-      32,400 combinations: 6 adj × 6 noun × 900 numbers) and/or add
-      per-IP rate limiting on failed recovery attempts.
-      **Bug #29 — engine-weak-points tracker.**
+- [ ] Resolve `handleGetCharacters` `@TODO: disable dm handing` (typo:
+      "handing" → "handling") — `src/routes/handleGetCharacters.mts` line 14.
+      DM path is functional and auth-gated but returns all characters
+      unsanitized (see Medium Priority #27). Decide whether DM listing
+      stays in this endpoint or moves. Apply sanitization regardless.
+      **Bug #28 — api-infra-bugs tracker.**
+- [ ] Harden recovery endpoint — `generateBackupCode()` in
+      `src/lib/utils.mts` produces only 6 adj × 6 noun × 900 numbers =
+      **32,400 combinations**. `POST /api/v1/recover` (`src/app.mts`
+      line 325) has no rate limiting or lockout. A simple script could
+      recover any character by name + enumeration. Fix: (a) expand
+      keyspace (more words, longer numbers), (b) add per-IP or per-name
+      rate limiting on failed attempts, (c) consider lockout after N
+      failures. Low risk given ADR-003 trusted userbase.
+      **Bug #29 — api-infra-bugs tracker.**
 
 ### Client-Side Validation Redesign
 

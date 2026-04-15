@@ -837,13 +837,13 @@ Mock `#config` at top level before dynamic import of `app.mts`.
   creation but not update). Derived-fields recalculation test uses DM token.
 - Path traversal protection works correctly (tested `/../` patterns).
 - CORS `Access-Control-Allow-Origin: *` confirmed — documented gap (#24 in
-  engine-weak-points.md), tracked in roadmap Phase 5.
+  api-infra-bugs.md), tracked in roadmap Phase 5.
 
 **Addon integration:** No addon-specific endpoints exist yet. `GET /characters/:id/export/addon`
 is documented in `docs/addon-integration.md` but not implemented. No placeholder
 tests added — will be created when the endpoint is built.
 
-**Post-session security review — 5 new bugs documented (engine-weak-points #25–#29):**
+**Post-session security review — 5 new bugs documented (api-infra-bugs #25–#29):**
 
 | # | Severity | Summary | Roadmap |
 |---|----------|---------|---------|
