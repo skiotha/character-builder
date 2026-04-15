@@ -7,6 +7,9 @@ export function sanitizeCharacterForRole(
   if (role !== "dm" && role !== "owner") {
     delete characterData.backupCode;
     delete characterData.playerId;
+    delete characterData.deleted;
+    delete characterData.deletedAt;
+    delete characterData.deletedBy;
   }
 
   return characterData;

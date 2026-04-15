@@ -34,10 +34,18 @@ The website is the **canonical long-term store** for character data. The Discord
 
 The bot reads the following files from the website's `data/` directory:
 
-| File                         | Purpose                              |
-| ---------------------------- | ------------------------------------ |
-| `data/index.json`            | Character search by name, ID lookup  |
-| `data/characters/<id>.json`  | Full character data for display      |
+| File                           | Purpose                                |
+| ------------------------------ | -------------------------------------- |
+| `data/index.json`              | Character search by name, ID lookup    |
+| `data/characters/<id>.json`    | Full character data for display        |
+| `data/abilities.{locale}.json` | Ability definitions (trait reference)   |
+| `data/spells.{locale}.json`    | Spell definitions (trait reference)     |
+| `data/boons.{locale}.json`     | Boon definitions (talent reference)     |
+| `data/sins.{locale}.json`      | Sin definitions (talent reference)      |
+| `data/rituals.{locale}.json`   | Ritual definitions (ritual reference)   |
+
+`{locale}` is a language code (`en`, `ru`). The bot selects the locale
+matching the Discord server's configured language.
 
 The bot **never writes** to these files. All mutations go through the API.
 
@@ -45,8 +53,9 @@ The bot **never writes** to these files. All mutations go through the API.
 
 The bot depends on the structure of `index.json` and the character JSON schema. If either changes shape, the bot must be updated. Specifically:
 
-- `index.json` must contain a `byId` map where values include at minimum `characterName` (for name search).
+- `index.json` must contain a `byId` map where values include at minimum `name` (for name search). Note: the index uses `name`, not `characterName`, as a lightweight abbreviation.
 - Character JSON files must follow the schema defined in [data-contracts.md §1](data-contracts.md).
+- Reference data files (abilities, spells, boons, sins, rituals) must follow their respective schemas. Shape contracts for these files are not yet formalized — they may change during Phase 6 normalization.
 
 ### 2.2 Filesystem Safety
 

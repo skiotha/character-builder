@@ -76,7 +76,6 @@ export interface CharacterIndexEntry {
   backupCode: string;
   created: string;
   deleted?: boolean;
-  deleteAt?: string;
   deletedAt?: string;
 }
 
@@ -184,7 +183,6 @@ export interface DeleteResult {
   success: boolean;
   error?: string;
   statusCode?: number;
-  status?: number;
   type?: string;
   message?: string;
 }

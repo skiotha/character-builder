@@ -67,7 +67,7 @@ async function updateIndexMetadata(
     backupCode: character.backupCode as string,
     created: character.created as string,
     deleted: (character.deleted as boolean) || false,
-    deleteAt: character.deleteAt as string | undefined,
+    deletedAt: character.deletedAt as string | undefined,
   };
   // @TODO finish
 

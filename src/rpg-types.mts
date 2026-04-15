@@ -220,6 +220,5 @@ export interface Character {
   portrait: CharacterPortrait;
   deleted?: boolean;
   deletedAt?: string;
-  deleteAt?: string;
   deletedBy?: string;
 }

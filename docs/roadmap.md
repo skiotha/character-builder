@@ -277,6 +277,9 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
   - [ ] Update with metadata change triggers index update
   - [ ] Soft delete and hard delete
   - [ ] Player lookup returns only non-deleted characters
+- [ ] `test/data-contracts.test.mts` — Discord bot integration foundation
+  - [ ] Character shape matches data-contracts §1
+  - [ ] Sanitized-for-public strips sensitive + deletion metadata
 - [ ] `test/api.test.mts` — HTTP integration tests
   - [ ] GET /characters — list
   - [ ] POST /characters — create
@@ -367,6 +370,9 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       `boolean | void` to paper over this — revert once the design is fixed.
 - [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
       storage (`storage.mjs`). Handler should call service, service calls storage
+- [ ] Remove duplicate `deepMerge`/`isObject` in `index.mts` — copy-pasted
+      from `traversal.mts` but lacks `skipUndefined` support. Service layer
+      should import from `#models/traversal` instead.
 - [ ] Verify role-based editability (owner, DM, public) in character view —
       deferred from Phase 3 Step 2 (DM login requires local env file)
 - [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical

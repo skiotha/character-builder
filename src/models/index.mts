@@ -83,7 +83,7 @@ async function deleteCharacterAsPlayer(
   const updatedCharacter = {
     ...character,
     deleted: true,
-    deleteAt: new Date().toISOString(),
+    deletedAt: new Date().toISOString(),
     deletedBy: "player",
     lastModified: new Date().toISOString(),
   };
@@ -109,7 +109,7 @@ async function deleteCharacterAsDM(
 
   const character = await storage.getCharacter(characterId);
   if (!character) {
-    return { success: false, error: "Character not found", status: 404 };
+    return { success: false, error: "Character not found", statusCode: 404 };
   }
 
   await storage.hardDeleteCharacter(characterId);
@@ -121,6 +121,8 @@ async function deleteCharacterAsDM(
   };
 }
 
+// @TODO Phase 5: remove duplicate — use deepMerge from #models/traversal
+// This local copy lacks skipUndefined support, diverging from the canonical version.
 function deepMerge(
   target: Record<string, unknown>,
   source: Record<string, unknown>,

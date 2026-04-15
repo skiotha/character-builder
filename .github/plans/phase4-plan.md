@@ -568,24 +568,28 @@ Tests in `test/rules/` subdirectory — verify glob pattern discovers them.
 **Goal:** Test file-based character storage (CRUD, index consistency) and
 lay groundwork for Discord bot integration tests.
 
+### Pre-session prep (completed 2025-07-15)
+
+Fixes applied to put codebase on solid ground before writing storage tests:
+
+| Fix | Files | Detail |
+|-----|-------|--------|
+| `deleteAt` → `deletedAt` | rpg-types.mts, types.mts, storage.mts, index.mts | Align with `created`/`lastModified` naming |
+| `status` → `statusCode` | types.mts, index.mts | `DeleteResult` type + usage in `deleteCharacterAsDM` |
+| Sanitization gap | sanitization.mts | Strip `deleted`/`deletedAt`/`deletedBy` for non-dm/non-owner |
+| Bot integration docs | bot-integration.md | Added reference data files, fixed `characterName` → `name` |
+| Duplicate `deepMerge` | index.mts | `@TODO` comment added; tracked in roadmap Phase 5 Medium |
+| Stale test data | data/ | Cleared `characters/`, `uploads/portraits/`, reset `index.json` |
+
+**Decision: mock strategy:** (`mock.module("#config")` to redirect
+`DATA_DIR`). Proven pattern from `test/auth.test.mts` (Session 3). Most
+resilient — isolates top-level side effects in both `storage.mts` and
+`uploads.mts`.
+
 **Create:**
 - `test/helpers/temp-dir.mts`
 - `test/storage.test.mts`
 - `test/data-contracts.test.mts` (bot integration foundation)
-
-### Setup strategy
-
-**Review at session start:** Evaluate approaches for handling `storage.mts`
-top-level side effects:
-- **Option A:** `mock.module()` on `#config` — redirect `DATA_DIR` to temp dir
-  before `storage.mts` is imported. Index created in temp dir. Clean isolation.
-- **Option B:** Dynamic import within each test — `await import(...)` after
-  setting up temp dir + env vars. More control per-test, more boilerplate.
-- **Option C:** Test storage functions by directly exercising the filesystem
-  in a temp dir, bypassing module-level init. May need to extract init logic
-  into an `init()` function (minor refactor).
-
-Decision made during session based on what works best with `node:test`.
 
 ### `test/storage.test.mts` — `src/models/storage.mts`
 
@@ -654,7 +658,7 @@ Likely tests:
 - `attributes.secondary` has all 6 derived stats
 - `combat` section has `attackAttribute`, `baseDamage`, `bonusDamage`
 - `equipment` has expected structure (weapons, armor, etc.)
-- Sanitized-for-public version: `backupCode` stripped, `playerId` stripped
+- Sanitized-for-public version: `backupCode`, `playerId`, `deleted`, `deletedAt`, `deletedBy` stripped
 
 ### Session 5 verification
 
