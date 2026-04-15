@@ -790,6 +790,77 @@ npm run typecheck
 
 **Estimated scope:** ~60–80 test cases. High setup effort.
 
+### Session 6 Results ✅
+
+**Completed 2026-04-15.**
+
+**Files created:**
+- `test/helpers/http.mts` — test server lifecycle helper (`startTestServer(tempDir)`)
+- `test/api.test.mts` — 53 integration tests covering full API surface
+
+**Test counts:**
+- API tests: **57 pass, 0 fail** (53 endpoint tests + 4 `@bug` regression tests)
+- Full suite: **364 pass, 0 fail** (was 307 before this session)
+- Typecheck: clean
+
+**Strategy chosen:** Option A — import `app`, `http.createServer`, port 0.
+Mock `#config` at top level before dynamic import of `app.mts`.
+
+**Setup details:**
+- `mock.module("#config")` with `DATA_DIR` → temp dir, `DM_TOKEN` → test token,
+  `PUBLIC_DIR` → real `public/` dir via `fileURLToPath` + `join`
+- `abilities.json` seeded in temp dir (GET /abilities would 500 without it)
+- `createTestCharacter()` helper strips `effects` (DM-write-only field) and
+  server-controlled fields before POST
+
+**Coverage by endpoint:**
+| Endpoint | Tests |
+| --- | --- |
+| GET /characters (list) | 4 |
+| POST /characters (create) | 5 |
+| GET /characters/:id | 6 |
+| PATCH /characters/:id | 9 |
+| DELETE /characters/:id | 6 |
+| POST /recover | 4 |
+| GET /dm/validate | 3 |
+| GET /schema | 3 |
+| GET /config | 1 |
+| GET /abilities | 2 |
+| CORS | 3 |
+| API routing | 1 |
+| Static files | 6 |
+
+**Discoveries during testing:**
+- `effects` field has `perm_dm_write` — owners cannot set it during creation.
+  Fixture's `effects: []` triggered PERMISSION_DENIED. Stripped in helper.
+- `attributes.primary.*` fields are DM-only for PATCH (owner can set during
+  creation but not update). Derived-fields recalculation test uses DM token.
+- Path traversal protection works correctly (tested `/../` patterns).
+- CORS `Access-Control-Allow-Origin: *` confirmed — documented gap (#24 in
+  engine-weak-points.md), tracked in roadmap Phase 5.
+
+**Addon integration:** No addon-specific endpoints exist yet. `GET /characters/:id/export/addon`
+is documented in `docs/addon-integration.md` but not implemented. No placeholder
+tests added — will be created when the endpoint is built.
+
+**Post-session security review — 5 new bugs documented (engine-weak-points #25–#29):**
+
+| # | Severity | Summary | Roadmap |
+|---|----------|---------|---------|
+| 25 | HIGH | Portrait upload has zero auth checks | Phase 5 High |
+| 26 | HIGH | SSE stream auth commented out + unsanitized broadcast | Phase 5 High |
+| 27 | MEDIUM | Inconsistent sanitization — only GET single char sanitizes by role | Phase 5 Medium |
+| 28 | LOW | `handleGetCharacters` TODO "disable dm handling" — incomplete refactor | Phase 5 Low |
+| 29 | LOW | Recovery endpoint: weak backup-code keyspace (32,400) + no rate limiting | Phase 5 Low |
+
+4 `@bug` regression tests added to `api.test.mts` asserting current broken behavior
+(will fail once bugs are fixed): portrait upload without auth, list endpoint leaking
+`backupCode`, DM list leaking `backupCode`, recovery response leaking `playerId`.
+
+**Deferred to Session 7:**
+- Portrait upload integration tests (needs multipart handling)
+- SSE broadcast tests (dedicated session)
+
 ---
 
 ## Session 7 — SSE Broadcast

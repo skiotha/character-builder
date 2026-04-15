@@ -322,7 +322,23 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [ ] Re-enable `validateCharacterCreation()` in `createCharacter()` service
       (currently commented out in `index.mjs`)
 - [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
+      All 6 body-reading sites (`handleCreateCharacter`, `handleUpdateCharacter`,
+      `parseImage` in multipart, recover/backup-create/backup-restore in `app.mts`)
+      accumulate the full request body into memory with zero size limit.
+      **Bug #25-related — engine-weak-points tracker.**
 - [ ] Re-enable file upload size check (commented out in `fileUploader.mjs`)
+- [ ] Add auth to portrait upload — `handleUploadPortrait` has zero auth
+      checks (no `x-player-id`, no `x-dm-id`, no ownership check). Any anonymous
+      client knowing a character UUID can overwrite any character's portrait.
+      Fix: wrap with `withCharacterPermissions` or add inline ownership/DM check.
+      **Bug #25 — engine-weak-points tracker.**
+- [ ] Re-enable SSE stream auth + sanitize broadcast payload —
+      `handleStreamCharacter` has auth checks (401 + 403) explicitly commented
+      out. `broadcast.mts` sends full unsanitized character data (including
+      `backupCode`, `playerId`) to all subscribers. Fix: re-enable auth
+      (consider EventSource header limitations — may need query-param token)
+      and apply `sanitizeCharacterForRole` to broadcast payload.
+      **Bug #26 — engine-weak-points tracker.**
 - [ ] Use `crypto.timingSafeEqual()` for DM token comparison —
       `auth.mts` uses `===` for both `validateDmToken` and `requireDmToken`.
       Timing-safe comparison is required to prevent timing side-channel attacks.
@@ -393,6 +409,11 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [ ] Add write serialization for storage — per-character write lock to
       prevent concurrent writes from corrupting JSON files (see ADR-002
       consequences)
+- [ ] Consistent sanitization across all response paths — currently only
+      `GET /characters/:id` calls `sanitizeCharacterForRole`. List, update
+      response, recover, and SSE broadcast all return raw character data
+      including `backupCode` and `playerId`.
+      **Bug #27 — engine-weak-points tracker.**
 
 ### Low Priority
 
@@ -416,6 +437,14 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
       from crash (only restart on non-zero exit), add `SIGINT`/`SIGTERM`
       handlers for graceful shutdown, TypeScript with proper types
 - [ ] Remove dead/commented code throughout the codebase
+- [ ] Resolve `handleGetCharacters` `@TODO: disable dm handing` —
+      decide whether DM listing stays in this endpoint or moves. Apply
+      sanitization regardless (see Medium Priority sanitization item).
+      **Bug #28 — engine-weak-points tracker.**
+- [ ] Harden recovery endpoint — expand backup code keyspace (currently
+      32,400 combinations: 6 adj × 6 noun × 900 numbers) and/or add
+      per-IP rate limiting on failed recovery attempts.
+      **Bug #29 — engine-weak-points tracker.**
 
 ### Client-Side Validation Redesign
 
