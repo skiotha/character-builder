@@ -332,7 +332,10 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `parseImage` in multipart, recover/backup-create/backup-restore in `app.mts`)
       accumulate the full request body into memory with zero size limit.
       **Bug #25-related — api-infra-bugs tracker.**
-- [ ] Re-enable file upload size check (commented out in `fileUploader.mjs`)
+- [x] Re-enable file upload size check (commented out in `fileUploader.mjs`)
+      **Resolved** — `fileUploader.mjs` no longer exists (removed in Phase 1
+      restructure). Client-side check active in `portraitHandler.mjs` line 89.
+      Server-side limit addressed via new body size limit utility (see above).
 - [ ] Add auth to portrait upload — `handleUploadPortrait` has zero auth
       checks (no `x-player-id`, no `x-dm-id`, no ownership check). Any anonymous
       client knowing a character UUID can overwrite any character's portrait.
@@ -401,14 +404,7 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [ ] Extract shared `byId` index-entry builder in `storage.mts` —
       `updateIndexMetadata()` and `saveCharacter()` build the same object
       literal. Factor into a helper to keep in sync.
-- [ ] Verify role-based editability (owner, DM, public) in character view —
-      deferred from Phase 3 Step 2 (DM login requires local env file)
-- [ ] Align effect modifier types: current `add`/`mul`/`set` → canonical
-      `setBase`/`addFlat`/`multiply`/`cap` — moved to Phase 6 (RPG Engine)
-- [ ] Add `schemaVersion` bumping on schema changes
 - [ ] Implement CORS origin whitelisting (ADR-007)
-- [ ] Fix `rpgValidators` — all currently return `true`. Implement real
-      attribute budget validation, health range checks, etc.
 - [ ] Fix `validateCharacterUpdate` `increment` on `traits` — commented-out
       block references `calculateXPForNextRank()` which does not exist.
       Remove the dead commented-out code or implement properly in Phase 6.
@@ -435,20 +431,20 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `@layer`, field wrapper pattern (div.input with label + control).
       Schema-driven renderer DOM must stay compatible with existing CSS
       selectors.
-- [ ] Fix client router: navigating back to `#` (empty hash) does not
-      re-render the landing page — likely missing `hashchange` listener
-      or `isNavigating` guard not resetting properly
-- [ ] DM login fails with 400 in development when env file is missing —
+- [x] DM login fails with 400 in development when env file is missing —
       `config/nagara.development.env` is gitignored and must be created
       locally with `NAGARA_DM_TOKEN=<value>`. Bare `node src/server.mts`
       doesn't load it (needs `--env-file` flag or `npm run start:dev`)
-- [ ] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character`, remove
-      unused `timeStamp` import
-- [ ] Replace `buffer.slice` with `buffer.subarray` in multipart parser
+      **Not a bug** — documentation gap. Requires local env file, not a code
+      fix. Documented in README.
+- [x] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character` —
+      **Resolved** — both typos already fixed. Remaining `timeStamp` →
+      `timestamp` casing fix tracked in
+      [phase5-plan.md](../.github/plans/phase5-plan.md) Session 4.
+- [x] Replace `buffer.slice` with `buffer.subarray` in multipart parser —
+      **Resolved** — no `.slice()` on Buffer found anywhere in `src/`.
+      Already resolved before Phase 5.
 - [ ] Fix DELETE route — extract inline handler into a proper handler file
-- [ ] Rewrite `watcher.mts` — port mychar pattern: distinguish clean exit
-      from crash (only restart on non-zero exit), add `SIGINT`/`SIGTERM`
-      handlers for graceful shutdown, TypeScript with proper types
 - [ ] Remove dead/commented code throughout the codebase
 - [ ] Resolve `handleGetCharacters` `@TODO: disable dm handing` (typo:
       "handing" → "handling") — `src/routes/handleGetCharacters.mts` line 14.
@@ -466,97 +462,10 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       failures. Low risk given ADR-003 trusted userbase.
       **Bug #29 — api-infra-bugs tracker.**
 
-### Client-Side Validation Redesign
-
-FormValidator was bypassed during Session 3 creation view migration due to
-structural incompatibilities with the flat-key served schema.
-
-The existing client validation system (`public/validation/`) was designed for
-a nested, client-side duplicate of the server schema. It cannot work with the
-flat-key schema served by `GET /api/v1/schema`:
-
-1. **`validation/engine.mjs`:** `validateField()` iterates all object keys as
-   rule names (only skips 3). `validateForm()` recursively walks a nested
-   schema tree. Neither works with flat dot-path keys.
-2. **`validation/ui.mjs` (FormValidator):** `buildFieldMap()` queries
-   `[name]` attributes. `getFormData()` builds nested objects via
-   `deepMerge()` with `DEFAULT_CHARACTER`. Tightly coupled to the nested
-   schema format.
-3. **`validation/schema.mjs`:** Client-side duplicate of `CHARACTER_SCHEMA`
-   with nested structure — the served schema was meant to replace this.
-4. **`rpgValidators`:** Custom validators are functions — not
-   JSON-serializable, can't be served via the schema endpoint.
-5. **~60% commented-out scaffolding** in engine.mjs + ui.mjs.
-
-Current workaround: HTML5 constraint validation + manual JS budget check +
-server-side `validateCharacterCreation()` as the safety net.
-
-- [ ] Delete `public/validation/schema.mjs` (the duplicate nested schema)
-- [ ] Redesign `validation/engine.mjs` to work with flat-key served schema
-- [ ] Redesign or replace `validation/ui.mjs` (FormValidator)
-- [ ] Design cross-field RPG validation (budget, defense, etc.) that works
-      with the served schema
-- [ ] Add proper UI error display (inline field errors, summary)
-
-### Creation View UX Bugs (Session 3 smoke test)
-
-- [ ] Input value not auto-selected on click — clicking a number input should
-      select the current value for immediate overwrite
-- [ ] Tab navigation across fields broken — field focus order doesn't follow
-      expected flow
-- [ ] Primary attributes should not default to 5 — initial value doesn't help
-      (sum = 40, fails validation anyway) and passes `required` check
-      incorrectly. Use empty inputs with placeholder values instead.
-- [ ] Derived attributes are editable when they shouldn't be — permanent and
-      temporary corruption depend on chosen abilities and must be read-only.
-      Unspent experience should also not be editable (or possibly hidden via
-      CSS in this view).
-- [ ] No derived stats recalculation on the client after character creation —
-      the server recalculates on save, but the client should immediately
-      display correct derived values (secondary attributes, combat stats)
-      without requiring a page reload.
-      **Root cause identified:** `SECONDARY_ATTRIBUTES_RULES` keys don't match
-      schema paths + `toughness` is a nested object. Fix tracked in
-      [phase3-plan.md](../.github/plans/phase3-plan.md) Session 3.5.
-- [ ] Portrait section markup broken — `section#portrait` is nested inside
-      another root section; duplicate headers (`h3` + `span`) appearing
-- [ ] `equipment.money` should not be user-editable during creation — it is
-      a derived/starting value, not a player choice
-
-### Array-Typed Derived Fields in Form Collection
-
-`collectFormData()` iterates `form.elements` and coerces values to numbers
-or strings. Fields whose schema type is `"array"` (e.g. `combat.bonusDamage`)
-render as `<output>` with an empty or comma-separated string value — the
-collector cannot reconstruct the original array from that.
-
-**Temporary fix (Session 3.5a):** skip `<output>` elements with empty values
-so array-typed fields fall through to server defaults.
-
-**Proper fix (Phase 6):** These fields should have `type: "number"` in the
-schema, not `type: "array"`. The array lives in the character's `effects`
-list; the derived scalar is a reduction:
-`effects.filter(e => e.target === 'combat.bonusDamage').reduce((sum, e) => sum + e.value, 0)`.
-Once the effect resolution pipeline (Phase 6 Step 0) produces typed scalar
-derived values, `combat.bonusDamage` becomes a plain number and the form
-collector handles it naturally.
-
-- [x] Temporary: skip empty `<output>` values in `collectFormData()`
-- [ ] Permanent: change `combat.bonusDamage` schema type from `"array"` to
-      `"number"` once the effect resolution pipeline computes the total
-
-### Client Import Map Aliases
-
-The server uses subpath import aliases (`#types`, `#models`, etc.) but the
-client still uses relative paths everywhere (`../state.mjs`,
-`../renderers/form-renderer.mjs`, etc.). The `index.html` import map should
-be expanded to provide clean aliases for client modules, matching the server
-convention.
-
-- [ ] Define client import aliases in `index.html` import map
-- [ ] Update client `.mjs` files to use aliased imports
-
-**Deliverable:** All known bugs fixed. All fixes covered by tests.
+**Deliverable:** All server-side bugs fixed and hardened. All fixes covered
+by tests. Client-side items deferred to Phase 8. RPG-engine-dependent items
+deferred to Phase 6. See [phase5-plan.md](../.github/plans/phase5-plan.md)
+for session-by-session breakdown.
 
 ---
 
@@ -716,6 +625,23 @@ Complete the `deriveCombat()` function.
 (combat, secondary attributes) reflect equipped weapons and learned traits.
 Reference data is complete and normalized.
 
+### Items Relocated from Phase 5
+
+These items were originally tracked in Phase 5 but require the typed effect
+pipeline, reference data, or RPG rules engine to implement properly.
+
+- [ ] Align effect modifier types (`add`/`mul`/`set` → `setBase`/`addFlat`/
+      `multiply`/`cap`) — addressed by Step 0 applicator rewrite + Step 3
+      alignment
+- [ ] Fix `rpgValidators` — all currently return `true`. Implement real
+      attribute budget validation, health range checks, etc. — belongs in
+      Step 6 (Validation & Docs)
+- [ ] Add `schemaVersion` bumping on schema changes — belongs in Step 6
+      (Validation & Docs)
+- [ ] Change `combat.bonusDamage` schema type from `"array"` to `"number"`
+      once the effect resolution pipeline computes the total — belongs in
+      Step 0 (typed pipeline produces scalar derived values)
+
 ---
 
 ## Phase 7 — Sibling Project Integration
@@ -834,6 +760,50 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       (precompressed files or on-the-fly compression via `node:zlib`)
 - [ ] Set `Cache-Control` headers for static assets (fonts, icons, CSS)
 - [ ] Review image portrait delivery (format, compression, sizing)
+
+### Items Relocated from Phase 5
+
+These items are client-only, require DOM testing infrastructure, or are UX
+polish that doesn't affect server correctness.
+
+- [ ] Client-Side Validation Redesign — the existing client validation
+      system (`public/validation/`) was designed for a nested, client-side
+      duplicate of the server schema. It cannot work with the flat-key schema
+      served by `GET /api/v1/schema`: `engine.mjs` walks a nested schema
+      tree, `ui.mjs` (FormValidator) builds nested objects via `deepMerge()`
+      with `DEFAULT_CHARACTER`, and `rpgValidators` are functions (not
+      JSON-serializable). ~60% of engine.mjs + ui.mjs is commented-out
+      scaffolding. Current workaround: HTML5 constraint validation + manual
+      JS budget check + server-side `validateCharacterCreation()`.
+      Tasks: delete duplicate `public/validation/schema.mjs`, redesign
+      `validation/engine.mjs` + `validation/ui.mjs` for flat-key served
+      schema, design cross-field RPG validation (budget, defense, etc.),
+      add proper inline error display.
+- [ ] Creation View UX Bugs (7 items from Session 3 smoke test) — input
+      value not auto-selected on click, tab navigation broken, primary
+      attributes should not default to 5 (sum=40 fails validation but passes
+      `required` incorrectly — use empty inputs with placeholders), derived
+      attributes are editable when they should be read-only (permanent/
+      temporary corruption depend on abilities), no client-side derived stat
+      recalculation after creation (server recalculates on save but client
+      shows stale values), portrait section markup broken (nested sections,
+      duplicate headers), `equipment.money` editable during creation (should
+      be derived/starting value).
+- [ ] Array-Typed Derived Fields — `collectFormData()` cannot reconstruct
+      arrays from `<output>` elements with empty/comma-separated values.
+      Temporary fix (Session 3.5a): skip empty `<output>` values. Permanent
+      fix: change `combat.bonusDamage` schema type from `"array"` to
+      `"number"` once the Phase 6 effect resolution pipeline computes the
+      scalar total from `effects.filter(e => e.target === 'combat.bonusDamage')`.
+- [ ] Client Import Map Aliases — server uses subpath aliases (`#types`,
+      `#models`, etc.) but client still uses relative paths everywhere.
+      Define client aliases in `index.html` import map, update `.mjs` files.
+- [ ] Fix client router empty-hash navigation — `hashchange` listener or
+      `isNavigating` guard not resetting
+- [ ] Verify role-based editability (owner, DM, public) in character view —
+      DM login requires local env file for manual testing
+- [ ] Rewrite `watcher.mts` — port mychar pattern: clean exit vs crash
+      detection, `SIGINT`/`SIGTERM` handlers, proper TypeScript types
 
 ---
 
