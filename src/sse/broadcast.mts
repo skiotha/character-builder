@@ -64,6 +64,7 @@ export function broadcastToCharacter(
   });
 
   const eventString = `event: character-updated\ndata: ${eventData}\n\n`;
+  const targetCount = clients.size;
 
   clients.forEach((client) => {
     try {
@@ -78,21 +79,10 @@ export function broadcastToCharacter(
   });
 
   console.info(
-    `[SSE] Broadcast to ${clients.size} client(s) for character ${characterId}`,
+    `[SSE] Broadcast to ${targetCount} client(s) for character ${characterId}`,
   );
 }
 
-export function sendKeepAlive(characterId: string): void {
-  const clients = characterClients.get(characterId);
-
-  if (!clients) return;
-
-  clients.forEach((client) => {
-    try {
-      client.res.write(": keepalive\n\n");
-    } catch (error) {
-      console.log("[SSE] need to remove client:", error);
-      removeClient(characterId, client.res);
-    }
-  });
+export function _resetForTesting(): void {
+  characterClients.clear();
 }

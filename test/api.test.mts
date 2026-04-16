@@ -1,3 +1,4 @@
+import http from "node:http";
 import { describe, it, mock, after } from "node:test";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
@@ -990,6 +991,113 @@ describe("@bug #27: recovery response leaks full character data", () => {
     assert.ok(
       body.playerId !== undefined,
       "@bug #27: recover endpoint leaks playerId in response",
+    );
+  });
+});
+
+// ── SSE Stream Integration ────────────────────────────────────────
+
+describe("GET /api/v1/characters/:id/stream", () => {
+  it("returns 200 with correct SSE headers", async () => {
+    const char = await createTestCharacter(
+      { characterName: "StreamHdr" },
+      "player-sse-hdr",
+    );
+
+    const data = await new Promise<{
+      statusCode: number;
+      headers: http.IncomingHttpHeaders;
+    }>((resolve, reject) => {
+      const req = http.get(
+        `${BASE}/api/v1/characters/${char.id}/stream`,
+        (res) => {
+          resolve({ statusCode: res.statusCode!, headers: res.headers });
+          res.destroy();
+        },
+      );
+      req.on("error", reject);
+    });
+
+    assert.equal(data.statusCode, 200);
+    assert.equal(data.headers["content-type"], "text/event-stream");
+    assert.equal(data.headers["cache-control"], "no-cache");
+    assert.equal(data.headers["connection"], "keep-alive");
+  });
+
+  it("sends initial connected event as first SSE message", async () => {
+    const char = await createTestCharacter(
+      { characterName: "StreamInit" },
+      "player-sse-init",
+    );
+
+    const firstChunk = await new Promise<string>((resolve, reject) => {
+      const req = http.get(
+        `${BASE}/api/v1/characters/${char.id}/stream`,
+        (res) => {
+          res.setEncoding("utf8");
+          res.once("data", (chunk: string) => {
+            resolve(chunk);
+            res.destroy();
+          });
+        },
+      );
+      req.on("error", reject);
+    });
+
+    assert.ok(
+      firstChunk.startsWith("event: connected\n"),
+      `Expected SSE connected event, got: ${firstChunk.slice(0, 80)}`,
+    );
+    const jsonStr = firstChunk
+      .replace("event: connected\ndata: ", "")
+      .replace(/\n\n$/, "");
+    const parsed = JSON.parse(jsonStr) as { message: string };
+    assert.equal(parsed.message, "SSE stream established");
+  });
+
+  it("returns 404 for non-existent character", async () => {
+    const data = await new Promise<{ statusCode: number }>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/no-such-id/stream`,
+          (res) => {
+            resolve({ statusCode: res.statusCode! });
+            res.destroy();
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    assert.equal(data.statusCode, 404);
+  });
+});
+
+describe("@bug #26: SSE stream has no auth checks", () => {
+  it("stream is accessible without playerId or DM token", async () => {
+    const char = await createTestCharacter(
+      { characterName: "StreamNoAuth" },
+      "player-sse-noauth",
+    );
+
+    // @bug — no auth required. Once auth is re-enabled, this should return 401.
+    const data = await new Promise<{ statusCode: number }>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/${char.id}/stream`,
+          (res) => {
+            resolve({ statusCode: res.statusCode! });
+            res.destroy();
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    assert.equal(
+      data.statusCode,
+      200,
+      "@bug #26: SSE stream should require auth but currently allows anonymous access",
     );
   });
 });

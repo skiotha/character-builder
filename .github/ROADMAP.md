@@ -7,9 +7,11 @@
 | **0** | Documentation & Decisions                  | ✅ Done        |
 | **1** | Project Restructure (ADR-006)              | ✅ Done        |
 | **2** | TypeScript Migration (ADR-008)             | ✅ Done        |
-| **3** | Schema-Driven Rendering (ADR-009)          | 🔄 In progress |
-| **4** | Testing (`node:test`, malizia conventions) | Not started    |
+| **3** | Schema-Driven Rendering (ADR-009)          | ✅ Done         |
+| **4** | Testing (`node:test`, malizia conventions) | ✅ Done*        |
 | **5** | Bug Fixes & Hardening                      | Not started    |
+
+\* _Sessions 1–7 complete (385 tests). Session 8 (RPG Engine tests) runs alongside Phase 6._
 | **6** | RPG Engine (ADR-010, ADR-011)              | Not started    |
 | **7** | Sibling Project Integration (addon, bot)   | Not started    |
 | **8** | Polish & Beyond MVP                        | Not started    |

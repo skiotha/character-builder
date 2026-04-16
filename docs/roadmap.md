@@ -244,9 +244,13 @@ data. One rendering path for both initial load and real-time updates.
 
 ---
 
-## Phase 4 — Testing
+## Phase 4 — Testing ✓ DONE
 
 **Goal:** Comprehensive test suite using `node:test` + `node:assert/strict`. Same conventions as malizia.
+
+**Result:** 385 tests passing across 11 test files. Sessions 1–7 complete.
+Session 8 (RPG Engine tests) is deferred — runs alongside Phase 6 as new
+engine code is delivered.
 
 **Detailed plan:** [phase4-plan.md](../.github/plans/phase4-plan.md) — 8-session
 breakdown covering pure utilities, validation, auth, rules engine baseline,
@@ -280,26 +284,28 @@ storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 - [x] `test/data-contracts.test.mts` — Discord bot integration foundation (25 cases) *(Session 5)*
   - [x] Character shape matches data-contracts §1
   - [x] Sanitized-for-public strips sensitive + deletion metadata
-- [ ] `test/api.test.mts` — HTTP integration tests
-  - [ ] GET /characters — list
-  - [ ] POST /characters — create
-  - [ ] GET /characters/:id — retrieve
-  - [ ] PATCH /characters/:id — update
-  - [ ] DELETE /characters/:id — soft/hard delete
-  - [ ] Permission enforcement (owner, DM, public)
-  - [ ] Malformed request handling
-- [ ] `test/sse.test.mts` — SSE broadcast
-  - [ ] Client connection and disconnection
-  - [ ] Broadcast reaches connected clients
-  - [ ] Keep-alive pings
+- [x] `test/api.test.mts` — HTTP integration tests *(Sessions 6–7)*
+  - [x] GET /characters — list
+  - [x] POST /characters — create
+  - [x] GET /characters/:id — retrieve
+  - [x] PATCH /characters/:id — update
+  - [x] DELETE /characters/:id — soft/hard delete
+  - [x] Permission enforcement (owner, DM, public)
+  - [x] Malformed request handling
+- [x] `test/sse.test.mts` — SSE broadcast *(Session 7)*
+  - [x] Client connection and disconnection
+  - [x] Broadcast reaches connected clients
 - [ ] `test/schema-renderer.test.mts` — schema-driven form rendering
+      _(deferred to Phase 8 — client-side code, needs DOM environment)_
   - [ ] Field generation from schema metadata
   - [ ] Section grouping and ordering
   - [ ] Role-based editability gating
   - [ ] Hidden field exclusion
   - [ ] Component overrides for custom sections
 
-**Deliverable:** Full test suite. `npm test` runs green.
+**Deliverable:** Server-side test suite complete. `npm test` runs green (385 tests).
+Client-side rendering tests deferred to Phase 8 (DOM environment needed).
+RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 
 ---
 
@@ -695,8 +701,16 @@ Complete the `deriveCombat()` function.
 - [ ] Verify all derived stats compute correctly with real ability data
 - [ ] Update `docs/data-contracts.md` with final effect vocabulary
 - [ ] Update `docs/deferred-tasks.md` to mark completed items
-- [ ] Run full test suite — add engine-specific tests if Phase 4 tests
-      don't cover new behavior
+- [ ] Run full test suite — rewrite Phase 4 Session 4 baseline tests
+      (`test/rules/attributes.test.mts`, `test/rules/applicator.test.mts`,
+      `test/rules/derived.test.mts`) for typed pipeline inputs/outputs.
+      Add new test files per Phase 4 Session 8 plan:
+      `test/rules/effects.test.mts` (collectAllEffects),
+      `test/rules/registry.test.mts` (reference data, target deserialization),
+      `test/rules/combat.test.mts` (multi-weapon, attack attribute, bonus damage).
+      See [phase4-plan.md Session 8](../.github/plans/phase4-plan.md) for full
+      test categories: phase ordering, modifier matrix, flag resolution,
+      constraint enforcement.
 
 **Deliverable:** Rules engine processes canonical effects. Derived stats
 (combat, secondary attributes) reflect equipped weapons and learned traits.
@@ -766,6 +780,16 @@ Discord bot.
 - [ ] Static data endpoints: `/api/v1/spells`, `/api/v1/rituals`, etc.
       (for addon build script)
 - [ ] GitHub Actions CI: run `npm run typecheck` and `npm test` on push
+
+### Client-Side Test Coverage
+
+Deferred from Phase 4 — client rendering code (`public/renderers/`,
+`public/components/`) needs a DOM environment for meaningful testing.
+
+- [ ] `test/schema-renderer.test.mts` — schema-driven form rendering:
+      field generation, section grouping, role-based editability,
+      hidden field exclusion, component overrides.
+      _(Requires jsdom, happy-dom, or headless browser.)_
 
 ### Client Code Hygiene
 
