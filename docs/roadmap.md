@@ -325,8 +325,9 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `validateCrossFieldRules` iterate all paths.
       **Fixed in Phase 4 Session 2** — `getFieldPathsByProperty` now uses
       existence check when `propertyValue` is `undefined`. Regression test added.
-- [ ] Re-enable `validateCharacterCreation()` in `createCharacter()` service
-      (currently commented out in `index.mjs`)
+- [x] ~~Re-enable `validateCharacterCreation()` in `createCharacter()` service~~
+      **Resolved** — handler already validates; commented-out call was redundant.
+      Dead code removed, service cleaned to thin wrapper (Phase 5 Session 1).
 - [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
       All 6 body-reading sites (`handleCreateCharacter`, `handleUpdateCharacter`,
       `parseImage` in multipart, recover/backup-create/backup-restore in `app.mts`)
@@ -352,38 +353,22 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `auth.mts` uses `===` for both `validateDmToken` and `requireDmToken`.
       Timing-safe comparison is required to prevent timing side-channel attacks.
       **Bug documented in Phase 4 Session 3** — auth tests label this as a bug.
-- [ ] Fix `validateRPGRules` attribute budget check — `src/models/schema-utils.mts`
-      `validateRPGRules()` condition `if (primaryTotal > 80)` only rejects
-      over-budget but should also reject `< 80`. There is no RPG reason to
-      allow character creation with unused attribute points (e.g., total 40
-      out of 80). Fix: change condition to `!== 80` (or add a second check
-      for `< 80` with a distinct error message).
+- [x] Fix `validateRPGRules` attribute budget check — split into over-budget
+      and under-budget checks with distinct error messages (Phase 5 Session 1).
       **Bug #17 — api-infra-bugs tracker.**
-- [ ] Fix `generateDefaultCharacter()` — `serverControlled` check is an empty
-      `if`-block with no `continue`/`return`, so fields like `schemaVersion`
-      that are both `serverControlled: true` and have a `default` value leak
-      into the generated character. Fix: add `continue` after the
-      `SERVER_CONTROLLED_FIELDS` check so traversal skips to the next field.
+- [x] Fix `generateDefaultCharacter()` — added `continue` after
+      `SERVER_CONTROLLED_FIELDS` check. `schemaVersion` now stamped in
+      `createCharacter()` service instead (Phase 5 Session 1).
 - [ ] Fix crash on undefined effect target — `src/rules/derived.mts` passes
       `effect.target!` to `applyEffect` when `target` is `undefined`, causing
       a `TypeError` at runtime (`undefined.split(".")`). Guard `!effect.target
       ?.startsWith("rules.")` evaluates `true` when target is missing. Fix:
       add `effect.target &&` guard before calling `applyEffect`.
       **Bug #18 documented in Phase 4 Session 4** — engine-weak-points tracker.
-- [ ] Fix `validateCharacterUpdate` XP check for `push` on `traits` — multiple
-      bugs make it unreachable and incorrect:
-      1. `validateFieldValue` rejects the push value before the XP check runs
-         (trait object is `typeof "object"` but schema `type` is `"array"` →
-         type mismatch → early `VALIDATION` error)
-      2. If reached, `(trait.cost as number[])[0]` always reads the novice
-         cost regardless of which tier is being learned
-      3. No `cost` property exists on trait objects — costs come from reference
-         data lookup, not inline data
-      4. XP costs are per-tier (novice=10, adept=20, master=30) but the code
-         has no concept of tiers
-      Fix: remove the XP check from validation.mts entirely. XP cost
-      validation belongs in the RPG rules layer (Phase 6) where reference
-      data is available and tier-aware cost calculation lives.
+- [x] Fix `validateCharacterUpdate` XP check for `push` on `traits` —
+      removed premature XP code (both commented-out `increment` block and
+      active but incomplete `push` XP check). Will be rebuilt properly in
+      Phase 6 with typed effects and reference data (Phase 5 Session 1).
 
 ### Medium Priority
 
@@ -398,19 +383,17 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `boolean | void` to paper over this — revert once the design is fixed.
 - [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
       storage (`storage.mjs`). Handler should call service, service calls storage
-- [ ] Remove duplicate `deepMerge`/`isObject` in `index.mts` — copy-pasted
-      from `traversal.mts` but lacks `skipUndefined` support. Service layer
-      should import from `#models/traversal` instead.
+- [x] Remove duplicate `deepMerge`/`isObject` in `index.mts` — removed;
+      service layer now imports from `#models/traversal` (Phase 5 Session 1).
 - [ ] Extract shared `byId` index-entry builder in `storage.mts` —
       `updateIndexMetadata()` and `saveCharacter()` build the same object
       literal. Factor into a helper to keep in sync.
 - [ ] Implement CORS origin whitelisting (ADR-007)
-- [ ] Fix `validateCharacterUpdate` `increment` on `traits` — commented-out
-      block references `calculateXPForNextRank()` which does not exist.
-      Remove the dead commented-out code or implement properly in Phase 6.
-- [ ] Remove dead `xp.mts` — contains only a comment describing intended
-      client flow, no implementation. Either implement XP calculation in
-      Phase 6 or delete the file.
+- [x] Fix `validateCharacterUpdate` `increment` on `traits` — removed
+      commented-out dead code (Phase 5 Session 1). XP validation will be
+      implemented properly in Phase 6.
+- [x] Remove dead `xp.mts` — deleted (Phase 5 Session 1). XP calculation
+      will be implemented in Phase 6.
 - [ ] Add write serialization for storage — per-character write lock to
       prevent concurrent writes from corrupting JSON files (see ADR-002
       consequences)

@@ -449,6 +449,12 @@ describe("createCharacter", () => {
     assert.ok(fromDisk);
     assert.equal(fromDisk.characterName, "Created");
   });
+
+  it("stamps schemaVersion on created character", async () => {
+    const charData = makeCharacter();
+    const result = await service.createCharacter("player-create3", charData);
+    assert.equal(result.schemaVersion, 1);
+  });
 });
 
 describe("deleteCharacterAsPlayer", () => {

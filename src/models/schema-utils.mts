@@ -93,7 +93,7 @@ export function generateDefaultCharacter(
       const field = fieldSchema as Record<string, unknown>;
 
       if (SERVER_CONTROLLED_FIELDS.includes(fullPath)) {
-        // skipped during default character generation
+        continue;
       }
 
       if (field.default !== undefined) {
@@ -238,6 +238,12 @@ export function validateRPGRules(
       errors.push({
         field: "attributes.primary",
         error: `Total primary attributes (${primaryTotal}) exceed budget of 80`,
+        code: "BUSINESS_RULE",
+      });
+    } else if (primaryTotal < 80) {
+      errors.push({
+        field: "attributes.primary",
+        error: `Total primary attributes (${primaryTotal}) do not use full budget of 80`,
         code: "BUSINESS_RULE",
       });
     }

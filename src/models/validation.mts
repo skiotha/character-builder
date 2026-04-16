@@ -160,34 +160,6 @@ export async function validateCharacterUpdate(
       continue;
     }
 
-    if (operation === "increment" && field === "traits") {
-      // const requiredXP = calculateXPForNextRank(character);
-      // if (value < requiredXP) {
-      //   errors.push({
-      //     field,
-      //     error: `Need ${requiredXP} XP for the next rank`,
-      //     code: `BUSINESS_RULE`,
-      //   });
-      //   continue;
-      // }
-    }
-
-    if (update.field === "traits" && update.operation === "push") {
-      const trait = update.value as Record<string, unknown>;
-      const cost = (trait.cost as number[])[0]!;
-      const unspent = (character as Record<string, Record<string, unknown>>)
-        .experience?.unspent as number;
-
-      if (unspent < cost) {
-        errors.push({
-          field: "experience.unspent",
-          error: "Not enough XP",
-          code: "INSUFFICIENT_XP",
-        });
-        continue;
-      }
-    }
-
     validUpdates.push(update);
   }
 

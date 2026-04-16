@@ -1,26 +1,19 @@
 import { generateId, generateBackupCode } from "../lib/utils.mts";
-import { generateDefaultCharacter } from "./schema-utils.mts";
-import { validateCharacterCreation } from "./validation.mts";
+import { deepMerge } from "./traversal.mts";
 import * as storage from "./storage.mts";
 import { validateDmToken } from "#auth";
+
 import type { DeleteResult } from "#types";
 
 async function createCharacter(
   playerId: string,
   characterData: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
-  // validateCharacterCreation(characterData);
-
-  // const defaultCharacter = generateDefaultCharacter(
-  //   playerId,
-  //   characterData.characterName,
-  //   characterData.player || "Unknown",
-  // );
-
   const character = {
     ...characterData,
     id: generateId(),
     backupCode: generateBackupCode(),
+    schemaVersion: 1,
   };
 
   return await storage.saveCharacter(character);
@@ -117,38 +110,6 @@ async function deleteCharacterAsDM(
     type: "hard",
     message: "Character permanently deleted",
   };
-}
-
-// @TODO Phase 5: remove duplicate — use deepMerge from #models/traversal
-// This local copy lacks skipUndefined support, diverging from the canonical version.
-function deepMerge(
-  target: Record<string, unknown>,
-  source: Record<string, unknown>,
-): Record<string, unknown> {
-  const output: Record<string, unknown> = { ...target };
-
-  if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
-        if (!(key in target)) {
-          output[key] = source[key];
-        } else {
-          output[key] = deepMerge(
-            target[key] as Record<string, unknown>,
-            source[key] as Record<string, unknown>,
-          );
-        }
-      } else {
-        output[key] = source[key];
-      }
-    });
-  }
-
-  return output;
-}
-
-function isObject(item: unknown): item is Record<string, unknown> {
-  return item !== null && typeof item === "object" && !Array.isArray(item);
 }
 
 export type { DeleteResult } from "#types";

@@ -263,11 +263,7 @@ describe("validateCharacterCreation", () => {
     assert.match(budgetErr!.error, /80/);
   });
 
-  // NOTE: This test documents a bug — under-budget creation should NOT be
-  // allowed. There's no RPG reason to create a character with unused attribute
-  // points. validateRPGRules only checks `> 80`, not `!== 80`.
-  // Tracked in roadmap Phase 5.
-  it("accepts attributes under budget (all defaults = 40) — BUG", () => {
+  it("rejects attributes under budget (all defaults = 40)", () => {
     const attrs = makePrimaryAttributes({
       accurate: 5,
       cunning: 5,
@@ -283,7 +279,8 @@ describe("validateCharacterCreation", () => {
     const budgetErr = result.errors.find(
       (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
     );
-    assert.equal(budgetErr, undefined, "under-budget is accepted (bug)");
+    assert.ok(budgetErr, "should reject total < 80");
+    assert.match(budgetErr!.error, /80/);
   });
 
   it("accepts single attribute at 15 with others compensating to total 80", () => {
@@ -472,27 +469,24 @@ describe("validateCharacterUpdate", () => {
     assert.equal(result.validUpdates.length, 0);
   });
 
-  it("push on traits with array value crashes in XP check (bug)", async () => {
-    // Passing an array satisfies type:array, but then the XP check
-    // reads .cost from the array (undefined) → TypeError.
-    // Documents a bug: push operations should validate the pushed item,
-    // not the full field value against the array schema.
+  it("push on traits with array value passes validation", async () => {
+    // Previously this crashed in the XP check (reading .cost from array → TypeError).
+    // XP logic removed in Phase 5 Session 1 — push operations now pass through
+    // gated only by isFieldWritable. XP validation will be rebuilt in Phase 6.
     const char = makeCharacter({ experience: { total: 50, unspent: 0 } });
-    await assert.rejects(
-      () =>
-        validateCharacterUpdate(
-          [
-            {
-              field: "traits",
-              value: [{ name: "Iron Fist", cost: [10, 20, 30] }],
-              operation: "push",
-            },
-          ],
-          char,
-          "dm",
-        ),
-      TypeError,
+    const result = await validateCharacterUpdate(
+      [
+        {
+          field: "traits",
+          value: [{ name: "Iron Fist", cost: [10, 20, 30] }],
+          operation: "push",
+        },
+      ],
+      char,
+      "dm",
     );
+    assert.equal(result.errors.length, 0);
+    assert.equal(result.validUpdates.length, 1);
   });
 });
 
@@ -739,19 +733,15 @@ describe("generateDefaultCharacter", () => {
     assert.ok(!isNaN(Date.parse(defaults.lastModified as string)));
   });
 
-  it("contains schemaVersion default", () => {
-    // NOTE: generateDefaultCharacter has a bug — the serverControlled check
-    // has an empty if-block, so serverControlled fields with defaults (like
-    // schemaVersion: default 1) still leak through. This test documents
-    // current behavior. See deferred-tasks for fix tracking.
-    assert.equal(defaults.schemaVersion, 1);
+  it("excludes serverControlled fields like schemaVersion", () => {
+    assert.equal(defaults.schemaVersion, undefined);
   });
 
-  it("contains primary attribute defaults", () => {
+  it("includes non-serverControlled fields with defaults", () => {
     const attrs = defaults.attributes as Record<string, unknown>;
     const primary = attrs.primary as Record<string, number>;
     assert.equal(primary.accurate, 5);
-    assert.equal(primary.cunning, 5);
+    assert.equal(primary.strong, 5);
   });
 
   it("uses 'Unknown' as default playerName when not provided", () => {

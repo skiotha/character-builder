@@ -131,10 +131,14 @@ Update tracker files. Produce the final Phase 5 plan file.
 
 ---
 
-## Session 1 — Service Layer & Validation Fixes
+## Session 1 — Service Layer & Validation Fixes ✓ DONE
 
 **Goal:** Fix pure logic bugs in the model/service layer. All fixes testable
 with existing unit test infrastructure — no HTTP server needed.
+
+**Result:** All 6 tasks complete. 386 tests passing (was 385). Typecheck clean.
+`schemaVersion` stamping moved to `createCharacter()` service (Option A).
+Dead XP code removed — will be rebuilt properly in Phase 6.
 
 ### Tasks
 
