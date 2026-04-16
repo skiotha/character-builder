@@ -11,7 +11,7 @@ All three share the same character data model. The website is the source of trut
 
 ## Stack & Conventions
 
-- **Runtime:** Node.js 24+ (native TypeScript strip-types, no flag needed)
+- **Runtime:** Node.js 25+ (native TypeScript strip-types, no flag needed)
 - **Language:** TypeScript (`.mts` files, `noEmit`, `strict`, `verbatimModuleSyntax`)
 - **Server:** Raw `node:http` / `node:https` — zero npm runtime dependencies
 - **Client:** Vanilla JavaScript SPA with native ES modules (no build step)
@@ -75,7 +75,7 @@ highest-priority item (functions > constants).
 npm run start:dev        # Dev server with file watcher
 npm run typecheck        # TypeScript type-check (tsc --noEmit)
 npm test                 # Run all tests: node --test test/**/*.test.mts
-node --test test/foo.test.mts  # Run a single test file
+node --experimental-test-module-mocks --test test/foo.test.mts  # Run a single test file
 ```
 
 ### Testing
@@ -83,8 +83,10 @@ node --test test/foo.test.mts  # Run a single test file
 - Mirror the malizia project's test structure (`test/*.test.mts`)
 - Use `node:test` (`describe`, `it`, `mock`) and `node:assert/strict`
 - Mock external dependencies (filesystem, HTTP) using `node:test` mock utilities
-- Tests run via: `node --test test/**/*.test.mts`
+- Tests run via: `node --experimental-test-module-mocks --test test/**/*.test.mts`
 - `noUncheckedIndexedAccess` is enabled — array/index accesses return `T | undefined`. Use `!` non-null assertion on values you know exist (e.g. `mock.calls[0]!`) rather than adding unnecessary guards in test code.
+- To mock subpath imports (e.g. `#config`, `#sse`), use `mock.module("#config", { namedExports: { ... } })` — this requires the `--experimental-test-module-mocks` flag (already in `npm test` and the single-test command above).
+- Shared test helpers live in `test/helpers/`: `fixtures.mts` (character factories), `temp-dir.mts` (isolated `DATA_DIR`), `http.mts` (test server), `mock-response.mts` (response spy). Use them rather than recreating test infrastructure.
 
 ### Static File Serving & URL Mapping
 
