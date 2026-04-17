@@ -4,25 +4,14 @@
     "name": "Break Will",
     "category": "spell",
     "description": "Domination of another creature's will and forced obedience.",
-    "tags": [
-      "magic",
-      "control",
-      "mind-control",
-      "mental",
-      "order",
-      "circle",
-      "witchcraft",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "status", "order", "circle", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Allows control over one creature while concentration and Resolute checks hold.",
         "effects": [
           {
-            "target": "Controlled creature",
-            "action": "control_target",
-            "value": "1 action per turn",
+            "tier": "C",
             "description": "Resolute and concentration let you take control of a monster, human, or animal; it can take only one action per turn and cannot use active abilities or powers."
           }
         ]
@@ -31,9 +20,7 @@
         "description": "Maintains control without concentration and frees the mystic to act normally.",
         "effects": [
           {
-            "target": "Break Will concentration",
-            "action": "remove_requirement",
-            "value": "concentration",
+            "tier": "C",
             "description": "Concentration is no longer required to maintain control, and the mystic can freely take other actions."
           }
         ]
@@ -42,9 +29,7 @@
         "description": "Makes the control complete and lets the caster force the target to use its full capabilities.",
         "effects": [
           {
-            "target": "Controlled creature",
-            "action": "expand_control",
-            "value": "all actions and checks",
+            "tier": "C",
             "description": "The controlled creature can be forced to take all actions available on its turn and make any checks without restriction."
           }
         ]
@@ -56,24 +41,14 @@
     "name": "Illusory Correction",
     "category": "spell",
     "description": "A twist of perception that lets the mystic replay failed outcomes.",
-    "tags": [
-      "magic",
-      "reaction",
-      "defense",
-      "utility",
-      "order",
-      "illusion",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "reaction", "defense", "support", "order", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic reroll one failed Defense check each turn as a reaction.",
         "effects": [
           {
-            "target": "Failed Defense check",
-            "action": "reroll_failed_checks",
-            "value": 1,
+            "tier": "C",
             "description": "As a reaction, the mystic may reroll one failed Defense check once per turn."
           }
         ]
@@ -82,9 +57,7 @@
         "description": "Expands the reroll to any failed check involving the mystic.",
         "effects": [
           {
-            "target": "Failed self-related check",
-            "action": "reroll_failed_checks",
-            "value": 1,
+            "tier": "C",
             "description": "As a reaction, the mystic may reroll any failed check related to them once per turn."
           }
         ]
@@ -93,9 +66,7 @@
         "description": "Lets the mystic interfere with nearby checks, even those involving others.",
         "effects": [
           {
-            "target": "Nearby check",
-            "action": "force_reroll",
-            "value": "1 per turn",
+            "tier": "C",
             "description": "As a reaction, the mystic may force a reroll of any nearby check once per turn, even if it belonged to someone else."
           }
         ]
@@ -116,15 +87,13 @@
       "theurgy",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises the mystic above the ground, but requires concentration and risks a painful fall.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "enable_flight",
-            "value": "self with concentration",
+            "tier": "C",
             "description": "Resolute lets the mystic rise above the ground; if concentration is broken, they fall and take up to d6 armor-ignoring damage."
           }
         ]
@@ -133,9 +102,7 @@
         "description": "Lets the mystic levitate one ally with the same risk on collapse.",
         "effects": [
           {
-            "target": "Ally",
-            "action": "enable_flight",
-            "value": "single ally with concentration",
+            "tier": "C",
             "description": "Resolute lifts an ally into the air; if concentration is broken, the ally falls and takes up to d6 armor-ignoring damage."
           }
         ]
@@ -144,9 +111,7 @@
         "description": "Lifts the mystic and the whole group, and makes a broken effect end in a safe descent.",
         "effects": [
           {
-            "target": "Caster and allies",
-            "action": "enable_group_flight",
-            "value": "separate checks per ally",
+            "tier": "C",
             "description": "The mystic may lift themselves and all allies with separate checks; if concentration is lost, the whole group glides safely down."
           }
         ]
@@ -161,22 +126,19 @@
     "tags": [
       "magic",
       "damage",
-      "control",
+      "status",
       "reaction",
       "ranged",
       "order",
-      "mental",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Allows the mystic to hurl objects at a target or block attacks with them.",
         "effects": [
           {
-            "target": "Object or chosen target",
-            "action": "throw_object",
-            "value": "d8 damage or block attack",
+            "tier": "C",
             "description": "Resolute lets the mystic lift and throw an object for up to d8 damage, or as a reaction lift one to block a physical or mental attack aimed at them."
           }
         ]
@@ -185,9 +147,7 @@
         "description": "Lets the mystic seize and fling an enemy, knocking them onto their back.",
         "effects": [
           {
-            "target": "Enemy",
-            "action": "throw_target",
-            "value": "d8 damage and prone",
+            "tier": "C",
             "description": "Resolute lifts an enemy into the air, hurls them away for up to d8 damage, and knocks them prone on their back."
           }
         ]
@@ -196,9 +156,7 @@
         "description": "Spreads the telekinetic throw across a whole group until the checks begin to fail.",
         "effects": [
           {
-            "target": "Enemy group",
-            "action": "throw_multiple_targets",
-            "value": "until first failed check",
+            "tier": "C",
             "description": "The mystic may lift and hurl a group of enemies away, making a separate check for each one until the first failure."
           }
         ]
@@ -212,24 +170,20 @@
     "description": "Revealing the real nature of creatures and things through illusions and disguises.",
     "tags": [
       "magic",
-      "utility",
-      "control",
-      "perception",
-      "illusion",
+      "support",
+      "status",
       "transformation",
       "order",
       "theurgy",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic see through illusions and effects that hide what something truly is.",
         "effects": [
           {
-            "target": "Illusions and disguises",
-            "action": "reveal_true_form",
-            "value": "single perception effect",
+            "tier": "C",
             "description": "Resolute lets the mystic see through illusions, transformations, and similar concealment; illusions are dispelled, while transformations remain but reveal their true nature."
           }
         ]
@@ -238,9 +192,7 @@
         "description": "Forces a whole group of creatures to reveal their real shape and shed transformations.",
         "effects": [
           {
-            "target": "Group of creatures",
-            "action": "force_true_form",
-            "value": "group reveal",
+            "tier": "C",
             "description": "The mystic may make a group of creatures show their true nature, and active transformations on them fall away."
           }
         ]
@@ -249,9 +201,7 @@
         "description": "Stops a revealed target from changing shape again.",
         "effects": [
           {
-            "target": "Shapeshifting creature",
-            "action": "prevent_transformation",
-            "value": "maintain true form",
+            "tier": "C",
             "description": "Resolute forces a creature to remain in its true form and prevents it from transforming again while the effect lasts."
           }
         ]
@@ -263,25 +213,14 @@
     "name": "Invisibility",
     "category": "spell",
     "description": "A gentle turn of attention that makes the mystic and allies slip from notice.",
-    "tags": [
-      "magic",
-      "stealth",
-      "utility",
-      "support",
-      "illusion",
-      "order",
-      "theurgy",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "mobility", "support", "order", "theurgy", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes the mystic from one creature's senses until they take a harmful action.",
         "effects": [
           {
-            "target": "Single creature perception",
-            "action": "grant_invisibility",
-            "value": "single observer",
+            "tier": "C",
             "description": "Resolute makes the mystic vanish from one creature's senses until the mystic attacks it or takes another action that harms it."
           }
         ]
@@ -290,9 +229,7 @@
         "description": "Extends the effect to an entire group of observers.",
         "effects": [
           {
-            "target": "Group perception",
-            "action": "grant_invisibility",
-            "value": "group of observers",
+            "tier": "C",
             "description": "The mystic may disappear from the field of view of a whole group of creatures."
           }
         ]
@@ -301,9 +238,7 @@
         "description": "Lets the mystic hide nearby allies as well, each resolving invisibility separately.",
         "effects": [
           {
-            "target": "Caster and allies",
-            "action": "grant_group_invisibility",
-            "value": "independent ally resolution",
+            "tier": "C",
             "description": "The mystic can make both themselves and their allies invisible to a group of creatures, with each ally's invisibility tracked separately."
           }
         ]
@@ -315,16 +250,14 @@
     "name": "Reflection",
     "category": "spell",
     "description": "Illusory doubles that confuse enemies and take blows in the mystic's place.",
-    "tags": ["magic", "defense", "illusion", "order", "mirage", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "order", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates d4 doubles around the mystic that vanish when struck.",
         "effects": [
           {
-            "target": "Illusion copies",
-            "action": "summon_illusion_copies",
-            "value": "d4 copies",
+            "tier": "C",
             "description": "The mystic creates d4 indistinguishable copies around themselves; enemies who cannot tell truth from illusion may attack them instead, and any hit dispels a copy."
           }
         ]
@@ -333,9 +266,7 @@
         "description": "Increases the number of copies and makes them harder to clear with area damage.",
         "effects": [
           {
-            "target": "Illusion copies",
-            "action": "improve_illusion_copies",
-            "value": "d6 copies, area removes one",
+            "tier": "C",
             "description": "The number of copies increases to d6, and area damage dispels only one copy."
           }
         ]
@@ -344,9 +275,7 @@
         "description": "Raises the number of copies to d8 and makes them ignore area damage.",
         "effects": [
           {
-            "target": "Illusion copies",
-            "action": "improve_illusion_copies",
-            "value": "d8 copies, area ignored",
+            "tier": "C",
             "description": "The Master creates d8 copies, and area damage no longer reduces their number."
           }
         ]
@@ -358,24 +287,14 @@
     "name": "Psychic Strike",
     "category": "spell",
     "description": "A mental weapon that reinforces a mundane blow with psychic force.",
-    "tags": [
-      "magic",
-      "melee",
-      "damage",
-      "mental",
-      "order",
-      "mentalism",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "melee", "damage", "piercing", "order", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a psychic copy of a melee weapon and grants a retry on a miss.",
         "effects": [
           {
-            "target": "Melee attack",
-            "action": "reroll_failed_checks",
-            "value": 1,
+            "tier": "C",
             "description": "The mystic forms a psychic copy of their melee weapon and may reroll the hit check if the original melee attack misses."
           }
         ]
@@ -384,9 +303,7 @@
         "description": "Paralyzes the target and makes the physical half of the strike hit automatically.",
         "effects": [
           {
-            "target": "Target of psychic strike",
-            "action": "add_status",
-            "value": "paralyzed and auto-hit",
+            "tier": "C",
             "description": "Resolute makes the psychic strike paralyze the target, and the physical attack becomes an automatic hit."
           }
         ]
@@ -395,9 +312,7 @@
         "description": "Adds a separate burst of armor-ignoring psychic damage to the strike.",
         "effects": [
           {
-            "target": "Target of psychic strike",
-            "action": "add_damage",
-            "value": "d4 armor-ignoring",
+            "tier": "C",
             "description": "The psychic strike deals d4 extra damage on top of the physical attack, and that bonus damage ignores armor."
           }
         ]
@@ -409,25 +324,14 @@
     "name": "Anathema",
     "category": "spell",
     "description": "Dispelling foreign magic and non-ritual supernatural effects.",
-    "tags": [
-      "magic",
-      "utility",
-      "protection",
-      "runes",
-      "theurgy",
-      "witchcraft",
-      "dispel",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "support", "runes", "theurgy", "witchcraft", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes an ongoing hostile spell effect from one target.",
         "effects": [
           {
-            "target": "Ongoing hostile spell",
-            "action": "dispel_magic",
-            "value": "single target",
+            "tier": "C",
             "description": "Resolute lets the mystic remove an ongoing effect of another caster's spell from themselves or from any other target."
           }
         ]
@@ -436,9 +340,7 @@
         "description": "Lets the mystic dispel effects from a whole group at once.",
         "effects": [
           {
-            "target": "Group of creatures or objects",
-            "action": "dispel_magic",
-            "value": "group effect",
+            "tier": "C",
             "description": "The spell may be used to dispel effects from a whole group of creatures or objects at once."
           }
         ]
@@ -447,9 +349,7 @@
         "description": "Cleanses an entire area of magic, including summons and created phenomena.",
         "effects": [
           {
-            "target": "Area of effect",
-            "action": "dispel_area_magic",
-            "value": "area including summons",
+            "tier": "C",
             "description": "The Master may remove any magic from an area, including summoned creatures and magically created phenomena."
           }
         ]
@@ -461,25 +361,14 @@
     "name": "Witch Hammer",
     "category": "spell",
     "description": "Blessed weaponry made especially deadly against monsters and the corrupt.",
-    "tags": [
-      "magic",
-      "melee",
-      "damage",
-      "theurgy",
-      "weapons",
-      "church",
-      "monster-hunting",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "melee", "damage", "theurgy", "weapons", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Empowers a consecrated weapon and punishes monsters even harder.",
         "effects": [
           {
-            "target": "Blessed weapon",
-            "action": "add_damage",
-            "value": "+d4, or +d6 vs monsters",
+            "tier": "C",
             "description": "A consecrated weapon deals +d4 damage, or +d6 against corrupt creatures and monsters."
           }
         ]
@@ -488,9 +377,7 @@
         "description": "Raises the bonus damage of the blessed weapon to d8.",
         "effects": [
           {
-            "target": "Blessed weapon",
-            "action": "modify_value",
-            "value": "+d8 damage",
+            "tier": "C",
             "description": "The mystic's weapon deals +d8 damage."
           }
         ]
@@ -499,9 +386,7 @@
         "description": "Raises the bonus damage of the blessed weapon to d10.",
         "effects": [
           {
-            "target": "Blessed weapon",
-            "action": "modify_value",
-            "value": "+d10 damage",
+            "tier": "C",
             "description": "The mystic's weapon deals +d10 damage."
           }
         ]
@@ -513,25 +398,14 @@
     "name": "Blessed Shield",
     "category": "spell",
     "description": "An unseen holy shield that raises armor and scorches attackers.",
-    "tags": [
-      "magic",
-      "defense",
-      "protection",
-      "damage",
-      "support",
-      "theurgy",
-      "shield",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "damage", "support", "theurgy", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a shield for the whole battle that improves armor and punishes monster attacks.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "grant_barrier",
-            "value": "+d4 armor and d4 retaliatory damage",
+            "tier": "C",
             "description": "Resolute creates a shield in the air until the end of the battle: it grants +d4 Armor and deals d4 armor-ignoring damage to monsters that attack the mystic."
           }
         ]
@@ -540,9 +414,7 @@
         "description": "Extends the shield to one nearby ally and raises both effects to d6.",
         "effects": [
           {
-            "target": "Caster and one ally",
-            "action": "expand_barrier",
-            "value": "+d6 armor and d6 retaliatory damage",
+            "tier": "C",
             "description": "The shield may also protect one nearby ally, and both its Armor bonus and its retaliatory damage increase to d6."
           }
         ]
@@ -551,9 +423,7 @@
         "description": "Lets the shield cover up to two nearby allies and raises it to d8.",
         "effects": [
           {
-            "target": "Caster and two allies",
-            "action": "expand_barrier",
-            "value": "+d8 armor and d8 retaliatory damage",
+            "tier": "C",
             "description": "The shield may also cover up to two nearby allies, and both its Armor bonus and its retaliatory damage increase to d8."
           }
         ]
@@ -565,24 +435,14 @@
     "name": "Holy Aura",
     "category": "spell",
     "description": "A lasting aura that burns monsters and sustains the living nearby.",
-    "tags": [
-      "magic",
-      "damage",
-      "healing",
-      "support",
-      "theurgy",
-      "aura",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "damage", "healing", "support", "theurgy", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Fills the area around the mystic with holy power that harms hostile monsters.",
         "effects": [
           {
-            "target": "Hostile monsters in aura",
-            "action": "add_damage_over_time",
-            "value": "d6 per turn",
+            "tier": "C",
             "description": "Resolute fills the surrounding space with an aura that deals up to d6 damage each turn to hostile monsters while the mystic sustains it."
           }
         ]
@@ -591,9 +451,7 @@
         "description": "Strengthens the aura's damage and adds healing for living beings.",
         "effects": [
           {
-            "target": "Creatures in aura",
-            "action": "heal_and_harm_aura",
-            "value": "d8 damage, d4 healing",
+            "tier": "C",
             "description": "The aura's damage rises to d8, and all living creatures within it recover d4 Survival each turn."
           }
         ]
@@ -602,9 +460,7 @@
         "description": "Raises both the damaging and healing halves of the aura to their peak.",
         "effects": [
           {
-            "target": "Creatures in aura",
-            "action": "heal_and_harm_aura",
-            "value": "d10 damage, d6 healing",
+            "tier": "C",
             "description": "The aura's damage rises to d10, and the healing it grants to living creatures rises to d6 Survival each turn."
           }
         ]
@@ -612,28 +468,18 @@
     }
   },
   {
-    "id": "burning-glass-of-apoleata",
-    "name": "Apoleata's Burning Glass",
+    "id": "burning-glass",
+    "name": "Burning Glass",
     "category": "spell",
     "description": "A focused beam of holy light that is especially lethal to monsters.",
-    "tags": [
-      "magic",
-      "damage",
-      "ranged",
-      "theurgy",
-      "fire",
-      "monster-hunting",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "damage", "ranged", "theurgy", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Focuses the mystic's inner light into a ray that burns monsters harder than anything else.",
         "effects": [
           {
-            "target": "Single target",
-            "action": "add_damage",
-            "value": "d6, or d8 vs monsters",
+            "tier": "C",
             "description": "Resolute concentrates the light of the mystic's soul into a burning ray that deals d6 damage to a target, or d8 if the target is a monster."
           }
         ]
@@ -642,9 +488,7 @@
         "description": "Turns the beam into an area effect and hits monsters even harder.",
         "effects": [
           {
-            "target": "All targets in area",
-            "action": "add_damage",
-            "value": "d8, or d12 vs monsters",
+            "tier": "C",
             "description": "Resolute deals d8 damage to all targets at once, or d12 if they are monsters."
           }
         ]
@@ -653,9 +497,7 @@
         "description": "Adds a stun to every monster struck by the light.",
         "effects": [
           {
-            "target": "Monsters hit by burning glass",
-            "action": "add_status",
-            "value": "stunned for 1 turn",
+            "tier": "C",
             "description": "On a successful effect, the mystic may also stun all affected monsters for one turn."
           }
         ]
@@ -673,18 +515,15 @@
       "support",
       "corruption",
       "theurgy",
-      "clericalism",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes Corruption from one target and turns excess cleansing into healing.",
         "effects": [
           {
-            "target": "Single target",
-            "action": "reduce_corruption",
-            "value": "d4 or heal remainder",
+            "tier": "C",
             "description": "The spell removes up to d4 Corruption from a target; if the target has less than that, the remainder becomes healing."
           }
         ]
@@ -693,9 +532,7 @@
         "description": "Spreads the same cleansing effect to all visible allies.",
         "effects": [
           {
-            "target": "Visible allies",
-            "action": "expand_healing",
-            "value": "all visible allies",
+            "tier": "C",
             "description": "The cleansing and healing effect now works on all visible allies around the mystic."
           }
         ]
@@ -704,9 +541,7 @@
         "description": "Weakens new Corruption effects in the mystic's presence.",
         "effects": [
           {
-            "target": "Acquired corruption effects",
-            "action": "reduce_corruption",
-            "value": "d4 less in caster presence",
+            "tier": "C",
             "description": "Any effect of newly acquired Corruption is reduced by d4 while the mystic is present."
           }
         ]
@@ -720,23 +555,20 @@
     "description": "Punishment that turns a target's Corruption into paralysis and pure harm.",
     "tags": [
       "magic",
-      "control",
+      "status",
       "damage",
       "corruption",
       "theurgy",
-      "fanaticism",
-      "blood",
-      "resolute"
+      "resolute",
+      "reaction"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Compares d20 to the target's Corruption, paralyzing them and scorching monsters.",
         "effects": [
           {
-            "target": "Target corruption",
-            "action": "conditional_paralyze",
-            "value": "d20 <= corruption, plus d6 vs monsters",
+            "tier": "C",
             "description": "If a d20 roll is less than or equal to the target's Corruption, the target is paralyzed for a turn, and monsters also suffer d6 armor-ignoring damage."
           }
         ]
@@ -745,9 +577,7 @@
         "description": "Lets the mystic compare the result against every visible target at once.",
         "effects": [
           {
-            "target": "Visible targets",
-            "action": "expand_corruption_judgement",
-            "value": "all visible targets",
+            "tier": "C",
             "description": "The d20 result is compared to the Corruption of all visible targets at the same time."
           }
         ]
@@ -756,9 +586,7 @@
         "description": "Triggers reactively whenever Corruption is gained or used and turns it directly into damage.",
         "effects": [
           {
-            "target": "Any creature gaining or using corruption",
-            "action": "reflect_corruption_as_damage",
-            "value": "1 damage per corruption",
+            "tier": "C",
             "description": "As a reaction, the effect automatically strikes any target that gains or uses Corruption: each point of Corruption becomes one point of armor-ignoring damage, though allies may be exempted."
           }
         ]
@@ -766,20 +594,18 @@
     }
   },
   {
-    "id": "laying-on-of-hands",
+    "id": "laying-of-hands",
     "name": "Laying on of Hands",
     "category": "spell",
     "description": "Direct miraculous healing through touch, gaze, and cleansing grace.",
     "tags": ["magic", "healing", "support", "theurgy", "circle", "resolute"],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Heals d6 Survival through touch.",
         "effects": [
           {
-            "target": "Touched target",
-            "action": "heal",
-            "value": "d6 hp",
+            "tier": "C",
             "description": "Resolute heals a touched target for d6 Survival."
           }
         ]
@@ -788,9 +614,7 @@
         "description": "Improves the healing and cleanses poison and bleeding.",
         "effects": [
           {
-            "target": "Touched target",
-            "action": "heal_and_cleanse",
-            "value": "d8 hp and remove poison/bleeding",
+            "tier": "C",
             "description": "Touch now heals d8 Survival and removes all poison and bleeding effects from the target."
           }
         ]
@@ -799,9 +623,7 @@
         "description": "Lets the mystic heal powerfully in melee or heal at range with a glance.",
         "effects": [
           {
-            "target": "Touched or seen target",
-            "action": "heal",
-            "value": "d12 touch or d8 at range",
+            "tier": "C",
             "description": "Resolute heals d12 Survival by touch, or d8 at range with nothing but a look."
           }
         ]
@@ -818,20 +640,17 @@
       "healing",
       "support",
       "damage",
-      "sacrifice",
       "theurgy",
       "circle",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic take another creature's harm onto themselves and heal that creature.",
         "effects": [
           {
-            "target": "Caster and ally",
-            "action": "transfer_damage",
-            "value": "heal d6, caster takes same amount",
+            "tier": "C",
             "description": "The mystic may draw harm from another creature onto themselves: the target heals d6 Survival, while the mystic takes the same amount of damage."
           }
         ]
@@ -840,9 +659,7 @@
         "description": "Improves the healing, reduces the backlash, and lets the mystic absorb toxins.",
         "effects": [
           {
-            "target": "Caster and ally",
-            "action": "transfer_damage_and_status",
-            "value": "heal d8, caster takes half, absorbs poison/bleeding",
+            "tier": "C",
             "description": "The healing increases to d8, the mystic takes only half that amount as damage, and they may also take all poison and bleeding effects onto themselves."
           }
         ]
@@ -851,9 +668,7 @@
         "description": "Lets the mystic send the remaining harm into any other visible creature.",
         "effects": [
           {
-            "target": "Visible creature",
-            "action": "redirect_damage",
-            "value": "remaining half, armor-ignoring",
+            "tier": "C",
             "description": "The mystic may transfer the remaining half of the damage to any other visible creature; that damage cannot be defended against and ignores armor."
           }
         ]
@@ -865,16 +680,14 @@
     "name": "Maltransformation",
     "category": "spell",
     "description": "A forced transformation that reduces the victim to a harmless beast.",
-    "tags": ["magic", "control", "transformation", "circle", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "status", "transformation", "circle", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Turns one target into a harmless animal while the mystic holds concentration.",
         "effects": [
           {
-            "target": "Single target",
-            "action": "transform_target",
-            "value": "harmless beast with concentration",
+            "tier": "C",
             "description": "Resolute and concentration transform the chosen target into a harmless beast; in that form it cannot act or use weapons."
           }
         ]
@@ -883,9 +696,7 @@
         "description": "Removes the need to keep concentrating on the transformation.",
         "effects": [
           {
-            "target": "Maltransformation concentration",
-            "action": "remove_requirement",
-            "value": "concentration",
+            "tier": "C",
             "description": "Concentration is no longer required to maintain the effect."
           }
         ]
@@ -894,9 +705,7 @@
         "description": "Lets the mystic lay the transformation on multiple nearby creatures.",
         "effects": [
           {
-            "target": "Nearby creatures",
-            "action": "transform_multiple_targets",
-            "value": "until first failed check",
+            "tier": "C",
             "description": "The mystic may transform multiple nearby creatures, making a separate Resolute check for each until the first failure."
           }
         ]
@@ -908,16 +717,14 @@
     "name": "Wild Hunt",
     "category": "spell",
     "description": "Calling natural beasts out of the land itself to fight for the mystic.",
-    "tags": ["magic", "support", "summoning", "circle", "beasts", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "support", "summoning", "circle", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Summons one weak beast native to the local land.",
         "effects": [
           {
-            "target": "Natural beast ally",
-            "action": "summon_creature",
-            "value": "1 weak beast",
+            "tier": "C",
             "description": "The mystic summons one weak beast appropriate to the terrain; after the battle, the animal returns to where it came from."
           }
         ]
@@ -926,9 +733,7 @@
         "description": "Lets the mystic call either one strong beast or a pack of weaker ones.",
         "effects": [
           {
-            "target": "Natural beast allies",
-            "action": "summon_creature",
-            "value": "1 strong or d4 weak beasts",
+            "tier": "C",
             "description": "The mystic may summon one strong beast or d4 weak beasts."
           }
         ]
@@ -937,9 +742,7 @@
         "description": "Opens the way to mighty beasts and larger packs.",
         "effects": [
           {
-            "target": "Natural beast allies",
-            "action": "summon_creature",
-            "value": "1 mighty, d4 strong, or d6 weak beasts",
+            "tier": "C",
             "description": "The mystic may summon one mighty beast, d4 strong beasts, or d6 weak beasts."
           }
         ]
@@ -960,15 +763,13 @@
       "circle",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic become a small animal and gain exceptional agility and evasiveness.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "shapeshift_self",
-            "value": "small animal form",
+            "tier": "C",
             "description": "Resolute lets the mystic take the shape of a small animal: they may reroll all failed Discreet and Quick checks, including Defense, and enemies can no longer make Free Attacks against them in that form."
           }
         ]
@@ -977,9 +778,7 @@
         "description": "Unlocks a combat beast form with basic battle traits.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "upgrade_shapeshift",
-            "value": "combat beast with Hardened and Natural Weapon",
+            "tier": "C",
             "description": "The mystic may turn into a combat beast and gains the traits Hardened (Novice) and Natural Weapon (Novice)."
           }
         ]
@@ -988,9 +787,7 @@
         "description": "Unlocks a large combat form with regeneration and great might.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "upgrade_shapeshift",
-            "value": "large combat beast with Regeneration and Mighty",
+            "tier": "C",
             "description": "The mystic may turn into a large combat beast and gains the traits Regeneration (Novice) and Mighty (Novice)."
           }
         ]
@@ -1002,24 +799,14 @@
     "name": "Thorn Cloak",
     "category": "spell",
     "description": "A living mantle of vines and thorns that protects the mystic and wounds attackers.",
-    "tags": [
-      "magic",
-      "defense",
-      "protection",
-      "damage",
-      "circle",
-      "nature",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "damage", "circle", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Wraps the mystic in living growth that grants more armor if they hold still.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "grant_barrier",
-            "value": "+d4 armor, or +d6 if stationary",
+            "tier": "C",
             "description": "Vines, roots, and thorns raise the mystic's Armor by +d4, or by +d6 if the mystic did not move on the previous turn."
           }
         ]
@@ -1028,9 +815,7 @@
         "description": "Lets nearby allies share in the protection so long as they stay close.",
         "effects": [
           {
-            "target": "Nearby allies",
-            "action": "expand_barrier",
-            "value": "shared protection while adjacent",
+            "tier": "C",
             "description": "The vines may also protect allies, so long as they do not break away from the mystic's side."
           }
         ]
@@ -1039,9 +824,7 @@
         "description": "Awakened nature begins to strike back automatically at attackers.",
         "effects": [
           {
-            "target": "Attackers against protected targets",
-            "action": "retaliate",
-            "value": "d10 armor-ignoring",
+            "tier": "C",
             "description": "Every successful attack against the mystic or a protected ally triggers d10 retaliatory damage that ignores armor."
           }
         ]
@@ -1053,24 +836,14 @@
     "name": "Embrace of Earth",
     "category": "spell",
     "description": "Retreat beneath the ground for safety, movement, and hidden spellcasting.",
-    "tags": [
-      "magic",
-      "defense",
-      "mobility",
-      "utility",
-      "circle",
-      "earth",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "mobility", "support", "circle", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic sink underground and become unreachable, but unable to act.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "burrow",
-            "value": "safe underground state with repeat checks",
+            "tier": "C",
             "description": "Resolute places the mystic beneath the earth, beyond the reach of enemies; while there, the mystic cannot act and must repeat the Resolute check each turn or return to the surface."
           }
         ]
@@ -1079,9 +852,7 @@
         "description": "Lets the mystic use mystical powers underground and removes the upkeep checks.",
         "effects": [
           {
-            "target": "Caster underground",
-            "action": "improve_burrow",
-            "value": "cast spells underground without upkeep",
+            "tier": "C",
             "description": "The mystic may use mystical powers while underground and no longer needs repeated Resolute checks to stay there."
           }
         ]
@@ -1090,9 +861,7 @@
         "description": "Gives the mystic sight of the surface and freedom of movement below it.",
         "effects": [
           {
-            "target": "Caster underground",
-            "action": "improve_burrow",
-            "value": "surface sight and free movement",
+            "tier": "C",
             "description": "The mystic may see allies and enemies on the surface, use mystical powers on them, and move freely while underground."
           }
         ]
@@ -1106,23 +875,20 @@
     "description": "Roots and vines rise to restrain enemies and eventually tear them with thorns.",
     "tags": [
       "magic",
-      "control",
       "status",
       "damage",
       "circle",
-      "witchcraft",
-      "entangling",
-      "resolute"
+      "resolute",
+      "piercing",
+      "sorcery"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Entangles one enemy and takes away its mobility.",
         "effects": [
           {
-            "target": "Single enemy",
-            "action": "restrain_target",
-            "value": "immobilized",
+            "tier": "C",
             "description": "Resolute summons vines, roots, or strong tendrils to bind a target; it cannot move, though it may still use ranged weapons and cast spells."
           }
         ]
@@ -1131,9 +897,7 @@
         "description": "Lets the binding spread through a chain of enemies.",
         "effects": [
           {
-            "target": "Enemy chain",
-            "action": "restrain_multiple_targets",
-            "value": "until first failed check",
+            "tier": "C",
             "description": "Resolute may extend the effect through a chain of enemies until the first failed check."
           }
         ]
@@ -1142,9 +906,7 @@
         "description": "Adds thorns that keep dealing pain to bound targets.",
         "effects": [
           {
-            "target": "Restrained enemies",
-            "action": "add_damage",
-            "value": "d6 armor-ignoring",
+            "tier": "C",
             "description": "The summoned vines gain thorns, and entangled enemies take d6 armor-ignoring damage."
           }
         ]
@@ -1156,16 +918,14 @@
     "name": "Storm Arrow",
     "category": "spell",
     "description": "Arrows enchanted to hover in the air and fly unerringly to their targets.",
-    "tags": ["magic", "ranged", "damage", "utility", "circle", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "ranged", "damage", "circle", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Suspends up to five arrows beside the mystic and lets them fire without missing.",
         "effects": [
           {
-            "target": "Enchanted arrows",
-            "action": "enchant_ammunition",
-            "value": "up to 5 arrows, d6 damage, 1 per turn",
+            "tier": "C",
             "description": "Resolute enchants up to five arrows to hover beside the mystic and launch as a free action, always hitting for d6 damage and carrying any effects already placed on the ammunition."
           }
         ]
@@ -1174,9 +934,7 @@
         "description": "Strengthens the arrows and lets the mystic send two at once.",
         "effects": [
           {
-            "target": "Enchanted arrows",
-            "action": "modify_value",
-            "value": "d8 damage, 2 arrows at once",
+            "tier": "C",
             "description": "The arrows deal up to d8 damage, and the mystic may launch two at the same time."
           }
         ]
@@ -1185,9 +943,7 @@
         "description": "Raises the volley to three arrows at once.",
         "effects": [
           {
-            "target": "Enchanted arrows",
-            "action": "modify_value",
-            "value": "3 arrows at once",
+            "tier": "C",
             "description": "The mystic may launch three arrows at the same time."
           }
         ]
@@ -1199,24 +955,14 @@
     "name": "Curse",
     "category": "spell",
     "description": "The evil eye of the mystic that twists actions and turns activity into self-destruction.",
-    "tags": [
-      "magic",
-      "curse",
-      "control",
-      "damage",
-      "circle",
-      "witchcraft",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "status", "damage", "circle", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Forces the target to achieve two successes on actions directed against the mystic.",
         "effects": [
           {
-            "target": "Cursed target",
-            "action": "increase_action_cost",
-            "value": "2 successes vs caster",
+            "tier": "C",
             "description": "Resolute lays a curse on the target so that any action directed against the mystic requires two successes instead of one."
           }
         ]
@@ -1225,9 +971,7 @@
         "description": "Extends that double-check burden to every action the victim takes.",
         "effects": [
           {
-            "target": "Cursed target",
-            "action": "increase_action_cost",
-            "value": "2 successes on all actions",
+            "tier": "C",
             "description": "The cursed target must effectively confirm all of its actions, regardless of whom those actions affect."
           }
         ]
@@ -1236,9 +980,7 @@
         "description": "Turns the curse into a death sentence that punishes every action with damage.",
         "effects": [
           {
-            "target": "Cursed target",
-            "action": "add_damage_on_action",
-            "value": "d6 armor-ignoring",
+            "tier": "C",
             "description": "Resolute places a death curse on the target: every action it takes, whether successful or not, deals d6 armor-ignoring damage to it."
           }
         ]
@@ -1250,25 +992,14 @@
     "name": "Tormenting Spirits",
     "category": "spell",
     "description": "Summoned spirits harry the victim, ruin concentration, and wear away the mind.",
-    "tags": [
-      "magic",
-      "control",
-      "mental",
-      "damage",
-      "witchcraft",
-      "spiritualism",
-      "necromancy",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "status", "damage", "circle", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Breaks concentration and makes all of the target's checks harder.",
         "effects": [
           {
-            "target": "Tormented target",
-            "action": "break_concentration_and_weaken",
-            "value": "2 checks for success",
+            "tier": "C",
             "description": "The summoned spirits break the target's concentration and force it to make two checks for any success; Resolute may carry the torment into the next turn."
           }
         ]
@@ -1277,9 +1008,7 @@
         "description": "Adds a steady drain on the target's Resolute.",
         "effects": [
           {
-            "target": "Tormented target",
-            "action": "reduce_attribute_over_time",
-            "value": "Resolute -d4 per turn",
+            "tier": "C",
             "description": "Resolute and concentration let the spirits reduce the target's Resolute by d4 each turn while the effect lasts."
           }
         ]
@@ -1288,9 +1017,7 @@
         "description": "Increases the pace of Resolute damage to d6 each turn.",
         "effects": [
           {
-            "target": "Tormented target",
-            "action": "modify_value",
-            "value": "Resolute -d6 per turn",
+            "tier": "C",
             "description": "The damage dealt to the target's Resolute increases to d6 each turn."
           }
         ]
@@ -1307,19 +1034,17 @@
       "damage",
       "status",
       "circle",
-      "witchcraft",
+      "sorcery",
       "corruption",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Plants larvae in an enemy, dealing ongoing internal damage and ruining concentration.",
         "effects": [
           {
-            "target": "Infested enemy",
-            "action": "add_damage_over_time",
-            "value": "d4 armor-ignoring and no concentration",
+            "tier": "C",
             "description": "The mystic places larvae inside the enemy: the target takes d4 armor-ignoring damage each turn, cannot maintain concentration, and Resolute may carry the effect into the next turn."
           }
         ]
@@ -1328,9 +1053,7 @@
         "description": "Raises the larvae's damage to d6 each turn.",
         "effects": [
           {
-            "target": "Infested enemy",
-            "action": "modify_value",
-            "value": "d6 damage per turn",
+            "tier": "C",
             "description": "The larvae deal d6 damage each turn."
           }
         ]
@@ -1339,9 +1062,7 @@
         "description": "Raises the larvae's damage to d8 each turn.",
         "effects": [
           {
-            "target": "Infested enemy",
-            "action": "modify_value",
-            "value": "d8 damage per turn",
+            "tier": "C",
             "description": "The larvae deal d8 damage each turn."
           }
         ]
@@ -1353,24 +1074,14 @@
     "name": "Bewilderment",
     "category": "spell",
     "description": "A maze of sensations that makes the victim lose control of their own behavior.",
-    "tags": [
-      "magic",
-      "control",
-      "status",
-      "mental",
-      "circle",
-      "sirens",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "status", "circle", "sirens", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Confuses one opponent and randomly determines what they do each turn.",
         "effects": [
           {
-            "target": "Bewildered target",
-            "action": "confuse_target",
-            "value": "d6 behavior table with concentration",
+            "tier": "C",
             "description": "Resolute and concentration bewilder the target; each turn a d6 determines whether it is paralyzed, attacks the nearest ally, or attacks the nearest enemy."
           }
         ]
@@ -1379,9 +1090,7 @@
         "description": "Removes the need for concentration and keeps the mystic from becoming a random target.",
         "effects": [
           {
-            "target": "Bewildered target",
-            "action": "improve_confusion",
-            "value": "no concentration, never attacks caster",
+            "tier": "C",
             "description": "The effect no longer requires concentration, and the target will no longer try to attack the mystic."
           }
         ]
@@ -1390,9 +1099,7 @@
         "description": "Lets the mystic spread bewilderment across multiple enemies.",
         "effects": [
           {
-            "target": "Multiple enemies",
-            "action": "confuse_multiple_targets",
-            "value": "until first failed check",
+            "tier": "C",
             "description": "The mystic may cast the spell on several enemies, making a Resolute check for each additional target until the first failure."
           }
         ]
@@ -1404,25 +1111,14 @@
     "name": "Ghost Strike",
     "category": "spell",
     "description": "A cursed weapon that kills more effectively and raises its victims as undead servants.",
-    "tags": [
-      "magic",
-      "melee",
-      "damage",
-      "summoning",
-      "witchcraft",
-      "necromancy",
-      "weapons",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "melee", "damage", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Shrouds the weapon in ominous flame and raises its damage.",
         "effects": [
           {
-            "target": "Cursed melee weapon",
-            "action": "add_damage",
-            "value": "+d4 damage",
+            "tier": "C",
             "description": "The witch kindles an ominous flame around their melee weapon, and it deals +d4 damage."
           }
         ]
@@ -1431,9 +1127,7 @@
         "description": "Raises anything slain by the weapon as obedient undead.",
         "effects": [
           {
-            "target": "Living creature slain by weapon",
-            "action": "raise_undead",
-            "value": "until end of battle",
+            "tier": "C",
             "description": "Any living creature killed by the mystic's weapon immediately rises again as undead and obeys the witch until the end of the battle."
           }
         ]
@@ -1442,9 +1136,7 @@
         "description": "Raises the weapon's bonus damage to d8.",
         "effects": [
           {
-            "target": "Cursed melee weapon",
-            "action": "modify_value",
-            "value": "+d8 damage",
+            "tier": "C",
             "description": "The extra damage from Ghost Strike increases to +d8."
           }
         ]
@@ -1456,24 +1148,14 @@
     "name": "Corrupt Aura",
     "category": "spell",
     "description": "An aura of foul energy that harms the living and nourishes monsters.",
-    "tags": [
-      "magic",
-      "damage",
-      "healing",
-      "corruption",
-      "witchcraft",
-      "aura",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "damage", "healing", "corruption", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a corrupt aura around the mystic that damages the living and requires concentration.",
         "effects": [
           {
-            "target": "Living creatures near caster",
-            "action": "add_damage_over_time",
-            "value": "d6 armor-ignoring with concentration",
+            "tier": "C",
             "description": "Resolute creates an aura around the mystic that harms humans and animals for d6 armor-ignoring damage while concentration is maintained."
           }
         ]
@@ -1482,9 +1164,7 @@
         "description": "Removes the concentration requirement and lets the mystic spare chosen creatures.",
         "effects": [
           {
-            "target": "Corrupt aura upkeep",
-            "action": "remove_requirement",
-            "value": "concentration and selective exclusion",
+            "tier": "C",
             "description": "Concentration is no longer required, and the mystic may exclude selected creatures from the aura."
           }
         ]
@@ -1493,9 +1173,7 @@
         "description": "Strengthens the aura and makes it a source of healing for monsters and summons.",
         "effects": [
           {
-            "target": "Creatures in aura",
-            "action": "heal_and_harm_aura",
-            "value": "d8 damage, d8 healing for monsters",
+            "tier": "C",
             "description": "The aura deals up to d8 damage and also heals monsters and summoned creatures for d8 Survival."
           }
         ]
@@ -1511,20 +1189,18 @@
       "magic",
       "ranged",
       "damage",
-      "control",
-      "witchcraft",
+      "status",
+      "sorcery",
       "corruption",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Fires one Black Arrow that hurts and restrains the target until concentration breaks.",
         "effects": [
           {
-            "target": "Hit target",
-            "action": "restrain_target",
-            "value": "d6 armor-ignoring, one active effect",
+            "tier": "C",
             "description": "Resolute fires a Black Arrow: on a hit it deals d6 armor-ignoring damage and prevents the target from acting until concentration is broken or the target wins with Resolute; only one such effect may be maintained at a time."
           }
         ]
@@ -1533,9 +1209,7 @@
         "description": "Lets the mystic hold multiple targets in the same linked effect.",
         "effects": [
           {
-            "target": "Multiple targets",
-            "action": "restrain_multiple_targets",
-            "value": "group releases together",
+            "tier": "C",
             "description": "The effect may spread to several targets until the first miss, but if one target breaks free, the entire group is released."
           }
         ]
@@ -1544,9 +1218,7 @@
         "description": "Separates the linked prisoners so each must escape individually.",
         "effects": [
           {
-            "target": "Multiple restrained targets",
-            "action": "separate_escape_checks",
-            "value": "individual release",
+            "tier": "C",
             "description": "Each trapped target now escapes individually, so long as concentration remains unbroken."
           }
         ]
@@ -1562,19 +1234,17 @@
       "magic",
       "healing",
       "corruption",
-      "utility",
-      "witchcraft",
+      "support",
+      "sorcery",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Compares d4 to the target's current Corruption to decide between healing and more corruption.",
         "effects": [
           {
-            "target": "Single target corruption",
-            "action": "heal_or_increase_corruption",
-            "value": "d4 comparison",
+            "tier": "C",
             "description": "If a d4 roll is lower than the target's current Corruption, the target heals that much; if it is higher, the target gains that much Corruption instead."
           }
         ]
@@ -1583,9 +1253,7 @@
         "description": "Increases the strength of the effect to d6.",
         "effects": [
           {
-            "target": "Single target corruption",
-            "action": "modify_value",
-            "value": "d6 comparison",
+            "tier": "C",
             "description": "The comparison and result now use d6 instead of d4."
           }
         ]
@@ -1594,9 +1262,7 @@
         "description": "Lets the effect jump across a group until it finally heals someone.",
         "effects": [
           {
-            "target": "Target group",
-            "action": "chain_effect",
-            "value": "until first healing result",
+            "tier": "C",
             "description": "The spell may be applied to a group of targets, spreading through them until the first time it produces healing."
           }
         ]
@@ -1608,24 +1274,14 @@
     "name": "Spirit Path",
     "category": "spell",
     "description": "A shift into an immaterial spirit state for passage, safety, and armor-piercing attacks.",
-    "tags": [
-      "magic",
-      "mobility",
-      "defense",
-      "utility",
-      "witchcraft",
-      "necromancy",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "mobility", "defense", "support", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic become a spirit and pass through walls, enemies, and ordinary weapons.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "become_ethereal",
-            "value": "up to 10 meters",
+            "tier": "C",
             "description": "Resolute turns the mystic into a spirit, allowing up to ten meters of travel through walls and enemies and granting immunity to ordinary weapons."
           }
         ]
@@ -1634,9 +1290,7 @@
         "description": "Lets the mystic enter spirit form as a reaction to a physical attack.",
         "effects": [
           {
-            "target": "Incoming physical attack",
-            "action": "defensive_transformation",
-            "value": "Resolute instead of Defense",
+            "tier": "C",
             "description": "Resolute replaces Defense and lets the mystic become a spirit as a reaction to a physical attack, then return to normal immediately afterward."
           }
         ]
@@ -1645,9 +1299,7 @@
         "description": "Lets the mystic's own attacks touch the spirit world and ignore armor.",
         "effects": [
           {
-            "target": "Caster attacks",
-            "action": "ignore_armor",
-            "value": "all attacks can ignore armor",
+            "tier": "C",
             "description": "Resolute lets the mystic's weapons or spells slip into the spirit world at the moment of impact, so their attacks may ignore armor."
           }
         ]
@@ -1662,22 +1314,18 @@
     "tags": [
       "magic",
       "mobility",
-      "utility",
+      "support",
       "corruption",
-      "witchcraft",
-      "demonology",
-      "teleportation",
+      "sorcery",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Moves the mystic a short distance, but deals harm and risks opening the way to something else.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "teleport",
-            "value": "up to 2 moves, d4 armor-ignoring on travel",
+            "tier": "C",
             "description": "Resolute teleports the mystic up to two normal moves away through the Other World; the passage deals d4 armor-ignoring damage, does not provoke Free Attacks, and on failure may release a creature from the breach."
           }
         ]
@@ -1686,9 +1334,7 @@
         "description": "Makes the passage safe and gives the mystic a chance to stop a monster from crossing over.",
         "effects": [
           {
-            "target": "Teleport mishap",
-            "action": "negate_teleport_backlash",
-            "value": "no self-damage, may stop summoned monster",
+            "tier": "C",
             "description": "The mystic no longer takes damage from the journey and may reroll Resolute to prevent a monster from emerging through the tear if the teleport fails."
           }
         ]
@@ -1697,9 +1343,7 @@
         "description": "Lets the mystic bring a nearby companion along at the cost of pain and temporary Corruption.",
         "effects": [
           {
-            "target": "Nearby companion",
-            "action": "teleport_with_target",
-            "value": "d4 armor-ignoring and d4 temporary corruption",
+            "tier": "C",
             "description": "The mystic may take along anyone standing nearby; the passenger suffers d4 armor-ignoring damage and d4 temporary Corruption."
           }
         ]
@@ -1711,24 +1355,14 @@
     "name": "Banishment",
     "category": "spell",
     "description": "Hurling an enemy into the Other World, with the risk of a hostile breach in return.",
-    "tags": [
-      "magic",
-      "control",
-      "damage",
-      "corruption",
-      "witchcraft",
-      "demonology",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "status", "damage", "corruption", "sorcery", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Sends one enemy into the Other World and returns it weakened.",
         "effects": [
           {
-            "target": "Single enemy",
-            "action": "banish_target",
-            "value": "returns next turn with d4 damage and d4 temporary corruption",
+            "tier": "C",
             "description": "Resolute sends the chosen enemy into the Other World; it returns on the next turn shocked, with d4 armor-ignoring damage and d4 temporary Corruption."
           }
         ]
@@ -1737,9 +1371,7 @@
         "description": "Keeps the victim banished until it can force its way back with Resolute.",
         "effects": [
           {
-            "target": "Banished target",
-            "action": "extend_banishment",
-            "value": "until target passes Resolute check",
+            "tier": "C",
             "description": "The target remains in the Other World until it passes a Resolute check to return, and the portal stays open while it is alive and trying to come back."
           }
         ]
@@ -1748,9 +1380,7 @@
         "description": "Turns banishment into a reaction against an attacker.",
         "effects": [
           {
-            "target": "Attacker against caster",
-            "action": "reaction_banishment",
-            "value": "returns after 1 turn",
+            "tier": "C",
             "description": "Resolute lets the mystic send a creature that attacked them into the Other World as a reaction; the creature returns after one turn."
           }
         ]
@@ -1766,20 +1396,18 @@
       "magic",
       "damage",
       "support",
-      "control",
-      "witchcraft",
+      "status",
+      "sorcery",
       "sirens",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Marks one target so everyone else can finish it more easily.",
         "effects": [
           {
-            "target": "Marked target",
-            "action": "grant_rerolls_against_target",
-            "value": "all attackers reroll misses",
+            "tier": "C",
             "description": "Resolute condenses dark energy around the target, allowing any attacker to reroll any failed attack against it until the end of the battle."
           }
         ]
@@ -1788,9 +1416,7 @@
         "description": "Creates a reactive harmful link between the mystic and one attacker.",
         "effects": [
           {
-            "target": "Chosen attacker",
-            "action": "link_damage",
-            "value": "mirrors all damage taken by caster",
+            "tier": "C",
             "description": "As a reaction, the mystic may forge a deadly link to one attacker so that all damage the mystic receives, from any source, is mirrored onto that target."
           }
         ]
@@ -1799,9 +1425,7 @@
         "description": "Lets the mystic maintain several harmful links at once.",
         "effects": [
           {
-            "target": "All linked attackers",
-            "action": "stack_damage_links",
-            "value": "new link on each attack",
+            "tier": "C",
             "description": "The mystic may create a new deadly link with each new attacker without ending the old ones, duplicating incoming damage onto all linked enemies."
           }
         ]
@@ -1813,16 +1437,14 @@
     "name": "Sulfur Cascade",
     "category": "spell",
     "description": "Violent streams of fire that lash one enemy after another.",
-    "tags": ["magic", "damage", "fire", "court", "ranged", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "damage", "tribe", "ranged", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Whips one foe with flame and still hurts them on a failed check.",
         "effects": [
           {
-            "target": "Single enemy",
-            "action": "add_damage",
-            "value": "d12 on success or d6 on failure",
+            "tier": "C",
             "description": "Resolute lashes an enemy with a cascade of fire for d12 damage, or d6 if the check fails."
           }
         ]
@@ -1831,9 +1453,7 @@
         "description": "Lets the cascade leap from one enemy to the next.",
         "effects": [
           {
-            "target": "Enemy chain",
-            "action": "chain_attack",
-            "value": "continues until first failure",
+            "tier": "C",
             "description": "After the first successful hit, the mystic may strike the next enemy, and then the next, continuing until the first failed check."
           }
         ]
@@ -1842,9 +1462,7 @@
         "description": "Turns the cascade into a sustained burning assault that ends only with repeated failure.",
         "effects": [
           {
-            "target": "Enemies hit by cascades",
-            "action": "sustain_attack",
-            "value": "continues until two failed checks in a turn",
+            "tier": "C",
             "description": "The fiery cascades continue burning enemies until the mystic fails two checks in a turn."
           }
         ]
@@ -1856,16 +1474,14 @@
     "name": "Wall of Fire",
     "category": "spell",
     "description": "A wall or dome of flame that divides space and burns anything that crosses it.",
-    "tags": ["magic", "fire", "control", "defense", "court", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "status", "defense", "tribe", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises a blazing wall that blocks movement and inflicts heavy damage on anything passing through.",
         "effects": [
           {
-            "target": "Area barrier",
-            "action": "create_barrier",
-            "value": "d12 armor-ignoring on crossing",
+            "tier": "C",
             "description": "Resolute raises a broad wall of whirling flame that forces enemies to go around, deals d12 armor-ignoring damage to anything crossing it, and burns up small objects such as arrows."
           }
         ]
@@ -1874,9 +1490,7 @@
         "description": "Lets the wall curl into a ring around chosen creatures.",
         "effects": [
           {
-            "target": "Chosen enclosed area",
-            "action": "reshape_barrier",
-            "value": "ring around allies or enemies",
+            "tier": "C",
             "description": "The wall may be folded into a ring around the mystic, allies, or selected enemies marked for isolation."
           }
         ]
@@ -1885,9 +1499,7 @@
         "description": "Lets the wall become a full dome of flame.",
         "effects": [
           {
-            "target": "Chosen enclosed area",
-            "action": "reshape_barrier",
-            "value": "dome",
+            "tier": "C",
             "description": "The wall may take the shape of a dome."
           }
         ]
@@ -1899,24 +1511,14 @@
     "name": "Fire Soul",
     "category": "spell",
     "description": "For the mystic, fire becomes shield, weapon, and source of healing.",
-    "tags": [
-      "magic",
-      "fire",
-      "defense",
-      "reaction",
-      "damage",
-      "court",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "reaction", "damage", "tribe", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Scorches attackers and improves resistance against fire.",
         "effects": [
           {
-            "target": "Attackers and fire defense",
-            "action": "retaliate_and_resist",
-            "value": "d6 returned damage and +d6 armor vs fire",
+            "tier": "C",
             "description": "As a reaction, the mystic deals d6 fire damage to anyone who attacks them and gains +d6 Armor when defending against fire."
           }
         ]
@@ -1925,9 +1527,7 @@
         "description": "Raises the returned damage in melee and strengthens fire defense further.",
         "effects": [
           {
-            "target": "Melee attackers and fire defense",
-            "action": "modify_value",
-            "value": "d10 returned damage and +d10 armor vs fire",
+            "tier": "C",
             "description": "The returned melee damage rises to d10, and the Armor bonus against fire rises to +d10."
           }
         ]
@@ -1936,9 +1536,7 @@
         "description": "Makes the mystic immune to fire and turns flame into healing.",
         "effects": [
           {
-            "target": "Fire and attackers",
-            "action": "grant_immunity_and_retaliation",
-            "value": "fire immunity, heal half fire damage, d10 returned damage",
+            "tier": "C",
             "description": "The mystic no longer takes fire damage, half of any potential fire damage becomes healing instead, and any non-mental attack against them may trigger d10 returned damage."
           }
         ]
@@ -1950,16 +1548,23 @@
     "name": "Battle Hymn",
     "category": "spell",
     "description": "An inspiring song that strengthens the physical gifts of nearby allies.",
-    "tags": ["magic", "support", "healing", "tribe", "resolute"],
-    "source": "spells.md",
+    "tags": [
+      "magic",
+      "support",
+      "healing",
+      "tribe",
+      "resolute",
+      "quick",
+      "strong",
+      "accurate"
+    ],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises one chosen physical attribute for each ally.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "grant_bonus",
-            "value": "+1 Speed, Strength, or Accuracy",
+            "tier": "C",
             "description": "Each ally may increase either Quick, Strong, or Accurate by one."
           }
         ]
@@ -1968,9 +1573,7 @@
         "description": "Raises all three battle attributes at once.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "grant_bonus",
-            "value": "+1 Speed, Strength, and Accuracy",
+            "tier": "C",
             "description": "Allies increase Quick, Strong, and Accurate by one."
           }
         ]
@@ -1979,9 +1582,7 @@
         "description": "Adds a single pulse of healing to the hymn once per battle.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "heal",
-            "value": "d6 once per battle",
+            "tier": "C",
             "description": "The hymn also heals d6 Survival once per battle."
           }
         ]
@@ -1993,16 +1594,22 @@
     "name": "Elegy",
     "category": "spell",
     "description": "A focusing song that steadies the mind, charm, and self-control of allies.",
-    "tags": ["magic", "support", "utility", "corruption", "tribe", "resolute"],
-    "source": "spells.md",
+    "tags": [
+      "magic",
+      "support",
+      "corruption",
+      "tribe",
+      "discreet",
+      "appealing",
+      "resolute"
+    ],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets each ally choose one mental attribute to improve.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "grant_bonus",
-            "value": "+1 Discreet, Resolute, or Appealing",
+            "tier": "C",
             "description": "Each ally may increase either Discreet, Resolute, or Appealing by one."
           }
         ]
@@ -2011,9 +1618,7 @@
         "description": "Raises all three mental attributes together.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "grant_bonus",
-            "value": "+1 Discreet, Resolute, and Appealing",
+            "tier": "C",
             "description": "Allies increase Discreet, Resolute, and Appealing by one."
           }
         ]
@@ -2022,9 +1627,7 @@
         "description": "Lets the song prevent temporary Corruption once per battle.",
         "effects": [
           {
-            "target": "Allies",
-            "action": "prevent_corruption",
-            "value": "d4 temporary corruption once per battle",
+            "tier": "C",
             "description": "The elegy also prevents d4 temporary Corruption once per battle."
           }
         ]
@@ -2036,16 +1639,14 @@
     "name": "Pamphlet",
     "category": "spell",
     "description": "A cutting harmony that disorients enemies and makes them overturn their own successes.",
-    "tags": ["magic", "control", "damage", "tribe", "resolute", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "status", "damage", "tribe", "appealing", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Forces wounded enemies to reroll even their successful checks.",
         "effects": [
           {
-            "target": "Wounded enemies",
-            "action": "force_reroll_successes",
-            "value": "all successful checks",
+            "tier": "C",
             "description": "Appealing forces wounded enemies to reroll all of their successful checks for any action."
           }
         ]
@@ -2054,9 +1655,7 @@
         "description": "Spreads that same humiliation to all enemies, wounded or not.",
         "effects": [
           {
-            "target": "All enemies",
-            "action": "force_reroll_successes",
-            "value": "all successful checks",
+            "tier": "C",
             "description": "All enemies must reroll all of their successful checks for any action."
           }
         ]
@@ -2065,9 +1664,7 @@
         "description": "Adds ongoing armor-ignoring damage to the effect.",
         "effects": [
           {
-            "target": "Affected target",
-            "action": "add_damage_over_time",
-            "value": "d4 armor-ignoring per turn",
+            "tier": "C",
             "description": "On success, the affected target also takes d4 armor-ignoring damage each turn while the effect lasts."
           }
         ]
@@ -2081,24 +1678,21 @@
     "description": "A weapon lifted by will alone to fight and defend in the mystic's place.",
     "tags": [
       "magic",
-
       "melee",
       "defense",
-      "utility",
+      "support",
       "tribe",
       "runes",
       "weapons",
       "resolute"
     ],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the weapon fight on its own, but forbids other active powers.",
         "effects": [
           {
-            "target": "Floating weapon",
-            "action": "animate_weapon",
-            "value": "Resolute for attack and defense, no other active abilities",
+            "tier": "C",
             "description": "Resolute replaces Accurate for attack and Quick for Defense while the weapon fights by itself, but the mystic may not use other active abilities."
           }
         ]
@@ -2107,9 +1701,7 @@
         "description": "Allows spellcasting and other abilities alongside the floating weapon.",
         "effects": [
           {
-            "target": "Floating weapon upkeep",
-            "action": "remove_restriction",
-            "value": "may use abilities, full action to activate",
+            "tier": "C",
             "description": "The mystic may use abilities and other powers while the effect lasts, although activating the weapon still requires a full action."
           }
         ]
@@ -2118,9 +1710,7 @@
         "description": "Makes the enchantment permanent and removes the action cost to set it in motion.",
         "effects": [
           {
-            "target": "Floating weapon upkeep",
-            "action": "remove_activation_cost",
-            "value": "always enchanted",
+            "tier": "C",
             "description": "The mystic's weapon is always enchanted and needs no action to activate: while it holds its position, the mystic is free to do anything else."
           }
         ]
@@ -2132,16 +1722,14 @@
     "name": "Banishing Seal",
     "category": "spell",
     "description": "A symbol that drives a chosen kind of creature out of a marked area.",
-    "tags": ["magic", "control", "damage", "symbolism", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "status", "damage", "symbolism", "resolute", "piercing"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Expels a group of one chosen creature type from the seal's area.",
         "effects": [
           {
-            "target": "Chosen creature type in symbol area",
-            "action": "repel_targets",
-            "value": "until first failed check",
+            "tier": "C",
             "description": "Resolute drives a group of the chosen creature type from the symbol's area, checking each creature in sequence until the first failure; expelled creatures cannot return for an hour."
           }
         ]
@@ -2150,9 +1738,7 @@
         "description": "Threatens the creature where the chain breaks if it hesitates to leave.",
         "effects": [
           {
-            "target": "Creature where chain breaks",
-            "action": "threaten_departure",
-            "value": "d4 armor-ignoring",
+            "tier": "C",
             "description": "The creature where the banishment chain breaks risks d4 armor-ignoring damage if it does not leave the area immediately."
           }
         ]
@@ -2161,9 +1747,7 @@
         "description": "Raises the punishment for resisting the seal.",
         "effects": [
           {
-            "target": "Creature where chain breaks",
-            "action": "threaten_departure",
-            "value": "d8 armor-ignoring, or d4 if it leaves",
+            "tier": "C",
             "description": "The creature where the chain breaks risks d8 armor-ignoring damage, or only d4 if it leaves the symbol's area at once."
           }
         ]
@@ -2176,15 +1760,13 @@
     "category": "spell",
     "description": "An awakened symbol siphons life from enemies and later redirects it to allies.",
     "tags": ["magic", "damage", "healing", "symbolism", "resolute"],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Deals steady damage to all nearby enemies while the mystic concentrates.",
         "effects": [
           {
-            "target": "Nearby enemies",
-            "action": "add_damage_over_time",
-            "value": "d4 armor-ignoring with concentration",
+            "tier": "C",
             "description": "Resolute and concentration make the symbol deal d4 armor-ignoring damage each turn to all enemies nearby."
           }
         ]
@@ -2193,9 +1775,7 @@
         "description": "Lets the glyph continue without concentration.",
         "effects": [
           {
-            "target": "Glyph upkeep",
-            "action": "remove_requirement",
-            "value": "concentration",
+            "tier": "C",
             "description": "Concentration is no longer required to preserve the effect."
           }
         ]
@@ -2204,9 +1784,7 @@
         "description": "Redirects the stolen vitality into nearby allies.",
         "effects": [
           {
-            "target": "Nearby allies",
-            "action": "heal",
-            "value": "d4 hp per turn",
+            "tier": "C",
             "description": "The life force taken by the glyph is redirected into allies, restoring d4 Survival to them each turn."
           }
         ]
@@ -2218,16 +1796,14 @@
     "name": "Blinding Symbol",
     "category": "spell",
     "description": "A burst of light from a symbol that strips sight from enemies for longer and longer spans.",
-    "tags": ["magic", "control", "status", "symbolism", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "status", "symbolism", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Blinds a group of enemies for one turn.",
         "effects": [
           {
-            "target": "Enemy group",
-            "action": "add_status",
-            "value": "blinded for 1 turn",
+            "tier": "C",
             "description": "Resolute blinds a group of enemies for one turn."
           }
         ]
@@ -2236,9 +1812,7 @@
         "description": "Lets the blinding continue so long as concentration and Resolute hold.",
         "effects": [
           {
-            "target": "Blinded targets",
-            "action": "extend_status",
-            "value": "until concentration ends or Resolute fails",
+            "tier": "C",
             "description": "The effect continues until concentration is broken or the mystic fails a Resolute check."
           }
         ]
@@ -2247,9 +1821,7 @@
         "description": "Makes the blindness last until it is cured by magic or elixirs.",
         "effects": [
           {
-            "target": "Blinded targets",
-            "action": "extend_status",
-            "value": "until healed by magic or elixirs",
+            "tier": "C",
             "description": "The effect lasts until the target heals it with magic or alchemical elixirs."
           }
         ]
@@ -2261,24 +1833,14 @@
     "name": "Protective Runes",
     "category": "spell",
     "description": "Guarding runes create a separate layer of magical armor and lash back at attackers.",
-    "tags": [
-      "magic",
-      "defense",
-      "protection",
-      "damage",
-      "runes",
-      "symbolism",
-      "resolute"
-    ],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "damage", "runes", "symbolism", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates rune-armor that is checked separately against each incoming blow.",
         "effects": [
           {
-            "target": "Rune-protected target",
-            "action": "grant_barrier",
-            "value": "d4 armor with concentration",
+            "tier": "C",
             "description": "Resolute and concentration create d4 Armor that is rolled separately against every incoming strike."
           }
         ]
@@ -2287,9 +1849,7 @@
         "description": "Adds armor-ignoring return damage to the runes.",
         "effects": [
           {
-            "target": "Attackers against rune-protected target",
-            "action": "retaliate",
-            "value": "d4 armor-ignoring",
+            "tier": "C",
             "description": "Protective runes also return d4 damage that ignores armor."
           }
         ]
@@ -2298,9 +1858,7 @@
         "description": "Raises both the protection and the backlash, and removes the need for concentration.",
         "effects": [
           {
-            "target": "Rune-protected target",
-            "action": "improve_barrier",
-            "value": "d6 armor and d6 retaliatory damage, no concentration",
+            "tier": "C",
             "description": "Both the Armor and the returned damage increase to d6, and concentration is no longer required to maintain the effect."
           }
         ]
@@ -2312,16 +1870,14 @@
     "name": "Sphere",
     "category": "spell",
     "description": "A spinning weapon forms a defensive sphere against physical arms.",
-    "tags": ["magic", "defense", "protection", "runes", "weapons", "resolute"],
-    "source": "spells.md",
+    "tags": ["magic", "defense", "runes", "weapons", "resolute"],
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Replaces ordinary Defense with Resolute, but limits the mystic to movement only.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "change_base_attribute",
-            "value": "Resolute instead of Speed vs physical weapons",
+            "tier": "C",
             "description": "While Sphere is active, Resolute replaces Quick to determine Defense against physical weapons, but the mystic may do nothing except move."
           }
         ]
@@ -2330,9 +1886,7 @@
         "description": "Turns the defense against physical weapons into an automatic ward so long as concentration holds.",
         "effects": [
           {
-            "target": "Caster",
-            "action": "grant_immunity",
-            "value": "automatic protection from physical weapons with concentration",
+            "tier": "C",
             "description": "The protective Sphere automatically stops all physical weapons while the mystic maintains concentration."
           }
         ]
@@ -2341,9 +1895,7 @@
         "description": "Lets the Sphere protect a nearby ally and frees the mystic to act more broadly without concentration.",
         "effects": [
           {
-            "target": "Caster and nearby ally",
-            "action": "expand_barrier",
-            "value": "protect ally, no concentration, non-attack actions allowed",
+            "tier": "C",
             "description": "The Sphere may protect not only the mystic but also a nearby ally, the mystic may take non-attack actions while it lasts, and concentration is no longer required."
           }
         ]
@@ -2356,15 +1908,13 @@
     "category": "spell",
     "description": "A staff or other weapon becomes a self-guiding missile that always returns to its master.",
     "tags": ["magic", "ranged", "damage", "runes", "weapons", "resolute"],
-    "source": "spells.md",
+    "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
         "effects": [
           {
-            "target": "Thrown staff",
-            "action": "ranged_weapon_spell",
-            "value": "d8 damage with enchantments",
+            "tier": "C",
             "description": "Resolute replaces Accurate to hurl a staff for d8 damage, and any enchantments already placed on the weapon may trigger on the hit."
           }
         ]
@@ -2373,9 +1923,7 @@
         "description": "Lets the weapon bypass obstacles and increases the impact.",
         "effects": [
           {
-            "target": "Thrown staff",
-            "action": "ignore_obstacles",
-            "value": "d10 damage",
+            "tier": "C",
             "description": "The staff may pass around walls and enemies as long as the mystic can see some part of the target, and the damage rises to d10."
           }
         ]
@@ -2384,9 +1932,7 @@
         "description": "Turns the throw into a chained attack across multiple targets with descending damage.",
         "effects": [
           {
-            "target": "Up to five visible targets",
-            "action": "chain_attack",
-            "value": "d12/d10/d8... without breaking on miss",
+            "tier": "C",
             "description": "The mystic may attack up to five visible targets at once: the first takes d12 damage, the second d10, and so on, and a miss does not break the chain."
           }
         ]
