@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@6.0.2
+        uses: actions/checkout@v6.0.2
         with:
           submodules: true
 
