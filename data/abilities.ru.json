@@ -10,6 +10,7 @@
       "ближний",
       "скорость",
       "каблуки",
+      "реакция",
       "преимущество"
     ],
     "source": "03-reference/abilities",
@@ -590,7 +591,7 @@
     "category": "ability",
     "description": "Знание ядов и способов надежно нанести их через оружие или скрытое приспособление.",
     "tags": [
-      "яд",
+      "яды",
       "ближний",
       "статус",
       "алхимия",
@@ -814,7 +815,7 @@
     "name": "Животный Мир",
     "category": "ability",
     "description": "Следопытское и биологическое знание о людях, зверях и чудовищах.",
-    "tags": ["знание", "слежка", "урон", "поддержка", "сообразительность"],
+    "tags": ["знание", "урон", "поддержка", "сообразительность"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
@@ -858,7 +859,7 @@
             },
             "modifier": {
               "type": "addFlat",
-              "value": 6
+              "value": 2
             },
             "description": "Дополнительный урон по выбранной категории существ теперь равен +d6."
           }
@@ -1793,7 +1794,7 @@
             },
             "modifier": {
               "type": "addFlat",
-              "value": 2
+              "value": 4
             },
             "description": "Все атаки по выбранной цели наносят на +d4 больше урона."
           }
@@ -3336,7 +3337,7 @@
     }
   },
   {
-    "id": "mystical-tradition-ratassan",
+    "id": "mystical-tradition-tribe",
     "name": "Мистическая Традиция: Племя",
     "category": "ability",
     "description": "Племенная традиция огненной и боевой магии, снижающая цену порочности собственной школы.",
@@ -3430,15 +3431,11 @@
         "description": "Снимает постоянную Порочность с неофитских сил и дает переброс одиночного воздействия на разум.",
         "effects": [
           {
-            "target": "Novice spells of the tradition",
-            "action": "remove_permanent_corruption",
-            "value": true,
+            "tier": "C",
             "description": "Изучение мистических сил уровня Неофита не добавляет постоянной Порочности."
           },
           {
-            "target": "Single-target mind-affecting spell or effect",
-            "action": "reroll_failed_checks",
-            "value": 1,
+            "tier": "C",
             "description": "Неофит Сирен может повторить проверку заклинания или другого эффекта, воздействующего на разум, если это не массовое воздействие."
           }
         ]
@@ -3447,15 +3444,11 @@
         "description": "Снимает постоянную цену с адептских сил и позволяет перебросить любую одну проверку воздействия на разум.",
         "effects": [
           {
-            "target": "Adept spells of the tradition",
-            "action": "remove_permanent_corruption",
-            "value": true,
+            "tier": "C",
             "description": "Изучение мистических сил уровня Адепта не добавляет постоянной Порочности."
           },
           {
-            "target": "One mind-affecting spell or effect check",
-            "action": "reroll_failed_checks",
-            "value": 1,
+            "tier": "C",
             "description": "Сирена может повторить одну любую проверку заклинания и другого эффекта, воздействующего на разум."
           }
         ]
@@ -3464,15 +3457,11 @@
         "description": "Снимает постоянную цену с мастерских сил и позволяет повторять проверки разума столько раз, сколько нужно по эффекту.",
         "effects": [
           {
-            "target": "Master spells of the tradition",
-            "action": "remove_permanent_corruption",
-            "value": true,
+            "tier": "C",
             "description": "Изучение мистических сил уровня Мастера не добавляет постоянной Порочности."
           },
           {
-            "target": "Mind-affecting spell or effect checks",
-            "action": "remove_limit",
-            "value": "repeats as needed",
+            "tier": "C",
             "description": "Сирена может повторить столько проверок заклинаний и других воздействий на разум, сколько требуется по эффекту."
           }
         ]
@@ -3918,6 +3907,7 @@
               "quality": "catastrophic",
               "weaponFilter": "alchemy"
             },
+            "modifier": { "type": "remove" },
             "description": "Использование алхимических мин или гранат больше не может привести к катастрофическому результату."
           }
         ]
@@ -3992,7 +3982,7 @@
     "name": "Бронированный Мистик",
     "category": "ability",
     "description": "Храмовническая школа, позволяющая кастовать в тяжелой броне и усиливать ее мистикой.",
-    "tags": ["магия", "броня", "церковь", "защита"],
+    "tags": ["магия", "броня", "защита"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
