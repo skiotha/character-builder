@@ -9,7 +9,7 @@ data/index.json
 data/aliases.json
 
 # Environment
-.env
+*.env
 
 # Logs
 *.log
