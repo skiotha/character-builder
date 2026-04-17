@@ -268,14 +268,14 @@ describe("index entry shape", () => {
 describe("sanitization for public role", () => {
   it("strips backupCode for public", () => {
     const char = { ...makeCharacter() };
-    sanitizeCharacterForRole(char, "public");
-    assert.equal(char.backupCode, undefined);
+    const result = sanitizeCharacterForRole(char, "public");
+    assert.equal(result.backupCode, undefined);
   });
 
   it("strips playerId for public", () => {
     const char = { ...makeCharacter() };
-    sanitizeCharacterForRole(char, "public");
-    assert.equal(char.playerId, undefined);
+    const result = sanitizeCharacterForRole(char, "public");
+    assert.equal(result.playerId, undefined);
   });
 
   it("strips deleted, deletedAt, deletedBy for public", () => {
@@ -285,24 +285,24 @@ describe("sanitization for public role", () => {
       deletedAt: "2025-01-01T00:00:00.000Z",
       deletedBy: "player",
     };
-    sanitizeCharacterForRole(char, "public");
-    assert.equal(char.deleted, undefined);
-    assert.equal(char.deletedAt, undefined);
-    assert.equal(char.deletedBy, undefined);
+    const result = sanitizeCharacterForRole(char, "public");
+    assert.equal(result.deleted, undefined);
+    assert.equal(result.deletedAt, undefined);
+    assert.equal(result.deletedBy, undefined);
   });
 
   it("preserves all fields for owner", () => {
     const char = { ...makeCharacter() };
-    sanitizeCharacterForRole(char, "owner");
-    assert.ok(char.backupCode !== undefined);
-    assert.ok(char.playerId !== undefined);
+    const result = sanitizeCharacterForRole(char, "owner");
+    assert.ok(result.backupCode !== undefined);
+    assert.ok(result.playerId !== undefined);
   });
 
   it("preserves all fields for dm", () => {
     const char = { ...makeCharacter() };
-    sanitizeCharacterForRole(char, "dm");
-    assert.ok(char.backupCode !== undefined);
-    assert.ok(char.playerId !== undefined);
+    const result = sanitizeCharacterForRole(char, "dm");
+    assert.ok(result.backupCode !== undefined);
+    assert.ok(result.playerId !== undefined);
   });
 });
 

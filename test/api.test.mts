@@ -887,14 +887,13 @@ describe("static files", () => {
 
 // ── Known Bugs (assert current broken behavior — will fail once fixed) ──
 
-describe("@bug #25: portrait upload lacks auth", () => {
-  it("allows anonymous portrait upload without any auth headers", async () => {
+describe("POST /api/v1/characters/:id/portrait — auth", () => {
+  it("returns 403 without any auth headers", async () => {
     const char = await createTestCharacter(
-      { characterName: "PortraitBug" },
-      "player-portrait-bug",
+      { characterName: "PortraitNoAuth" },
+      "player-portrait-noauth",
     );
 
-    // Minimal valid multipart body (tiny 1x1 PNG)
     const boundary = "----TestBoundary";
     const png1x1 = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAB" +
@@ -911,31 +910,127 @@ describe("@bug #25: portrait upload lacks auth", () => {
       Buffer.from(`\r\n--${boundary}--\r\n`),
     ]);
 
-    // BUG: No x-player-id, no x-dm-id — should be rejected but isn't
     const res = await fetch(`${BASE}/api/v1/characters/${char.id}/portrait`, {
       method: "POST",
       headers: { "Content-Type": `multipart/form-data; boundary=${boundary}` },
       body,
     });
 
-    // @bug — currently succeeds (200) without auth. Should be 401.
-    assert.equal(
-      res.status,
-      200,
-      "@bug #25: portrait upload should require auth",
+    assert.equal(res.status, 403);
+  });
+
+  it("returns 403 for wrong player", async () => {
+    const char = await createTestCharacter(
+      { characterName: "PortraitWrong" },
+      "player-portrait-owner",
     );
+
+    const boundary = "----TestBoundary";
+    const png1x1 = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAB" +
+        "Nl7BcQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const body = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="portrait"; filename="test.png"\r\n` +
+          `Content-Type: image/png\r\n\r\n`,
+      ),
+      png1x1,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}/portrait`, {
+      method: "POST",
+      headers: {
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        "x-player-id": "wrong-player",
+      },
+      body,
+    });
+
+    assert.equal(res.status, 403);
+  });
+
+  it("returns 200 for owner", async () => {
+    const char = await createTestCharacter(
+      { characterName: "PortraitOwnerOk" },
+      "player-portrait-ok",
+    );
+
+    const boundary = "----TestBoundary";
+    const png1x1 = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAB" +
+        "Nl7BcQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const body = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="portrait"; filename="test.png"\r\n` +
+          `Content-Type: image/png\r\n\r\n`,
+      ),
+      png1x1,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}/portrait`, {
+      method: "POST",
+      headers: {
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        "x-player-id": "player-portrait-ok",
+      },
+      body,
+    });
+
+    assert.equal(res.status, 200);
+  });
+
+  it("returns 200 for DM", async () => {
+    const char = await createTestCharacter(
+      { characterName: "PortraitDmOk" },
+      "player-portrait-dm",
+    );
+
+    const boundary = "----TestBoundary";
+    const png1x1 = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAB" +
+        "Nl7BcQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const body = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="portrait"; filename="test.png"\r\n` +
+          `Content-Type: image/png\r\n\r\n`,
+      ),
+      png1x1,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}/portrait`, {
+      method: "POST",
+      headers: {
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        "x-dm-id": TEST_DM_TOKEN,
+      },
+      body,
+    });
+
+    assert.equal(res.status, 200);
   });
 });
 
-describe("@bug #27: inconsistent sanitization on list endpoint", () => {
-  it("GET /characters?playerId leaks backupCode", async () => {
+describe("GET /characters list sanitization", () => {
+  it("GET /characters?playerId strips backupCode from every entry", async () => {
     const char = await createTestCharacter(
-      { characterName: "LeakTestara" },
-      "player-leak-test",
+      { characterName: "OwnerListSan" },
+      "player-ownerlist-sanitize",
     );
 
     const res = await fetch(
-      `${BASE}/api/v1/characters?playerId=player-leak-test`,
+      `${BASE}/api/v1/characters?playerId=player-ownerlist-sanitize`,
     );
     assert.equal(res.status, 200);
     const body = (await res.json()) as Record<string, unknown>[];
@@ -943,55 +1038,52 @@ describe("@bug #27: inconsistent sanitization on list endpoint", () => {
       | Record<string, unknown>
       | undefined;
     assert.ok(found, "character should appear in list");
-
-    // @bug — backupCode is exposed in list response. Should be sanitized.
-    assert.ok(
-      found.backupCode !== undefined,
-      "@bug #27: list endpoint leaks backupCode (should be sanitized)",
-    );
+    assert.equal(found.backupCode, undefined);
   });
 
-  it("DM list leaks backupCode for all characters", async () => {
+  it("DM list strips backupCode for every entry", async () => {
     const res = await fetch(`${BASE}/api/v1/characters`, {
       headers: { "x-dm-id": TEST_DM_TOKEN },
     });
     assert.equal(res.status, 200);
     const body = (await res.json()) as Record<string, unknown>[];
     assert.ok(body.length > 0);
-
-    // @bug — DM list returns raw data including backupCode
-    const first = body[0]!;
-    assert.ok(
-      first.backupCode !== undefined,
-      "@bug #27: DM list endpoint leaks backupCode (should be role-sanitized)",
-    );
+    for (const entry of body) {
+      assert.equal(
+        entry.backupCode,
+        undefined,
+        "DM list must not leak backupCode",
+      );
+    }
   });
 });
 
-describe("@bug #27: recovery response leaks full character data", () => {
-  it("POST /recover returns unsanitized character including playerId", async () => {
+describe("POST /recover response sanitization", () => {
+  it("returns character with owner-level fields (sanitized, not raw)", async () => {
     const char = await createTestCharacter(
-      { characterName: "RecoverLeak" },
-      "player-recover-leak",
+      { characterName: "RecoverSan" },
+      "player-recover-sanitize",
     );
 
     const res = await fetch(`${BASE}/api/v1/recover`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        characterName: "RecoverLeak",
+        characterName: "RecoverSan",
         backupCode: char.backupCode,
       }),
     });
 
     assert.equal(res.status, 200);
     const body = (await res.json()) as Record<string, unknown>;
-
-    // @bug — recovery response includes playerId (should be sanitized for public)
-    assert.ok(
-      body.playerId !== undefined,
-      "@bug #27: recover endpoint leaks playerId in response",
-    );
+    assert.equal(body.id, char.id);
+    // Recovery proves ownership via backupCode → response is role-sanitized
+    // for "owner" (playerId retained so the client can bind session identity).
+    assert.equal(body.playerId, "player-recover-sanitize");
+    // Internal DM-only flags must never leak.
+    assert.equal(body.deleted, undefined);
+    assert.equal(body.deletedAt, undefined);
+    assert.equal(body.deletedBy, undefined);
   });
 });
 
@@ -1009,7 +1101,7 @@ describe("GET /api/v1/characters/:id/stream", () => {
       headers: http.IncomingHttpHeaders;
     }>((resolve, reject) => {
       const req = http.get(
-        `${BASE}/api/v1/characters/${char.id}/stream`,
+        `${BASE}/api/v1/characters/${char.id}/stream?playerId=player-sse-hdr`,
         (res) => {
           resolve({ statusCode: res.statusCode!, headers: res.headers });
           res.destroy();
@@ -1032,7 +1124,7 @@ describe("GET /api/v1/characters/:id/stream", () => {
 
     const firstChunk = await new Promise<string>((resolve, reject) => {
       const req = http.get(
-        `${BASE}/api/v1/characters/${char.id}/stream`,
+        `${BASE}/api/v1/characters/${char.id}/stream?playerId=player-sse-init`,
         (res) => {
           res.setEncoding("utf8");
           res.once("data", (chunk: string) => {
@@ -1059,7 +1151,7 @@ describe("GET /api/v1/characters/:id/stream", () => {
     const data = await new Promise<{ statusCode: number }>(
       (resolve, reject) => {
         const req = http.get(
-          `${BASE}/api/v1/characters/no-such-id/stream`,
+          `${BASE}/api/v1/characters/no-such-id/stream?playerId=anyone`,
           (res) => {
             resolve({ statusCode: res.statusCode! });
             res.destroy();
@@ -1073,14 +1165,13 @@ describe("GET /api/v1/characters/:id/stream", () => {
   });
 });
 
-describe("@bug #26: SSE stream has no auth checks", () => {
-  it("stream is accessible without playerId or DM token", async () => {
+describe("GET /api/v1/characters/:id/stream — auth", () => {
+  it("allows anonymous subscribers (public role, sanitized via broadcast)", async () => {
     const char = await createTestCharacter(
-      { characterName: "StreamNoAuth" },
-      "player-sse-noauth",
+      { characterName: "StreamAnon" },
+      "player-sse-anon",
     );
 
-    // @bug — no auth required. Once auth is re-enabled, this should return 401.
     const data = await new Promise<{ statusCode: number }>(
       (resolve, reject) => {
         const req = http.get(
@@ -1094,10 +1185,178 @@ describe("@bug #26: SSE stream has no auth checks", () => {
       },
     );
 
-    assert.equal(
-      data.statusCode,
-      200,
-      "@bug #26: SSE stream should require auth but currently allows anonymous access",
+    assert.equal(data.statusCode, 200);
+  });
+
+  it("returns 403 for wrong playerId", async () => {
+    const char = await createTestCharacter(
+      { characterName: "StreamWrong" },
+      "player-sse-right",
     );
+
+    const data = await new Promise<{ statusCode: number }>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/${char.id}/stream?playerId=player-sse-wrong`,
+          (res) => {
+            resolve({ statusCode: res.statusCode! });
+            res.destroy();
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    assert.equal(data.statusCode, 403);
+  });
+
+  it("returns 200 for DM via dmId query param", async () => {
+    const char = await createTestCharacter(
+      { characterName: "StreamDm" },
+      "player-sse-dm",
+    );
+
+    const data = await new Promise<{ statusCode: number }>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/${char.id}/stream?dmId=${encodeURIComponent(TEST_DM_TOKEN)}`,
+          (res) => {
+            resolve({ statusCode: res.statusCode! });
+            res.destroy();
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    assert.equal(data.statusCode, 200);
+  });
+
+  it("delivers broadcast payload matching the client contract (character + timestamp)", async () => {
+    // Regression for the `timeStamp` → `timestamp` rename: the client consumer
+    // reads `data.character` and `data.timestamp` from the SSE event. This test
+    // exercises the full live broadcast path (subscribe → PATCH → receive event)
+    // to catch field-name drift between server and client.
+    const owner = "player-sse-contract";
+    const char = await createTestCharacter(
+      { characterName: "SseContract" },
+      owner,
+    );
+
+    const eventPromise = new Promise<{
+      character: Record<string, unknown>;
+      timestamp: string;
+      type: string;
+    }>((resolve, reject) => {
+      const req = http.get(
+        `${BASE}/api/v1/characters/${char.id}/stream?playerId=${owner}`,
+        (res) => {
+          let buf = "";
+          res.setEncoding("utf8");
+          res.on("data", (chunk: string) => {
+            buf += chunk;
+            const match = buf.match(
+              /event: character-updated\ndata: (.+?)\n\n/,
+            );
+            if (match) {
+              try {
+                const parsed = JSON.parse(match[1]!);
+                resolve(parsed);
+              } catch (err) {
+                reject(err);
+              } finally {
+                res.destroy();
+              }
+            }
+          });
+          res.on("error", reject);
+        },
+      );
+      req.on("error", reject);
+    });
+
+    // Give the subscriber a moment to land before we trigger the broadcast.
+    await new Promise((r) => setTimeout(r, 50));
+
+    const patchRes = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": owner,
+      },
+      body: JSON.stringify({
+        updates: [{ field: "location", value: "SSE Land", operation: "set" }],
+      }),
+    });
+    assert.equal(patchRes.status, 200);
+
+    const event = await eventPromise;
+    assert.equal(event.type, "character-updated");
+    assert.ok(
+      typeof event.timestamp === "string",
+      "payload must expose `timestamp` (not `timeStamp`)",
+    );
+    assert.ok(!isNaN(new Date(event.timestamp).getTime()));
+    assert.ok(event.character, "payload must carry `character`");
+    assert.equal(event.character.id, char.id);
+    assert.equal(event.character.location, "SSE Land");
+  });
+
+  it("public subscriber receives sanitized broadcast (no backupCode/playerId)", async () => {
+    const owner = "player-sse-pubsan";
+    const char = await createTestCharacter(
+      { characterName: "SsePubSan" },
+      owner,
+    );
+
+    const eventPromise = new Promise<Record<string, unknown>>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/${char.id}/stream`,
+          (res) => {
+            let buf = "";
+            res.setEncoding("utf8");
+            res.on("data", (chunk: string) => {
+              buf += chunk;
+              const match = buf.match(
+                /event: character-updated\ndata: (.+?)\n\n/,
+              );
+              if (match) {
+                try {
+                  const parsed = JSON.parse(match[1]!) as {
+                    character: Record<string, unknown>;
+                  };
+                  resolve(parsed.character);
+                } catch (err) {
+                  reject(err);
+                } finally {
+                  res.destroy();
+                }
+              }
+            });
+            res.on("error", reject);
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": owner,
+      },
+      body: JSON.stringify({
+        updates: [{ field: "location", value: "Hidden", operation: "set" }],
+      }),
+    });
+
+    const character = await eventPromise;
+    assert.equal(character.backupCode, undefined);
+    assert.equal(character.playerId, undefined);
+    assert.equal(character.location, "Hidden");
   });
 });

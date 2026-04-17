@@ -1,4 +1,7 @@
+import { sanitizeCharacterForRole } from "#models/sanitization";
+
 import type { ServerResponse } from "node:http";
+import type { CharacterRole } from "#types";
 
 interface SSEClientEntry {
   res: ServerResponse;
@@ -57,16 +60,25 @@ export function broadcastToCharacter(
   const clients = characterClients.get(characterId);
   if (!clients || clients.size === 0) return;
 
-  const eventData = JSON.stringify({
-    type: "character-updated",
-    character: characterData,
-    timeStamp: new Date().toISOString(),
-  });
-
-  const eventString = `event: character-updated\ndata: ${eventData}\n\n`;
+  const timestamp = new Date().toISOString();
+  const ownerPlayerId = characterData.playerId;
   const targetCount = clients.size;
 
   clients.forEach((client) => {
+    const role: CharacterRole = client.isDM
+      ? "dm"
+      : client.playerId !== undefined && client.playerId === ownerPlayerId
+        ? "owner"
+        : "public";
+
+    const sanitized = sanitizeCharacterForRole(characterData, role);
+    const eventData = JSON.stringify({
+      type: "character-updated",
+      character: sanitized,
+      timestamp,
+    });
+    const eventString = `event: character-updated\ndata: ${eventData}\n\n`;
+
     try {
       client.res.write(eventString);
     } catch (error) {

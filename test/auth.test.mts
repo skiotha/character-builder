@@ -43,15 +43,13 @@ describe("validateDmToken", () => {
     assert.equal(validateDmToken(""), false);
   });
 
-  // ⚠ BUG: auth.mts uses === instead of crypto.timingSafeEqual().
-  // Timing-safe comparison is required to prevent timing side-channel
-  // attacks on the DM token. See roadmap Phase 5 High Priority.
-  it("uses === comparison (documents timing-unsafe bug)", () => {
-    // The fact that this test passes at all demonstrates === comparison.
-    // A timingSafeEqual implementation would also pass, but would require
-    // Buffer conversion and length check. This test documents current behavior.
+  // Uses crypto.timingSafeEqual() for constant-time comparison.
+  // Length mismatch short-circuits to false (timingSafeEqual requires
+  // same-length buffers).
+  it("uses timing-safe comparison and handles length mismatch", () => {
     assert.equal(validateDmToken(TEST_TOKEN), true);
     assert.equal(validateDmToken(TEST_TOKEN + "x"), false);
+    assert.equal(validateDmToken(TEST_TOKEN.slice(0, -1)), false);
   });
 });
 
@@ -103,7 +101,8 @@ describe("requireDmToken", () => {
 
 configMock.restore();
 mock.module("#config", { namedExports: { DM_TOKEN: undefined } });
-const { validateDmToken: validateNoToken } = await import("#auth");
+const { validateDmToken: validateNoToken, requireDmToken: requireNoToken } =
+  await import("#auth");
 
 describe("validateDmToken — no DM_TOKEN configured", () => {
   it("returns false for any string when DM_TOKEN is undefined", () => {
@@ -116,5 +115,18 @@ describe("validateDmToken — no DM_TOKEN configured", () => {
 
   it("returns false for empty string when DM_TOKEN is undefined", () => {
     assert.equal(validateNoToken(""), false);
+  });
+});
+
+describe("requireDmToken — no DM_TOKEN configured", () => {
+  it("throws 401 for any token when DM_TOKEN is undefined", () => {
+    assert.throws(
+      () => requireNoToken(makeRequest("any-token")),
+      (err: unknown) => {
+        assert.ok(err instanceof Error);
+        assert.equal((err as Error & { statusCode: number }).statusCode, 401);
+        return true;
+      },
+    );
   });
 });

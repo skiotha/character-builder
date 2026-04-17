@@ -67,7 +67,7 @@ export function connectCharacterStream(characterId) {
   eventSource.addEventListener("character-updated", (e) => {
     lastEventTime = Date.now();
     const data = JSON.parse(e.data);
-    console.log("Character updated via SSE:", data.timeStamp);
+    console.log("Character updated via SSE:", data.timestamp);
 
     if (data.character) {
       nagara.setCurrentCharacter(data.character);

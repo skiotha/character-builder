@@ -2,6 +2,7 @@ import { getCharacter, updateCharacter } from "#models/storage";
 import { validateCharacterUpdate } from "#models/validation";
 import { validateDmToken } from "#auth";
 import { applyFieldUpdate } from "#models/schema-utils";
+import { sanitizeCharacterForRole } from "#models/sanitization";
 import { recalculateDerivedFields } from "#rules";
 import { broadcastToCharacter } from "#sse";
 import type { ServerResponse } from "node:http";
@@ -64,7 +65,6 @@ export async function handleUpdateCharacter(
       );
 
       if (errors.length > 0) {
-        console.log("ERRORS ON PATCH", errors);
         if (!res.headersSent) {
           res.writeHead(422);
           res.end(
@@ -104,11 +104,15 @@ export async function handleUpdateCharacter(
       broadcastToCharacter(characterId, savedCharacter);
 
       if (!res.headersSent) {
+        const sanitized = sanitizeCharacterForRole(
+          savedCharacter as Record<string, unknown>,
+          userRole,
+        );
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(
           JSON.stringify({
             success: true,
-            character: savedCharacter,
+            character: sanitized,
           }),
         );
       } else {

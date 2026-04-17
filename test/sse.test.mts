@@ -177,7 +177,7 @@ describe("broadcast", () => {
       });
     });
 
-    it("event data contains type, character, and timeStamp", () => {
+    it("event data contains type, character, and timestamp", () => {
       const res = createMockResponse();
       addClient("char-1", asRes(res), "player-1", false);
 
@@ -192,10 +192,10 @@ describe("broadcast", () => {
 
       assert.equal(parsed.type, "character-updated");
       assert.deepStrictEqual(parsed.character, charData);
-      assert.ok(typeof parsed.timeStamp === "string");
+      assert.ok(typeof parsed.timestamp === "string");
     });
 
-    it("timeStamp is a valid ISO string", () => {
+    it("timestamp is a valid ISO string", () => {
       const res = createMockResponse();
       addClient("char-1", asRes(res), "player-1", false);
 
@@ -205,10 +205,10 @@ describe("broadcast", () => {
       const jsonStr = msg
         .replace("event: character-updated\ndata: ", "")
         .replace(/\n\n$/, "");
-      const parsed = JSON.parse(jsonStr) as { timeStamp: string };
-      const date = new Date(parsed.timeStamp);
-      assert.ok(!isNaN(date.getTime()), "timeStamp should be a valid date");
-      assert.equal(parsed.timeStamp, date.toISOString());
+      const parsed = JSON.parse(jsonStr) as { timestamp: string };
+      const date = new Date(parsed.timestamp);
+      assert.ok(!isNaN(date.getTime()), "timestamp should be a valid date");
+      assert.equal(parsed.timestamp, date.toISOString());
     });
 
     it("removes client whose write() throws and delivers to others", () => {
@@ -246,6 +246,111 @@ describe("broadcast", () => {
       broadcastToCharacter("char-1", { name: "Test" });
 
       assert.equal(second.written.length, 1);
+    });
+
+    // ── per-subscriber sanitization ───────────────────────────
+
+    function parseEvent(msg: string): {
+      character: Record<string, unknown>;
+    } {
+      const jsonStr = msg
+        .replace("event: character-updated\ndata: ", "")
+        .replace(/\n\n$/, "");
+      return JSON.parse(jsonStr) as { character: Record<string, unknown> };
+    }
+
+    it("strips backupCode/playerId for public subscriber", () => {
+      const res = createMockResponse();
+      // Anonymous subscriber: no playerId, not DM → public role
+      addClient("char-1", asRes(res), undefined, false);
+
+      broadcastToCharacter("char-1", {
+        name: "Testara",
+        playerId: "owner-1",
+        backupCode: "secret-code",
+      });
+
+      const { character } = parseEvent(res.written[0]!);
+      assert.equal(character.backupCode, undefined);
+      assert.equal(character.playerId, undefined);
+      assert.equal(character.name, "Testara");
+    });
+
+    it("preserves backupCode/playerId for owner subscriber", () => {
+      const res = createMockResponse();
+      addClient("char-1", asRes(res), "owner-1", false);
+
+      broadcastToCharacter("char-1", {
+        name: "Testara",
+        playerId: "owner-1",
+        backupCode: "secret-code",
+      });
+
+      const { character } = parseEvent(res.written[0]!);
+      assert.equal(character.backupCode, "secret-code");
+      assert.equal(character.playerId, "owner-1");
+    });
+
+    it("preserves backupCode/playerId for DM subscriber", () => {
+      const res = createMockResponse();
+      addClient("char-1", asRes(res), undefined, true);
+
+      broadcastToCharacter("char-1", {
+        name: "Testara",
+        playerId: "owner-1",
+        backupCode: "secret-code",
+      });
+
+      const { character } = parseEvent(res.written[0]!);
+      assert.equal(character.backupCode, "secret-code");
+      assert.equal(character.playerId, "owner-1");
+    });
+
+    it("does not cross-contaminate: owner, DM, and public all get correct payloads", () => {
+      const ownerRes = createMockResponse();
+      const dmRes = createMockResponse();
+      const publicRes = createMockResponse();
+      addClient("char-1", asRes(ownerRes), "owner-1", false);
+      addClient("char-1", asRes(dmRes), undefined, true);
+      addClient("char-1", asRes(publicRes), "other-player", false);
+
+      broadcastToCharacter("char-1", {
+        name: "Testara",
+        playerId: "owner-1",
+        backupCode: "secret-code",
+      });
+
+      const owner = parseEvent(ownerRes.written[0]!).character;
+      const dm = parseEvent(dmRes.written[0]!).character;
+      const pub = parseEvent(publicRes.written[0]!).character;
+
+      assert.equal(owner.backupCode, "secret-code");
+      assert.equal(dm.backupCode, "secret-code");
+      assert.equal(pub.backupCode, undefined);
+      assert.equal(pub.playerId, undefined);
+    });
+
+    it("does not mutate the broadcast payload across subscribers", () => {
+      const publicRes = createMockResponse();
+      const ownerRes = createMockResponse();
+      addClient("char-1", asRes(publicRes), undefined, false);
+      addClient("char-1", asRes(ownerRes), "owner-1", false);
+
+      const payload = {
+        name: "Testara",
+        playerId: "owner-1",
+        backupCode: "secret-code",
+      };
+      broadcastToCharacter("char-1", payload);
+
+      // Original payload untouched
+      assert.equal(payload.backupCode, "secret-code");
+      assert.equal(payload.playerId, "owner-1");
+
+      // Owner still gets full payload (regression for the mutation bug)
+      const owner = parseEvent(ownerRes.written[0]!).character;
+      assert.equal(owner.backupCode, "secret-code");
+      assert.equal(owner.playerId, "owner-1");
     });
   });
 });

@@ -6,16 +6,16 @@ import { URL } from "node:url";
 import { requireDmToken } from "#auth";
 import * as nagara from "#models";
 import * as backup from "./lib/backup.mts";
+import { sanitizeCharacterForRole } from "#models/sanitization";
 import {
   handleValidateDM,
   handleGetAbilities,
   handleGetCharacters,
-  handleUploadPortrait,
   handleUpdateCharacter,
   handleCreateCharacter,
   handleCharacterStream,
 } from "#routes";
-import { createCharacterRoute } from "./routes/routes.mts";
+import { createCharacterRoute, createPortraitRoute } from "./routes/routes.mts";
 import { getSerializedSchema } from "#models/schema-serializer";
 
 import {
@@ -30,6 +30,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NagaraRequest } from "#types";
 
 const getCharacterHandler = createCharacterRoute();
+const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
@@ -254,7 +255,7 @@ async function handleApi(
       pathParts[1] &&
       pathParts[2] === "portrait"
     ) {
-      return await handleUploadPortrait(req, res, pathParts[1]!);
+      return await portraitHandler(req, res, pathParts);
     }
 
     // GET /api/v1/characters/:id
@@ -336,8 +337,12 @@ async function handleApi(
           );
 
           if (character) {
+            const sanitized = sanitizeCharacterForRole(
+              character as Record<string, unknown>,
+              "owner",
+            );
             res.writeHead(200);
-            res.end(JSON.stringify(character));
+            res.end(JSON.stringify(sanitized));
           } else {
             res.writeHead(404);
             res.end(

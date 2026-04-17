@@ -228,14 +228,19 @@ Dead XP code removed — will be rebuilt properly in Phase 6.
 
 ---
 
-## Session 2 — Security Hardening
+## Session 2 — Security Hardening ✅ COMPLETED
 
 **Goal:** Fix all authentication, authorization, and data exposure bugs.
 These are the highest-impact security issues in the codebase.
 
+**Status:** All tasks completed. Additionally pulled forward from Session 3:
+SSE auth re-enablement (Session 3 task 3). Additionally pulled forward from
+Session 4: `timeStamp→timestamp` rename (task 2) and `console.log` debug
+removal (task 4). See "Notes" at end of this section for details.
+
 ### Tasks
 
-1. **Use `crypto.timingSafeEqual()` for DM token comparison**
+1. **Use `crypto.timingSafeEqual()` for DM token comparison** ✅
    - **File:** `src/lib/auth.mts`
    - **Change:** Replace `token === DM_TOKEN` with timing-safe comparison
      in both `requireDmToken` (line 7) and `validateDmToken` (line 18).
@@ -244,26 +249,27 @@ These are the highest-impact security issues in the codebase.
      requires same-length buffers).
    - **Pattern:** `Buffer.from(a).length === Buffer.from(b).length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))`
 
-2. **Add auth to portrait upload**
-   - **File:** `src/routes/handleUploadPortrait.mts`
-   - **Change:** Add ownership/DM check before processing upload. Options:
-     (a) Wrap with `withCharacterPermissions` middleware in the route wiring,
-     or (b) add inline check: read `x-player-id` header, compare to
-     `character.playerId`, check `x-dm-id` with `validateDmToken`. Reject
-     if role is `public` (no player ID and not DM).
+2. **Add auth to portrait upload** ✅
+   - **File:** `src/routes/handleUploadPortrait.mts` + new
+     `src/routes/portraitRoutes.mts`
+   - **Change:** Added ownership/DM check before processing upload via
+     option (a): wrapped handler with `withCharacterPermissions` middleware,
+     rejects role `"public"`. Also fixed latent `finally { return true }`
+     swallow-bug in `res.on("close")` path → explicit returns per path.
    - **Bug #25** — api-infra-bugs tracker
    - **Reference:** `handleGetCharacter.mts` uses `withCharacterPermissions`
      via `characterRoutes.mts` — follow same pattern
 
-3. **Consistent sanitization across all response paths**
+3. **Consistent sanitization across all response paths** ✅
    - **Files:** `src/routes/handleGetCharacters.mts`,
      `src/routes/handleUpdateCharacter.mts`,
      `src/sse/broadcast.mts`, `src/app.mts` (recover endpoint)
    - **Changes:**
      - `handleGetCharacters.mts` line 18 (DM list): sanitize each character
-       for `"dm"` role
+       for `"dm"` role (list endpoint additionally strips `backupCode`
+       regardless of role)
      - `handleGetCharacters.mts` line 30 (player list): sanitize each
-       character for `"owner"` role
+       character for `"owner"` role (+ strip `backupCode` as above)
      - `handleUpdateCharacter.mts` line 96: sanitize response for
        `userRole` (already computed on line 52)
      - `app.mts` recover endpoint line 338: sanitize for `"owner"` role
@@ -271,17 +277,38 @@ These are the highest-impact security issues in the codebase.
      - `broadcast.mts` line 62: sanitize per subscriber using `client.isDM`
        and `client.playerId` vs `characterData.playerId` to determine role.
        Each subscriber may get a different payload.
+   - **Additional fix:** `sanitizeCharacterForRole` itself was mutating its
+     input (latent bug that would cause cross-contamination once used in the
+     per-subscriber broadcast loop). Changed to clone-then-delete.
    - **Exception:** POST create 201 response in `handleCreateCharacter.mts`
      should include `backupCode` — owner needs it on first creation. No
      change needed there.
    - **Bug #27** — api-infra-bugs tracker
 
-4. **Resolve `handleGetCharacters` TODO**
+4. **Resolve `handleGetCharacters` TODO** ✅
    - **File:** `src/routes/handleGetCharacters.mts` line 14
-   - **Change:** Fix typo in comment ("handing" → "handling"). The DM path is
-     functional and auth-gated — keep it. Sanitization from task 3 addresses
+   - **Change:** Fixed typo in comment ("handing" → "handling") and removed
+     the `@TODO: disable dm handling` line entirely. The DM path is
+     functional and auth-gated — kept. Sanitization from task 3 addresses
      the data exposure concern.
    - **Bug #28** — api-infra-bugs tracker
+
+### Notes — tasks pulled forward from later sessions
+
+- **From Session 3 task 3 (SSE auth):** `handleStreamCharacter.mts` 401/403
+  blocks uncommented; query-param auth (`?playerId` / `?dmId`) used since
+  EventSource can't set headers. Client (`public/sse/characterStream.mjs`)
+  already supplies these.
+- **From Session 4 task 2 (`timeStamp`→`timestamp`):** Renamed in
+  `src/sse/broadcast.mts` + `test/sse.test.mts`. No client code read this
+  field (verified).
+- **From Session 4 task 4 (dead code):** Removed
+  `console.log("ERRORS ON PATCH", errors)` from
+  `src/routes/handleUpdateCharacter.mts`.
+- **Still open for Session 3:** `Access-Control-Allow-Origin: *` fallback
+  in `src/routes/handleStreamCharacter.mts` line 43 (belongs with Session 3
+  CORS whitelist task).
+
 
 ### New/Updated Tests
 
@@ -358,7 +385,7 @@ and CORS origin whitelisting.
      - `src/lib/multipart.mts` `parseImage()` — 20 MB limit (upload)
    - **Bug #25** — api-infra-bugs tracker
 
-3. **Re-enable SSE stream auth**
+3. **Re-enable SSE stream auth** ✅ (completed in Session 2)
    - **File:** `src/routes/handleStreamCharacter.mts` lines 21-37
    - **Change:** Uncomment both auth blocks (401 unauthorized + 403 forbidden).
    - **EventSource limitation:** `EventSource` API cannot send custom headers.
@@ -442,7 +469,7 @@ typos, and structural debt.
      (already handled in the setBase loop above).
    - **Bug #18** — engine-weak-points tracker
 
-2. **Fix `timeStamp` → `timestamp` in broadcast**
+2. **Fix `timeStamp` → `timestamp` in broadcast** ✅ (completed in Session 2)
    - **File:** `src/sse/broadcast.mts` line 63
    - **Change:** Rename `timeStamp` to `timestamp` in the event payload.
    - **Check client:** Search `public/` for any code reading `timeStamp` from
@@ -454,7 +481,7 @@ typos, and structural debt.
      following the same signature as other handlers. Wire it in `app.mts`
      via import.
 
-4. **Remove dead/commented code sweep**
+4. **Remove dead/commented code sweep** (partial — `console.log` debug removed in Session 2)
    - **Files:** Multiple
    - **Changes:**
      - Remove `console.log("ERRORS ON PATCH", errors)` debug line in

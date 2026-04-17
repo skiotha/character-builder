@@ -282,8 +282,13 @@ async function uploadPortrait(characterId, file) {
   const formData = new FormData();
   formData.append("portrait", file);
 
+  const headers = {};
+  const playerToken = getPlayerToken();
+  if (playerToken) headers["x-player-id"] = playerToken;
+
   const response = await fetch(`/api/v1/characters/${characterId}/portrait`, {
     method: "POST",
+    headers,
     body: formData,
   });
 

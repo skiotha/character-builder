@@ -7,22 +7,31 @@ import type { NagaraRequest } from "#types";
 export async function handleUploadPortrait(
   req: NagaraRequest,
   res: ServerResponse,
-  characterId: string,
 ): Promise<boolean> {
   try {
-    const character = await nagara.getCharacter(characterId);
-    if (!character) {
+    const character = req.character;
+    const permissions = req.characterPermissions;
+
+    if (!character || !permissions) {
       res.writeHead(404);
       res.end(JSON.stringify({ error: "Character not found" }));
-      return false;
+      return true;
     }
+
+    if (permissions.role === "public") {
+      res.writeHead(403);
+      res.end(JSON.stringify({ error: "Not authorized" }));
+      return true;
+    }
+
+    const characterId = character.id as string;
 
     const contentType = req.headers["content-type"] || "";
     const boundaryMatch = contentType.match(/boundary=(.+)$/);
     if (!boundaryMatch) {
       res.writeHead(400);
       res.end(JSON.stringify({ error: "Invalid content type" }));
-      return false;
+      return true;
     }
 
     const { filename, stream } = await parseImage(req, boundaryMatch[1]!);
@@ -48,13 +57,13 @@ export async function handleUploadPortrait(
         message: "Portrait uploaded successfully",
       }),
     );
+    return true;
   } catch (error) {
     console.error("Portrait upload error:", error);
-    res.writeHead(500);
-    res.end(JSON.stringify({ error: "Failed to upload portrait " }));
-
-    return false;
-  } finally {
+    if (!res.headersSent) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: "Failed to upload portrait" }));
+    }
     return true;
   }
 }
