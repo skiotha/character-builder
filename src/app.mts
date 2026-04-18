@@ -15,6 +15,8 @@ import {
   handleCreateCharacter,
   handleCharacterStream,
 } from "#routes";
+import { applyCors } from "./lib/cors.mts";
+import { BodyTooLargeError, MAX_JSON_BODY, readBody } from "./lib/body.mts";
 import { createCharacterRoute, createPortraitRoute } from "./routes/routes.mts";
 import { getSerializedSchema } from "#models/schema-serializer";
 
@@ -184,18 +186,10 @@ async function handleApi(
 ): Promise<boolean | void> {
   const { pathname } = url;
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, x-player-id, x-dm-id",
-  );
+  applyCors(req, res);
 
   if (req.method === "OPTIONS") {
-    res.writeHead(200);
+    res.writeHead(204);
     res.end();
     return;
   }
@@ -325,37 +319,38 @@ async function handleApi(
 
     // POST /api/v1/recover
     if (req.method === "POST" && pathParts[0] === "recover") {
-      let body = "";
-      req.on("data", (chunk) => (body += chunk));
+      try {
+        const body = await readBody(req, MAX_JSON_BODY);
+        const { characterName, backupCode } = JSON.parse(body);
+        const character = await nagara.recoverCharacter(
+          characterName,
+          backupCode,
+        );
 
-      req.on("end", async () => {
-        try {
-          const { characterName, backupCode } = JSON.parse(body);
-          const character = await nagara.recoverCharacter(
-            characterName,
-            backupCode,
+        if (character) {
+          const sanitized = sanitizeCharacterForRole(
+            character as Record<string, unknown>,
+            "owner",
           );
-
-          if (character) {
-            const sanitized = sanitizeCharacterForRole(
-              character as Record<string, unknown>,
-              "owner",
-            );
-            res.writeHead(200);
-            res.end(JSON.stringify(sanitized));
-          } else {
-            res.writeHead(404);
-            res.end(
-              JSON.stringify({
-                error: "Character not found or invalid backup code",
-              }),
-            );
-          }
-        } catch (error) {
+          res.writeHead(200);
+          res.end(JSON.stringify(sanitized));
+        } else {
+          res.writeHead(404);
+          res.end(
+            JSON.stringify({
+              error: "Character not found or invalid backup code",
+            }),
+          );
+        }
+      } catch (error) {
+        if (error instanceof BodyTooLargeError) {
+          res.writeHead(413);
+          res.end(JSON.stringify({ error: error.message }));
+        } else {
           res.writeHead(400);
           res.end(JSON.stringify({ error: (error as Error).message }));
         }
-      });
+      }
       return;
     }
 
@@ -365,7 +360,7 @@ async function handleApi(
       res.end(
         JSON.stringify({
           apiBase: API_ROUTE,
-          maxFileSize: 10485760,
+          maxFileSize: 20_971_520,
           allowedImageTypes: [
             MIME_TYPES["jpeg"],
             MIME_TYPES["png"],
@@ -387,22 +382,24 @@ async function handleApi(
       const characterId = pathParts[2]!;
       requireDmToken(req);
 
-      let body = "";
-      req.on("data", (chunk: Buffer) => (body += chunk));
-      req.on("end", async () => {
-        try {
-          const { note } = JSON.parse(body || "{}");
-          const backupRecord = await backup.createCharacterBackup(
-            characterId,
-            note,
-          );
-          res.writeHead(201, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(backupRecord));
-        } catch (error) {
+      try {
+        const body = await readBody(req, MAX_JSON_BODY);
+        const { note } = JSON.parse(body || "{}");
+        const backupRecord = await backup.createCharacterBackup(
+          characterId,
+          note,
+        );
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(backupRecord));
+      } catch (error) {
+        if (error instanceof BodyTooLargeError) {
+          res.writeHead(413);
+          res.end(JSON.stringify({ error: error.message }));
+        } else {
           res.writeHead(500);
           res.end(JSON.stringify({ error: (error as Error).message }));
         }
-      });
+      }
       return;
     }
 
@@ -441,20 +438,22 @@ async function handleApi(
       pathParts[1] === "restore"
     ) {
       requireDmToken(req);
-      let body = "";
-      req.on("data", (chunk: Buffer) => (body += chunk));
-      req.on("end", async () => {
-        try {
-          const { backupId } = JSON.parse(body);
-          if (!backupId) throw new Error("Missing backupId");
-          const result = await backup.restoreCharacterBackup(backupId);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(result));
-        } catch (error) {
+      try {
+        const body = await readBody(req, MAX_JSON_BODY);
+        const { backupId } = JSON.parse(body);
+        if (!backupId) throw new Error("Missing backupId");
+        const result = await backup.restoreCharacterBackup(backupId);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      } catch (error) {
+        if (error instanceof BodyTooLargeError) {
+          res.writeHead(413);
+          res.end(JSON.stringify({ error: error.message }));
+        } else {
           res.writeHead(400);
           res.end(JSON.stringify({ error: (error as Error).message }));
         }
-      });
+      }
       return;
     }
 

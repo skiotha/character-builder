@@ -359,93 +359,94 @@ removal (task 4). See "Notes" at end of this section for details.
 
 ---
 
-## Session 3 — Request Safety (Body Limits, SSE Auth, CORS)
+## Session 3 — Request Safety (Body Limits, CORS) ✅ COMPLETED
 
-**Goal:** HTTP-layer hardening. Body size limits, SSE auth re-enablement,
-and CORS origin whitelisting.
+**Goal:** HTTP-layer hardening. Body size limits and CORS origin whitelisting.
+
+**Status:** All tasks completed. 412 tests passing (was 385). Typecheck clean.
+New `src/lib/body.mts` utility with `readBody`/`readBodyBuffer` + typed
+`BodyTooLargeError`. New `src/lib/cors.mts` with env-driven origin whitelist
+per ADR-007. New `config/nagara.production.env` template. `MAX_UPLOAD_BODY`
+set to `22_020_096` (≈21 MB — 20 MB image + multipart overhead).
 
 ### Tasks
 
-1. **Create `readBody()` utility with size limit**
-   - **File:** New `src/lib/body.mts` (or add to `src/lib/utils.mts`)
-   - **Function:** `readBody(req: IncomingMessage, maxBytes: number): Promise<string>`
-     - Accumulates chunks, tracks total size
-     - Rejects with 413 (Payload Too Large) if limit exceeded
-     - Destroys the request stream on rejection to stop reading
-   - **Constants:** `MAX_JSON_BODY = 1_048_576` (1 MB),
-     `MAX_UPLOAD_BODY = 20_971_520` (20 MB)
+1. **Create `readBody()` utility with size limit** ✅
+   - **File:** New `src/lib/body.mts`
+   - **Exports:** `readBody(req, maxBytes): Promise<string>`,
+     `readBodyBuffer(req, maxBytes): Promise<Buffer>`,
+     `BodyTooLargeError` (typed error with `limit` property),
+     `MAX_JSON_BODY = 1_048_576` (1 MB),
+     `MAX_UPLOAD_BODY = 22_020_096` (~21 MB incl. multipart overhead)
+   - **Design note:** On overflow, `req.pause()` + no-op `'data'` drain
+     listener is used instead of `req.destroy()`. Destroying the socket
+     prevented 413 responses from reaching clients (fetch `SocketError`).
 
-2. **Apply body size limits to all 6 body-reading sites**
-   - Replace `let body = ""; req.on("data", ...)` pattern with `readBody()`:
+2. **Apply body size limits to all 6 body-reading sites** ✅
+   - Replaced `let body = ""; req.on("data", ...)` with `readBody()`:
      - `src/routes/handleCreateCharacter.mts` — 1 MB limit
      - `src/routes/handleUpdateCharacter.mts` — 1 MB limit
-     - `src/app.mts` recover endpoint (~line 327) — 1 MB limit
-     - `src/app.mts` backup-create endpoint (~line 385) — 1 MB limit
-     - `src/app.mts` backup-restore endpoint (~line 439) — 1 MB limit
-     - `src/lib/multipart.mts` `parseImage()` — 20 MB limit (upload)
+     - `src/app.mts` recover endpoint — 1 MB limit
+     - `src/app.mts` backup-create endpoint — 1 MB limit
+     - `src/app.mts` backup-restore endpoint — 1 MB limit
+     - `src/lib/multipart.mts` `parseImage()` — 21 MB limit (via `readBodyBuffer`)
+   - All catch blocks map `BodyTooLargeError` → 413 response.
    - **Bug #25** — api-infra-bugs tracker
 
 3. **Re-enable SSE stream auth** ✅ (completed in Session 2)
-   - **File:** `src/routes/handleStreamCharacter.mts` lines 21-37
-   - **Change:** Uncomment both auth blocks (401 unauthorized + 403 forbidden).
-   - **EventSource limitation:** `EventSource` API cannot send custom headers.
-     Current code already supports query-param auth: `url.searchParams.get("playerId")`
-     and `url.searchParams.get("dmId")` on lines 14-17. This is sufficient
-     for the trusted userbase (ADR-003). The commented-out code is already
-     wired to use these params.
-   - **Bug #26** — api-infra-bugs tracker
-   - **Note:** SSE broadcast sanitization was handled in Session 2.
 
-4. **Implement CORS origin whitelisting (ADR-007)**
-   - **File:** `src/app.mts` line 186 + `src/lib/config.mts`
-   - **Change:**
-     - Add `CORS_ORIGINS: string[]` to config (read from env, default to
-       `["http://localhost:3000"]` in dev, `["https://nagara.team"]` in prod)
-     - Replace `res.setHeader("Access-Control-Allow-Origin", "*")` with
-       origin check: if `req.headers.origin` is in the whitelist, reflect it
-       back; otherwise omit the header (browser will reject the request)
-     - Also set `Vary: Origin` header when reflecting
+4. **Implement CORS origin whitelisting (ADR-007)** ✅
+   - **Config:** `CORS_ORIGINS: string[]` in `src/lib/config.mts`, read from
+     `NAGARA_CORS_ORIGINS` env var (comma-separated). Defaults: dev
+     `["http://localhost:3000","http://127.0.0.1:3000"]`, prod
+     `["https://nagara.team"]`.
+   - **Helper:** New `src/lib/cors.mts` with `applyCors(req, res)` and
+     `isAllowedOrigin(origin)`. Always sets `Vary: Origin`. Reflects
+     `Access-Control-Allow-Origin` only for whitelisted origins. No
+     `Access-Control-Allow-Credentials` (conservative — revisit if needed).
+   - **Applied in:** `src/app.mts` `handleApi()` (replaces `*` wildcard),
+     `src/routes/handleStreamCharacter.mts` (replaces `origin || "*"` fallback).
+   - OPTIONS preflight now returns **204** (was 200).
+   - **Production env:** New `config/nagara.production.env` template with
+     `NAGARA_CORS_ORIGINS=https://nagara.team`. `package.json` `start` script
+     updated to load it via `--env-file-if-exists`.
 
 ### New/Updated Tests
 
-- **`test/api.test.mts`:**
-  - Add test: POST body exceeding 1 MB → 413 response
-  - Add test: POST body at exactly 1 MB → accepted
-  - Add test: CORS preflight with allowed origin → correct headers
-  - Add test: CORS preflight with disallowed origin → no `Access-Control-Allow-Origin`
+- **`test/body.test.mts`** (new — 7 tests):
+  - `readBody`: under limit → resolves, over limit → BodyTooLargeError + paused,
+    empty stream → empty string, exact limit → resolves
+  - `readBodyBuffer`: returns Buffer
+  - Constants: MAX_JSON_BODY = 1MB, MAX_UPLOAD_BODY = ~21MB
 
-- **`test/sse.test.mts`:**
-  - Add test: SSE connect without playerId or dmId → 401
-  - Add test: SSE connect with wrong playerId for character → 403
-  - Add test: SSE connect with valid playerId → 200 + event stream
-  - Update existing connection test to pass auth params
-
-- **New `test/body.test.mts`** (or section in api.test.mts):
-  - Unit test `readBody()` with mock request stream
-  - Test: stream under limit → resolves with body string
-  - Test: stream over limit → rejects with appropriate error
-  - Test: empty stream → resolves with empty string
+- **`test/api.test.mts`** (6 new + 3 updated):
+  - Body limits: POST >1MB → 413, POST small → not 413, PATCH >1MB → 413
+  - CORS: preflight allowed origin → 204 + ACAO + Vary,
+    preflight disallowed → 204 no ACAO, GET disallowed → 200 no ACAO
+  - Updated: maxFileSize 10MB→20MB, OPTIONS 200→204, ACAO `*`→whitelist
 
 ### Verification
 
-- `npm run typecheck` clean
-- `npm test` — all tests pass
-- Manual: `curl` with oversized body → 413
-- Manual: SSE connect without auth → 401
-- Manual: cross-origin request from non-whitelisted origin → blocked
+- [x] `npm run typecheck` — clean
+- [x] `npm test` — 412/412 pass (27 new tests since Session 1)
+- [x] App starts and serves correctly
 
 ### Files modified
 
-- `src/lib/body.mts` — new file (readBody utility)
-- `src/lib/config.mts` — add CORS_ORIGINS
-- `src/routes/handleCreateCharacter.mts` — use readBody
-- `src/routes/handleUpdateCharacter.mts` — use readBody
-- `src/routes/handleStreamCharacter.mts` — uncomment auth
-- `src/lib/multipart.mts` — use readBody / add size limit
-- `src/app.mts` — use readBody for inline handlers, CORS whitelisting
-- `test/api.test.mts` — body limit + CORS tests
-- `test/sse.test.mts` — auth tests
-- `test/body.test.mts` — new file (unit tests for readBody)
+- `src/lib/body.mts` — new file (readBody + readBodyBuffer utility)
+- `src/lib/cors.mts` — new file (CORS origin whitelisting)
+- `src/lib/config.mts` — added CORS_ORIGINS
+- `src/routes/handleCreateCharacter.mts` — use readBody, BodyTooLargeError→413
+- `src/routes/handleUpdateCharacter.mts` — use readBody, BodyTooLargeError→413
+- `src/routes/handleUploadPortrait.mts` — BodyTooLargeError→413
+- `src/routes/handleStreamCharacter.mts` — applyCors (no more `*` fallback)
+- `src/lib/multipart.mts` — use readBodyBuffer for parseImage
+- `src/app.mts` — applyCors in handleApi, readBody for 3 inline handlers,
+  OPTIONS→204, bumped maxFileSize to 20MB
+- `config/nagara.production.env` — new file (production env template)
+- `package.json` — start script loads production env
+- `test/body.test.mts` — new file (7 unit tests)
+- `test/api.test.mts` — 6 new tests + 3 updated
 
 ---
 

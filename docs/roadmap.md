@@ -328,30 +328,27 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [x] ~~Re-enable `validateCharacterCreation()` in `createCharacter()` service~~
       **Resolved** — handler already validates; commented-out call was redundant.
       Dead code removed, service cleaned to thin wrapper (Phase 5 Session 1).
-- [ ] Add request body size limit (1 MB for JSON, 20 MB for uploads)
-      All 6 body-reading sites (`handleCreateCharacter`, `handleUpdateCharacter`,
-      `parseImage` in multipart, recover/backup-create/backup-restore in `app.mts`)
-      accumulate the full request body into memory with zero size limit.
+- [x] Add request body size limit (1 MB for JSON, ~21 MB for uploads)
+      New `src/lib/body.mts` utility: `readBody`, `readBodyBuffer`,
+      `BodyTooLargeError`. Applied to all 6 body-reading sites. 413 response
+      on overflow (Phase 5 Session 3).
       **Bug #25-related — api-infra-bugs tracker.**
 - [x] Re-enable file upload size check (commented out in `fileUploader.mjs`)
       **Resolved** — `fileUploader.mjs` no longer exists (removed in Phase 1
       restructure). Client-side check active in `portraitHandler.mjs` line 89.
       Server-side limit addressed via new body size limit utility (see above).
-- [ ] Add auth to portrait upload — `handleUploadPortrait` has zero auth
-      checks (no `x-player-id`, no `x-dm-id`, no ownership check). Any anonymous
-      client knowing a character UUID can overwrite any character's portrait.
-      Fix: wrap with `withCharacterPermissions` or add inline ownership/DM check.
+- [x] Add auth to portrait upload — wrapped with `withCharacterPermissions`
+      middleware; handler rejects `"public"` role. Also fixed `finally { return true }`
+      swallow-bug in close-handler (Phase 5 Session 2).
       **Bug #25 — api-infra-bugs tracker.**
-- [ ] Re-enable SSE stream auth + sanitize broadcast payload —
-      `handleStreamCharacter` has auth checks (401 + 403) explicitly commented
-      out. `broadcast.mts` sends full unsanitized character data (including
-      `backupCode`, `playerId`) to all subscribers. Fix: re-enable auth
-      (consider EventSource header limitations — may need query-param token)
-      and apply `sanitizeCharacterForRole` to broadcast payload.
+- [x] Re-enable SSE stream auth + sanitize broadcast payload —
+      Auth blocks uncommented; query-param auth (`?playerId`/`?dmId`) used.
+      `broadcast.mts` now sanitizes per subscriber via `sanitizeCharacterForRole`
+      (Phase 5 Session 2).
       **Bug #26 — api-infra-bugs tracker.**
-- [ ] Use `crypto.timingSafeEqual()` for DM token comparison —
-      `auth.mts` uses `===` for both `validateDmToken` and `requireDmToken`.
-      Timing-safe comparison is required to prevent timing side-channel attacks.
+- [x] Use `crypto.timingSafeEqual()` for DM token comparison —
+      Replaced `===` with `crypto.timingSafeEqual()` in `auth.mts`
+      (Phase 5 Session 2).
       **Bug documented in Phase 4 Session 3** — auth tests label this as a bug.
 - [x] Fix `validateRPGRules` attribute budget check — split into over-budget
       and under-budget checks with distinct error messages (Phase 5 Session 1).
@@ -388,7 +385,9 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [ ] Extract shared `byId` index-entry builder in `storage.mts` —
       `updateIndexMetadata()` and `saveCharacter()` build the same object
       literal. Factor into a helper to keep in sync.
-- [ ] Implement CORS origin whitelisting (ADR-007)
+- [x] Implement CORS origin whitelisting (ADR-007) — new `src/lib/cors.mts`
+      with env-driven `CORS_ORIGINS`. Replaces `*` wildcard. Always sets
+      `Vary: Origin`. Production env file added (Phase 5 Session 3).
 - [x] Fix `validateCharacterUpdate` `increment` on `traits` — removed
       commented-out dead code (Phase 5 Session 1). XP validation will be
       implemented properly in Phase 6.
@@ -397,14 +396,10 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [ ] Add write serialization for storage — per-character write lock to
       prevent concurrent writes from corrupting JSON files (see ADR-002
       consequences)
-- [ ] Consistent sanitization across all response paths — currently only
-      `GET /characters/:id` calls `sanitizeCharacterForRole`. Five endpoints
-      return raw character data including `backupCode` and `playerId`:
-      `GET /characters` player list (`handleGetCharacters.mts` line 30),
-      `GET /characters` DM list (line 18), `PATCH /characters/:id`
-      (`handleUpdateCharacter.mts` line 96), `POST /recover` (`app.mts`
-      line 338), SSE broadcast (`broadcast.mts` line 62). Exception: POST
-      create 201 response should include `backupCode` (owner needs it).
+- [x] Consistent sanitization across all response paths — applied
+      `sanitizeCharacterForRole` to GET list, PATCH update, POST recover,
+      and SSE broadcast. POST create still returns `backupCode` (owner needs
+      it on first creation) (Phase 5 Session 2).
       **Bug #27 — api-infra-bugs tracker.**
 
 ### Low Priority
@@ -429,11 +424,9 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       Already resolved before Phase 5.
 - [ ] Fix DELETE route — extract inline handler into a proper handler file
 - [ ] Remove dead/commented code throughout the codebase
-- [ ] Resolve `handleGetCharacters` `@TODO: disable dm handing` (typo:
-      "handing" → "handling") — `src/routes/handleGetCharacters.mts` line 14.
-      DM path is functional and auth-gated but returns all characters
-      unsanitized (see Medium Priority #27). Decide whether DM listing
-      stays in this endpoint or moves. Apply sanitization regardless.
+- [x] Resolve `handleGetCharacters` `@TODO: disable dm handing` — removed
+      stale TODO, fixed typo. DM path kept (auth-gated); sanitization from
+      bug #27 fix addresses data exposure (Phase 5 Session 2).
       **Bug #28 — api-infra-bugs tracker.**
 - [ ] Harden recovery endpoint — `generateBackupCode()` in
       `src/lib/utils.mts` produces only 6 adj × 6 noun × 900 numbers =

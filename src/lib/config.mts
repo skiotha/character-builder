@@ -20,6 +20,16 @@ const API_ROUTE: string = "/api/v1";
 
 const DM_TOKEN: string | undefined = process.env.NAGARA_DM_TOKEN;
 
+const DEFAULT_CORS_ORIGINS: readonly string[] = isDev
+  ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+  : ["https://nagara.team"];
+
+const CORS_ORIGINS: readonly string[] = process.env.NAGARA_CORS_ORIGINS
+  ? process.env.NAGARA_CORS_ORIGINS.split(",")
+      .map((o) => o.trim())
+      .filter((o) => o.length > 0)
+  : DEFAULT_CORS_ORIGINS;
+
 const MIME_TYPES: Record<string, string> = {
   default: "application/octet-stream",
   plain: "text/plain",
@@ -69,5 +79,6 @@ export {
   DATA_DIR,
   PROJECT_ROOT,
   DM_TOKEN,
+  CORS_ORIGINS,
 };
 export type { SSLOptions };

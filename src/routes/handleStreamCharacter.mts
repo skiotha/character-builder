@@ -1,6 +1,7 @@
 import { validateDmToken } from "#auth";
 import { addClient, removeClient } from "#sse";
 import { getCharacter } from "#models/storage";
+import { applyCors } from "../lib/cors.mts";
 import type { ServerResponse } from "node:http";
 import type { NagaraRequest } from "#types";
 
@@ -36,11 +37,11 @@ export async function handleCharacterStream(
     }
   }
 
+  applyCors(req, res);
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
-    "Access-Control-Allow-Origin": req.headers.origin || "*",
   });
 
   const initialEvent = `event: connected\ndata: ${JSON.stringify({ message: "SSE stream established" })}\n\n`;

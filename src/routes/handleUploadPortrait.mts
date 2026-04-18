@@ -1,6 +1,7 @@
 import { uploadPortrait } from "../lib/uploads.mts";
 import * as nagara from "#models";
 import { parseImage } from "../lib/multipart.mts";
+import { BodyTooLargeError } from "../lib/body.mts";
 import type { ServerResponse } from "node:http";
 import type { NagaraRequest } from "#types";
 
@@ -61,8 +62,13 @@ export async function handleUploadPortrait(
   } catch (error) {
     console.error("Portrait upload error:", error);
     if (!res.headersSent) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: "Failed to upload portrait" }));
+      if (error instanceof BodyTooLargeError) {
+        res.writeHead(413);
+        res.end(JSON.stringify({ error: error.message }));
+      } else {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: "Failed to upload portrait" }));
+      }
     }
     return true;
   }

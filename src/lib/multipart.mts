@@ -1,52 +1,41 @@
 import { Buffer } from "node:buffer";
 import Stream from "node:stream";
+
+import { MAX_UPLOAD_BODY, readBodyBuffer } from "./body.mts";
+
 import type { IncomingMessage } from "node:http";
 import type { ParsedImage } from "#types";
 
-export function parseImage(
+export async function parseImage(
   req: IncomingMessage,
   boundary: string,
 ): Promise<ParsedImage> {
-  return new Promise((resolve, reject) => {
-    const buffers: Buffer[] = [];
+  const buffer = await readBodyBuffer(req, MAX_UPLOAD_BODY);
+  const boundaryBuffer = Buffer.from(`--${boundary}`);
+  const endBoundaryBuffer = Buffer.from(`--${boundary}--`);
 
-    req.on("data", (chunk: Buffer) => buffers.push(chunk));
+  const startIdx = buffer.indexOf(boundaryBuffer) + boundaryBuffer.length + 2;
+  const endIdx = buffer.indexOf(endBoundaryBuffer);
 
-    req.on("end", () => {
-      const buffer = Buffer.concat(buffers);
-      const boundaryBuffer = Buffer.from(`--${boundary}`);
-      const endBoundaryBuffer = Buffer.from(`--${boundary}--`);
+  if (startIdx === -1 || endIdx === -1) {
+    throw new Error("Invalid image data");
+  }
 
-      const startIdx =
-        buffer.indexOf(boundaryBuffer) + boundaryBuffer.length + 2;
-      const endIdx = buffer.indexOf(endBoundaryBuffer);
+  const fileSection = buffer.subarray(startIdx, endIdx);
 
-      if (startIdx === -1 || endIdx === -1) {
-        reject(new Error("Invalid image data"));
-        return;
-      }
+  const headerEnd = fileSection.indexOf("\r\n\r\n");
+  if (headerEnd === -1) {
+    throw new Error("No file headers found");
+  }
 
-      // @TODO: dangerous probably
-      const fileSection = buffer.subarray(startIdx, endIdx);
+  const headers = fileSection.subarray(0, headerEnd).toString();
+  const filenameMatch = headers.match(/filename="([^"]+)"/);
+  const filename = filenameMatch ? filenameMatch[1]! : "upload.jpg";
 
-      const headerEnd = fileSection.indexOf("\r\n\r\n");
-      if (headerEnd === -1) {
-        reject(new Error("No file headers found"));
-        return;
-      }
+  const fileContent = fileSection.subarray(headerEnd + 4);
 
-      const headers = fileSection.subarray(0, headerEnd).toString();
-      const filenameMatch = headers.match(/filename="([^"]+)"/);
-      const filename = filenameMatch ? filenameMatch[1]! : "upload.jpg";
-
-      const fileContent = fileSection.subarray(headerEnd + 4);
-
-      resolve({
-        filename,
-        stream: Stream.Readable.from(fileContent),
-      });
-    });
-
-    req.on("error", reject);
-  });
+  return {
+    filename,
+    stream: Stream.Readable.from(fileContent),
+  };
 }

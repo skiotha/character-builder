@@ -53,6 +53,7 @@ mock.module("#config", {
     API_ROUTE: "/api/v1",
     LOCAL_ADDRESS: "127.0.0.1",
     PROJECT_ROOT: projectRoot,
+    CORS_ORIGINS: ["http://allowed.example"] as readonly string[],
   },
 });
 
@@ -745,7 +746,7 @@ describe("GET /api/v1/config", () => {
     assert.equal(res.status, 200);
     const body = (await res.json()) as Record<string, unknown>;
     assert.equal(body.apiBase, "/api/v1");
-    assert.equal(body.maxFileSize, 10485760);
+    assert.equal(body.maxFileSize, 20_971_520);
     assert.ok(Array.isArray(body.allowedImageTypes));
     assert.ok((body.allowedImageTypes as string[]).length > 0);
   });
@@ -774,31 +775,32 @@ describe("GET /api/v1/abilities", () => {
 
 // ── CORS & Routing ────────────────────────────────────────────────
 
-describe("CORS", () => {
-  it("OPTIONS returns 200 with CORS headers", async () => {
+describe("CORS preflight basics", () => {
+  it("OPTIONS returns 204 (no content)", async () => {
     const res = await fetch(`${BASE}/api/v1/characters`, {
       method: "OPTIONS",
     });
 
-    assert.equal(res.status, 200);
+    assert.equal(res.status, 204);
     // Consume body
     await res.text();
   });
 
-  it("includes Access-Control-Allow-Origin: * (documents current behavior)", async () => {
+  it("omits Access-Control-Allow-Origin when no Origin header is sent", async () => {
     const res = await fetch(`${BASE}/api/v1/characters`, {
       method: "OPTIONS",
     });
 
-    // NOTE: Current implementation uses wildcard "*". ADR-007 requires strict
-    // origin whitelist. Tracked in roadmap Phase 5.
-    assert.equal(res.headers.get("access-control-allow-origin"), "*");
+    // Whitelist-only — no Origin → no ACAO header.
+    assert.equal(res.headers.get("access-control-allow-origin"), null);
+    assert.ok(res.headers.get("vary")?.includes("Origin"));
     await res.text();
   });
 
-  it("includes custom headers in Access-Control-Allow-Headers", async () => {
+  it("includes custom headers in Access-Control-Allow-Headers when origin allowed", async () => {
     const res = await fetch(`${BASE}/api/v1/characters`, {
       method: "OPTIONS",
+      headers: { Origin: "http://allowed.example" },
     });
 
     const allowHeaders = res.headers.get("access-control-allow-headers") ?? "";
@@ -1358,5 +1360,100 @@ describe("GET /api/v1/characters/:id/stream — auth", () => {
     assert.equal(character.backupCode, undefined);
     assert.equal(character.playerId, undefined);
     assert.equal(character.location, "Hidden");
+  });
+});
+
+// ── Body size limits ─────────────────────────────────────────────
+
+describe("Request body size limits", () => {
+  it("POST /characters with body > 1 MB → 413", async () => {
+    const huge = "x".repeat(1_048_577); // 1 MB + 1 byte
+    const res = await fetch(`${BASE}/api/v1/characters`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": "player-too-big",
+      },
+      body: JSON.stringify({ characterName: huge }),
+    });
+    assert.equal(res.status, 413);
+  });
+
+  it("POST /characters with small body → not 413", async () => {
+    const charData = makeCharacter({ characterName: "Smollie" });
+    delete charData.id;
+    delete charData.backupCode;
+    delete charData.created;
+    delete charData.lastModified;
+    delete charData.schemaVersion;
+    delete charData.effects;
+
+    const res = await fetch(`${BASE}/api/v1/characters`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": "player-small-body",
+      },
+      body: JSON.stringify({ ...charData, playerId: "player-small-body" }),
+    });
+    assert.notEqual(res.status, 413);
+  });
+
+  it("PATCH /characters with body > 1 MB → 413", async () => {
+    const owner = "player-patch-too-big";
+    const char = await createTestCharacter({}, owner);
+    const huge = "x".repeat(1_048_577);
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": owner,
+      },
+      body: JSON.stringify({
+        updates: [{ field: "location", value: huge, operation: "set" }],
+      }),
+    });
+    assert.equal(res.status, 413);
+  });
+});
+
+// ── CORS ─────────────────────────────────────────────────────────
+
+describe("CORS", () => {
+  it("preflight from allowed origin reflects Access-Control-Allow-Origin", async () => {
+    const res = await fetch(`${BASE}/api/v1/characters`, {
+      method: "OPTIONS",
+      headers: {
+        Origin: "http://allowed.example",
+        "Access-Control-Request-Method": "POST",
+      },
+    });
+    assert.equal(res.status, 204);
+    assert.equal(
+      res.headers.get("access-control-allow-origin"),
+      "http://allowed.example",
+    );
+    assert.ok(res.headers.get("vary")?.includes("Origin"));
+  });
+
+  it("preflight from disallowed origin omits Access-Control-Allow-Origin", async () => {
+    const res = await fetch(`${BASE}/api/v1/characters`, {
+      method: "OPTIONS",
+      headers: {
+        Origin: "http://evil.example",
+        "Access-Control-Request-Method": "POST",
+      },
+    });
+    assert.equal(res.status, 204);
+    assert.equal(res.headers.get("access-control-allow-origin"), null);
+    assert.ok(res.headers.get("vary")?.includes("Origin"));
+  });
+
+  it("actual GET from disallowed origin returns data but no ACAO header", async () => {
+    const res = await fetch(`${BASE}/api/v1/config`, {
+      headers: { Origin: "http://evil.example" },
+    });
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("access-control-allow-origin"), null);
   });
 });

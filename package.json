@@ -23,7 +23,7 @@
     "node": ">=25.0.0"
   },
   "scripts": {
-    "start": "node src/server.mts",
+    "start": "node --env-file-if-exists=config/nagara.production.env src/server.mts",
     "start:dev": "node --env-file-if-exists=config/nagara.development.env scripts/watcher.mts",
     "typecheck": "tsc -p tsconfig.json",
     "test": "node --experimental-test-module-mocks --test test/**/*.test.mts"
