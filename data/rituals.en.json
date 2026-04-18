@@ -2,273 +2,259 @@
   {
     "id": "life-extension",
     "name": "Life Extension",
-    "tags": ["magic", "order", "longevity", "corruption"],
+    "tags": ["magic", "order", "corruption"],
     "description": "Requires an Elixir of Life and a cost paid in experience or permanent Corruption; delays the mystic’s aging by one year."
   },
   {
     "id": "telepathic-interrogation",
     "name": "Telepathic Interrogation",
-    "tags": ["magic", "order", "mental", "telepathy", "interrogation"],
+    "tags": ["magic", "order"],
     "description": "Allows the mystic to read a victim’s thoughts by touch and receive yes/no answers from their subconscious through Will checks; after a failure, the interrogation cannot be repeated until the end of the chapter."
   },
   {
     "id": "form",
     "name": "Form",
-    "tags": ["magic", "order", "illusion", "transformation", "stealth"],
+    "tags": ["magic", "order", "transformation"],
     "description": "Places a lasting illusory guise on the mystic or an ally for one week. The guise changes appearance and apparent height, but not attributes, abilities, or actual size."
   },
   {
     "id": "illusion",
     "name": "Illusion",
-    "tags": ["magic", "order", "illusion", "utility", "control"],
+    "tags": ["magic", "order", "support", "status"],
     "description": "Creates a moving, speaking illusion with scent and sound that can distract others or carry out simple tasks, but cannot affect the physical world."
   },
   {
     "id": "false-ground",
     "name": "False Ground",
-    "tags": ["magic", "order", "illusion", "control", "protection"],
+    "tags": ["magic", "order", "status"],
     "description": "Masks an area with an illusion, hiding danger or, conversely, showing a passage that does not exist. The illusion lasts indefinitely and must be renewed once a month."
   },
   {
     "id": "fata-morgana",
     "name": "Fata Morgana",
-    "tags": ["magic", "order", "illusion", "fortification", "utility"],
+    "tags": ["magic", "order", "support"],
     "description": "Makes a created landscape real: the mystic can impose new geography on an area or raise a temporary structure for one month. Performing it costs 1 experience."
   },
   {
     "id": "enchanting-landscape",
     "name": "Enchanted Landscape",
-    "tags": ["magic", "order", "illusion", "control", "protection"],
+    "tags": ["magic", "order", "status"],
     "description": "Covers an area with an illusion in which creatures become lost and cannot escape without a successful check. The effect lasts indefinitely until the mystic ends it."
   },
   {
     "id": "foresight",
     "name": "Foresight",
-    "tags": ["magic", "order", "divination", "surveillance", "perception"],
+    "tags": ["magic", "order"],
     "description": "Allows the mystic to watch and hear events in a place they have previously visited. It is blocked by protective rituals and can be noticed by those versed in soothsaying."
   },
   {
     "id": "spell-tunnel",
     "name": "Spell Tunnel",
-    "tags": ["magic", "order", "divination", "utility", "communication"],
+    "tags": ["magic", "order", "support"],
     "description": "Opens a two-way mystical channel to a place accessible through Foresight, allowing spells and rituals that require no physical contact to be sent there and back."
   },
   {
     "id": "magic-circle",
     "name": "Magic Circle",
-    "tags": ["magic", "order", "communication", "circle", "utility"],
+    "tags": ["magic", "order", "circle", "support"],
     "description": "Creates a permanent circle for telepathic communication with other known Magic Circles; anyone standing nearby can receive its messages."
   },
   {
     "id": "seven-league-step",
     "name": "Seven-League Step",
-    "tags": ["magic", "order", "teleportation", "mobility", "circle"],
+    "tags": ["magic", "order", "mobility", "circle"],
     "description": "Creates a temporary circle to teleport the mystic and allies to a familiar permanent Magic Circle."
   },
   {
     "id": "sanctuary",
     "name": "Sanctuary",
-    "tags": ["magic", "order", "protection", "sanctuary", "warding"],
+    "tags": ["magic", "order"],
     "description": "Creates a magical dome over a chamber, concealing it from observation and outside mystical interference while also blocking target-linked rituals and circles within."
   },
   {
     "id": "soul-stone",
     "name": "Soul Stone",
-    "tags": ["magic", "order", "soul", "corruption", "protection"],
+    "tags": ["magic", "order", "corruption"],
     "description": "Seals a dying creature’s soul in a crystal or binds the mystic’s own soul to it. The stone can accumulate and hold part of its owner’s permanent Corruption up to a limit."
   },
   {
     "id": "severed-connection",
     "name": "Severed Connection",
-    "tags": ["magic", "order", "protection", "warding", "utility"],
+    "tags": ["magic", "order", "support"],
     "description": "Cuts an object, creature, or area off from magical links to the outside world, canceling summons, scrying, teleportation, and ties to artifacts."
   },
   {
     "id": "divination",
     "name": "Divination",
-    "tags": ["magic", "circle", "divination", "perception"],
+    "tags": ["magic", "circle"],
     "description": "Grants one yes/no answer about the current adventure through a Will check; the ritual can be repeated once per chapter."
   },
   {
     "id": "borrowed-beast",
     "name": "Borrowed Beast",
-    "tags": ["magic", "circle", "beasts", "possession", "utility"],
+    "tags": ["magic", "circle", "support"],
     "description": "Transfers the mystic’s consciousness into a small animal while leaving their own body in a trance. Its duration depends on the circumstances and can become indefinite inside a Witch Circle."
   },
   {
     "id": "familiar",
     "name": "Familiar",
-    "tags": ["magic", "circle", "beasts", "familiar", "support"],
+    "tags": ["magic", "circle", "summoning", "support"],
     "description": "Binds an animal familiar to the mystic with telepathic communication, shared senses, and the ability to split damage. The familiar can serve as a conduit and grow as a separate character."
   },
   {
     "id": "blood-bond",
     "name": "Blood Bond",
-    "tags": ["magic", "circle", "familiar", "corruption", "blood"],
+    "tags": ["magic", "circle", "summoning", "corruption"],
     "description": "Transfers part of the mystic’s permanent Corruption to their familiar, lowering it for the master and increasing it for the beast."
   },
   {
     "id": "beast-companion",
     "name": "Beast Companion",
-    "tags": ["magic", "circle", "familiar", "beasts", "resurrection"],
+    "tags": ["magic", "circle", "familiar"],
     "description": "Empowers a familiar so that if it dies, it returns at the next dawn unless it perished from exceeding its Corruption limit."
   },
   {
     "id": "weather-turn",
     "name": "Turn the Weather",
-    "tags": ["magic", "circle", "weather", "utility"],
+    "tags": ["magic", "circle", "support"],
     "description": "Changes the local weather—calling up or dispersing storms, fogs, and other conditions—for half a day after one hour of preparation."
   },
   {
     "id": "erase-tracks",
     "name": "Erase Tracks",
-    "tags": ["magic", "circle", "stealth", "tracking", "utility"],
+    "tags": ["magic", "circle", "support"],
     "description": "Erases physical traces left by the mystic and allies, including prints, scents, damage, and signs of interference, over the past or coming day."
   },
   {
     "id": "witch-circle",
     "name": "Witch Circle",
-    "tags": ["magic", "circle", "protection", "nature", "utility"],
+    "tags": ["magic", "circle", "support"],
     "description": "Creates a hidden living domain protected from outside influence and observation, where the mystic fully controls conditions and strengthens circle-related rituals."
   },
   {
     "id": "quick-growth",
     "name": "Quick Growth",
-    "tags": ["magic", "circle", "nature", "utility", "support"],
+    "tags": ["magic", "circle", "support"],
     "description": "Instantly grows a plant from seed in suitable conditions and shapes it as desired; inside a Witch Circle, the growth ignores the season."
   },
   {
     "id": "living-fortress",
     "name": "Living Fortress",
-    "tags": ["magic", "circle", "nature", "protection", "fortification"],
+    "tags": ["magic", "circle"],
     "description": "Grows a fortification of living trees and thorns that defends its own passages and lasts for one season. Performing it costs 1 experience."
   },
   {
     "id": "call",
     "name": "Call",
-    "tags": ["magic", "circle", "control", "summoning", "tracking"],
+    "tags": ["magic", "circle", "status", "summoning"],
     "description": "Summons a known creature by means of one of its possessions and compels it to come to the ritual site without any chance to resist."
   },
   {
     "id": "chosen-by-fate",
     "name": "Chosen by Fate",
-    "tags": ["magic", "circle", "control", "fate", "support"],
+    "tags": ["magic", "circle", "status", "support"],
     "description": "Imposes a mission upon the target: actions that do not advance it become harder, while actions serving it gain a notable advantage until the ritual is lifted."
   },
   {
     "id": "torture",
     "name": "Torture",
-    "tags": ["magic", "circle", "witchcraft", "curse", "damage"],
+    "tags": ["magic", "circle", "sorcery", "damage"],
     "description": "Places a lasting curse on the victim that exhausts them or inflicts other chosen torments until the connection is broken."
   },
   {
     "id": "black-sympathy",
     "name": "Black Sympathy",
-    "tags": ["magic", "circle", "witchcraft", "theurgy", "damage", "curse"],
+    "tags": ["magic", "circle", "sorcery", "theurgy", "damage"],
     "description": "Lets the mystic torment a victim from afar through a doll, traces, or a personal belonging; the victim cannot heal while the agony lasts."
   },
   {
     "id": "necromancy",
     "name": "Necromancy",
-    "tags": [
-      "magic",
-      "circle",
-      "necromancy",
-      "spiritualism",
-      "interrogation",
-      "soul"
-    ],
+    "tags": ["magic", "circle"],
     "description": "Allows yes/no questions to be asked of the dead at their remains or grave. Failure can lead to possession by the spirit and an obligation to fulfill its final wish."
   },
   {
     "id": "death-omen",
     "name": "Death Omen",
-    "tags": [
-      "magic",
-      "circle",
-      "necromancy",
-      "spiritualism",
-      "divination",
-      "soul"
-    ],
+    "tags": ["magic", "circle"],
     "description": "Enhances Necromancy with an additional attempt and allows the mystic to ask the dead about things they did not know themselves but could have learned from other souls."
   },
   {
     "id": "lullaby",
     "name": "Lullaby",
-    "tags": ["magic", "circle", "sirens", "stealth", "control"],
+    "tags": ["magic", "circle", "sirens", "status"],
     "description": "Puts a corrupted area or creature to sleep and hides non-aggressive allies from corrupted beings as long as the mystic keeps singing."
   },
   {
     "id": "restoration",
     "name": "Restoration",
-    "tags": ["magic", "sirens", "utility", "support"],
+    "tags": ["magic", "sirens", "support"],
     "description": "Fully repairs a damaged item through song, but does not create a new one."
   },
   {
     "id": "retrieval",
     "name": "Retrieval",
-    "tags": ["magic", "sirens", "tracking", "utility"],
+    "tags": ["magic", "sirens", "support"],
     "description": "Reveals the path to a lost item if the mystic knows it already or can obtain an exact description of it."
   },
   {
     "id": "rite-of-opening-and-sealing",
     "name": "Rite of Opening and Rite of Sealing",
-    "tags": ["magic", "sirens", "utility", "locks", "protection"],
+    "tags": ["magic", "sirens", "support"],
     "description": "Opens any door, lock, or gate, or seals it mystically instead; opening something locked requires a Will check."
   },
   {
     "id": "fire-stories",
     "name": "Fire Stories",
-    "tags": ["magic", "court", "fire", "divination", "perception"],
+    "tags": ["magic", "tribe"],
     "description": "Uses ashes to show what exactly burned and how it happened, letting the mystic witness scenes of the fire and the people who were present."
   },
   {
     "id": "burning-servant",
     "name": "Burning Servant",
-    "tags": ["magic", "court", "fire", "summoning", "support"],
+    "tags": ["magic", "tribe", "summoning", "support"],
     "description": "Binds a fire creature to a suit of armor, turning it into a servant that guards the mystic, can develop over time, and can return after the armor is repaired."
   },
   {
     "id": "twin-servants",
     "name": "Twin Servants",
-    "tags": ["magic", "court", "fire", "summoning", "support"],
+    "tags": ["magic", "tribe", "summoning", "support"],
     "description": "Allows the mystic to summon and control two Burning Servants at the same time."
   },
   {
     "id": "cleansing-flame",
     "name": "Cleansing Flame",
-    "tags": ["magic", "theurgy", "court", "fire", "purification", "corruption"],
+    "tags": ["magic", "theurgy", "tribe", "corruption"],
     "description": "A bonfire slowly burns away the mystic’s own permanent Corruption through repeated Will checks at the cost of fire damage and 1 experience."
   },
   {
     "id": "prophecy",
     "name": "Prophecy",
-    "tags": ["magic", "theurgy", "divination", "perception"],
+    "tags": ["magic", "theurgy"],
     "description": "Allows one open-ended question about the future of the current adventure to be asked once per chapter, yielding a truthful though not necessarily direct answer."
   },
   {
     "id": "condemning-shackles",
     "name": "Condemning Shackles",
-    "tags": ["magic", "theurgy", "control", "protection", "shackles"],
+    "tags": ["magic", "theurgy", "status"],
     "description": "Consecrates chains or other restraints so that a bound creature cannot use mystical powers or abilities that require Will. The ritual must be renewed monthly."
   },
   {
     "id": "interrogation",
     "name": "Interrogation",
-    "tags": ["magic", "theurgy", "interrogation", "control", "mental"],
+    "tags": ["magic", "theurgy", "status"],
     "description": "Forces the target to answer yes/no questions truthfully as long as the mystic keeps winning Will checks against them."
   },
   {
     "id": "holy-smoke",
     "name": "Holy Smoke",
-    "tags": ["magic", "theurgy", "perception", "corruption", "detection"],
+    "tags": ["magic", "theurgy", "corruption"],
     "description": "Uses incense to reveal corrupted creatures nearby and show the degree of their Corruption."
   },
   {
     "id": "piercing-gaze",
     "name": "Piercing Gaze",
-    "tags": ["magic", "theurgy", "perception", "corruption", "detection"],
+    "tags": ["magic", "theurgy", "corruption"],
     "description": "An enhanced unveiling of Corruption: it grants two checks to identify it, allows the mystic to see through Shadow Exchange, and can be performed without incense through self-denial."
   },
   {
@@ -280,25 +266,25 @@
   {
     "id": "consecration-rite",
     "name": "Consecration Rite",
-    "tags": ["magic", "theurgy", "protection", "damage", "sanctuary"],
+    "tags": ["magic", "theurgy", "damage"],
     "description": "Consecrates an area or a weapon, blocks many hostile rituals, and harms corrupted creatures that remain within it."
   },
   {
     "id": "exorcism",
     "name": "Exorcism",
-    "tags": ["magic", "theurgy", "exorcism", "protection", "soul"],
+    "tags": ["magic", "theurgy"],
     "description": "Drives a possessing entity out of a creature or object; there can be up to three attempts to succeed, but total failure moves the entity into the mystic."
   },
   {
     "id": "atonement",
     "name": "Atonement",
-    "tags": ["magic", "theurgy", "healing", "corruption", "purification"],
+    "tags": ["magic", "theurgy", "healing", "corruption"],
     "description": "Cleanses a supplicant of d4 permanent Corruption. Performing it costs 1 experience."
   },
   {
     "id": "pursuit",
     "name": "Pursuit",
-    "tags": ["magic", "theurgy", "tracking", "corruption", "demonology"],
+    "tags": ["magic", "theurgy", "corruption"],
     "description": "Allows the mystic to track a familiar corrupted creature and determine its location as long as the trail is not broken by water, a crowd, or protective conditions."
   },
   {
@@ -310,128 +296,115 @@
   {
     "id": "runic-tattoos",
     "name": "Runic Tattoos",
-    "tags": ["magic", "symbolism", "runes", "support", "crafting"],
+    "tags": ["magic", "symbolism", "support"],
     "description": "Places runic tattoos on a creature at the cost of experience or permanent Corruption."
   },
   {
     "id": "distant-calligraphy",
     "name": "Distant Calligraphy",
-    "tags": ["magic", "symbolism", "communication", "runes", "utility"],
+    "tags": ["magic", "symbolism", "support"],
     "description": "Leaves inscriptions and runic messages at any distance within a well-known area; when reinforced, the inscription can carry the power of Symbolism."
   },
   {
     "id": "magic-trap",
     "name": "Magic Trap",
-    "tags": ["magic", "symbolism", "traps", "runes", "control"],
+    "tags": ["magic", "symbolism", "status"],
     "description": "Binds a mystical power to an object or place with a chosen trigger and an indefinite duration, until the trap is dispelled."
   },
   {
     "id": "runic-guardian",
     "name": "Runic Guardian",
-    "tags": [
-      "magic",
-      "symbolism",
-      "runes",
-      "summoning",
-      "constructs",
-      "support"
-    ],
+    "tags": ["magic", "symbolism", "summoning", "support"],
     "description": "Animates a wooden or stone statue as an obedient guardian that can be strengthened with experience."
   },
   {
     "id": "shadow-exchange",
     "name": "Shadow Exchange",
-    "tags": ["magic", "witchcraft", "shadows", "stealth", "corruption"],
+    "tags": ["magic", "sorcery", "corruption"],
     "description": "Replaces a creature’s shadow with the mystic’s own, using a pattern made from its hair, blood, or a valued possession, thus hiding the target’s true nature from those who see Shadows."
   },
   {
     "id": "possession",
     "name": "Possession",
-    "tags": ["magic", "witchcraft", "possession", "mind-control", "control"],
+    "tags": ["magic", "sorcery", "status"],
     "description": "Gives the mystic control over a victim’s body for one day through a personal sample or a direct ritual over the body, while the mystic’s own body lies in a trance."
   },
   {
     "id": "enslavement",
     "name": "Enslavement",
-    "tags": ["magic", "witchcraft", "control", "mind-control", "runes"],
+    "tags": ["magic", "sorcery", "status"],
     "description": "Places a rune of complete submission on the victim’s skin, forcing them to obey commands without question until the rune is removed or destroyed."
   },
   {
     "id": "soul-trap",
     "name": "Soul Trap",
-    "tags": ["magic", "witchcraft", "soul", "necromancy", "control"],
+    "tags": ["magic", "sorcery", "status"],
     "description": "Intercepts the soul of someone who has just died and imprisons it in a vessel, denying access to it for Necromancy until the vessel is destroyed or purified."
   },
   {
     "id": "phylactery",
     "name": "Phylactery",
-    "tags": ["magic", "witchcraft", "soul", "resurrection", "corruption"],
+    "tags": ["magic", "sorcery", "corruption"],
     "description": "Binds the mystic’s soul to a vessel and restores them to life beside it after d12 days following death, at the cost of experience or Corruption."
   },
   {
     "id": "resurrection",
     "name": "Resurrection",
-    "tags": ["magic", "witchcraft", "necromancy", "resurrection", "control"],
+    "tags": ["magic", "sorcery", "status"],
     "description": "Raises the recently dead as an undead servant that retains its skills and remains fully obedient after a successful Will check."
   },
   {
     "id": "lord-of-death",
     "name": "Lord of Death",
-    "tags": ["magic", "witchcraft", "necromancy", "resurrection", "summoning"],
+    "tags": ["magic", "sorcery", "summoning"],
     "description": "Prepares the mystic for safe undeath without decay and allows them to raise greater undead capable of commanding other undead."
   },
   {
     "id": "desecration-rite",
     "name": "Desecration Rite",
-    "tags": ["magic", "witchcraft", "corruption", "protection", "support"],
+    "tags": ["magic", "sorcery", "corruption", "support"],
     "description": "Desecrates an area or object, turning it into a source of Corruption, healing for corrupted creatures, and interference for tracking rituals."
   },
   {
     "id": "fleshcraft",
     "name": "Fleshcraft",
-    "tags": [
-      "magic",
-      "witchcraft",
-      "transformation",
-      "corruption",
-      "fleshcraft"
-    ],
+    "tags": ["magic", "sorcery", "transformation", "corruption"],
     "description": "Turns the mystic’s hands into tools of flesh and lets them add or remove monstrous traits from a victim at the cost of Corruption."
   },
   {
     "id": "summon-vengeful-demon",
     "name": "Summon Vengeful Demon",
-    "tags": ["magic", "witchcraft", "demonology", "summoning", "damage"],
+    "tags": ["magic", "sorcery", "summoning", "damage"],
     "description": "Summons a vengeful demon into a prepared circle. Subjugation requires a Will check; on success, the demon hunts the mystic’s enemies or performs one service. Performing it costs 1 experience."
   },
   {
     "id": "summon-knowing-demon",
     "name": "Summon Knowing Demon",
-    "tags": ["magic", "witchcraft", "demonology", "summoning", "divination"],
+    "tags": ["magic", "sorcery", "summoning"],
     "description": "Summons a knowing demon into a prepared circle. Subjugation requires a Will check; on success, the demon answers the mystic’s direct or open-ended questions. Performing it costs 1 experience."
   },
   {
     "id": "summon-guardian-demon",
     "name": "Summon Guardian Demon",
-    "tags": ["magic", "witchcraft", "demonology", "summoning", "protection"],
+    "tags": ["magic", "sorcery", "summoning"],
     "description": "Summons a guardian demon into a prepared circle. Subjugation requires a Will check; on success, the demon guards an area according to the mystic’s instructions. Performing it costs 1 experience."
   },
   {
     "id": "demon-servant",
     "name": "Demon Servant",
-    "tags": ["magic", "witchcraft", "demonology", "summoning", "support"],
+    "tags": ["magic", "sorcery", "summoning", "support"],
     "description": "An empowered version of one of the Demon Summoning rituals: the summoned demon obeys without question, gains experience, and can become the target of Blood Bond."
   },
   {
     "id": "blood-storm",
     "name": "Blood Storm",
-    "tags": ["magic", "runes", "blood", "damage", "control"],
+    "tags": ["magic", "runes", "damage", "status"],
     "description": "Seals a blood storm into a weapon; when activated, it blinds enemies in the area and deals them d4 armor-ignoring damage each turn until they leave or find cover."
   },
   {
     "id": "earthquake",
     "name": "Earthquake",
-    "tags": ["magic", "runes", "damage", "control", "utility"],
+    "tags": ["magic", "runes", "damage", "status", "support"],
     "description": "Seals a shockwave into a weapon that, when activated, knocks down nearby creatures or destroys a chosen structure at the cost of d6 temporary Corruption."
   }
 ]
