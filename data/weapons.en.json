@@ -1,0 +1,39 @@
+[
+  {
+    "id": "longsword",
+    "name": "Longsword",
+    "type": "heavy",
+    "damage": 8,
+    "qualities": ["long"]
+  },
+  {
+    "id": "stiletto",
+    "name": "Stiletto",
+    "type": "light",
+    "subtype": "dagger",
+    "damage": 4,
+    "qualities": ["precise", "short", "concealed"]
+  },
+  {
+    "id": "crossbow",
+    "name": "Crossbow",
+    "type": "ranged",
+    "subtype": "crossbow",
+    "damage": 8,
+    "qualities": ["massive"]
+  },
+  {
+    "id": "heels",
+    "name": "Battle Heels",
+    "type": "light",
+    "damage": 4,
+    "qualities": ["short", "unwieldy"]
+  },
+  {
+    "id": "staff",
+    "name": "Staff",
+    "type": "staff",
+    "damage": 6,
+    "qualities": ["long", "blunt"]
+  }
+]
