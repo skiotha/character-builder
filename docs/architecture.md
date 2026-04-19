@@ -129,16 +129,25 @@ Calculates derived character stats from primary attributes and active effects.
 - **Effect applicator** (`applicator.mts`): applies modifier pipeline to character fields
 - **Derived recalculation** (`derived.mts`): orchestrates the full recalculation pass, called on every character update before saving
 
-### 3.6 Storage
+### 3.6 Domain Layer
 
-File-based JSON persistence with an in-memory index.
+The domain layer (`src/models/index.mts`) is the single entry point for character mutations and the canonical place to read characters. It owns cross-cutting invariants — merge semantics, derived recalculation, SSE broadcast, and the per-character write lock — that handlers used to do ad-hoc. See [ADR-013](decisions/013-domain-layer-mutation-gate.md).
+
+- Handlers translate HTTP into domain calls and back; they never reach past the domain layer.
+- Storage (below) is internal — outside `src/models/` and the explicit `src/lib/backup.mts` carve-out, no module imports from `#models/storage`.
+- Transport-adjacent dependencies (`#sse`, `#rules`) are wired into the domain layer via a `createCharacterService({ recalc, broadcast })` factory at app startup, keeping `models/` free of transport knowledge.
+
+### 3.7 Storage
+
+File-based JSON persistence with an in-memory index. Internal CRUD module called by the domain layer.
 
 - Each character is a separate `.json` file in `data/characters/`
 - An `index.json` maintains lookup maps: `byId`, `byBackupCode`, `byPlayer`, `all`
 - Index is loaded into memory at startup, kept in sync on writes
+- Per-character write lock serializes concurrent writers to the same file
 - Backup system: snapshot-based, stored in `data/backups/`
 
-### 3.7 SSE (Server-Sent Events)
+### 3.8 SSE (Server-Sent Events)
 
 Per-character broadcast channels for real-time updates during gameplay.
 
@@ -147,7 +156,7 @@ Per-character broadcast channels for real-time updates during gameplay.
 - Designed for DM + player pairs working on the same character during a session
 - Keep-alive pings to maintain connections
 
-### 3.8 Client SPA
+### 3.9 Client SPA
 
 Vanilla JavaScript SPA served as static files.
 
@@ -157,7 +166,7 @@ Vanilla JavaScript SPA served as static files.
 - **SSE client:** Connects to character stream, updates local state on events — same rendering pipeline as initial load
 - **Import maps:** Module aliases (`@state`, `@api`, `@router`) in the HTML
 
-### 3.9 RPG Rules Vault
+### 3.10 RPG Rules Vault
 
 Canonical RPG rules authored as Markdown in an Obsidian vault (`rpg/`).
 

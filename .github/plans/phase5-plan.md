@@ -491,25 +491,15 @@ typos, and structural debt.
      - Remove unused imports after Session 1-3 changes
      - Audit for other commented-out blocks beyond what was already cleaned
 
-5. **Fix duplicate `updateCharacter()` — service vs storage**
-   - **File:** `src/models/index.mts` lines 58-67
-   - **Change:** The service-layer `updateCharacter()` does
-     `deepMerge` + stamp `lastModified` + `saveCharacter()`. The storage-layer
-     `updateCharacter()` does `deepMerge` + stamp `lastModified` +
-     `writeCharacterFile()` + conditional `updateIndexMetadata()`.
-     The handler (`handleUpdateCharacter.mts`) calls `storage.updateCharacter`
-     directly (line 1: `import { updateCharacter } from "#models/storage"`).
-     **Decision:** The handler should call the service. The service should call
-     storage. Remove the service-layer duplicate or make the handler use it.
-     Currently the storage version is more complete (handles index metadata).
-     Simplest fix: remove the service-layer `updateCharacter` from index.mts
-     and keep the storage version. The handler already imports from storage.
-
-6. **Extract shared `byId` index-entry builder in storage.mts**
+5. **Extract shared `byId` index-entry builder in storage.mts**
    - **File:** `src/models/storage.mts` lines 71-77 and 90-96
    - **Change:** Extract the duplicated object literal into a helper function
      `buildIndexEntry(character)` that both `updateIndexMetadata()` and
      `saveCharacter()` call.
+
+_(Note: "Fix duplicate `updateCharacter()`" was originally task 5 of this
+session. Per [ADR-013](../../docs/decisions/013-domain-layer-mutation-gate.md)
+it was promoted to its own session — see Session 4.5 below.)_
 
 ### New/Updated Tests
 
@@ -538,22 +528,169 @@ typos, and structural debt.
 ### Files modified
 
 - `src/rules/derived.mts` — guard undefined target
-- `src/sse/broadcast.mts` — fix timeStamp
 - `src/app.mts` — extract DELETE, cleanup
 - `src/routes/handleDeleteCharacter.mts` — new file
-- `src/routes/handleUpdateCharacter.mts` — remove debug log
-- `src/models/index.mts` — remove duplicate updateCharacter
-- `src/models/storage.mts` — extract byId builder
+- `src/models/storage.mts` — extract `byId` builder, minor cleanup (`console.error`, alias stubs decision)
 - `test/rules/derived.test.mts` — undefined target test
 - `test/api.test.mts` — DELETE endpoint tests
 
 ---
 
-## Session 5 — Middleware Architecture & Storage Safety (Stretch)
+## Session 4.5 — Domain Layer Consolidation (ADR-013)
 
-**Goal:** Fix the middleware chain type lie and add write serialization for
-storage. These are medium-priority architectural improvements that don't
-affect user-visible behavior but improve type safety and data integrity.
+**Goal:** Cement the domain layer as the single mutation gate per
+[ADR-013](../../docs/decisions/013-domain-layer-mutation-gate.md).
+Collapses the duplicate `updateCharacter`, fixes the latent
+`skipUndefined` bug in `handleUploadPortrait`, moves cross-cutting
+invariants (recalc, broadcast) into the domain layer, and adds the
+per-character write lock at the storage primitive level.
+
+**Why a dedicated session:** What looked like a one-line deletion in the
+original Session 4 task 5 is in fact a layering decision that touches
+~10 files. Doing it as part of cleanup would conflate refactor with
+bug-fix. ADR-013 captures the rationale; this session implements it.
+
+### Tasks
+
+1. **Consolidate `updateCharacter` to a single implementation**
+   - **Files:** `src/models/index.mts`, `src/models/storage.mts`
+   - **Change:** Storage's `updateCharacter` (with `skipUndefined: true`
+     and conditional `updateIndexMetadata`) becomes the sole low-level
+     implementation. The domain `updateCharacter` becomes a thin wrapper
+     that calls it and adds the cross-cutting steps (task 3).
+   - **Removes:** the duplicate merge/save logic in `models/index.mts`.
+
+2. **Add per-character write lock in storage**
+   - **File:** `src/models/storage.mts`
+   - **Change:** `Map<string, Promise<void>>` keyed by character ID.
+     `saveCharacter`, `updateCharacter`, `hardDeleteCharacter` (anything
+     touching a character file) acquire the lock before writing.
+     Pattern:
+     ```
+     const writeLocks = new Map<string, Promise<void>>();
+     async function withWriteLock<T>(id: string, fn: () => Promise<T>): Promise<T> {
+       const prev = writeLocks.get(id) ?? Promise.resolve();
+       const next = prev.then(fn, fn); // run even if prev failed
+       writeLocks.set(id, next as Promise<unknown> as Promise<void>);
+       return next;
+     }
+     ```
+   - **Defense in depth:** lives in storage so it protects future leaks of
+     the no-storage-imports convention.
+
+3. **Move recalc + broadcast into the domain layer via DI factory**
+   - **Files:** new `src/models/character-service.mts` (or extend
+     `src/models/index.mts`), `src/app.mts`,
+     `src/routes/handleUpdateCharacter.mts`,
+     `src/routes/handleUploadPortrait.mts`
+   - **Change:** Introduce `createCharacterService({ recalc, broadcast })`
+     factory. Returns an object whose `updateCharacter` (and any other
+     mutation function) calls storage, then `recalc(saved)`, then
+     `broadcast(id, recalculated)`. App startup wires the factory once,
+     passing `recalculateDerivedFields` and `broadcastToCharacter`,
+     and the bound result is what handlers import.
+   - **Why DI:** keeps `models/` free of imports from `#sse` and `#rules`
+     (layering: models → transport / models → rules engine would invert
+     the dependency direction). Tests can pass stub functions.
+   - **Handlers stop calling** `recalculateDerivedFields` and
+     `broadcastToCharacter` directly. Their PATCH/portrait flow shrinks
+     to: parse → validate → `service.updateCharacter` → sanitize → respond.
+
+4. **Migrate read sites to `#models`**
+   - **Files:** `src/routes/handleUpdateCharacter.mts`,
+     `src/routes/handleStreamCharacter.mts`,
+     `src/middleware/characterPermissions.mts`,
+     `src/routes/handleUploadPortrait.mts` (already uses `#models`).
+   - **Change:** Replace `import { ... } from "#models/storage"` with
+     imports from `#models`. Per ADR-013, `#models/storage` must not be
+     imported outside `src/models/` and the `src/lib/backup.mts` carve-out.
+   - **`lib/backup.mts` exception:** documented carve-out, no change.
+
+5. **Audit test helpers**
+   - **Files:** `test/helpers/fixtures.mts`, `test/helpers/temp-dir.mts`
+   - **Change:** If helpers reach into `#models/storage` directly to set
+     up character files, decide whether they should switch to the domain
+     layer or are themselves a legitimate carve-out (test infrastructure
+     setting up fixtures cheaply, bypassing recalc/broadcast on purpose).
+     Likely the latter — document inline.
+
+### New/Updated Tests
+
+- **`test/api.test.mts`:**
+  - Update existing PATCH/portrait tests — they should still pass.
+    Recalc and broadcast are now invariants, not handler responsibilities;
+    end-to-end behavior unchanged.
+  - Add test: PATCH on a field that triggers derived recalc — response
+    contains the recalculated derived fields (regression for handlers that
+    previously forgot to call recalc).
+  - Add test: portrait upload does not clobber other character fields
+    with `undefined` (regression for the `skipUndefined` bug).
+  - Add test: concurrent PATCH requests to the same character don't
+    corrupt data (write lock).
+
+- **`test/storage.test.mts`:**
+  - Add test: two concurrent `saveCharacter` calls to same ID — both
+    succeed, last write wins, no file corruption.
+  - Add test: concurrent writes to **different** characters proceed in
+    parallel (no over-serialization).
+
+- **New `test/character-service.test.mts`** (or extend an existing models
+  test file):
+  - Test the factory in isolation: `createCharacterService({ recalc,
+    broadcast })` with stub functions — verify both are called after
+    `updateCharacter`.
+  - Verify the factory's `updateCharacter` returns the recalculated
+    character, not the pre-recalc snapshot.
+
+### Verification
+
+- `npm run typecheck` clean
+- `npm test` — all tests pass
+- `grep -r "#models/storage" src/routes/ src/middleware/ src/app.mts` —
+  zero results (only `src/models/` and `src/lib/backup.mts` should match
+  inside `src/`)
+- Latent portrait-upload `skipUndefined` bug demonstrably fixed by the
+  new regression test
+- Manual: two browser tabs PATCHing the same character don't corrupt the
+  file
+
+### Files modified
+
+- `src/models/index.mts` — remove duplicate `updateCharacter`; add
+  `createCharacterService` factory; export bound mutations
+- `src/models/storage.mts` — add `withWriteLock` helper, apply to all
+  write paths; remain importable only from inside `src/models/` and
+  `src/lib/backup.mts`
+- `src/app.mts` — instantiate `createCharacterService({ recalc,
+  broadcast })` at startup, pass to handlers (or expose via module-level
+  binding)
+- `src/routes/handleUpdateCharacter.mts` — use service; drop direct
+  `recalculateDerivedFields` and `broadcastToCharacter` calls; switch
+  imports to `#models`
+- `src/routes/handleUploadPortrait.mts` — use service (gets
+  `skipUndefined` automatically)
+- `src/routes/handleStreamCharacter.mts` — read via `#models`
+- `src/middleware/characterPermissions.mts` — read via `#models`
+- `test/api.test.mts` — regression tests, write-lock test
+- `test/storage.test.mts` — concurrency tests
+- `test/character-service.test.mts` (new) — factory tests
+- `test/helpers/*.mts` — audit, document any intentional storage carve-out
+
+### Out of scope (intentional)
+
+- Optimistic concurrency (409 / `If-Unmodified-Since`) — deferred to
+  Phase 8 per ADR-013 non-goals.
+- Renaming `src/models/` — deferred indefinitely per ADR-013 non-goals.
+- Class-based `CharacterService` / DI container — plain factory function
+  is sufficient.
+
+---
+
+## Session 5 — Middleware Architecture & Recovery Hardening (Stretch)
+
+**Goal:** Fix the middleware chain type lie and (optionally) harden the
+recovery endpoint. These are low/medium-priority improvements that don't
+affect user-visible behavior. Write serialization moved to Session 4.5.
 
 **Note:** This session is optional. If the prior sessions have addressed all
 high and medium items, this can be deferred or folded into Phase 6 prep.
@@ -575,24 +712,7 @@ high and medium items, this can be deferred or folded into Phase 6 prep.
      that has distinct types for middleware vs terminal handler. Evaluate
      which approach is cleaner during implementation.
 
-2. **Add write serialization for storage**
-   - **File:** `src/models/storage.mts`
-   - **Change:** Add per-character write lock using a simple `Map<string, Promise>`.
-     Before writing, await the previous write promise for the same character ID.
-     Chain writes sequentially per character, allow parallel writes to
-     different characters.
-   - **Pattern:**
-     ```
-     const writeLocks = new Map<string, Promise<void>>();
-     async function withWriteLock(id, fn) {
-       const prev = writeLocks.get(id) ?? Promise.resolve();
-       const next = prev.then(fn, fn); // run even if prev failed
-       writeLocks.set(id, next);
-       return next;
-     }
-     ```
-
-3. **Harden recovery endpoint (stretch)**
+2. **Harden recovery endpoint (stretch)**
    - **File:** `src/lib/utils.mts`
    - **Change:** Expand backup code keyspace — add more adjectives and nouns
      (20+ each), use 4-digit numbers (0000-9999). This increases keyspace
@@ -605,13 +725,6 @@ high and medium items, this can be deferred or folded into Phase 6 prep.
 
 - **`test/api.test.mts`:**
   - Existing middleware/route tests should still pass after refactor
-  - Add test: concurrent PATCH requests to same character don't corrupt data
-
-- **`test/storage.test.mts`:**
-  - Add test: two concurrent `saveCharacter` calls to same ID → both succeed,
-    last write wins (no file corruption)
-  - Add test: concurrent writes to different characters → both succeed
-    independently
 
 - **`test/utils.test.mts`:**
   - Add test: `generateBackupCode()` format matches expected pattern with
@@ -629,11 +742,8 @@ high and medium items, this can be deferred or folded into Phase 6 prep.
 - `src/middleware/index.mts` — redesign chain
 - `src/types.mts` — update middleware types
 - `src/routes/characterRoutes.mts` — use new chain API
-- `src/models/storage.mts` — add write locks
 - `src/lib/utils.mts` — expand keyspace
 - `src/app.mts` — add rate limiting to recover endpoint
-- `test/api.test.mts` — concurrency tests
-- `test/storage.test.mts` — write lock tests
 - `test/utils.test.mts` — backup code format tests
 
 ---
@@ -641,18 +751,23 @@ high and medium items, this can be deferred or folded into Phase 6 prep.
 ## Summary: Session Dependency Map
 
 ```
-Session 0 (docs)
+Session 0 (docs) — done
     │
     ├──→ Session 1 (validation/service) ──→ Session 2 (security)
+    │   done                                  done
     │                                            │
     │                                            ▼
     └──────────────────────────────────→ Session 3 (HTTP safety)
+                                                 done
                                                  │
                                                  ▼
                                           Session 4 (crash fix + cleanup)
                                                  │
                                                  ▼
-                                          Session 5 (stretch — architecture)
+                                          Session 4.5 (domain layer — ADR-013)
+                                                 │
+                                                 ▼
+                                          Session 5 (stretch — middleware + recovery)
 ```
 
 - **Session 0** is a prerequisite for all — establishes the final scope
@@ -662,6 +777,8 @@ Session 0 (docs)
 - **Session 3** is independent of Session 2 but benefits from it (SSE
   sanitization in S2 + SSE auth in S3 are complementary)
 - **Session 4** is cleanup — benefits from all prior fixes being in place
+- **Session 4.5** is the ADR-013 implementation — should follow Session 4
+  because the DELETE extraction simplifies the migration
 - **Session 5** is a stretch goal — can be deferred to Phase 6 prep
 
 ## Test Count Estimates
@@ -672,8 +789,10 @@ Session 0 (docs)
 | 1 | ~5 | ~3 | 2-3 test files |
 | 2 | ~8 | ~2 | 3 test files |
 | 3 | ~10 | ~2 | 3 test files |
-| 4 | ~4 | ~2 | 2-3 test files |
-| 5 | ~5 | ~1 | 2-3 test files |
-| **Total** | **~32** | **~10** | — |
+| 4 | ~3 | ~2 | 2-3 test files |
+| 4.5 | ~6 | ~3 | 3 test files (api, storage, new character-service) |
+| 5 | ~3 | ~1 | 2 test files |
+| **Total** | **~35** | **~13** | — |
 
-Expected final count: ~385 (existing) + ~32 (new) - ~5 (removed/merged) ≈ **~412 tests**.
+Sessions 1–3 already added 27 tests (385 → 412). Sessions 4, 4.5, and 5
+add ~12 more, putting the expected final count near **~424 tests**.

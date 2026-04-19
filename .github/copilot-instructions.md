@@ -54,6 +54,7 @@ All decisions are documented as ADRs in `docs/decisions/`. Key ones:
 - **ADR-010:** Effect resolution pipeline — explicit phases (`setBase` → formulas → `addFlat` → `multiply` → `cap` → flags), typed `Character` state, unified effect collection from all sources.
 - **ADR-011:** Typed effect targets — discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | check`) replacing dotted-path strings. Exhaustive switch/case handling.
 - **ADR-012:** Standards-first HTML, CSS & Web Platform conventions. Semantic markup, `@layer`/`@scope`/native nesting, native widgets over custom JS, modern CSS and Web APIs preferred.
+- **ADR-013:** Domain layer as the mutation gate. `src/models/index.mts` is the single entry point for character mutations; storage is internal. Handlers and middleware import from `#models`, never `#models/storage` (carve-outs: `src/lib/backup.mts` and code inside `src/models/` itself).
 
 ## Coding Guidelines
 
@@ -116,6 +117,14 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
 - Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`
+
+### Domain Layer (ADR-013)
+
+- `src/models/index.mts` is **the** entry point for character mutations and reads
+- Handlers, middleware, and `app.mts` import from `#models` only — never `#models/storage`
+- Carve-outs: `src/lib/backup.mts` (snapshot tooling) and code inside `src/models/` itself
+- Cross-cutting mutation invariants (recalc derived, SSE broadcast, write lock) live in the domain layer, not in handlers
+- Transport-adjacent dependencies (`#sse`, `#rules`) are wired in via `createCharacterService({ recalc, broadcast })` at app startup
 
 ## File Naming
 

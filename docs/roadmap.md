@@ -378,8 +378,13 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       or (b) redesign the chain to distinguish middleware from terminal handlers
       at the type level. During Phase 2, return types were widened to
       `boolean | void` to paper over this — revert once the design is fixed.
-- [ ] Fix duplicate `updateCharacter()` — service layer (`index.mjs`) vs
-      storage (`storage.mjs`). Handler should call service, service calls storage
+- [ ] Consolidate domain layer per [ADR-013](decisions/013-domain-layer-mutation-gate.md)
+      (Phase 5 Session 4.5). One `updateCharacter` (delegates to storage),
+      recalc + broadcast move into the domain layer, handlers and middleware
+      stop importing from `#models/storage`, transport deps wired via
+      `createCharacterService({ recalc, broadcast })` factory. Resolves the
+      duplicate `updateCharacter` and the latent `skipUndefined` bug in
+      `handleUploadPortrait`.
 - [x] Remove duplicate `deepMerge`/`isObject` in `index.mts` — removed;
       service layer now imports from `#models/traversal` (Phase 5 Session 1).
 - [ ] Extract shared `byId` index-entry builder in `storage.mts` —
