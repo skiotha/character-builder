@@ -6,11 +6,10 @@ import { deepMerge } from "./traversal.mts";
 
 import { ENCODING, DATA_DIR } from "#config";
 
-import type { CharacterIndex } from "#types";
+import type { CharacterIndex, CharacterIndexEntry } from "#types";
 
 const LIVE_DATA_DIR = path.join(DATA_DIR, "characters");
 const INDEX_FILE = path.join(DATA_DIR, "index.json");
-const ALIAS_FILE = path.join(DATA_DIR, "aliases.json");
 const BACKUP_ROOT_DIR = path.join(DATA_DIR, "backups");
 const BACKUP_CHAR_DIR = path.join(BACKUP_ROOT_DIR, "characters");
 const BACKUP_INDEX = path.join(BACKUP_ROOT_DIR, "index.json");
@@ -18,18 +17,6 @@ const BACKUP_INDEX = path.join(BACKUP_ROOT_DIR, "index.json");
 async function ensureBackupDirs(): Promise<void> {
   const fs = await import("fs/promises");
   await fs.mkdir(BACKUP_CHAR_DIR, { recursive: true });
-}
-
-async function createAlias(
-  _characterId: string,
-  _alias: string,
-): Promise<void> {
-  // TODO
-}
-
-async function resolveAlias(_alias: string): Promise<string | null> {
-  // TODO
-  return null;
 }
 
 await fs.mkdir(LIVE_DATA_DIR, { recursive: true });
@@ -61,8 +48,15 @@ async function writeCharacterFile(
 async function updateIndexMetadata(
   character: Record<string, unknown>,
 ): Promise<void> {
-  // @TODO Phase 5: extract shared byId entry builder — duplicated in saveCharacter
-  characterIndex.byId[character.id as string] = {
+  characterIndex.byId[character.id as string] = buildIndexEntry(character);
+
+  await saveIndex();
+}
+
+function buildIndexEntry(
+  character: Record<string, unknown>,
+): CharacterIndexEntry {
+  return {
     name: character.characterName as string,
     playerId: character.playerId as string,
     backupCode: character.backupCode as string,
@@ -70,8 +64,6 @@ async function updateIndexMetadata(
     deleted: (character.deleted as boolean) || false,
     deletedAt: character.deletedAt as string | undefined,
   };
-
-  await saveIndex();
 }
 
 async function saveIndex(): Promise<void> {
@@ -83,14 +75,7 @@ async function saveCharacter(
 ): Promise<Record<string, unknown>> {
   const filename = path.join(LIVE_DATA_DIR, `${character.id as string}.json`);
 
-  characterIndex.byId[character.id as string] = {
-    name: character.characterName as string,
-    playerId: character.playerId as string,
-    backupCode: character.backupCode as string,
-    created: character.created as string,
-    deleted: (character.deleted as boolean) || false,
-    deletedAt: character.deletedAt as string | undefined,
-  };
+  characterIndex.byId[character.id as string] = buildIndexEntry(character);
 
   characterIndex.byBackupCode[character.backupCode as string] =
     character.id as string;
@@ -203,8 +188,6 @@ async function getAllCharacters(): Promise<Record<string, unknown>[]> {
   return characters;
 }
 
-
-
 async function hardDeleteCharacter(characterId: string): Promise<boolean> {
   try {
     const charInfo = characterIndex.byId[characterId];
@@ -257,8 +240,6 @@ export {
   getCharactersByPlayer,
   findCharacterByNameAndCode,
   getAllCharacters,
-  createAlias,
-  resolveAlias,
   ensureBackupDirs,
   LIVE_DATA_DIR,
   BACKUP_CHAR_DIR,

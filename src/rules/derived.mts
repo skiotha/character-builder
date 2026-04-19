@@ -29,6 +29,8 @@ export function recalculateDerivedFields(
       effect.target?.startsWith("rules.") &&
       effect.modifier.type === "setBase"
     ) {
+      // TODO Phase 6 (ADR-011): typed effect targets — drop `!` once `target`
+      // becomes a discriminated union and `split(".")[1]` is unnecessary.
       const stat = effect.target.split(".")[1]!;
       overrides[stat] = effect.modifier.value as string;
     }
@@ -54,8 +56,8 @@ export function recalculateDerivedFields(
   }
 
   for (const effect of allEffects) {
-    if (!effect.target?.startsWith("rules.")) {
-      applyEffect(result, effect.target!, effect.modifier);
+    if (effect.target && !effect.target.startsWith("rules.")) {
+      applyEffect(result, effect.target, effect.modifier);
     }
   }
 

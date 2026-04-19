@@ -43,7 +43,11 @@ describe("recalculateDerivedFields", () => {
     it("uses custom primary attributes", () => {
       const char = makeCharacter({
         attributes: {
-          primary: makePrimaryAttributes({ strong: 15, quick: 13, resolute: 12 }),
+          primary: makePrimaryAttributes({
+            strong: 15,
+            quick: 13,
+            resolute: 12,
+          }),
         },
       });
       const result = recalculateDerivedFields(char);
@@ -162,8 +166,12 @@ describe("recalculateDerivedFields", () => {
         ],
       });
       const result = recalculateDerivedFields(char);
-      const toughness = ((result.attributes as Record<string, unknown>)
-        .secondary as Record<string, unknown>).toughness as { max: number };
+      const toughness = (
+        (result.attributes as Record<string, unknown>).secondary as Record<
+          string,
+          unknown
+        >
+      ).toughness as { max: number };
       assert.equal(toughness.max, 15);
     });
   });
@@ -233,6 +241,39 @@ describe("recalculateDerivedFields", () => {
     });
   });
 
+  // ── undefined effect.target → silently skipped ───────────────
+
+  describe("effect with undefined target", () => {
+    it("does not crash when an effect has no target", () => {
+      const char = makeCharacter({
+        effects: [
+          {
+            modifier: { type: "add", value: 5 },
+          },
+        ],
+      });
+      assert.doesNotThrow(() => recalculateDerivedFields(char));
+    });
+
+    it("skips the targetless effect but still applies valid effects", () => {
+      const char = makeCharacter({
+        effects: [
+          {
+            modifier: { type: "add", value: 99 },
+          },
+          {
+            target: "attributes.secondary.defense",
+            modifier: { type: "add", value: 3 },
+          },
+        ],
+      });
+      const result = recalculateDerivedFields(char);
+      const secondary = (result.attributes as Record<string, unknown>)
+        .secondary as Record<string, unknown>;
+      assert.equal(secondary.defense, 13);
+    });
+  });
+
   // ── enforceConsistency (tested via recalculateDerivedFields output) ──
 
   describe("enforceConsistency", () => {
@@ -246,8 +287,12 @@ describe("recalculateDerivedFields", () => {
         },
       });
       const result = recalculateDerivedFields(char);
-      const toughness = ((result.attributes as Record<string, unknown>)
-        .secondary as Record<string, unknown>).toughness as {
+      const toughness = (
+        (result.attributes as Record<string, unknown>).secondary as Record<
+          string,
+          unknown
+        >
+      ).toughness as {
         max: number;
         current: number;
       };
@@ -263,8 +308,12 @@ describe("recalculateDerivedFields", () => {
         },
       });
       const result = recalculateDerivedFields(char);
-      const toughness = ((result.attributes as Record<string, unknown>)
-        .secondary as Record<string, unknown>).toughness as { current: number };
+      const toughness = (
+        (result.attributes as Record<string, unknown>).secondary as Record<
+          string,
+          unknown
+        >
+      ).toughness as { current: number };
       assert.equal(toughness.current, 0);
     });
 
@@ -392,7 +441,11 @@ describe("recalculateDerivedFields", () => {
     it("primaries → formulas → effects → equipment → clamp → consistency", () => {
       const char = makeCharacter({
         attributes: {
-          primary: makePrimaryAttributes({ strong: 15, quick: 12, resolute: 14 }),
+          primary: makePrimaryAttributes({
+            strong: 15,
+            quick: 12,
+            resolute: 14,
+          }),
           secondary: { toughness: { max: 99, current: 20 } },
         },
         effects: [

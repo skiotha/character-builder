@@ -578,7 +578,7 @@ describe("DELETE /api/v1/characters/:id", () => {
     assert.equal(getRes.status, 404);
   });
 
-  it("returns 401 for invalid DM token", async () => {
+  it("returns 400 for invalid DM token alone (treated as no auth)", async () => {
     const char = await createTestCharacter(
       { characterName: "Baddm" },
       "player-baddm",
@@ -589,7 +589,29 @@ describe("DELETE /api/v1/characters/:id", () => {
       headers: { "x-dm-id": "wrong-dm-token" },
     });
 
-    assert.equal(res.status, 401);
+    assert.equal(res.status, 400);
+  });
+
+  it("falls through to player path when DM token is invalid but player id is valid", async () => {
+    // Regression: previously the handler treated any truthy x-dm-id as DM and
+    // returned 401, locking out a legitimate owner who happened to also send a
+    // stale/garbage DM header.
+    const char = await createTestCharacter(
+      { characterName: "Falldown" },
+      "player-fallthrough",
+    );
+
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "DELETE",
+      headers: {
+        "x-dm-id": "wrong-dm-token",
+        "x-player-id": "player-fallthrough",
+      },
+    });
+
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as { type: string };
+    assert.equal(body.type, "soft");
   });
 
   it("returns 400 with no auth headers", async () => {

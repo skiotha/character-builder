@@ -13,6 +13,7 @@ import {
   handleGetCharacters,
   handleUpdateCharacter,
   handleCreateCharacter,
+  handleDeleteCharacter,
   handleCharacterStream,
 } from "#routes";
 import { applyCors } from "./lib/cors.mts";
@@ -272,44 +273,7 @@ async function handleApi(
       pathParts[0] === "characters" &&
       pathParts[1]
     ) {
-      const characterId = pathParts[1]!;
-
-      try {
-        const dmToken = req.headers["x-dm-id"];
-        const playerId = req.headers["x-player-id"] as string | undefined;
-
-        if (!dmToken && !playerId) {
-          res.writeHead(400);
-          res.end(JSON.stringify({ error: "Authorization required" }));
-          return;
-        }
-
-        let result: nagara.DeleteResult;
-        if (dmToken) {
-          result = await nagara.deleteCharacterAsDM(characterId, dmToken);
-        } else {
-          result = await nagara.deleteCharacterAsPlayer(characterId, playerId!);
-        }
-
-        if (result.success) {
-          res.writeHead(200);
-          res.end(
-            JSON.stringify({
-              message: "Character deleted",
-              type: result.type,
-            }),
-          );
-        } else {
-          res.writeHead(result.statusCode || 404);
-          res.end(JSON.stringify({ error: result.error }));
-        }
-      } catch (error) {
-        console.error("DELETE error:", error);
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: "Internal server error" }));
-      }
-
-      return;
+      return void (await handleDeleteCharacter(req, res, pathParts[1]!));
     }
 
     // POST /api/v1/characters

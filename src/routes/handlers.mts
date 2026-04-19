@@ -3,6 +3,7 @@ export { handleGetCharacters } from "./handleGetCharacters.mts";
 export { handleUploadPortrait } from "./handleUploadPortrait.mts";
 export { handleUpdateCharacter } from "./handleUpdateCharacter.mts";
 export { handleCreateCharacter } from "./handleCreateCharacter.mts";
+export { handleDeleteCharacter } from "./handleDeleteCharacter.mts";
 export { handleValidateDM } from "./handleValidateDM.mts";
 export { handleGetCharacter } from "./handleGetCharacter.mts";
 export { handleCharacterStream } from "./handleStreamCharacter.mts";
