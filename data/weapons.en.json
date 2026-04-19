@@ -1,39 +1,298 @@
 [
   {
+    "id": "heavy_weapon",
+    "name": "Heavy Weapon",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 10,
+    "qualities": []
+  },
+  {
+    "id": "two_handed_sword",
+    "name": "Two-Handed Sword",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["precise", "versatile"]
+  },
+  {
+    "id": "heavy_flail",
+    "name": "Heavy Flail",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["composite"]
+  },
+  {
+    "id": "two_handed_axe",
+    "name": "Two-Handed Axe",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["deep_wounds"]
+  },
+  {
+    "id": "polearm",
+    "name": "Polearm",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 3,
+    "qualities": ["long"]
+  },
+  {
+    "id": "halberd",
+    "name": "Halberd",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "deep_wounds"]
+  },
+  {
+    "id": "pike",
+    "name": "Pike",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "precise"]
+  },
+  {
+    "id": "staff",
+    "name": "Staff",
+    "type": "polearm",
+    "damage": 6,
+    "cost": 0.1,
+    "qualities": ["long", "blunt"]
+  },
+  {
+    "id": "composite_staff",
+    "name": "Composite Staff",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "composite"]
+  },
+  {
+    "id": "one_handed_weapon",
+    "name": "One-handed Weapon",
+    "type": "main",
+    "damage": 8,
+    "cost": 5,
+    "qualities": []
+  },
+  {
     "id": "longsword",
     "name": "Longsword",
-    "type": "heavy",
+    "type": "main",
     "damage": 8,
-    "qualities": ["long"]
+    "cost": 25,
+    "qualities": ["precise"]
+  },
+  {
+    "id": "flail",
+    "name": "Flail",
+    "type": "main",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["composite"]
+  },
+  {
+    "id": "shield",
+    "name": "Shield",
+    "type": "shield",
+    "damage": 4,
+    "cost": 3,
+    "qualities": []
+  },
+  {
+    "id": "buckler",
+    "name": "Buckler",
+    "type": "shield",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["flexible"]
+  },
+  {
+    "id": "iron_shield",
+    "name": "Iron Shield",
+    "type": "shield",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["balanced"]
+  },
+  {
+    "id": "short_weapon",
+    "name": "Short Weapon",
+    "type": "light",
+    "damage": 6,
+    "cost": 1,
+    "qualities": ["short"]
+  },
+  {
+    "id": "parring_dagger",
+    "name": "Parring Dagger",
+    "type": "light",
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["balanced", "short"]
   },
   {
     "id": "stiletto",
     "name": "Stiletto",
     "type": "light",
-    "subtype": "dagger",
-    "damage": 4,
-    "qualities": ["precise", "short", "concealed"]
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["deep_wounds", "short"]
   },
   {
-    "id": "crossbow",
-    "name": "Crossbow",
-    "type": "ranged",
-    "subtype": "crossbow",
-    "damage": 8,
-    "qualities": ["massive"]
+    "id": "assassins_dagger",
+    "name": "Assassin's Dagger",
+    "type": "light",
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["short", "concealed"]
+  },
+  {
+    "id": "natural_weapon",
+    "name": "Natural Weapon",
+    "type": "natural",
+    "damage": 4,
+    "cost": 0,
+    "qualities": ["short"]
+  },
+  {
+    "id": "war_claws",
+    "name": "War Claws",
+    "type": "natural",
+    "damage": 4,
+    "cost": 1,
+    "qualities": ["short", "deep_wounds"]
+  },
+  {
+    "id": "battle_fan",
+    "name": "Battle Fan",
+    "type": "exotic",
+    "damage": 6,
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "short", "balanced"]
   },
   {
     "id": "heels",
     "name": "Battle Heels",
-    "type": "light",
+    "type": "exotic",
     "damage": 4,
-    "qualities": ["short", "unwieldy"]
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "short", "concealed"]
   },
   {
-    "id": "staff",
-    "name": "Staff",
-    "type": "staff",
+    "id": "whip",
+    "name": "Whip",
+    "type": "exotic",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "composite", "blunt", "entangling"]
+  },
+  {
+    "id": "fire_tube",
+    "name": "Fire Tube",
+    "type": "exotic",
+    "damage": 12,
+    "cost": 10,
+    "qualities": ["special", "ranged", "flaming", "area"]
+  },
+  {
+    "id": "blowgun",
+    "name": "Blowgun",
+    "type": "exotic",
+    "damage": 0,
+    "cost": 2,
+    "qualities": ["special", "ranged"]
+  },
+  {
+    "id": "firearm",
+    "name": "Firearm",
+    "type": "firearm",
+    "damage": 8,
+    "cost": 40,
+    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+  },
+  {
+    "id": "ladies_revolver",
+    "name": "Ladies' Revolver",
+    "type": "firearm",
+    "damage": 8,
+    "cost": 50,
+    "qualities": ["ranged", "deep_wounds", "unwieldy", "concealed"]
+  },
+  {
+    "id": "rifle",
+    "name": "Rifle",
+    "type": "firearm",
+    "damage": 10,
+    "cost": 60,
+    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+  },
+  {
+    "id": "bow",
+    "name": "Bow",
+    "type": "bows",
+    "damage": 8,
+    "cost": 5,
+    "qualities": ["ranged"]
+  },
+  {
+    "id": "long_bow",
+    "name": "Long Bow",
+    "type": "bows",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["ranged", "precise"]
+  },
+  {
+    "id": "composite_bow",
+    "name": "Composite Bow",
+    "type": "bows",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["ranged", "deep_wounds"]
+  },
+  {
+    "id": "thrown_weapon",
+    "name": "Thrown Weapon",
+    "type": "thrown",
     "damage": 6,
-    "qualities": ["long", "blunt"]
+    "cost": 2,
+    "qualities": ["ranged"]
+  },
+  {
+    "id": "alchemical_bomb",
+    "name": "Alchemical Bomb",
+    "type": "thrown",
+    "damage": 10,
+    "cost": 1,
+    "qualities": ["ranged", "area", "flaming", "special"]
+  },
+  {
+    "id": "bolas",
+    "name": "Bolas",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 2,
+    "qualities": ["ranged", "entangling", "special"]
+  },
+  {
+    "id": "chakram",
+    "name": "Chakram",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 10,
+    "qualities": ["ranged", "special", "returning", "concealed"]
+  },
+  {
+    "id": "javelin",
+    "name": "Javelin",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 10,
+    "qualities": ["ranged", "deep_wounds"]
   }
 ]

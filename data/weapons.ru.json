@@ -1,1 +1,298 @@
-[]
+[
+  {
+    "id": "heavy_weapon",
+    "name": "Тяжелое оружие",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 10,
+    "qualities": []
+  },
+  {
+    "id": "two_handed_sword",
+    "name": "Двуручный меч",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["precise", "versatile"]
+  },
+  {
+    "id": "heavy_flail",
+    "name": "Тяжелый булава",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["composite"]
+  },
+  {
+    "id": "two_handed_axe",
+    "name": "Двуручный топор",
+    "type": "heavy",
+    "damage": 10,
+    "cost": 50,
+    "qualities": ["deep_wounds"]
+  },
+  {
+    "id": "polearm",
+    "name": "Древковое оружие",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 3,
+    "qualities": ["long"]
+  },
+  {
+    "id": "halberd",
+    "name": "Алебарда",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "deep_wounds"]
+  },
+  {
+    "id": "pike",
+    "name": "Пика",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "precise"]
+  },
+  {
+    "id": "staff",
+    "name": "Посох",
+    "type": "polearm",
+    "damage": 6,
+    "cost": 0.1,
+    "qualities": ["long", "blunt"]
+  },
+  {
+    "id": "composite_staff",
+    "name": "Составной посох",
+    "type": "polearm",
+    "damage": 8,
+    "cost": 15,
+    "qualities": ["long", "composite"]
+  },
+  {
+    "id": "one_handed_weapon",
+    "name": "Одноручное оружие",
+    "type": "main",
+    "damage": 8,
+    "cost": 5,
+    "qualities": []
+  },
+  {
+    "id": "longsword",
+    "name": "Длинный меч",
+    "type": "main",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["precise"]
+  },
+  {
+    "id": "flail",
+    "name": "Булава",
+    "type": "main",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["composite"]
+  },
+  {
+    "id": "shield",
+    "name": "Щит",
+    "type": "shield",
+    "damage": 4,
+    "cost": 3,
+    "qualities": []
+  },
+  {
+    "id": "buckler",
+    "name": "Баклер",
+    "type": "shield",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["flexible"]
+  },
+  {
+    "id": "iron_shield",
+    "name": "Железный щит",
+    "type": "shield",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["balanced"]
+  },
+  {
+    "id": "short_weapon",
+    "name": "Короткое оружие",
+    "type": "light",
+    "damage": 6,
+    "cost": 1,
+    "qualities": ["short"]
+  },
+  {
+    "id": "parring_dagger",
+    "name": "Парирующий кинжал",
+    "type": "light",
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["balanced", "short"]
+  },
+  {
+    "id": "stiletto",
+    "name": "Стилет",
+    "type": "light",
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["deep_wounds", "short"]
+  },
+  {
+    "id": "assassins_dagger",
+    "name": "Кинжал ассасина",
+    "type": "light",
+    "damage": 6,
+    "cost": 5,
+    "qualities": ["short", "concealed"]
+  },
+  {
+    "id": "natural_weapon",
+    "name": "Естественное оружие",
+    "type": "natural",
+    "damage": 4,
+    "cost": 0,
+    "qualities": ["short"]
+  },
+  {
+    "id": "war_claws",
+    "name": "Боевые когти",
+    "type": "natural",
+    "damage": 4,
+    "cost": 1,
+    "qualities": ["short", "deep_wounds"]
+  },
+  {
+    "id": "battle_fan",
+    "name": "Боевой веер",
+    "type": "exotic",
+    "damage": 6,
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "short", "balanced"]
+  },
+  {
+    "id": "heels",
+    "name": "Боевые каблуки",
+    "type": "exotic",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "short", "concealed"]
+  },
+  {
+    "id": "whip",
+    "name": "Кнут",
+    "type": "exotic",
+    "damage": 4,
+    "cost": 15,
+    "qualities": ["special", "unwieldy", "composite", "blunt", "entangling"]
+  },
+  {
+    "id": "fire_tube",
+    "name": "Огненная труба",
+    "type": "exotic",
+    "damage": 12,
+    "cost": 10,
+    "qualities": ["special", "ranged", "flaming", "area"]
+  },
+  {
+    "id": "blowgun",
+    "name": "Духовая трубка",
+    "type": "exotic",
+    "damage": 0,
+    "cost": 2,
+    "qualities": ["special", "ranged"]
+  },
+  {
+    "id": "firearm",
+    "name": "Огнестрельное оружие",
+    "type": "firearm",
+    "damage": 8,
+    "cost": 40,
+    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+  },
+  {
+    "id": "ladies_revolver",
+    "name": "Дамский револьвер",
+    "type": "firearm",
+    "damage": 8,
+    "cost": 50,
+    "qualities": ["ranged", "deep_wounds", "unwieldy", "concealed"]
+  },
+  {
+    "id": "rifle",
+    "name": "Ружье",
+    "type": "firearm",
+    "damage": 10,
+    "cost": 60,
+    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+  },
+  {
+    "id": "bow",
+    "name": "Лук",
+    "type": "bows",
+    "damage": 8,
+    "cost": 5,
+    "qualities": ["ranged"]
+  },
+  {
+    "id": "long_bow",
+    "name": "Длинный лук",
+    "type": "bows",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["ranged", "precise"]
+  },
+  {
+    "id": "composite_bow",
+    "name": "Составной лук",
+    "type": "bows",
+    "damage": 8,
+    "cost": 25,
+    "qualities": ["ranged", "deep_wounds"]
+  },
+  {
+    "id": "thrown_weapon",
+    "name": "Метательное оружие",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 2,
+    "qualities": ["ranged"]
+  },
+  {
+    "id": "alchemical_bomb",
+    "name": "Алхимическая бомба",
+    "type": "thrown",
+    "damage": 10,
+    "cost": 1,
+    "qualities": ["ranged", "area", "flaming", "special"]
+  },
+  {
+    "id": "bolas",
+    "name": "Болас",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 2,
+    "qualities": ["ranged", "entangling", "special"]
+  },
+  {
+    "id": "chakram",
+    "name": "Чакрам",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 10,
+    "qualities": ["ranged", "special", "returning", "concealed"]
+  },
+  {
+    "id": "javelin",
+    "name": "Метательное копье",
+    "type": "thrown",
+    "damage": 6,
+    "cost": 10,
+    "qualities": ["ranged", "deep_wounds"]
+  }
+]
