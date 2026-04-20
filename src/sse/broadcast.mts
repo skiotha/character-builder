@@ -95,6 +95,37 @@ export function broadcastToCharacter(
   );
 }
 
+export function broadcastCharacterDeleted(characterId: string): void {
+  const clients = characterClients.get(characterId);
+  if (!clients || clients.size === 0) return;
+
+  const timestamp = new Date().toISOString();
+  const eventData = JSON.stringify({
+    type: "character-deleted",
+    characterId,
+    timestamp,
+  });
+  const eventString = `event: character-deleted\ndata: ${eventData}\n\n`;
+
+  clients.forEach((client) => {
+    try {
+      client.res.write(eventString);
+      client.res.end();
+    } catch (error) {
+      console.error(
+        `[SSE] Failed to send deletion event for ${characterId}:`,
+        (error as Error).message,
+      );
+    }
+  });
+
+  characterClients.delete(characterId);
+
+  console.info(
+    `[SSE] Broadcast deletion to ${clients.size} client(s) for character ${characterId}`,
+  );
+}
+
 export function _resetForTesting(): void {
   characterClients.clear();
 }

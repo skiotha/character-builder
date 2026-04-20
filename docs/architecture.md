@@ -90,17 +90,16 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 | `handleGetCharacter`    | `/api/v1/characters/:id`          | GET    |
 | `handleCreateCharacter` | `/api/v1/characters`              | POST   |
 | `handleUpdateCharacter` | `/api/v1/characters/:id`          | PATCH  |
-| _(inline in router)_    | `/api/v1/characters/:id`          | DELETE |
+| `handleDeleteCharacter`  | `/api/v1/characters/:id`          | DELETE |
 | `handleUploadPortrait`  | `/api/v1/characters/:id/portrait` | POST   |
 | `handleCharacterStream` | `/api/v1/characters/:id/stream`   | GET    |
 | `handleGetAbilities`    | `/api/v1/abilities`               | GET    |
 | `handleValidateDM`      | `/api/v1/validate-dm`             | POST   |
 | `handleGetSchema`       | `/api/v1/schema`                  | GET    |
 
-> **Note:** The server currently also mounts view endpoints under
-> `/api/v1/view/` that return server-rendered HTML fragments. These are
-> being replaced by schema-driven client rendering (see [ADR-009](decisions/009-schema-driven-rendering.md)).
-> Once the migration is complete, the server becomes a pure JSON API.
+> **Note:** View endpoints (`/api/v1/view/`) were removed in Phase 3.
+> The server is now a pure JSON API. Client renders all views from data
+> via schema-driven rendering (see [ADR-009](decisions/009-schema-driven-rendering.md)).
 
 ### 3.3 Middleware
 
@@ -135,7 +134,7 @@ The domain layer (`src/models/index.mts`) is the single entry point for characte
 
 - Handlers translate HTTP into domain calls and back; they never reach past the domain layer.
 - Storage (below) is internal — outside `src/models/` and the explicit `src/lib/backup.mts` carve-out, no module imports from `#models/storage`.
-- Transport-adjacent dependencies (`#sse`, `#rules`) are wired into the domain layer via a `createCharacterService({ recalc, broadcast })` factory at app startup, keeping `models/` free of transport knowledge.
+- Transport-adjacent dependencies (`#sse`, `#rules`) are wired into the domain layer via a `createCharacterService({ recalc, broadcast, broadcastDeleted })` factory at app startup, keeping `models/` free of transport knowledge.
 
 ### 3.7 Storage
 

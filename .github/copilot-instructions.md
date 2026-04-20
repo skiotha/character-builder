@@ -124,7 +124,7 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Handlers, middleware, and `app.mts` import from `#models` only — never `#models/storage`
 - Carve-outs: `src/lib/backup.mts` (snapshot tooling) and code inside `src/models/` itself
 - Cross-cutting mutation invariants (recalc derived, SSE broadcast, write lock) live in the domain layer, not in handlers
-- Transport-adjacent dependencies (`#sse`, `#rules`) are wired in via `createCharacterService({ recalc, broadcast })` at app startup
+- Transport-adjacent dependencies (`#sse`, `#rules`) are wired in via `createCharacterService({ recalc, broadcast, broadcastDeleted })` at app startup
 
 ## File Naming
 

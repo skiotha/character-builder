@@ -29,6 +29,16 @@ mock.module("#config", {
 const storage = await import("#models/storage");
 const service = await import("#models");
 
+// Wire the character service for the domain mutations exercised below
+// (createCharacter, deleteCharacterAsPlayer, deleteCharacterAsDM). These
+// tests aren't about recalc/broadcast behavior — that lives in
+// test/character-service.test.mts — so we use no-op stubs.
+service.initCharacterService({
+  recalc: (c) => c,
+  broadcast: () => {},
+  broadcastDeleted: () => {},
+});
+
 // ── Helpers ───────────────────────────────────────────────────────
 
 async function readIndex(): Promise<Record<string, unknown>> {
@@ -566,5 +576,93 @@ describe("recoverCharacter", () => {
   it("returns null when name or code do not match", async () => {
     const result = await service.recoverCharacter("Nobody", "Fake-Code-000");
     assert.equal(result, null);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// withWriteLock — per-character write serialization (ADR-013)
+// ══════════════════════════════════════════════════════════════════
+
+describe("withWriteLock", () => {
+  it("serializes concurrent saveCharacter calls to the same id", async () => {
+    const id = "lock-same-01";
+    await storage.saveCharacter(makeCharacter({ id, characterName: "Seed" }));
+
+    // Fire two concurrent saves with distinguishable names.
+    const charA = makeCharacter({ id, characterName: "WriteA" });
+    const charB = makeCharacter({ id, characterName: "WriteB" });
+
+    await Promise.all([
+      storage.saveCharacter(charA),
+      storage.saveCharacter(charB),
+    ]);
+
+    // File must be parseable JSON; whichever ran second wins.
+    const onDisk = await readCharacterFile(id);
+    assert.ok(
+      onDisk.characterName === "WriteA" || onDisk.characterName === "WriteB",
+      `unexpected characterName: ${onDisk.characterName as string}`,
+    );
+  });
+
+  it("runs writes to different ids in parallel (no over-serialization)", async () => {
+    // Both saves resolve essentially together; total wall time should be
+    // close to the slower of the two, not their sum. The exact threshold is
+    // generous so it survives noisy CI.
+    const start = Date.now();
+    await Promise.all([
+      storage.saveCharacter(makeCharacter({ id: "lock-par-A" })),
+      storage.saveCharacter(makeCharacter({ id: "lock-par-B" })),
+    ]);
+    const elapsed = Date.now() - start;
+    assert.ok(elapsed < 1000, `parallel saves took ${elapsed}ms`);
+  });
+
+  it("releases the lock after a rejected write, allowing the next call through", async () => {
+    // updateCharacter on a missing id rejects. The lock entry must clear so
+    // a subsequent save for the same id is not blocked forever.
+    await assert.rejects(
+      () => storage.updateCharacter("lock-recover-01", { location: "X" }),
+      { message: "Character not found" },
+    );
+
+    // This save would hang if the lock map kept the rejected promise pinned.
+    const saved = await storage.saveCharacter(
+      makeCharacter({ id: "lock-recover-01", characterName: "After" }),
+    );
+    assert.equal(saved.characterName, "After");
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// updateCharacter — transform callback (ADR-013)
+// ══════════════════════════════════════════════════════════════════
+
+describe("updateCharacter (transform param)", () => {
+  it("invokes transform on the merged character before write", async () => {
+    const id = "upd-tx-01";
+    await storage.saveCharacter(makeCharacter({ id, location: "Origin" }));
+
+    const transformed = await storage.updateCharacter(
+      id,
+      { location: "Updated" },
+      (c) => ({ ...c, transformed: true }),
+    );
+
+    assert.equal(transformed.location, "Updated");
+    assert.equal(transformed.transformed, true);
+
+    const onDisk = await readCharacterFile(id);
+    assert.equal(onDisk.transformed, true);
+  });
+
+  it("transform is optional and defaults to identity", async () => {
+    const id = "upd-tx-02";
+    await storage.saveCharacter(makeCharacter({ id, location: "Origin" }));
+
+    const updated = await storage.updateCharacter(id, {
+      location: "Updated",
+    });
+    assert.equal(updated.location, "Updated");
   });
 });

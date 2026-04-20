@@ -1,3 +1,7 @@
+// ADR-013 carve-out: this helper provides isolated DATA_DIR sandboxes for
+// tests. Tests using it may bypass the domain layer (`#models`) and operate
+// directly against `#models/storage` for fixture setup.
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";

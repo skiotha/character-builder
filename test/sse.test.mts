@@ -353,4 +353,45 @@ describe("broadcast", () => {
       assert.equal(owner.playerId, "owner-1");
     });
   });
+
+  // ── broadcastCharacterDeleted ─────────────────────────────────
+
+  describe("broadcastCharacterDeleted", () => {
+    it("emits a character-deleted event and ends the response", async () => {
+      const { broadcastCharacterDeleted } = await import("#sse");
+      const res = createMockResponse();
+      addClient("char-del-1", asRes(res), "player-1", false);
+
+      broadcastCharacterDeleted("char-del-1");
+
+      assert.equal(res.written.length, 1);
+      assert.ok(res.written[0]!.startsWith("event: character-deleted\n"));
+      const dataLine = res.written[0]!.split("\n").find((l) =>
+        l.startsWith("data: "),
+      )!;
+      const payload = JSON.parse(dataLine.slice(6));
+      assert.equal(payload.type, "character-deleted");
+      assert.equal(payload.characterId, "char-del-1");
+      assert.ok(typeof payload.timestamp === "string");
+      assert.equal(res.ended, true);
+    });
+
+    it("clears subscribers — subsequent broadcasts reach no one", async () => {
+      const { broadcastCharacterDeleted } = await import("#sse");
+      const res = createMockResponse();
+      addClient("char-del-2", asRes(res), "player-1", false);
+
+      broadcastCharacterDeleted("char-del-2");
+      const initialCount = res.written.length;
+
+      broadcastToCharacter("char-del-2", { name: "Ghost" });
+      assert.equal(res.written.length, initialCount);
+    });
+
+    it("no-ops when no clients are subscribed", async () => {
+      const { broadcastCharacterDeleted } = await import("#sse");
+      // Just must not throw.
+      broadcastCharacterDeleted("char-del-nobody");
+    });
+  });
 });

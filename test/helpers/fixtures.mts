@@ -1,6 +1,10 @@
 /**
  * Hand-coded character fixtures for testing.
  *
+ * ADR-013 carve-out: tests may bypass the domain layer (`#models`) and write
+ * fixtures directly via `#models/storage` to set up arbitrary states without
+ * triggering recalc/broadcast side effects.
+ *
  * Shapes are intentionally hard-coded (not generated from CHARACTER_SCHEMA)
  * so tests break explicitly when the schema changes, rather than silently
  * adapting via generateDefaultCharacter().

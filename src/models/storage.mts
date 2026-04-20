@@ -70,7 +70,47 @@ async function saveIndex(): Promise<void> {
   await fs.writeFile(INDEX_FILE, JSON.stringify(characterIndex, null, 2));
 }
 
+// ── Per-character write serialization ───────────────────────────
+//
+// Defense-in-depth against concurrent writes to the same character file.
+// Lives in storage so the lock is acquired regardless of caller (the
+// no-storage-imports convention from ADR-013 is enforced by review, not
+// by the runtime — this lock keeps us correct even if someone slips).
+//
+// Each entry chains a new write onto the previous promise. Map entries are
+// removed when their chain settles, but only if the slot still points at
+// the same promise (a fresher enqueue wins the slot).
+
+const writeLocks = new Map<string, Promise<unknown>>();
+
+async function withWriteLock<T>(id: string, fn: () => Promise<T>): Promise<T> {
+  const previous = writeLocks.get(id) ?? Promise.resolve();
+  const next = previous.then(fn, fn);
+  writeLocks.set(id, next);
+
+  // Schedule cleanup without holding onto the rejection — the caller's
+  // `await next` is the only place the error should surface.
+  next.then(
+    () => {
+      if (writeLocks.get(id) === next) writeLocks.delete(id);
+    },
+    () => {
+      if (writeLocks.get(id) === next) writeLocks.delete(id);
+    },
+  );
+
+  return next;
+}
+
 async function saveCharacter(
+  character: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  return withWriteLock(character.id as string, () =>
+    _saveCharacterUnlocked(character),
+  );
+}
+
+async function _saveCharacterUnlocked(
   character: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   const filename = path.join(LIVE_DATA_DIR, `${character.id as string}.json`);
@@ -103,36 +143,51 @@ async function saveCharacter(
   return character;
 }
 
+/**
+ * Merge `updates` into the stored character, optionally pass the result
+ * through `transform` (e.g. derived-field recalc) before persisting,
+ * and write to disk under the per-character write lock.
+ *
+ * Index metadata is rewritten only when one of the indexed fields
+ * actually changes.
+ */
 async function updateCharacter(
   id: string,
   updates: Record<string, unknown>,
+  transform?: (character: Record<string, unknown>) => Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
-  const existing = await getCharacter(id);
-  if (!existing) throw new Error("Character not found");
+  return withWriteLock(id, async () => {
+    const existing = await getCharacter(id);
+    if (!existing) throw new Error("Character not found");
 
-  const updated = deepMerge(existing, updates, { skipUndefined: true });
-  updated.lastModified = new Date().toISOString();
+    let updated = deepMerge(existing, updates, { skipUndefined: true });
+    updated.lastModified = new Date().toISOString();
 
-  await writeCharacterFile(updated);
+    if (transform) {
+      updated = transform(updated);
+    }
 
-  const metadataFields = [
-    "characterName",
-    "playerId",
-    "backupCode",
-    "deleted",
-    "deletedAt",
-  ];
-  const metadataChanged = metadataFields.some(
-    (field) =>
-      JSON.stringify((existing as Record<string, unknown>)[field]) !==
-      JSON.stringify((updated as Record<string, unknown>)[field]),
-  );
+    await writeCharacterFile(updated);
 
-  if (metadataChanged) {
-    await updateIndexMetadata(updated);
-  }
+    const metadataFields = [
+      "characterName",
+      "playerId",
+      "backupCode",
+      "deleted",
+      "deletedAt",
+    ];
+    const metadataChanged = metadataFields.some(
+      (field) =>
+        JSON.stringify((existing as Record<string, unknown>)[field]) !==
+        JSON.stringify((updated as Record<string, unknown>)[field]),
+    );
 
-  return updated;
+    if (metadataChanged) {
+      await updateIndexMetadata(updated);
+    }
+
+    return updated;
+  });
 }
 
 async function getCharacter(
@@ -189,6 +244,14 @@ async function getAllCharacters(): Promise<Record<string, unknown>[]> {
 }
 
 async function hardDeleteCharacter(characterId: string): Promise<boolean> {
+  return withWriteLock(characterId, () =>
+    _hardDeleteCharacterUnlocked(characterId),
+  );
+}
+
+async function _hardDeleteCharacterUnlocked(
+  characterId: string,
+): Promise<boolean> {
   try {
     const charInfo = characterIndex.byId[characterId];
 

@@ -1479,3 +1479,192 @@ describe("CORS", () => {
     assert.equal(res.headers.get("access-control-allow-origin"), null);
   });
 });
+
+// ── Domain layer regressions (ADR-013) ────────────────────────────
+
+describe("Domain layer integration", () => {
+  it("PATCH response reflects recalculated derived fields", async () => {
+    const owner = "player-domain-recalc";
+    const char = await createTestCharacter(
+      { characterName: "RecalcCheck" },
+      owner,
+    );
+
+    // DM-driven PATCH of a primary attribute → server must recalculate
+    // derived secondary attributes and return them in the response body.
+    const res = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-dm-id": TEST_DM_TOKEN,
+      },
+      body: JSON.stringify({
+        updates: [
+          {
+            field: "attributes.primary.strong",
+            value: 15,
+            operation: "set",
+          },
+        ],
+      }),
+    });
+
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as Record<string, unknown>;
+    const character = body.character as Record<string, unknown> | undefined;
+    assert.ok(character, "response must include character");
+    const attributes = character.attributes as
+      | Record<string, unknown>
+      | undefined;
+    assert.ok(attributes, "response must include attributes");
+    // Derived secondaries must be present in the response — proves recalc
+    // ran in-process before the response was serialized.
+    assert.ok(
+      attributes.secondary && typeof attributes.secondary === "object",
+      "response must include derived secondary attributes",
+    );
+  });
+
+  it("portrait upload preserves other character fields (skipUndefined regression)", async () => {
+    const owner = "player-portrait-preserve";
+    const char = await createTestCharacter(
+      { characterName: "PreserveMe", location: "PreserveLoc" },
+      owner,
+    );
+
+    const boundary = "----PreserveBoundary";
+    const png1x1 = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAB" +
+        "Nl7BcQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const body = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="portrait"; filename="t.png"\r\n` +
+          `Content-Type: image/png\r\n\r\n`,
+      ),
+      png1x1,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const upRes = await fetch(`${BASE}/api/v1/characters/${char.id}/portrait`, {
+      method: "POST",
+      headers: {
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        "x-player-id": owner,
+      },
+      body,
+    });
+    assert.equal(upRes.status, 200);
+
+    const getRes = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      headers: { "x-player-id": owner },
+    });
+    assert.equal(getRes.status, 200);
+    const fetched = (await getRes.json()) as Record<string, unknown>;
+    assert.equal(fetched.characterName, "PreserveMe");
+    assert.equal(fetched.location, "PreserveLoc");
+    const portrait = fetched.portrait as Record<string, unknown> | undefined;
+    assert.ok(portrait, "portrait field should be set");
+    assert.equal(portrait.status, "uploaded");
+    assert.ok(
+      typeof portrait.path === "string" && portrait.path.length > 0,
+      "portrait.path should be set",
+    );
+  });
+
+  it("concurrent PATCHes to the same character do not corrupt the file", async () => {
+    const owner = "player-domain-concurrent";
+    const char = await createTestCharacter(
+      { characterName: "ConcurrentBase", location: "Start" },
+      owner,
+    );
+
+    const headers = {
+      "Content-Type": "application/json",
+      "x-player-id": owner,
+    } as const;
+
+    const results = await Promise.all([
+      fetch(`${BASE}/api/v1/characters/${char.id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({
+          updates: [{ field: "location", value: "A", operation: "set" }],
+        }),
+      }),
+      fetch(`${BASE}/api/v1/characters/${char.id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({
+          updates: [{ field: "location", value: "B", operation: "set" }],
+        }),
+      }),
+    ]);
+
+    for (const r of results) {
+      assert.equal(r.status, 200);
+    }
+
+    const getRes = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      headers: { "x-player-id": owner },
+    });
+    assert.equal(getRes.status, 200);
+    const fetched = (await getRes.json()) as Record<string, unknown>;
+    assert.ok(
+      fetched.location === "A" || fetched.location === "B",
+      `location should be one of the two writes, got ${String(fetched.location)}`,
+    );
+    // File on disk is parseable JSON — proven by the successful GET above.
+  });
+
+  it("DM hard-delete emits a final character-deleted SSE event", async () => {
+    const owner = "player-domain-hd";
+    const char = await createTestCharacter(
+      { characterName: "HardDeleteSse" },
+      owner,
+    );
+
+    const eventPromise = new Promise<{ type: string; characterId: string }>(
+      (resolve, reject) => {
+        const req = http.get(
+          `${BASE}/api/v1/characters/${char.id}/stream?playerId=${owner}`,
+          (res) => {
+            let buf = "";
+            res.setEncoding("utf8");
+            res.on("data", (chunk: string) => {
+              buf += chunk;
+              const match = buf.match(
+                /event: character-deleted\ndata: (.+?)\n\n/,
+              );
+              if (match) {
+                try {
+                  resolve(JSON.parse(match[1]!));
+                } catch (e) {
+                  reject(e);
+                }
+                res.destroy();
+              }
+            });
+            res.on("error", reject);
+          },
+        );
+        req.on("error", reject);
+      },
+    );
+
+    // Give the SSE subscriber a moment to register before deleting.
+    await new Promise((r) => setTimeout(r, 50));
+
+    const delRes = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+      method: "DELETE",
+      headers: { "x-dm-id": TEST_DM_TOKEN },
+    });
+    assert.equal(delRes.status, 200);
+
+    const event = await eventPromise;
+    assert.equal(event.type, "character-deleted");
+    assert.equal(event.characterId, char.id);
+  });
+});

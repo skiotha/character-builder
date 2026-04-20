@@ -356,12 +356,8 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [x] Fix `generateDefaultCharacter()` — added `continue` after
       `SERVER_CONTROLLED_FIELDS` check. `schemaVersion` now stamped in
       `createCharacter()` service instead (Phase 5 Session 1).
-- [ ] Fix crash on undefined effect target — `src/rules/derived.mts` passes
-      `effect.target!` to `applyEffect` when `target` is `undefined`, causing
-      a `TypeError` at runtime (`undefined.split(".")`). Guard `!effect.target
-      ?.startsWith("rules.")` evaluates `true` when target is missing. Fix:
-      add `effect.target &&` guard before calling `applyEffect`.
-      **Bug #18 documented in Phase 4 Session 4** — engine-weak-points tracker.
+- [~] Fix crash on undefined effect target — deferred to Phase 6 Step 0
+      (engine foundation rework replaces this code entirely). **Bug #18.**
 - [x] Fix `validateCharacterUpdate` XP check for `push` on `traits` —
       removed premature XP code (both commented-out `increment` block and
       active but incomplete `push` XP check). Will be rebuilt properly in
@@ -378,13 +374,13 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       or (b) redesign the chain to distinguish middleware from terminal handlers
       at the type level. During Phase 2, return types were widened to
       `boolean | void` to paper over this — revert once the design is fixed.
-- [ ] Consolidate domain layer per [ADR-013](decisions/013-domain-layer-mutation-gate.md)
+- [x] Consolidate domain layer per [ADR-013](decisions/013-domain-layer-mutation-gate.md)
       (Phase 5 Session 4.5). One `updateCharacter` (delegates to storage),
       recalc + broadcast move into the domain layer, handlers and middleware
       stop importing from `#models/storage`, transport deps wired via
-      `createCharacterService({ recalc, broadcast })` factory. Resolves the
-      duplicate `updateCharacter` and the latent `skipUndefined` bug in
-      `handleUploadPortrait`.
+      `createCharacterService({ recalc, broadcast, broadcastDeleted })`
+      factory. Resolves the duplicate `updateCharacter` and the latent
+      `skipUndefined` bug in `handleUploadPortrait`.
 - [x] Remove duplicate `deepMerge`/`isObject` in `index.mts` — removed;
       service layer now imports from `#models/traversal` (Phase 5 Session 1).
 - [ ] Extract shared `byId` index-entry builder in `storage.mts` —
@@ -398,9 +394,10 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       implemented properly in Phase 6.
 - [x] Remove dead `xp.mts` — deleted (Phase 5 Session 1). XP calculation
       will be implemented in Phase 6.
-- [ ] Add write serialization for storage — per-character write lock to
+- [x] Add write serialization for storage — per-character write lock to
       prevent concurrent writes from corrupting JSON files (see ADR-002
-      consequences)
+      consequences). Implemented as `withWriteLock` in `storage.mts`
+      (Phase 5 Session 4.5).
 - [x] Consistent sanitization across all response paths — applied
       `sanitizeCharacterForRole` to GET list, PATCH update, POST recover,
       and SSE broadcast. POST create still returns `backupCode` (owner needs
@@ -427,7 +424,8 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [x] Replace `buffer.slice` with `buffer.subarray` in multipart parser —
       **Resolved** — no `.slice()` on Buffer found anywhere in `src/`.
       Already resolved before Phase 5.
-- [ ] Fix DELETE route — extract inline handler into a proper handler file
+- [x] Fix DELETE route — extracted into `handleDeleteCharacter.mts`
+      (Phase 5 Session 4)
 - [ ] Remove dead/commented code throughout the codebase
 - [x] Resolve `handleGetCharacters` `@TODO: disable dm handing` — removed
       stale TODO, fixed typo. DM path kept (auth-gated); sanitization from
@@ -496,6 +494,9 @@ dotted-path + numeric-priority approach.
       (`src/rules/registry.mts`)
 - [ ] Rewrite `src/rules/attributes.mts` — `SECONDARY_FORMULAS` functions
       receive typed `PrimaryAttributes` instead of `Record<string, unknown>`
+- [ ] Fix crash on undefined effect target — `derived.mts` passes
+      `effect.target!` to `applyEffect` when `target` is `undefined`.
+      Subsumes Phase 5 Bug #18; resolved by typed pipeline rewrite. **Bug #18**
 - [ ] Fix `EffectModifier.value: number` in rpg-types.mts — `setBase` effects
       carry attribute name strings (e.g., `"discreet"`). Type must be
       `number | string` or use per-phase modifier types. **Bug #19**
@@ -741,6 +742,20 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       (precompressed files or on-the-fly compression via `node:zlib`)
 - [ ] Set `Cache-Control` headers for static assets (fonts, icons, CSS)
 - [ ] Review image portrait delivery (format, compression, sizing)
+
+### Domain Layer Hygiene
+
+Deferred from Phase 5 Session 4.5 (ADR-013 implementation). Functional
+correctness is already ensured; these are tightening passes.
+
+- [ ] Tighten `handleUploadPortrait` payload — currently passes the full
+      character object to `updateCharacter`. The `skipUndefined` merge in
+      storage prevents data clobber, but the call should be narrowed to
+      `{ portrait: { path, status }, lastModified }` for explicitness.
+- [ ] Add `no-restricted-imports` lint rule for `#models/storage` — enforce
+      ADR-013 carve-out at tooling level. Requires a lint config (ESLint or
+      equivalent). Until then, rely on review + verification grep:
+      `Get-ChildItem -Recurse src -Filter *.mts | Select-String '#models/storage'`
 
 ### Items Relocated from Phase 5
 

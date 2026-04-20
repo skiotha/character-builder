@@ -7,6 +7,8 @@ import { requireDmToken } from "#auth";
 import * as nagara from "#models";
 import * as backup from "./lib/backup.mts";
 import { sanitizeCharacterForRole } from "#models/sanitization";
+import { recalculateDerivedFields } from "#rules";
+import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
 import {
   handleValidateDM,
   handleGetAbilities,
@@ -36,6 +38,15 @@ const getCharacterHandler = createCharacterRoute();
 const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
+
+// Wire the character service once at startup (ADR-013). Domain mutations
+// throw until this runs, so it must happen at module top-level — before
+// any request can land.
+nagara.initCharacterService({
+  recalc: recalculateDerivedFields,
+  broadcast: broadcastToCharacter,
+  broadcastDeleted: broadcastCharacterDeleted,
+});
 
 export default async function app(
   req: IncomingMessage,

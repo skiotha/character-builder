@@ -1,6 +1,6 @@
 import { validateDmToken } from "#auth";
 import { addClient, removeClient } from "#sse";
-import { getCharacter } from "#models/storage";
+import { getCharacter } from "#models";
 import { applyCors } from "../lib/cors.mts";
 import type { ServerResponse } from "node:http";
 import type { NagaraRequest } from "#types";

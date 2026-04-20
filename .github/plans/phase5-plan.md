@@ -546,7 +546,7 @@ it was promoted to its own session — see Session 4.5 below.)_
 
 ---
 
-## Session 4.5 — Domain Layer Consolidation (ADR-013)
+## Session 4.5 — Domain Layer Consolidation (ADR-013) ✓ DONE
 
 **Goal:** Cement the domain layer as the single mutation gate per
 [ADR-013](../../docs/decisions/013-domain-layer-mutation-gate.md).

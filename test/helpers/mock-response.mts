@@ -1,7 +1,9 @@
 interface MockResponse {
   written: string[];
+  ended: boolean;
   throwOnWrite: boolean;
   write(chunk: string): boolean;
+  end(): void;
   on(event: string, handler: (...args: unknown[]) => void): void;
   trigger(event: string): void;
 }
@@ -11,6 +13,7 @@ function createMockResponse(): MockResponse {
 
   const mock: MockResponse = {
     written: [],
+    ended: false,
     throwOnWrite: false,
 
     write(chunk: string): boolean {
@@ -19,6 +22,10 @@ function createMockResponse(): MockResponse {
       }
       mock.written.push(chunk);
       return true;
+    },
+
+    end(): void {
+      mock.ended = true;
     },
 
     on(event: string, handler: (...args: unknown[]) => void): void {

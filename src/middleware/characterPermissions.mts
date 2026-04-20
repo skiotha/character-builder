@@ -1,4 +1,4 @@
-import { getCharacter } from "#models/storage";
+import { getCharacter } from "#models";
 import { validateDmToken } from "#auth";
 import { extractCharacterIdFromPath } from "./index.mts";
 import type { ServerResponse } from "node:http";

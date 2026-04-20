@@ -1,12 +1,10 @@
 import type { ServerResponse } from "node:http";
 
-import { getCharacter, updateCharacter } from "#models/storage";
+import { getCharacter, updateCharacter } from "#models";
 import { validateCharacterUpdate } from "#models/validation";
 import { validateDmToken } from "#auth";
 import { applyFieldUpdate } from "#models/schema-utils";
 import { sanitizeCharacterForRole } from "#models/sanitization";
-import { recalculateDerivedFields } from "#rules";
-import { broadcastToCharacter } from "#sse";
 import { BodyTooLargeError, MAX_JSON_BODY, readBody } from "../lib/body.mts";
 
 import type { NagaraRequest } from "#types";
@@ -93,11 +91,8 @@ export async function handleUpdateCharacter(
       );
     }
 
-    updatedCharacter = recalculateDerivedFields(updatedCharacter);
-
+    // Recalc + broadcast happen inside the domain layer (ADR-013).
     const savedCharacter = await updateCharacter(characterId, updatedCharacter);
-
-    broadcastToCharacter(characterId, savedCharacter);
 
     if (!res.headersSent) {
       const sanitized = sanitizeCharacterForRole(
