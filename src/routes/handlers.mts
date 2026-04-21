@@ -7,3 +7,4 @@ export { handleDeleteCharacter } from "./handleDeleteCharacter.mts";
 export { handleValidateDM } from "./handleValidateDM.mts";
 export { handleGetCharacter } from "./handleGetCharacter.mts";
 export { handleCharacterStream } from "./handleStreamCharacter.mts";
+export { handleRecover } from "./handleRecover.mts";

@@ -59,13 +59,12 @@ export type MiddlewareFn = (
   res: ServerResponse,
   pathParts: string[],
   next: () => Promise<void>,
-) => Promise<boolean | void> | boolean | void;
+) => Promise<void> | void;
 
-export type MiddlewareChainHandler = (
+export type RouteChainHandler = (
   req: NagaraRequest,
   res: ServerResponse,
   pathParts: string[],
-  finalHandler?: RouteHandler,
 ) => Promise<boolean>;
 
 // ── Character Index (data/index.json) ─────────────────────────────

@@ -105,7 +105,7 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 
 - **Auth:** Extracts `x-player-id` and `x-dm-id` from headers. DM token validated against env var (see ADR-003).
 - **Character permissions:** Loads character, determines role (`dm` / `owner` / `public`), attaches to `req`.
-- **Middleware chain:** Custom `createMiddlewareChain()` composes middleware functions in sequence with a `next()` pattern.
+- **Route composition:** `createRoute(middlewares, handler)` composes a fixed list of middleware functions in sequence with a `next()` pattern, then invokes the terminal handler. Distinct types for the middleware list and the terminal handler keep the chain honest at the type level.
 
 ### 3.4 Schema & Validation
 

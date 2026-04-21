@@ -696,65 +696,131 @@ bug-fix. ADR-013 captures the rationale; this session implements it.
 
 ---
 
-## Session 5 — Middleware Architecture & Recovery Hardening (Stretch)
+## Session 5 — Middleware Architecture & Recovery Hardening ✅ COMPLETED
 
-**Goal:** Fix the middleware chain type lie and (optionally) harden the
-recovery endpoint. These are low/medium-priority improvements that don't
-affect user-visible behavior. Write serialization moved to Session 4.5.
+**Goal:** Fix the middleware chain type lie and harden the recovery
+endpoint. These were marked stretch but executed in full once Sessions
+1–4.5 had cleared the path.
 
-**Note:** This session is optional. If the prior sessions have addressed all
-high and medium items, this can be deferred or folded into Phase 6 prep.
+**Status:** All tasks completed. **444 tests passing** (was 415 after
+Session 4.5; +29 from Phase 5 stretch + intervening Session 4.5 tests).
+Typecheck clean. `/recover` route extracted to its own handler file as
+scope creep — it was the last meaningful inline route in `app.mts`, and
+extracting it kept the post-Session-4 convention consistent. `createRoute`
+option (b) chosen over `finalHandler` (option a) — distinct types for
+middleware vs terminal handler, no optional 4th argument.
 
 ### Tasks
 
-1. **Fix middleware chain type mismatch**
+1. **Replace `createMiddlewareChain` with `createRoute(middlewares, handler)`** ✅
    - **Files:** `src/middleware/index.mts`, `src/types.mts`,
-     `src/routes/characterRoutes.mts`
-   - **Change:** Option (a) — use `finalHandler` parameter as intended:
-     - `createMiddlewareChain(...middlewares)` returns a handler that accepts
-       `(req, res, pathParts)`
-     - Route wiring passes the terminal handler as `finalHandler`:
-       `createMiddlewareChain(withCharacterPermissions)(req, res, pathParts, handleGetCharacter)`
-     - This way, `handleGetCharacter` is NOT in the `middlewares` array and
-       doesn't need the `next` parameter
-     - Revert `boolean | void` return type widening from Phase 2
-   - **Alternative (b):** Create a `createRoute(middleware[], handler)` helper
-     that has distinct types for middleware vs terminal handler. Evaluate
-     which approach is cleaner during implementation.
+     `src/routes/characterRoutes.mts`, `src/routes/portraitRoutes.mts`
+   - **Change:** New `createRoute(middlewares: MiddlewareFn[], handler:
+     RouteHandler): RouteChainHandler` helper. Distinct types for the
+     middleware list and the terminal handler — no `finalHandler`
+     parameter, no optional 4th argument at the call site. `MiddlewareFn`
+     return type narrowed back to `Promise<void> | void`. Old
+     `createMiddlewareChain` and `MiddlewareChainHandler` deleted.
+   - Both call sites migrated.
 
-2. **Harden recovery endpoint (stretch)**
+2. **Extract `/recover` into a dedicated handler** ✅ (scope creep)
+   - **Files:** new `src/routes/handleRecover.mts`,
+     `src/routes/handlers.mts`, `src/app.mts`
+   - **Change:** Inline `/recover` block (~36 lines) lifted verbatim into
+     `handleRecover.mts` following the `Promise<boolean>` convention.
+     `app.mts` dispatch reduced to one line. Unused
+     `sanitizeCharacterForRole` import dropped.
+
+3. **In-memory rate limiter** ✅
+   - **Files:** new `src/lib/rateLimit.mts`,
+     `src/routes/handleRecover.mts`
+   - **Change:** Generic `createRateLimiter({ limit, windowMs, now? })`
+     factory returning `{ check, reset }`. Lazy-expiry `Map<string,
+     {count, resetAt}>` — no timers. `handleRecover` uses **two**
+     independent buckets (lowercased character name + `req.socket.remoteAddress`),
+     5 attempts per minute each. 429 response carries a `Retry-After`
+     header (seconds). Test-only `__resetRecoveryRateLimiters()` exported
+     so test cases don't bleed into one another (existing recover tests
+     gated with `beforeEach`).
+
+4. **Backup code keyspace expansion** ✅
    - **File:** `src/lib/utils.mts`
-   - **Change:** Expand backup code keyspace — add more adjectives and nouns
-     (20+ each), use 4-digit numbers (0000-9999). This increases keyspace
-     from ~32K to ~4M+ combinations.
-   - Rate limiting: add a simple in-memory rate limiter for
-     `POST /api/v1/recover` — max 5 attempts per character name per minute.
-   - **Bug #29** — api-infra-bugs tracker
+   - **Change:** Adjectives expanded from 6 → 22, nouns from 6 → 22,
+     numeric suffix changed to 4-digit zero-padded (`0000-9999`).
+     Resulting keyspace: ≈ 4 840 000 combinations (was ~32 400).
+     Format string unchanged: `${Adj}-${Noun}-${NNNN}`. Existing stored
+     codes remain valid (lookup is exact-match against `byBackupCode`).
+
+5. **Docs** ✅
+   - `docs/data-contracts.md` — backup code section appended noting the
+     wider keyspace and that the format is forward-only (sibling
+     projects must treat it as opaque). Inline schema example updated
+     `NNN → NNNN`.
 
 ### New/Updated Tests
 
-- **`test/api.test.mts`:**
-  - Existing middleware/route tests should still pass after refactor
+- **`test/api.test.mts`** (3 new + `beforeEach` resets on both
+  recover-related describe blocks):
+  - Recovery: 6 sequential POSTs with the same `characterName` → 6th
+    returns **429** with positive `Retry-After` header.
+  - Recovery: 6 sequential POSTs from same client IP with different
+    names → 6th returns **429** (IP bucket).
+  - Existing 4 recovery tests + 1 sanitization test unchanged in
+    behaviour; they now reset the limiter via `beforeEach` so the new
+    rate-limit cases run hermetically.
 
-- **`test/utils.test.mts`:**
-  - Add test: `generateBackupCode()` format matches expected pattern with
-    expanded keyspace
-  - Add test: recovery rate limiting blocks after N attempts
+- **`test/rate-limit.test.mts`** (new — 5 unit tests):
+  - Allows up to limit per key.
+  - Denies (limit + 1) with positive `retryAfterSec`.
+  - Independent keys don't interfere.
+  - Window elapse resets the bucket (uses injectable `now`).
+  - `reset()` clears all buckets.
+
+- **`test/utils.test.mts`** (replaced 3 backup-code tests):
+  - Format regex updated to `/^[A-Z][a-z]+-[A-Z][a-z]+-\d{4}$/`.
+  - Number range updated to 0000–9999.
+  - New: 1000-sample sanity check that ≥15 distinct adjectives and
+    ≥15 distinct nouns appear (keyspace expansion regression).
 
 ### Verification
 
-- `npm run typecheck` clean — this is the key test for middleware types
-- `npm test` — all tests pass
-- No `boolean | void` return types remain in middleware chain types
+- [x] `npm run typecheck` clean — primary signal for the middleware
+  refactor; the old `boolean | void` widening is gone.
+- [x] `npm test` — 444/444 (was 415).
+- [x] `Select-String src\ -Pattern 'createMiddlewareChain' -Recurse` →
+  zero matches.
+- [x] `Select-String src\app.mts -Pattern 'recoverCharacter'` → zero.
+- [x] No `boolean | void` returns in middleware-related types.
 
 ### Files modified
 
-- `src/middleware/index.mts` — redesign chain
-- `src/types.mts` — update middleware types
-- `src/routes/characterRoutes.mts` — use new chain API
-- `src/lib/utils.mts` — expand keyspace
-- `src/app.mts` — add rate limiting to recover endpoint
-- `test/utils.test.mts` — backup code format tests
+- `src/types.mts` — narrow `MiddlewareFn`, drop `MiddlewareChainHandler`,
+  add `RouteChainHandler`.
+- `src/middleware/index.mts` — replace `createMiddlewareChain` with
+  `createRoute`.
+- `src/routes/characterRoutes.mts` — use `createRoute`.
+- `src/routes/portraitRoutes.mts` — use `createRoute`.
+- `src/routes/handleRecover.mts` — **new**; lifted from `app.mts` plus
+  rate-limit wiring + `__resetRecoveryRateLimiters` test export.
+- `src/routes/handlers.mts` — re-export `handleRecover`.
+- `src/lib/rateLimit.mts` — **new**; generic limiter factory.
+- `src/lib/utils.mts` — `generateBackupCode` keyspace expansion.
+- `src/app.mts` — drop inline `/recover` block + unused
+  `sanitizeCharacterForRole` import; import & dispatch `handleRecover`.
+- `docs/data-contracts.md` — backup code forward-compat note + format fix.
+- `test/api.test.mts` — `beforeEach` resets + 2 rate-limit integration tests.
+- `test/rate-limit.test.mts` — **new** unit tests.
+- `test/utils.test.mts` — backup code format tests rewritten.
+
+### Out of scope (intentional)
+
+- `x-forwarded-for` parsing — no reverse proxy in front of the Node
+  server today; revisit if/when one is introduced.
+- Persistent rate-limit state across restarts — single-process file-based
+  deployment, in-memory is sufficient per ADR-003.
+- Generalizing the limiter to other endpoints — `/recover` is the only
+  credential-guessing surface today. Reuse later when needed.
+- Schema version bump for the backup-code format — format isn't versioned.
 
 ---
 

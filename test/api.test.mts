@@ -1,5 +1,5 @@
 import http from "node:http";
-import { describe, it, mock, after } from "node:test";
+import { describe, it, mock, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -58,6 +58,8 @@ mock.module("#config", {
 });
 
 const { startTestServer } = await import("./helpers/http.mts");
+const { __resetRecoveryRateLimiters } =
+  await import("../src/routes/handleRecover.mts");
 server = await startTestServer(tempDir);
 
 const BASE = server.baseUrl;
@@ -643,6 +645,8 @@ describe("DELETE /api/v1/characters/:id", () => {
 // ── Recovery & DM ─────────────────────────────────────────────────
 
 describe("POST /api/v1/recover", () => {
+  beforeEach(() => __resetRecoveryRateLimiters());
+
   it("returns 200 with character for correct name and backupCode", async () => {
     const char = await createTestCharacter(
       { characterName: "Recovara" },
@@ -696,6 +700,63 @@ describe("POST /api/v1/recover", () => {
       body: "{bad json",
     });
 
+    it("returns 429 with Retry-After when the same name is hit too many times", async () => {
+      __resetRecoveryRateLimiters();
+      const payload = JSON.stringify({
+        characterName: "RateLimitedName",
+        backupCode: "Wrong-Code-0001",
+      });
+
+      // First 5 requests pass through to the 404 path (wrong code).
+      for (let i = 0; i < 5; i++) {
+        const res = await fetch(`${BASE}/api/v1/recover`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        });
+        assert.equal(res.status, 404, `request ${i + 1} should be 404`);
+      }
+
+      // 6th hits the limiter.
+      const res = await fetch(`${BASE}/api/v1/recover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      });
+      assert.equal(res.status, 429);
+      const retryAfter = res.headers.get("retry-after");
+      assert.ok(retryAfter, "Retry-After header missing");
+      assert.ok(
+        Number(retryAfter) > 0,
+        `Retry-After ${retryAfter} not positive`,
+      );
+    });
+
+    it("returns 429 when the same client IP exhausts its bucket across different names", async () => {
+      __resetRecoveryRateLimiters();
+      // Different name each request — only the IP bucket should trip.
+      for (let i = 0; i < 5; i++) {
+        const res = await fetch(`${BASE}/api/v1/recover`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            characterName: `IpBucket${i}`,
+            backupCode: "Wrong-Code-0001",
+          }),
+        });
+        assert.equal(res.status, 404, `request ${i + 1} should be 404`);
+      }
+
+      const res = await fetch(`${BASE}/api/v1/recover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          characterName: "IpBucketFinal",
+          backupCode: "Wrong-Code-0001",
+        }),
+      });
+      assert.equal(res.status, 429);
+    });
     assert.equal(res.status, 400);
   });
 });
@@ -1083,6 +1144,8 @@ describe("GET /characters list sanitization", () => {
 });
 
 describe("POST /recover response sanitization", () => {
+  beforeEach(() => __resetRecoveryRateLimiters());
+
   it("returns character with owner-level fields (sanitized, not raw)", async () => {
     const char = await createTestCharacter(
       { characterName: "RecoverSan" },

@@ -1,4 +1,4 @@
-import { createMiddlewareChain } from "#middleware";
+import { createRoute } from "#middleware";
 import { withCharacterPermissions } from "#middleware";
 import { handleGetCharacter } from "./handleGetCharacter.mts";
 import type { ServerResponse } from "node:http";
@@ -9,8 +9,8 @@ export function createCharacterRoute(): (
   res: ServerResponse,
   pathParts: string[],
 ) => Promise<boolean> {
-  const getCharacterApiChain = createMiddlewareChain(
-    withCharacterPermissions,
+  const getCharacterApiChain = createRoute(
+    [withCharacterPermissions],
     handleGetCharacter,
   );
 

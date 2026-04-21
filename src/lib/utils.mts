@@ -8,9 +8,55 @@ function generateId(): string {
 }
 
 function generateBackupCode(): string {
-  const adjectives = ["Iris", "Crystal", "Shadow", "Iron", "Golden", "Silent"];
-  const nouns = ["Wolf", "Dragon", "Phoenix", "Tiger", "Hawk", "Serpent"];
-  const numbers = Math.floor(100 + Math.random() * 900);
+  const adjectives = [
+    "Iris",
+    "Crystal",
+    "Shadow",
+    "Iron",
+    "Golden",
+    "Silent",
+    "Crimson",
+    "Azure",
+    "Emerald",
+    "Obsidian",
+    "Frozen",
+    "Burning",
+    "Ancient",
+    "Hidden",
+    "Sacred",
+    "Wild",
+    "Stormy",
+    "Twilight",
+    "Radiant",
+    "Verdant",
+    "Solemn",
+    "Whispering",
+  ];
+  const nouns = [
+    "Wolf",
+    "Dragon",
+    "Phoenix",
+    "Tiger",
+    "Hawk",
+    "Serpent",
+    "Raven",
+    "Stag",
+    "Bear",
+    "Lion",
+    "Falcon",
+    "Otter",
+    "Lynx",
+    "Boar",
+    "Owl",
+    "Fox",
+    "Griffin",
+    "Wyvern",
+    "Kraken",
+    "Basilisk",
+    "Mantis",
+    "Heron",
+  ];
+  const numbers = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
 
   const adj = adjectives[Math.floor(Math.random() * adjectives.length)]!;
   const noun = nouns[Math.floor(Math.random() * nouns.length)]!;

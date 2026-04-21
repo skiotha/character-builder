@@ -309,9 +309,14 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 
 ---
 
-## Phase 5 — Bug Fixes & Hardening
+## Phase 5 — Bug Fixes & Hardening ✓ DONE
 
 **Goal:** Fix known issues identified in the code audit. Each fix should have a corresponding test (written in Phase 3 or added here).
+
+**Result:** 444 tests passing (385 → 444 over the phase). Typecheck clean.
+All High-, Medium-, and Low-priority items resolved or relocated to a phase
+with the right prerequisites. See [phase5-plan.md](../.github/plans/phase5-plan.md)
+for session-by-session detail (Sessions 0–5 + 4.5).
 
 ### High Priority
 
@@ -356,8 +361,11 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 - [x] Fix `generateDefaultCharacter()` — added `continue` after
       `SERVER_CONTROLLED_FIELDS` check. `schemaVersion` now stamped in
       `createCharacter()` service instead (Phase 5 Session 1).
-- [~] Fix crash on undefined effect target — deferred to Phase 6 Step 0
-      (engine foundation rework replaces this code entirely). **Bug #18.**
+- [x] Fix crash on undefined effect target — `effect.target` guarded in
+      `derived.mts`, non-null assertion removed (Phase 5 Session 4). The
+      remaining `setBase` `split(".")[1]!` assertion is safe today (only
+      reached when `target.startsWith("rules.")`) and is TODO-marked for
+      removal alongside ADR-011 typed targets in Phase 6. **Bug #18.**
 - [x] Fix `validateCharacterUpdate` XP check for `push` on `traits` —
       removed premature XP code (both commented-out `increment` block and
       active but incomplete `push` XP check). Will be rebuilt properly in
@@ -365,15 +373,12 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 
 ### Medium Priority
 
-- [ ] Fix middleware chain type mismatch — `createMiddlewareChain()` accepts
-      `...MiddlewareFn[]` but route handlers (signature `(req, res) → boolean`)
-      are passed in as middleware. This works at runtime because JS ignores
-      extra arguments, but the types are a lie. The `finalHandler?` parameter
-      on `MiddlewareChainHandler` exists for this purpose but is never used.
-      Fix: either (a) make final handlers use `finalHandler` param as intended,
-      or (b) redesign the chain to distinguish middleware from terminal handlers
-      at the type level. During Phase 2, return types were widened to
-      `boolean | void` to paper over this — revert once the design is fixed.
+- [x] Fix middleware chain type mismatch — replaced `createMiddlewareChain`
+      with `createRoute(middlewares: MiddlewareFn[], handler: RouteHandler):
+      RouteChainHandler`. Distinct types for the middleware list and the
+      terminal handler. `MiddlewareFn` return type narrowed back to
+      `Promise<void> | void`. Old `createMiddlewareChain` and
+      `MiddlewareChainHandler` deleted (Phase 5 Session 5).
 - [x] Consolidate domain layer per [ADR-013](decisions/013-domain-layer-mutation-gate.md)
       (Phase 5 Session 4.5). One `updateCharacter` (delegates to storage),
       recalc + broadcast move into the domain layer, handlers and middleware
@@ -383,9 +388,9 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       `skipUndefined` bug in `handleUploadPortrait`.
 - [x] Remove duplicate `deepMerge`/`isObject` in `index.mts` — removed;
       service layer now imports from `#models/traversal` (Phase 5 Session 1).
-- [ ] Extract shared `byId` index-entry builder in `storage.mts` —
-      `updateIndexMetadata()` and `saveCharacter()` build the same object
-      literal. Factor into a helper to keep in sync.
+- [x] Extract shared `byId` index-entry builder in `storage.mts` —
+      private `buildIndexEntry(character)` helper used by both
+      `updateIndexMetadata()` and `saveCharacter()` (Phase 5 Session 4).
 - [x] Implement CORS origin whitelisting (ADR-007) — new `src/lib/cors.mts`
       with env-driven `CORS_ORIGINS`. Replaces `*` wildcard. Always sets
       `Vary: Origin`. Production env file added (Phase 5 Session 3).
@@ -426,25 +431,32 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
       Already resolved before Phase 5.
 - [x] Fix DELETE route — extracted into `handleDeleteCharacter.mts`
       (Phase 5 Session 4)
-- [ ] Remove dead/commented code throughout the codebase
+- [x] Remove dead/commented code throughout the codebase — deleted
+      unused `createAlias`/`resolveAlias` stubs and `ALIAS_FILE` from
+      `storage.mts`; removed stale `console.log("ERRORS ON PATCH", …)`;
+      cleaned dead XP code from `validation.mts`; deleted dead
+      `src/rules/xp.mts`. Service-layer `createCharacter` reduced to a
+      thin wrapper after removing dead duplicate validation/merge
+      (Phase 5 Sessions 1–4).
 - [x] Resolve `handleGetCharacters` `@TODO: disable dm handing` — removed
       stale TODO, fixed typo. DM path kept (auth-gated); sanitization from
       bug #27 fix addresses data exposure (Phase 5 Session 2).
       **Bug #28 — api-infra-bugs tracker.**
-- [ ] Harden recovery endpoint — `generateBackupCode()` in
-      `src/lib/utils.mts` produces only 6 adj × 6 noun × 900 numbers =
-      **32,400 combinations**. `POST /api/v1/recover` (`src/app.mts`
-      line 325) has no rate limiting or lockout. A simple script could
-      recover any character by name + enumeration. Fix: (a) expand
-      keyspace (more words, longer numbers), (b) add per-IP or per-name
-      rate limiting on failed attempts, (c) consider lockout after N
-      failures. Low risk given ADR-003 trusted userbase.
+- [x] Harden recovery endpoint — keyspace expanded to 22 × 22 × 10 000 ≈
+      **4.84M combinations** (was ~32K). `/recover` extracted to
+      `src/routes/handleRecover.mts` and gated by an in-memory
+      `createRateLimiter` (5/min) on **two** independent buckets —
+      lowercased character name and `req.socket.remoteAddress` — with a
+      429 + `Retry-After` response on overflow (Phase 5 Session 5).
       **Bug #29 — api-infra-bugs tracker.**
 
-**Deliverable:** All server-side bugs fixed and hardened. All fixes covered
-by tests. Client-side items deferred to Phase 8. RPG-engine-dependent items
-deferred to Phase 6. See [phase5-plan.md](../.github/plans/phase5-plan.md)
-for session-by-session breakdown.
+**Deliverable:** ✅ All server-side bugs fixed and hardened. All fixes covered
+by tests (444 / 444 green; +59 from Phase 4 baseline of 385). Client-side
+items deferred to Phase 8. RPG-engine-dependent items (`#19`, `#20`, `#21`,
+`#22`, `#23`, plus the residual `setBase` non-null assertion) deferred to
+Phase 6 Step 0 — they are subsumed by the typed pipeline rewrite. See
+[phase5-plan.md](../.github/plans/phase5-plan.md) for session-by-session
+breakdown.
 
 ---
 

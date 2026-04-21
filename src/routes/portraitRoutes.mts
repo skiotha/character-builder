@@ -1,6 +1,6 @@
 import type { ServerResponse } from "node:http";
 
-import { createMiddlewareChain, withCharacterPermissions } from "#middleware";
+import { createRoute, withCharacterPermissions } from "#middleware";
 import { handleUploadPortrait } from "./handleUploadPortrait.mts";
 
 import type { NagaraRequest } from "#types";
@@ -10,8 +10,8 @@ export function createPortraitRoute(): (
   res: ServerResponse,
   pathParts: string[],
 ) => Promise<boolean> {
-  const uploadPortraitChain = createMiddlewareChain(
-    withCharacterPermissions,
+  const uploadPortraitChain = createRoute(
+    [withCharacterPermissions],
     handleUploadPortrait,
   );
 

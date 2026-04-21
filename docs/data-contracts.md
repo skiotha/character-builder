@@ -16,7 +16,7 @@ This is the **source of truth** — all other formats derive from it.
 {
   // ── Server-controlled metadata ──
   "id":            "uuid",              // generated, immutable
-  "backupCode":    "Adjective-Noun-NNN",// generated, recovery credential
+  "backupCode":    "Adjective-Noun-NNNN",// generated, recovery credential
   "playerId":      "string",            // self-asserted player identity (see ADR-003)
   "player":        "string",            // display name
   "created":       "ISO-8601",          // set once on creation
@@ -204,6 +204,16 @@ Roles are determined per-request:
 - **public**: everyone else
 
 Fields marked `serverControlled: true` cannot be set by any client — they are generated and maintained by the server (id, backupCode, created, lastModified, portrait.path, portrait.status).
+
+### Backup code format
+
+The `backupCode` is the user-facing recovery credential, formatted as
+`Adjective-Noun-NNNN` (e.g. `Crimson-Wyvern-0473`). The keyspace is at least
+20 adjectives × 20 nouns × 10 000 numbers (≈ 4 000 000+ combinations). The
+format is **forward-only**: previously issued codes (e.g. older 3-digit
+suffix variants) remain valid forever — the server resolves them by exact
+string match against the index. Sibling projects must not parse or
+validate the format; treat the value as an opaque string.
 
 Common permission patterns:
 - **Read-write** (most owner fields): `{ read: true, write: true }` for owner/dm, `{ read: true, write: false }` for public

@@ -3,20 +3,18 @@ import type { ServerResponse } from "node:http";
 import type {
   NagaraRequest,
   MiddlewareFn,
-  MiddlewareChainHandler,
+  RouteHandler,
+  RouteChainHandler,
 } from "#types";
 
-export function createMiddlewareChain(
-  ...middlewares: MiddlewareFn[]
-): MiddlewareChainHandler {
+export function createRoute(
+  middlewares: MiddlewareFn[],
+  handler: RouteHandler,
+): RouteChainHandler {
   return async (
     req: NagaraRequest,
     res: ServerResponse,
     pathParts: string[],
-    finalHandler?: (
-      req: NagaraRequest,
-      res: ServerResponse,
-    ) => Promise<boolean | void> | boolean | void,
   ) => {
     try {
       let index = 0;
@@ -25,8 +23,8 @@ export function createMiddlewareChain(
         if (index < middlewares.length) {
           const middleware = middlewares[index++]!;
           await middleware(req, res, pathParts, next);
-        } else if (finalHandler) {
-          await finalHandler(req, res);
+        } else {
+          await handler(req, res);
         }
       };
 
@@ -46,7 +44,7 @@ export function createMiddlewareChain(
         );
       }
 
-      console.error("Middleware chain error:", error);
+      console.error("Route chain error:", error);
 
       return true;
     }

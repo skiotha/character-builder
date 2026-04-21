@@ -28,14 +28,13 @@ Key layers:
 
 - `src/types.mts` — app infrastructure types (request, middleware, validation, storage)
 - `src/rpg-types.mts` — RPG domain types (Character, Effect, attributes, equipment)
-- `src/lib/` — config, logger, auth, utilities
-- `src/models/` — character schema, storage, validation, traversal
+- `src/lib/` — config, logger, auth, body parsing, CORS, rate limiter, utilities
+- `src/models/` — domain layer (mutation gate per ADR-013), schema, storage, validation, traversal
 - `src/rules/` — RPG rules engine (derived stats, effects, attributes)
-- `src/routes/` — API handlers and route wiring
+- `src/routes/` — API handlers and route wiring (`createRoute(middlewares, handler)`)
 - `src/middleware/` — auth and permission middleware
-- `src/renderers/` + `src/templates/` — server-rendered HTML views (being removed per ADR-009)
-- `src/sse/` — SSE broadcast channels
-- `public/` — static client files (SPA, styles, assets)
+- `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
+- `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
 - `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
@@ -87,6 +86,7 @@ node --experimental-test-module-mocks --test test/foo.test.mts  # Run a single t
 - Tests run via: `node --experimental-test-module-mocks --test test/**/*.test.mts`
 - `noUncheckedIndexedAccess` is enabled — array/index accesses return `T | undefined`. Use `!` non-null assertion on values you know exist (e.g. `mock.calls[0]!`) rather than adding unnecessary guards in test code.
 - To mock subpath imports (e.g. `#config`, `#sse`), use `mock.module("#config", { namedExports: { ... } })` — this requires the `--experimental-test-module-mocks` flag (already in `npm test` and the single-test command above).
+- **Mock-before-import gotcha:** A static `import { handleX } from "./foo.mts"` at the top of a test file evaluates `foo.mts` (and its transitive imports of `#config`, `#auth`, etc.) **before** any `mock.module(...)` call inside `before()` runs. The handler then closes over the real module and your mocks have no effect. Fix: import the handler dynamically *after* the mock is installed — `const { handleX } = await import("./foo.mts")` inside the `before()` hook (same pattern `startTestServer` uses). Symptom: auth/permission tests pass with real values but fail with mocked ones.
 - Shared test helpers live in `test/helpers/`: `fixtures.mts` (character factories), `temp-dir.mts` (isolated `DATA_DIR`), `http.mts` (test server), `mock-response.mts` (response spy). Use them rather than recreating test infrastructure.
 
 ### Static File Serving & URL Mapping
@@ -117,6 +117,13 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
 - Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`
+- Canonical RPG rules reference (attributes, formulas, effect tiers, combat) is kept as a Copilot repo memory (`nagara-rpg-rules.md`). Surface it explicitly when working on Phase 6 / engine code.
+
+### Bug Trackers
+
+- `.github/bugs/engine-weak-points.md` — RPG engine bugs and design weaknesses
+- `.github/bugs/api-infra-bugs.md` — API, HTTP, security, validation infrastructure bugs (also lists Phase 5-deferred ops items: `x-forwarded-for` parsing, persistent rate-limit state, generalizing the limiter)
+- These are **mutable trackers**, not stable repo facts — edit them as bugs are opened/closed. Do **not** put new bug trackers under `/memories/repo/`; that scope is `create`-only and unsuitable for living docs.
 
 ### Domain Layer (ADR-013)
 
@@ -139,17 +146,19 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 
 See `docs/roadmap.md` for the full phased work plan. Quick reference:
 
-| Phase | Focus                            |
-| ----- | -------------------------------- |
-| 0     | Documentation & decisions (done) |
-| 1     | Project restructure (done)       |
-| 2     | TypeScript migration (done)      |
-| 3     | Schema-driven rendering          |
-| 4     | Testing                          |
-| 5     | Bug fixes & hardening            |
-| 6     | RPG Engine                       |
-| 7     | Sibling project integration      |
-| 8     | Polish & beyond MVP              |
+| Phase | Focus                            | Status      |
+| ----- | -------------------------------- | ----------- |
+| 0     | Documentation & decisions        | ✅ Done     |
+| 1     | Project restructure              | ✅ Done     |
+| 2     | TypeScript migration             | ✅ Done     |
+| 3     | Schema-driven rendering          | ✅ Done     |
+| 4     | Testing                          | ✅ Done\*   |
+| 5     | Bug fixes & hardening            | ✅ Done     |
+| 6     | RPG Engine                       | Not started |
+| 7     | Sibling project integration      | Not started |
+| 8     | Polish & beyond MVP              | Not started |
+
+\* _Server-side tests complete (444). Engine + client-side test suites run alongside Phases 6 and 8 respectively._
 
 ## Sibling Projects
 

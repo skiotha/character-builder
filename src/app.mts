@@ -6,7 +6,6 @@ import { URL } from "node:url";
 import { requireDmToken } from "#auth";
 import * as nagara from "#models";
 import * as backup from "./lib/backup.mts";
-import { sanitizeCharacterForRole } from "#models/sanitization";
 import { recalculateDerivedFields } from "#rules";
 import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
 import {
@@ -17,6 +16,7 @@ import {
   handleCreateCharacter,
   handleDeleteCharacter,
   handleCharacterStream,
+  handleRecover,
 } from "#routes";
 import { applyCors } from "./lib/cors.mts";
 import { BodyTooLargeError, MAX_JSON_BODY, readBody } from "./lib/body.mts";
@@ -294,39 +294,7 @@ async function handleApi(
 
     // POST /api/v1/recover
     if (req.method === "POST" && pathParts[0] === "recover") {
-      try {
-        const body = await readBody(req, MAX_JSON_BODY);
-        const { characterName, backupCode } = JSON.parse(body);
-        const character = await nagara.recoverCharacter(
-          characterName,
-          backupCode,
-        );
-
-        if (character) {
-          const sanitized = sanitizeCharacterForRole(
-            character as Record<string, unknown>,
-            "owner",
-          );
-          res.writeHead(200);
-          res.end(JSON.stringify(sanitized));
-        } else {
-          res.writeHead(404);
-          res.end(
-            JSON.stringify({
-              error: "Character not found or invalid backup code",
-            }),
-          );
-        }
-      } catch (error) {
-        if (error instanceof BodyTooLargeError) {
-          res.writeHead(413);
-          res.end(JSON.stringify({ error: error.message }));
-        } else {
-          res.writeHead(400);
-          res.end(JSON.stringify({ error: (error as Error).message }));
-        }
-      }
-      return;
+      return void (await handleRecover(req, res));
     }
 
     // GET /api/v1/config

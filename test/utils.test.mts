@@ -26,30 +26,35 @@ describe("generateId", () => {
 // ── generateBackupCode ────────────────────────────────────────────
 
 describe("generateBackupCode", () => {
-  const ADJECTIVES = ["Iris", "Crystal", "Shadow", "Iron", "Golden", "Silent"];
-  const NOUNS = ["Wolf", "Dragon", "Phoenix", "Tiger", "Hawk", "Serpent"];
-
-  it("matches Word-Word-NNN pattern", () => {
-    assert.match(generateBackupCode(), /^[A-Z][a-z]+-[A-Z][a-z]+-\d{3}$/);
+  it("matches Word-Word-NNNN pattern (4-digit zero-padded number)", () => {
+    for (let i = 0; i < 100; i++) {
+      assert.match(generateBackupCode(), /^[A-Z][a-z]+-[A-Z][a-z]+-\d{4}$/);
+    }
   });
 
-  it("uses a number between 100 and 999", () => {
-    for (let i = 0; i < 50; i++) {
+  it("uses a number between 0000 and 9999", () => {
+    for (let i = 0; i < 100; i++) {
       const code = generateBackupCode();
-      const num = Number(code.split("-")[2]);
-      assert.ok(num >= 100 && num <= 999, `${num} out of range in "${code}"`);
+      const numStr = code.split("-")[2]!;
+      assert.equal(numStr.length, 4, `"${numStr}" not 4 digits in "${code}"`);
+      const num = Number(numStr);
+      assert.ok(num >= 0 && num <= 9999, `${num} out of range in "${code}"`);
     }
   });
 
-  it("uses adjectives and nouns from the known lists", () => {
-    for (let i = 0; i < 50; i++) {
+  it("draws from an expanded keyspace (≥15 distinct adjectives and nouns over 1000 samples)", () => {
+    const adjectives = new Set<string>();
+    const nouns = new Set<string>();
+    for (let i = 0; i < 1000; i++) {
       const parts = generateBackupCode().split("-");
-      assert.ok(
-        ADJECTIVES.includes(parts[0]!),
-        `"${parts[0]}" not in adjective list`,
-      );
-      assert.ok(NOUNS.includes(parts[1]!), `"${parts[1]}" not in noun list`);
+      adjectives.add(parts[0]!);
+      nouns.add(parts[1]!);
     }
+    assert.ok(
+      adjectives.size >= 15,
+      `only ${adjectives.size} distinct adjectives observed`,
+    );
+    assert.ok(nouns.size >= 15, `only ${nouns.size} distinct nouns observed`);
   });
 });
 
@@ -57,10 +62,7 @@ describe("generateBackupCode", () => {
 
 describe("validateCharacter", () => {
   it("throws when characterName is missing", () => {
-    assert.throws(
-      () => validateCharacter({}),
-      /at least 2 characters/,
-    );
+    assert.throws(() => validateCharacter({}), /at least 2 characters/);
   });
 
   it("throws when characterName is 1 character", () => {
