@@ -33,13 +33,21 @@ The Nagara Character Builder is a web application for creating and managing RPG 
 │   └───────────────────────────────────────────────────────────┘      │
 │                                                                      │
 │   ┌───────────────────────────────────────────────────────────┐      │
-│   │                    Data Layer                             │      │
+│   │                    Data Layer (runtime, gitignored)       │      │
 │   │   data/characters/*.json   data/index.json                │      │
 │   │   data/uploads/portraits/  data/backups/                  │      │
 │   └───────────────────────────────────────────────────────────┘      │
 │                                                                      │
 │   ┌───────────────────────────────────────────────────────────┐      │
-│   │                    RPG Rules Vault                        │      │
+│   │              Reference Catalog (authored, committed)      │      │
+│   │   reference/abilities.{en,ru}.json                        │      │
+│   │   reference/spells.{en,ru}.json                           │      │
+│   │   reference/{boons,sins,rituals}.{en,ru}.json             │      │
+│   │   reference/{weapons,armor,runes}.{en,ru}.json            │      │
+│   └───────────────────────────────────────────────────────────┘      │
+│                                                                      │
+│   ┌───────────────────────────────────────────────────────────┐      │
+│   │              RPG Rules Vault (authored, committed)        │      │
 │   │   rpg/{locale}/01-core/     rpg/{locale}/03-reference/    │      │
 │   │   rpg/{locale}/02-lore/     rpg/_meta/                    │      │
 │   └───────────────────────────────────────────────────────────┘      │
@@ -74,6 +82,7 @@ Entry point for all HTTP requests. Responsibilities:
 - Route API requests (`/api/v1/...`) to handlers
 - Serve static client files from `public/`
 - Serve uploaded portraits from `data/uploads/`
+- Serve reference catalogues from `reference/` (Phase 6+)
 - CORS headers (see ADR-007)
 - SPA fallback (serve `index.html` for unmatched client routes)
 
@@ -167,13 +176,39 @@ Vanilla JavaScript SPA served as static files.
 
 ### 3.10 RPG Rules Vault
 
-Canonical RPG rules authored as Markdown in an Obsidian vault (`rpg/`).
+Canonical RPG rules authored as Markdown in an Obsidian vault (`rpg/`). This
+is the **prose** form of the rules — full free-form rule text, lore, and
+reference galleries — meant for human reading and as the source of truth
+when authoring or revising mechanics.
 
 - **Structure:** `rpg/{locale}/{section}/{topic}.md` — locale-first, numbered sections for reading order
 - **Sections:** `01-core/` (mechanics), `02-lore/` (world lore), `03-reference/` (exhaustive galleries)
 - **Metadata:** `rpg/_meta/` holds the changelog; `rpg/.obsidian/` is gitignored
-- **Relationship to `data/*.json`:** The Markdown files are human-authored prose (rules as written). The JSON files in `data/` are machine-readable structured data (rules as encoded for the engine). Both are committed to the repo, but serve different audiences and have different lifecycles.
 - **Localizations:** `rpg/ru/` is the canonical authoring language. `rpg/en/` is pending translation.
+
+### 3.11 Reference Catalog
+
+Machine-readable JSON catalogues of the rules content the engine consumes
+(`reference/`). This is the **structured** companion to the prose vault:
+abilities, spells, talents (boons/sins), rituals, and (Phase 6+) weapons,
+armor, and runes — each per locale.
+
+- **Structure:** `reference/{topic}.{locale}.json` — flat, locale-as-suffix
+- **Audience:** the rules engine, the schema-driven client, and the sibling
+  projects (addon export, Discord bot lookup) — see
+  [`docs/data-contracts.md`](data-contracts.md),
+  [`docs/addon-integration.md`](addon-integration.md),
+  [`docs/bot-integration.md`](bot-integration.md).
+- **Lifecycle:** authored canon. Committed to the repo, immutable at runtime,
+  identical across deployments. Loaded once at startup by
+  `src/rules/registry.mts` (Phase 6 Step 0).
+- **Distinct from `data/`:** `data/` is runtime, mutable, gitignored,
+  per-deployment state (characters, index, backups, uploads). `reference/` is
+  authored content that ships with the codebase.
+- **Distinct from `rpg/`:** `rpg/` is the human-readable prose form;
+  `reference/` is the engine-readable encoded form. Both are committed and
+  authoritative; they describe the same rules at different fidelities for
+  different audiences.
 
 ## 4. Data Flow
 

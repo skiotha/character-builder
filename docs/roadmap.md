@@ -491,6 +491,41 @@ Architectural decisions recorded as ADRs:
 - [ ] Update `docs/deferred-tasks.md` with architectural decisions
 - [ ] Update `docs/data-contracts.md` §1.1 with final vocabulary
 
+### Gate: Reference Catalog Relocation
+
+Reference catalog files (`abilities`, `spells`, `boons`, `sins`, `rituals` ×
+`en`/`ru`, plus the `weapons`/`armor`/`runes` files added in Step 1) currently
+sit in [`data/`](../data/) alongside runtime mutable state (`characters/`,
+`index.json`, `backups/`, `uploads/`). They are authored canon — committed,
+read-only at runtime, served to clients and sibling projects — and have
+nothing in common with the runtime state they're nested with. With the Step 1
+additions about to double the catalog, this needs to be sorted before the
+engine starts depending on it.
+
+Move them to a new top-level `reference/` directory, sibling to `data/` and
+[`rpg/`](../rpg/). The two vaults then map cleanly onto each other: `rpg/`
+holds the **prose** rules (Obsidian Markdown, full free-form rule text);
+`reference/` holds the **structured** rules (machine-readable JSON catalogues
+the engine consumes). `data/` is left as the runtime, mutable, gitignored
+state-per-deployment directory.
+
+- [ ] Add `REFERENCE_DIR` to [`src/lib/config.mts`](../src/lib/config.mts)
+      (`<root>/reference`)
+- [ ] Move existing canon files: `abilities`, `spells`, `boons`, `sins`,
+      `rituals` × `en`/`ru` → `reference/`
+- [ ] Update [`src/models/abilities.mts`](../src/models/abilities.mts) — also
+      reconcile the legacy `data/abilities.json` (no locale suffix) read with
+      the localized `abilities.{locale}.json` convention used everywhere else
+- [ ] Update test helper [`test/helpers/http.mts`](../test/helpers/http.mts)
+      seed paths
+- [ ] Update static-file mapping table in
+      [`.github/copilot-instructions.md`](../.github/copilot-instructions.md)
+- [ ] Update path references in `docs/bot-integration.md`,
+      `docs/addon-integration.md`, `docs/data-contracts.md`,
+      `docs/deferred-tasks.md`, `docs/architecture.md`
+- [ ] Update repo memory (`/memories/repo/nagara-rpg-rules.md`,
+      `/memories/repo/character-builder.md`) with the new reference path
+
 ### Step 0 — Engine Foundation Rework
 
 Rewrite the rules engine foundation per ADR-010 and ADR-011 before building
@@ -546,14 +581,15 @@ dotted-path + numeric-priority approach.
 ### Step 1 — Reference Data Files
 
 Create missing reference data for equipment pick-lists and validation.
+Files land in `reference/` (see Gate above).
 
-- [ ] `data/weapons.en.json` — weapon catalog with type, damage, qualities
-- [ ] `data/weapons.ru.json` — Russian localization
-- [ ] `data/armor.en.json` — armor catalog with slot, defense, qualities
-- [ ] `data/armor.ru.json` — Russian localization
-- [ ] `data/runes.en.json` — rune catalog with description, qualities
-- [ ] `data/runes.ru.json` — Russian localization
-- [ ] Decide on `data/traditions.en.json` — separate file vs. filtered
+- [ ] `reference/weapons.en.json` — weapon catalog with type, damage, qualities
+- [ ] `reference/weapons.ru.json` — Russian localization
+- [ ] `reference/armor.en.json` — armor catalog with slot, defense, qualities
+- [ ] `reference/armor.ru.json` — Russian localization
+- [ ] `reference/runes.en.json` — rune catalog with description, qualities
+- [ ] `reference/runes.ru.json` — Russian localization
+- [ ] Decide on `reference/traditions.en.json` — separate file vs. filtered
       ability IDs
 
 ### Step 2 — Effect Normalization
@@ -564,8 +600,8 @@ Categorize and rewrite reference data effects to canonical form.
 - [ ] Categorize all ~147 spell tier effects into Tier A/B/C
 - [ ] Convert Tier A effects to canonical `{ target, modifier }` shape
 - [ ] Add structured effects to talents/rituals where applicable
-- [ ] Retire `data/abilities.normalized-effects.json` (replaced by canonical
-      effects in `abilities.en.json`)
+- [ ] Retire `reference/abilities.normalized-effects.json` (replaced by
+      canonical effects in `reference/abilities.en.json`)
 
 ### Step 3 — Applicator Alignment
 
@@ -585,7 +621,8 @@ Wire ability/spell lookups into the rules engine. The pipeline structure
 (from Step 0) is already in place; this step populates it with real data.
 
 - [ ] Build a lookup function: `(id, tier) → ResolvedEffect[]`
-      reads from `abilities.en.json` / `spells.en.json` at runtime
+      reads from `reference/abilities.en.json` / `reference/spells.en.json`
+      at runtime
 - [ ] In `recalculate()`, resolve `character.traits[]`
       via `collectAllEffects` (Step 0 skeleton)
 - [ ] Remove any remaining `traits`-based effect resolution code
