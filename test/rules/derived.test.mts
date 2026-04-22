@@ -481,7 +481,7 @@ describe("recalculateDerivedFields", () => {
               ],
             },
           ],
-          armor: { body: { defense: 3 }, plug: null },
+          armor: { body: { armor: 3 }, plug: null },
         },
         combat: {
           weapons: [0],

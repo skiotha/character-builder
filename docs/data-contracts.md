@@ -140,24 +140,80 @@ This is the **source of truth** — all other formats derive from it.
 
 ### 1.1 Effect Object
 
+The canonical shape is locked in [ADR-015 — Typed Effect Targets, Final Vocabulary](decisions/015-typed-effect-targets-final.md) (supersedes ADR-011) and [ADR-014 — Per-Slot Combat, Special Attacks & Reactions](decisions/014-per-slot-combat-special-attacks.md).
+
 ```jsonc
 {
   "id":          "string",
   "source":      "ability" | "spell" | "item" | "ritual" | "rule",
   "name":        "string",
   "description": "string",
-  "target":      "string",             // dotted path, e.g. "rules.defense.base"
-  "modifier": {
-    "type":  "setBase" | "addFlat" | "multiply" | "cap",
-    "value": "string | number"         // attribute name or numeric amount
-  },
-  "priority":    10,                   // lower = applied first
-  "duration":    null                  // null = permanent, or ISO-8601 expiry
+  "target":      EffectTarget,          // typed discriminated union, see below
+  "modifier":    EffectModifier,        // per-phase shape, see below
+  "duration":    null                   // null = permanent, or ISO-8601 expiry
 }
 ```
 
-> **Known issue:** The current `applicator.mjs` uses `add`/`mul`/`set` instead
-> of the canonical types above. This must be aligned — see roadmap Phase 4.
+The legacy dotted-path `target` strings, the `add`/`mul`/`set` modifier verbs, and the `priority` field are removed. Phase order replaces priority; effects within a single phase are commutative.
+
+#### `EffectTarget` (5-kind discriminated union)
+
+| `kind`          | Shape                                                       | Notes                                                                  |
+| --------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `secondary`     | `{ kind: "secondary", attribute: SecondaryName }`           | `defense`, `armor`, `toughness.max`, `corruptionMax`, `pain`, `xpMax`. |
+| `combat`        | `{ kind: "combat", field: CombatField }`                    | `baseDamage`, `bonusDamage`, `attackAttribute`.                        |
+| `weaponQuality` | `{ kind: "weaponQuality", quality, appliesTo? }`            | Adds/removes a quality on weapons matching every `WeaponPredicate`.    |
+| `armorQuality`  | `{ kind: "armorQuality", quality, slot? }`                  | Adds/removes a quality on the armor in `slot` (default `body`).        |
+| `flag`          | `{ kind: "flag", name: string }`                            | Boolean toggle consumed by rules / UI.                                 |
+
+`CheckTarget` is dropped — checks are derived from primaries/secondaries, not modified directly.
+
+#### `WeaponPredicate` (AND-composed)
+
+```jsonc
+{ "kind": "any" | "type" | "quality" | "id", "values": ["string"] }
+```
+
+`appliesTo: WeaponPredicate[]` is AND-composed; default is a single `{ kind: "any", values: [] }`. Predicate `kind: "subtype"` is **not** part of the vocabulary.
+
+#### `EffectModifier` (per phase)
+
+| `type`       | Shape                                          | Phase                       |
+| ------------ | ---------------------------------------------- | --------------------------- |
+| `setBase`    | `{ type: "setBase", value: string \| number }` | Base swap (e.g. attribute). |
+| `addFlat`    | `{ type: "addFlat", value: number }`           | Flat add after formula.     |
+| `multiply`   | `{ type: "multiply", value: number }`          | Multiplicative.             |
+| `cap`        | `{ type: "cap", value: number }`               | Upper bound.                |
+| `remove`     | `{ type: "remove" }`                           | Strikes a quality / flag.   |
+
+Invariant: negatives are only ever **removed**; positives only ever **added**. This is what makes dropping `priority` safe.
+
+#### Canonical reference vocabularies
+
+Sourced from the reference files in `data/`:
+
+| Domain          | Allowed values                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Weapon `type`   | See `data/weapons.{locale}.json` `type` field. Includes `melee`, `ranged`, `thrown`, `natural`, etc.                                                       |
+| Weapon `quality`| See `data/weapons.{locale}.json` `qualities`. Includes `own` (restricted to `natural_weapon`, `war_claws`, `heels`).                                       |
+| Weapon `id`     | `id` field of any entry in `data/weapons.{locale}.json`.                                                                                                   |
+| Armor `quality` | See `data/armor.{locale}.json` `qualities`. Includes `hampering` (single literal, no `_N` suffix — magnitude is implicit in the armor's `armor` value).    |
+| Armor `slot`    | `body` \| `plug`. **There is no `armor.type` field.**                                                                                                       |
+
+The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. (Existing stored characters with `equipment.armor.body.defense` continue to read correctly via a transition fallback in the reader; the fallback is removed in Chunk D.)
+
+#### Combat shape
+
+```jsonc
+{
+  "carried": [Slot | null, Slot | null, Slot],   // exactly 3 entries; slot 2 required
+  "attackAttribute": "accurate",
+  "baseDamage": 0,
+  "bonusDamage": []
+}
+```
+
+Slot 2 is invariably non-null and must reference a weapon with the `own` quality (default `natural_weapon`). There is no `combat.active` field; the combat phase fans out per slot. `SpecialAttack[]` and `Reaction[]` are derived arrays produced by the engine; their shape is documented in ADR-014.
 
 ### 1.2 Learned Trait / Talent / Ritual
 
@@ -176,8 +232,7 @@ Rituals use a level model:
 { "id": "string", "level": 1 }
 ```
 
-The `id` references the canonical definition in the corresponding reference
-data file (e.g. `data/abilities.en.json` for traits with `source: "ability"`).
+The `id` references the canonical definition in the corresponding reference data file (e.g. `data/abilities.en.json` for traits with `source: "ability"`).
 
 ---
 

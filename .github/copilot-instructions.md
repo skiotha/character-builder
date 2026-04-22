@@ -40,7 +40,8 @@ Key layers:
 
 ## Key Design Decisions
 
-All decisions are documented as ADRs in `docs/decisions/`. Key ones:
+All decisions are documented as ADRs in `docs/decisions/`. The index also lives
+in [`docs/decisions/README.md`](../docs/decisions/README.md). Key ones:
 
 - **ADR-001:** Zero external dependencies. No npm runtime deps.
 - **ADR-002:** File-based JSON storage. One file per character.
@@ -51,9 +52,11 @@ All decisions are documented as ADRs in `docs/decisions/`. Key ones:
 - **ADR-007:** Strict CORS with explicit origin whitelist.
 - **ADR-008:** TypeScript via Node.js strip-types (no build step).
 - **ADR-010:** Effect resolution pipeline — explicit phases (`setBase` → formulas → `addFlat` → `multiply` → `cap` → flags), typed `Character` state, unified effect collection from all sources.
-- **ADR-011:** Typed effect targets — discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | check`) replacing dotted-path strings. Exhaustive switch/case handling.
+- **ADR-011:** ~~Typed effect targets — initial discriminated-union design.~~ Superseded by ADR-015.
 - **ADR-012:** Standards-first HTML, CSS & Web Platform conventions. Semantic markup, `@layer`/`@scope`/native nesting, native widgets over custom JS, modern CSS and Web APIs preferred.
 - **ADR-013:** Domain layer as the mutation gate. `src/models/index.mts` is the single entry point for character mutations; storage is internal. Handlers and middleware import from `#models`, never `#models/storage` (carve-outs: `src/lib/backup.mts` and code inside `src/models/` itself).
+- **ADR-014:** Per-slot combat, special attacks & reactions. `combat.carried` is `[Slot|null, Slot|null, Slot]`; slot 2 is required and must reference a weapon with the `own` quality (default `natural_weapon`). Combat phase fans out per slot. `SpecialAttack[]` / `Reaction[]` are derived collections distinguished by `trigger === "manual"`. Tier stacking is additive.
+- **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). 5-kind discriminated union (`secondary | combat | weaponQuality | armorQuality | flag`), `WeaponPredicate` (`any | type | quality | id`, AND-composed via `appliesTo`), per-phase `EffectModifier` shapes including `remove`, no `priority` field.
 
 ## Coding Guidelines
 

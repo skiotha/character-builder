@@ -4,11 +4,16 @@
 > to future sessions. Each section is self-contained and can be tackled
 > independently.
 >
-> **Architectural decisions (April 2026):**
+> **Architectural decisions:**
 > - [ADR-010](decisions/010-effect-resolution-pipeline.md) — Effect resolution
 >   pipeline: explicit phases, typed state, unified effect collection
-> - [ADR-011](decisions/011-typed-effect-targets.md) — Typed effect targets:
->   discriminated union replacing dotted-path strings
+> - [ADR-011](decisions/011-typed-effect-targets.md) — Typed effect targets
+>   *(superseded; kept for history)*
+> - [ADR-014](decisions/014-per-slot-combat-special-attacks.md) — Per-slot
+>   combat, special attacks & reactions (subsumes §3 below)
+> - [ADR-015](decisions/015-typed-effect-targets-final.md) — Typed effect
+>   targets, final vocabulary (5-kind union, `WeaponPredicate`, `EffectModifier`
+>   incl. `remove`, no `priority`)
 >
 > These ADRs define the foundation that the tasks below build upon. See
 > roadmap Phase 6 Step 0 for the implementation plan.
@@ -21,19 +26,18 @@
 
 The reference data files use **free-text effect descriptions** that the rules
 engine cannot process. The `Character.effects[]` array and the applicator
-expect a canonical shape:
+expect a canonical shape (per ADR-015):
 
 ```jsonc
 {
   "id":       "string",
   "source":   "ability" | "spell" | "item" | "ritual" | "rule",
   "name":     "string",
-  "target":   { "kind": "secondary", "stat": "defense" },  // typed target per ADR-011
+  "target":   { "kind": "secondary", "attribute": "defense" },  // typed target
   "modifier": {
-    "type":  "setBase" | "addFlat" | "multiply" | "cap",
-    "value": "resolute" | 5                     // attribute name or number
+    "type":  "setBase" | "addFlat" | "multiply" | "cap" | "remove",
+    "value": "resolute" | 5                       // omitted for "remove"
   },
-  "priority":    10,
   "duration":    null
 }
 ```
@@ -69,28 +73,27 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
 
 **Tier A — Fully Mechanical** (can be expressed as canonical Effect objects):
 - Attribute substitution: "Use Discreet instead of Quick for Defense"
-  → `{ target: { kind: "secondary", stat: "defense" }, modifier: { type: "setBase", value: "discreet" } }`
+  → `{ target: { kind: "secondary", attribute: "defense" }, modifier: { type: "setBase", value: "discreet" } }`
 - Flat bonuses: "+1d4 damage", "+2 to Cunning checks"
   → `{ target: { kind: "combat", field: "bonusDamage" }, modifier: { type: "addFlat", value: 4 } }`
 - Multipliers: "Double your Pain Threshold"
-  → `{ target: { kind: "secondary", stat: "painThreshold" }, modifier: { type: "multiply", value: 2 } }`
+  → `{ target: { kind: "secondary", attribute: "pain" }, modifier: { type: "multiply", value: 2 } }`
 - Caps: "Defense cannot exceed 10"
-  → `{ target: { kind: "secondary", stat: "defense" }, modifier: { type: "cap", value: 10 } }`
+  → `{ target: { kind: "secondary", attribute: "defense" }, modifier: { type: "cap", value: 10 } }`
+- Remove armor quality: "Hampering quality removed for the Master"
+  → `{ target: { kind: "armorQuality", quality: "hampering" }, modifier: { type: "remove" } }`
 - Remove weapon quality: "Unwieldy quality removed from battle heels"
-  → `{ target: { kind: "weaponQuality", action: "remove", quality: "unwieldy", weaponFilter: "heels" }, modifier: { type: "remove" } }`
+  → `{ target: { kind: "weaponQuality", quality: "unwieldy", appliesTo: [{ kind: "id", values: ["heels"] }] }, modifier: { type: "remove" } }`
 
-**Tier B — Structured Flags** (machine-readable but not a numeric modifier).
-Uses the `flag` target kind per [ADR-011](decisions/011-typed-effect-targets.md):
-- Advantage/disadvantage on checks → `{ kind: "flag", flag: "advantage", scope: "..." }`
-- Free attack triggers → `{ kind: "flag", flag: "freeAttack" }`
-- Extra actions under conditions → `{ kind: "flag", flag: "extraAction" }`
-- Immunity to specific effects → `{ kind: "flag", flag: "immunity" }`
-- Reactions, special attacks, status effects, status removal
+**Tier B — Structured Flags / Special Attacks / Reactions**.
+Flag effects use the `flag` target kind per [ADR-015](decisions/015-typed-effect-targets-final.md):
+- Advantage/disadvantage on checks → `{ kind: "flag", name: "advantage.attack" }`
+- Immunity to specific effects → `{ kind: "flag", name: "immunity.fire" }`
 
-> **Vocabulary defined** in [ADR-011](decisions/011-typed-effect-targets.md):
-> `advantage`, `disadvantage`, `immunity`, `freeAttack`, `extraAction`,
-> `reaction`, `specialAttack`, `statusEffect`, `statusRemoval`.
-> Extensible — new flags can be added to the union type.
+Special attacks and reactions are **not** flag effects — they are promoted by
+the engine into the derived `SpecialAttack[]` / `Reaction[]` arrays
+(see [ADR-014](decisions/014-per-slot-combat-special-attacks.md)). Their
+tier-data shape carries `attackAttribute`, `damage`, and `trigger` directly.
 
 **Tier C — Narrative Only** (description text, not reducible):
 - RP guidance, situational judgment calls
@@ -298,37 +301,25 @@ UI weapon selector and validates weapon properties.
 #### `data/armor.en.json`
 
 Canonical armor reference data. `equipment.armor.body` and `equipment.armor.plug`
-reference these.
+reference these. **Shipped in Chunk A** with the locked vocabulary:
 
 ```jsonc
 [
   {
-    "id": "leather-armor",
-    "name": "Leather Armor",
+    "id": "light_armor",
+    "name": "Light Armor",
     "slot": "body",
-    "defense": 2,
-    "qualities": ["light"]
+    "armor": 4,
+    "cost": 2,
+    "qualities": ["hampering"]
   },
   {
     "id": "chainmail",
     "name": "Chainmail",
     "slot": "body",
-    "defense": 4,
-    "qualities": ["cumbersome"]
-  },
-  {
-    "id": "blessed-robe",
-    "name": "Blessed Robe",
-    "slot": "body",
-    "defense": 0,
-    "qualities": ["mystical"]
-  },
-  {
-    "id": "steel-buckler",
-    "name": "Steel Buckler",
-    "slot": "plug",
-    "defense": 0,
-    "qualities": ["reinforced"]
+    "armor": 6,
+    "cost": 125,
+    "qualities": ["hampering", "fortified", "flexible"]
   }
   // ...
 ]
@@ -336,10 +327,13 @@ reference these.
 
 **Fields**:
 - `id` — unique string identifier
-- `name` — display name
-- `slot` — `"body"` or `"plug"` (plug = auxiliary armor, no base defense, carries special qualities)
-- `defense` — armor value (0 for plug-type armor)
-- `qualities` — string array: `"light"`, `"cumbersome"`, `"mystical"`, `"reinforced"`, etc.
+- `name` — display name (locale-specific)
+- `slot` — `"body"` or `"plug"`. There is **no** `type` field.
+- `armor` — mitigation value (formerly `defense`; renamed in Chunk A so the
+  reference matches `secondary.armor`)
+- `cost` — purchase price in coins
+- `qualities` — string array. `"hampering"` (single literal, no `_N` suffix)
+  marks any negative quality on body armor; magnitude is implicit in `armor`.
 
 #### `data/runes.en.json`
 
@@ -399,6 +393,19 @@ follow the same pattern: `weapons.en.json` + `weapons.ru.json`, etc.
 ---
 
 ## 3. Combat Dual-Wield Refinement
+
+> **Subsumed by [ADR-014](decisions/014-per-slot-combat-special-attacks.md).**
+> The dual-wield problem disappears under the per-slot model: `combat.carried`
+> is `[Slot | null, Slot | null, Slot]` (slot 2 always non-null with an `own`
+> weapon, default `natural_weapon`). The combat phase fans out per slot — each
+> populated slot independently produces an attack profile, so no special
+> aggregation logic for two-weapon fighting is needed. Bonus dice from
+> abilities still come through `{ kind: "combat", field: "bonusDamage" }`
+> effects per Task 1.
+>
+> The original §3 content (multi-weapon damage aggregation, attack-attribute
+> resolution, bonus-damage wiring) is preserved below for historical context
+> only — do not implement it; implement the per-slot fanout in Chunk D.
 
 ### Current State
 

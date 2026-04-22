@@ -462,216 +462,66 @@ breakdown.
 
 ## Phase 6 — RPG Engine
 
-**Goal:** Build the rules engine into a proper effect resolution pipeline.
-Normalize reference data, create missing reference files, align the applicator,
-and wire traits/equipment into derived combat stats.
+**Goal:** Replace the stub rules engine with a typed effect-resolution
+pipeline, a 3-slot per-weapon combat model, derived special-attack /
+reaction collections, and fully normalized reference data so that derived
+stats reflect equipped weapons and learned traits.
 
-**Basis:** [deferred-tasks.md](deferred-tasks.md) (detailed task specs),
-[data-contracts.md](data-contracts.md) §1.1 (canonical effect shape)
+**Detailed plan:** [phase6-plan.md](../.github/plans/phase6-plan.md) —
+8 chunks (A–H), each independently reviewable. Replaces the original
+Step 0 / Step 5 outline.
 
-> **Why here:** Phases 3-5 work fine with stub combat/effect values. But
+**Basis:** [ADR-010](decisions/010-effect-resolution-pipeline.md),
+[ADR-014](decisions/014-per-slot-combat-special-attacks.md),
+[ADR-015](decisions/015-typed-effect-targets-final.md)
+(supersedes [ADR-011](decisions/011-typed-effect-targets.md)),
+[deferred-tasks.md](deferred-tasks.md) §1–§3,
+[data-contracts.md](data-contracts.md) §1.1.
+
+> **Why here:** Phases 3–5 work fine with stub combat/effect values. But
 > Phase 7 (sibling integration) needs the addon export to contain real
 > computed data. This phase delivers the engine that produces it.
 
-### Gate: Architecture Assessment ✓ DONE
+### Chunk Status
 
-Architectural decisions recorded as ADRs:
+| Chunk | Focus                                                        | Status                |
+| ----- | ------------------------------------------------------------ | --------------------- |
+| A     | Decisions, vocabulary lock & armor refactor                  | ✅ Done (2026-04-22)  |
+| B     | Reference catalog relocation (`data/` → `reference/`)        | Not started           |
+| C     | Typed pipeline foundation (no combat fanout)                 | Not started           |
+| D     | Schema migration: `Combat` + `specialAttacks` / `reactions`  | Not started           |
+| E     | Combat phase per-slot fanout + weapon predicates             | Not started           |
+| F     | Effect normalization (data, collaborative bulk edit)         | Not started           |
+| G     | Wire ability/spell registry into recalc + reference-lint     | Not started           |
+| H     | Validators, sibling docs, cleanup                            | Not started           |
 
-- [x] Effect resolution pipeline architecture — explicit phases, typed state,
-      unified effect collection. See [ADR-010](decisions/010-effect-resolution-pipeline.md).
-- [x] Typed effect targets — discriminated union replacing dotted-path strings.
-      See [ADR-011](decisions/011-typed-effect-targets.md).
-- [x] Effect target vocabulary defined: `secondary`, `combat`, `weaponQuality`,
-      `armorQuality`, `flag`, `check` (ADR-011)
-- [x] Tier B flag vocabulary defined: `advantage`, `disadvantage`, `immunity`,
-      `freeAttack`, `extraAction`, `reaction`, `specialAttack`, `statusEffect`,
-      `statusRemoval` (ADR-011)
-- [x] Effect resolution architecture decided: `collectAllEffects` → group by
-      phase → apply in fixed order (ADR-010)
-- [ ] Update `docs/deferred-tasks.md` with architectural decisions
-- [ ] Update `docs/data-contracts.md` §1.1 with final vocabulary
+### Chunk A Deliverables (done)
 
-### Gate: Reference Catalog Relocation
+- ADR-014, ADR-015 written; ADR-011 marked superseded.
+- `data/armor.{en,ru}.json` rewritten — dropped legacy `type` field, renamed
+  `defense` → `armor`, prepended `"hampering"` quality on all body armor.
+- `src/rules/attributes.mts` armor reader carries a transition fallback
+  (`body?.armor ?? body?.defense`) marked `TODO(phase6-chunk-D)`; dropped
+  with the character wipe in Chunk D.
+- `docs/data-contracts.md` §1.1 rewritten with the locked vocabulary.
+- `docs/deferred-tasks.md` §1, §2 (armor), §3 refreshed.
+- `.github/bugs/engine-weak-points.md` items re-linked to chunks.
+- 445 / 445 tests + typecheck green.
 
-Reference catalog files (`abilities`, `spells`, `boons`, `sins`, `rituals` ×
-`en`/`ru`, plus the `weapons`/`armor`/`runes` files added in Step 1) currently
-sit in [`data/`](../data/) alongside runtime mutable state (`characters/`,
-`index.json`, `backups/`, `uploads/`). They are authored canon — committed,
-read-only at runtime, served to clients and sibling projects — and have
-nothing in common with the runtime state they're nested with. With the Step 1
-additions about to double the catalog, this needs to be sorted before the
-engine starts depending on it.
+### Items Relocated from Phase 5 (now subsumed by phase6-plan.md)
 
-Move them to a new top-level `reference/` directory, sibling to `data/` and
-[`rpg/`](../rpg/). The two vaults then map cleanly onto each other: `rpg/`
-holds the **prose** rules (Obsidian Markdown, full free-form rule text);
-`reference/` holds the **structured** rules (machine-readable JSON catalogues
-the engine consumes). `data/` is left as the runtime, mutable, gitignored
-state-per-deployment directory.
+These were originally tracked in Phase 5 but require the typed effect
+pipeline, reference data, or RPG rules engine to implement properly. All
+are folded into the chunked plan:
 
-- [ ] Add `REFERENCE_DIR` to [`src/lib/config.mts`](../src/lib/config.mts)
-      (`<root>/reference`)
-- [ ] Move existing canon files: `abilities`, `spells`, `boons`, `sins`,
-      `rituals` × `en`/`ru` → `reference/`
-- [ ] Update [`src/models/abilities.mts`](../src/models/abilities.mts) — also
-      reconcile the legacy `data/abilities.json` (no locale suffix) read with
-      the localized `abilities.{locale}.json` convention used everywhere else
-- [ ] Update test helper [`test/helpers/http.mts`](../test/helpers/http.mts)
-      seed paths
-- [ ] Update static-file mapping table in
-      [`.github/copilot-instructions.md`](../.github/copilot-instructions.md)
-- [ ] Update path references in `docs/bot-integration.md`,
-      `docs/addon-integration.md`, `docs/data-contracts.md`,
-      `docs/deferred-tasks.md`, `docs/architecture.md`
-- [ ] Update repo memory (`/memories/repo/nagara-rpg-rules.md`,
-      `/memories/repo/character-builder.md`) with the new reference path
-
-### Step 0 — Engine Foundation Rework
-
-Rewrite the rules engine foundation per ADR-010 and ADR-011 before building
-features on top. This replaces the existing `Record<string, unknown>` +
-dotted-path + numeric-priority approach.
-
-**Basis:** [ADR-010](decisions/010-effect-resolution-pipeline.md),
-[ADR-011](decisions/011-typed-effect-targets.md)
-
-- [ ] Define `EffectTarget` union type, `EffectPhase` enum, `ResolvedEffect`
-      interface in `src/rpg-types.mts`
-- [ ] Define `ReferenceData` interface and implement startup loader
-      (`src/rules/registry.mts`)
-- [ ] Rewrite `src/rules/attributes.mts` — `SECONDARY_FORMULAS` functions
-      receive typed `PrimaryAttributes` instead of `Record<string, unknown>`
-- [ ] Fix crash on undefined effect target — `derived.mts` passes
-      `effect.target!` to `applyEffect` when `target` is `undefined`.
-      Subsumes Phase 5 Bug #18; resolved by typed pipeline rewrite. **Bug #18**
-- [ ] Fix `EffectModifier.value: number` in rpg-types.mts — `setBase` effects
-      carry attribute name strings (e.g., `"discreet"`). Type must be
-      `number | string` or use per-phase modifier types. **Bug #19**
-- [ ] Fix rules modules bypassing rpg-types — `applicator.mts` and
-      `derived.mts` define local `Modifier`/`RuleEffect` types with
-      `value: unknown` instead of importing from rpg-types. **Bug #20**
-- [ ] Fix double toughness clamping — `clampValues()` and
-      `enforceConsistency()` both clamp `toughness.current` identically.
-      Remove duplicate from `enforceConsistency()`. **Bug #21**
-- [ ] Fix nested effects never unwound — `recalculateDerivedFields` only
-      collects `character.effects[]` top-level. Any effect with child
-      `effects[]` sub-array is silently ignored. **Bug #22**
-- [ ] Fix `attackAttribute` `||` operator — `deriveCombat()` uses `||`
-      which prevents effect overrides from setting falsy values and
-      overwrites any effect-set value with the existing character data.
-      Use `??` nullish coalescing or derive from ability data. **Bug #23**
-- [ ] Rewrite `src/rules/applicator.mts` — typed `Character` state, exhaustive
-      `switch (target.kind)`, correct modifier verbs (`setBase`/`addFlat`/
-      `multiply`/`cap`)
-- [ ] Rewrite `src/rules/derived.mts` — typed pipeline:
-      `collectAllEffects` → `groupByPhase` → phase stages → `deriveCombatStats`
-      → `enforceConstraints`. No more `Record<string, unknown>`.
-- [ ] Implement `collectAllEffects` in `src/rules/effects.mts` — merges all
-      sources (traits, equipment, temporary) into one array
-- [ ] Implement target deserialization (JSON → `EffectTarget`) with startup
-      validation
-- [ ] Eliminate the `"rules."` prefix convention for setBase detection
-- [ ] Separate `enforceConsistency()` into distinct stages:
-      `deriveCombatStats`, `clampValues`, `enforceConstraints`
-- [ ] Pipeline tests: typed inputs → assert typed outputs per phase
-
-> **Note:** This step can use synthetic/mock effects before reference data
-> normalization (Step 2) is done. The pipeline and the data are independent.
-
-### Step 1 — Reference Data Files
-
-Create missing reference data for equipment pick-lists and validation.
-Files land in `reference/` (see Gate above).
-
-- [ ] `reference/weapons.en.json` — weapon catalog with type, damage, qualities
-- [ ] `reference/weapons.ru.json` — Russian localization
-- [ ] `reference/armor.en.json` — armor catalog with slot, defense, qualities
-- [ ] `reference/armor.ru.json` — Russian localization
-- [ ] `reference/runes.en.json` — rune catalog with description, qualities
-- [ ] `reference/runes.ru.json` — Russian localization
-- [ ] Decide on `reference/traditions.en.json` — separate file vs. filtered
-      ability IDs
-
-### Step 2 — Effect Normalization
-
-Categorize and rewrite reference data effects to canonical form.
-
-- [ ] Categorize all ~507 ability tier effects into Tier A/B/C
-- [ ] Categorize all ~147 spell tier effects into Tier A/B/C
-- [ ] Convert Tier A effects to canonical `{ target, modifier }` shape
-- [ ] Add structured effects to talents/rituals where applicable
-- [ ] Retire `reference/abilities.normalized-effects.json` (replaced by
-      canonical effects in `reference/abilities.en.json`)
-
-### Step 3 — Applicator Alignment
-
-> Most of this step is handled by Step 0 (foundation rework). What remains
-> is wiring the new applicator to handle equipment-specific edge cases.
-
-- [x] Change modifier types: `add`/`mul`/`set` → `setBase`/`addFlat`/
-      `multiply`/`cap` — done in Step 0
-- [x] Add handler for Tier B flag types (advantage, etc.) — done in Step 0
-- [ ] Add handler for `remove` modifier (weapon quality removal)
-- [ ] Update `applyEquipmentBonuses` for new equipment structure
-      (flattened `assassin`/`tools`, singular armor body/plug)
-
-### Step 4 — Effect Resolution Pipeline
-
-Wire ability/spell lookups into the rules engine. The pipeline structure
-(from Step 0) is already in place; this step populates it with real data.
-
-- [ ] Build a lookup function: `(id, tier) → ResolvedEffect[]`
-      reads from `reference/abilities.en.json` / `reference/spells.en.json`
-      at runtime
-- [ ] In `recalculate()`, resolve `character.traits[]`
-      via `collectAllEffects` (Step 0 skeleton)
-- [ ] Remove any remaining `traits`-based effect resolution code
-
-### Step 5 — Combat Derivation
-
-Complete the `deriveCombat()` function.
-
-- [ ] Multi-weapon damage: primary → `baseDamage`, secondary → `bonusDamage`
-- [ ] Attack attribute resolution from ability effects (`setBase`)
-- [ ] Bonus damage dice from ability effects (`addFlat` on `combat.bonusDamage`)
-- [ ] Weapon effect application (weapon-mounted effects fed to applicator)
-
-### Step 6 — Validation & Docs
-
-- [ ] Verify all derived stats compute correctly with real ability data
-- [ ] Update `docs/data-contracts.md` with final effect vocabulary
-- [ ] Update `docs/deferred-tasks.md` to mark completed items
-- [ ] Run full test suite — rewrite Phase 4 Session 4 baseline tests
-      (`test/rules/attributes.test.mts`, `test/rules/applicator.test.mts`,
-      `test/rules/derived.test.mts`) for typed pipeline inputs/outputs.
-      Add new test files per Phase 4 Session 8 plan:
-      `test/rules/effects.test.mts` (collectAllEffects),
-      `test/rules/registry.test.mts` (reference data, target deserialization),
-      `test/rules/combat.test.mts` (multi-weapon, attack attribute, bonus damage).
-      See [phase4-plan.md Session 8](../.github/plans/phase4-plan.md) for full
-      test categories: phase ordering, modifier matrix, flag resolution,
-      constraint enforcement.
-
-**Deliverable:** Rules engine processes canonical effects. Derived stats
-(combat, secondary attributes) reflect equipped weapons and learned traits.
-Reference data is complete and normalized.
-
-### Items Relocated from Phase 5
-
-These items were originally tracked in Phase 5 but require the typed effect
-pipeline, reference data, or RPG rules engine to implement properly.
-
-- [ ] Align effect modifier types (`add`/`mul`/`set` → `setBase`/`addFlat`/
-      `multiply`/`cap`) — addressed by Step 0 applicator rewrite + Step 3
-      alignment
-- [ ] Fix `rpgValidators` — all currently return `true`. Implement real
-      attribute budget validation, health range checks, etc. — belongs in
-      Step 6 (Validation & Docs)
-- [ ] Add `schemaVersion` bumping on schema changes — belongs in Step 6
-      (Validation & Docs)
-- [ ] Change `combat.bonusDamage` schema type from `"array"` to `"number"`
-      once the effect resolution pipeline computes the total — belongs in
-      Step 0 (typed pipeline produces scalar derived values)
+- Align effect modifier types (`add`/`mul`/`set` → `setBase`/`addFlat`/
+  `multiply`/`cap` + `remove`) — **Chunk C** (engine rewrite) +
+  **Chunk F** (data alignment).
+- Implement real `rpgValidators` — **Chunk H**.
+- Bump `schemaVersion` on schema changes — **Chunk D** (along with the
+  `Combat` shape change).
+- Combat derived fields scalar vs array — settled by **Chunk D** schema
+  + **Chunk E** fanout (`bonusDamage` is per-slot scalar).
 
 ---
 

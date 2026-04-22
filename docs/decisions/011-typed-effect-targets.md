@@ -1,6 +1,6 @@
 # ADR-011: Typed Effect Targets
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-015](015-typed-effect-targets-final.md)
 **Date:** 2026-04-04
 **Deciders:** Project owner + Copilot design session
 **Related:** [ADR-010](010-effect-resolution-pipeline.md) (Effect Resolution Pipeline),

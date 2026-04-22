@@ -43,20 +43,44 @@ chunks that resolve them.
 
 ## Chunks Overview
 
-| Chunk | Focus | Code | Data | Tests | Docs |
-|-------|-------|------|------|-------|------|
-| A | Decisions, vocabulary lock & armor refactor | — | small | — | ADRs |
-| B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium |
-| C | Typed pipeline foundation (no combat fanout) | large | — | large | — |
-| D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small |
-| E | Combat phase per-slot fanout + predicates | medium | — | medium | — |
-| F | Effect normalization (data, collaborative) | — | huge | — | — |
-| G | Wire ability/spell registry into recalc | small | — | medium | — |
-| H | Validators, sibling docs, cleanup | medium | — | medium | large |
+| Chunk | Focus | Code | Data | Tests | Docs | Status |
+|-------|-------|------|------|-------|------|--------|
+| A | Decisions, vocabulary lock & armor refactor | — | small | — | ADRs | ✅ Done (2026-04-22) |
+| B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium | ⏳ Not started |
+| C | Typed pipeline foundation (no combat fanout) | large | — | large | — | ⏳ Not started |
+| D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small | ⏳ Not started |
+| E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ⏳ Not started |
+| F | Effect normalization (data, collaborative) | — | huge | — | — | ⏳ Not started |
+| G | Wire ability/spell registry into recalc | small | — | medium | — | ⏳ Not started |
+| H | Validators, sibling docs, cleanup | medium | — | medium | large | ⏳ Not started |
 
 ---
 
 ## Chunk A — Decisions, Vocabulary Lock & Armor Refactor
+
+> **✅ Completed 2026-04-22.** Final decisions diverged from the original
+> outline below in two ways:
+>
+> - The armor `type` field refactor was **reverted**. Negative quality stays
+>   as a single literal `"hampering"` (no `_N` suffix); magnitude is implicit
+>   in the armor's `armor` value. No engine code reads armor type, so the
+>   refactor offered no payoff. See ADR-014 / ADR-015 for the locked shape.
+> - ADR-011 was superseded by **[ADR-015](../../docs/decisions/015-typed-effect-targets-final.md)**
+>   rather than amended (ADRs are immutable, mirroring how ADR-009 superseded
+>   ADR-004). ADR-015 records the final 5-kind `EffectTarget` union, the
+>   `WeaponPredicate` shape (no `subtype` kind), `EffectModifier` per-phase
+>   shapes including `remove`, the dropped `priority` field, and the
+>   `TriggerKind` draft.
+> - The armor reference field formerly named `defense` is now `armor`
+>   (matches `secondary.armor` semantics). A transition fallback in
+>   `src/rules/attributes.mts` keeps existing characters loadable; it is
+>   marked `TODO(phase6-chunk-D)` and dropped together with the character
+>   wipe in Chunk D.
+>
+> Live deliverables: ADR-014, ADR-015, ADR-011 (status header updated),
+> `data/armor.{en,ru}.json` rewritten, `docs/data-contracts.md` §1.1 rewritten,
+> `docs/deferred-tasks.md` refreshed, `.github/bugs/engine-weak-points.md`
+> re-linked to chunks. 445 / 445 tests + typecheck green.
 
 **No engine code changes.** Get all design docs and reference vocabulary
 into a stable state before any code moves.
@@ -286,10 +310,15 @@ SSE sanitizer, client renderer. Existing characters wiped.
    - `public/state.mjs` if it references old `combat.weapons` shape.
    - On creation form, default slot 2 to `natural_weapon`.
 5. Wipe `data/characters/*.json` and `data/index.json` (user authorized).
-6. Regenerate test fixtures in `test/helpers/fixtures.mts` for new shape.
-7. Update affected tests (storage, validation, sanitization, schema-serializer,
+6. Drop the legacy-armor transition fallback. Remove the `body?.defense ??`
+   branch in `src/rules/attributes.mts` `armor.base()` (search
+   `TODO(phase6-chunk-D)`) and the matching test case in
+   `test/rules/attributes.test.mts`. After the wipe in step 5 nothing on
+   disk carries the old `defense` key.
+7. Regenerate test fixtures in `test/helpers/fixtures.mts` for new shape.
+8. Update affected tests (storage, validation, sanitization, schema-serializer,
    data-contracts, sse, api). Expect significant churn.
-8. Update repo memory (`character-builder.md`) with new shape.
+9. Update repo memory (`character-builder.md`) with new shape.
 
 **Verification**
 

@@ -3,160 +3,160 @@
     "id": "light_armor",
     "name": "Light Armor",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 2,
-    "qualities": ["hampering_2"]
+    "qualities": ["hampering"]
   },
   {
     "id": "embroidered_silk",
     "name": "Embroidered Silk",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "witchs_robe",
     "name": "Witch's Robe",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "spiked_leather",
     "name": "Spiked Leather",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "mages_cloak",
     "name": "Mage's Cloak",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "skalds_cuirass",
     "name": "Skald's Cuirass",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 50,
-    "qualities": ["hampering_2", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"]
   },
   {
     "id": "wolfs_hide",
     "name": "Wolf's Hide",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 1,
-    "qualities": ["hampering_2", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"]
   },
   {
     "id": "concealed_armor",
     "name": "Concealed Armor",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 50,
-    "qualities": ["hampering_2", "concealed", "flexible"]
+    "qualities": ["hampering", "concealed", "flexible"]
   },
   {
     "id": "blessed_robe",
     "name": "Blessed Robe",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "medium_armor",
     "name": "Medium Armor",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 5,
-    "qualities": ["hampering_3"]
+    "qualities": ["hampering"]
   },
   {
     "id": "chainmail",
     "name": "Chainmail",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 125,
-    "qualities": ["hampering_3", "fortified", "flexible"]
+    "qualities": ["hampering", "fortified", "flexible"]
   },
   {
     "id": "ravens_armor",
     "name": "Raven's Armor",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 2,
-    "qualities": ["hampering_3", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"]
   },
   {
     "id": "lacquered_silk_cuirass",
     "name": "Lacquered Silk Cuirass",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 25,
-    "qualities": ["hampering_3", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "laminated_armor",
     "name": "Laminated Armor",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 25,
-    "qualities": ["hampering_3", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "heavy_armor",
     "name": "Heavy Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 10,
-    "qualities": ["hampering_4"]
+    "qualities": ["hampering"]
   },
   {
     "id": "field_armor",
     "name": "Field Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 50,
-    "qualities": ["hampering_4", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "plate_armor",
     "name": "Plate Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 50,
-    "qualities": ["hampering_4", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "knights_plate_armor",
     "name": "Knight's Plate Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 250,
-    "qualities": ["hampering_4", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"]
   },
   {
     "id": "templars_plate_armor",
     "name": "Templar's Plate Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 100,
-    "qualities": ["hampering_4", "blessed"]
+    "qualities": ["hampering", "blessed"]
   },
   {
     "id": "wrath_armor",
     "name": "Wrath Armor",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 100,
-    "qualities": ["hampering_4", "vengeful"]
+    "qualities": ["hampering", "vengeful"]
   }
 ]

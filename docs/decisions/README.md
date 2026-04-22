@@ -17,6 +17,8 @@ decisions are marked as such, not deleted.
 | 008 | [TypeScript via Node.js strip-types](008-typescript-strip-types.md)           | Accepted   |
 | 009 | [Schema-driven client rendering](009-schema-driven-rendering.md)              | Accepted   |
 | 010 | [Effect resolution pipeline architecture](010-effect-resolution-pipeline.md)  | Accepted   |
-| 011 | [Typed effect targets](011-typed-effect-targets.md)                           | Accepted   |
+| 011 | [Typed effect targets](011-typed-effect-targets.md)                           | Superseded by ADR-015 |
 | 012 | [Standards-first HTML, CSS & Web Platform conventions](012-standards-first-html-css.md) | Accepted |
 | 013 | [Domain layer as the mutation gate](013-domain-layer-mutation-gate.md)        | Accepted   |
+| 014 | [Per-slot combat, special attacks & reactions](014-per-slot-combat-special-attacks.md) | Accepted |
+| 015 | [Typed effect targets, final vocabulary](015-typed-effect-targets-final.md)   | Accepted   |

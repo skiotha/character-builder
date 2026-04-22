@@ -3,160 +3,160 @@
     "id": "light_armor",
     "name": "Легкая броня",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 2,
-    "qualities": ["hampering_2"]
+    "qualities": ["hampering"]
   },
   {
     "id": "embroidered_silk",
     "name": "Вышитый шелк",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "witchs_robe",
     "name": "Ведьмино одеяние",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "spiked_leather",
     "name": "Шипованная кожа",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "mages_cloak",
     "name": "Плащ мага",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "skalds_cuirass",
     "name": "Кираса скальда",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 50,
-    "qualities": ["hampering_2", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"]
   },
   {
     "id": "wolfs_hide",
     "name": "Шкура волка",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 1,
-    "qualities": ["hampering_2", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"]
   },
   {
     "id": "concealed_armor",
     "name": "Скрытая броня",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 50,
-    "qualities": ["hampering_2", "concealed", "flexible"]
+    "qualities": ["hampering", "concealed", "flexible"]
   },
   {
     "id": "blessed_robe",
     "name": "Благословенное одеяние",
     "slot": "body",
-    "defense": 4,
+    "armor": 4,
     "cost": 10,
-    "qualities": ["hampering_2", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "medium_armor",
     "name": "Средняя броня",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 5,
-    "qualities": ["hampering_3"]
+    "qualities": ["hampering"]
   },
   {
     "id": "chainmail",
     "name": "Кольчуга",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 125,
-    "qualities": ["hampering_3", "fortified", "flexible"]
+    "qualities": ["hampering", "fortified", "flexible"]
   },
   {
     "id": "ravens_armor",
     "name": "Броня ворона",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 2,
-    "qualities": ["hampering_3", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"]
   },
   {
     "id": "lacquered_silk_cuirass",
     "name": "Лакированная шелковая кираса",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 25,
-    "qualities": ["hampering_3", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "laminated_armor",
     "name": "Ламинированная броня",
     "slot": "body",
-    "defense": 6,
+    "armor": 6,
     "cost": 25,
-    "qualities": ["hampering_3", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "heavy_armor",
     "name": "Тяжелая броня",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 10,
-    "qualities": ["hampering_4"]
+    "qualities": ["hampering"]
   },
   {
     "id": "field_armor",
     "name": "Полевой доспех",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 50,
-    "qualities": ["hampering_4", "fortified"]
+    "qualities": ["hampering", "fortified"]
   },
   {
     "id": "plate_armor",
     "name": "Латная броня",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 50,
-    "qualities": ["hampering_4", "flexible"]
+    "qualities": ["hampering", "flexible"]
   },
   {
     "id": "knights_plate_armor",
     "name": "Латная броня рыцаря",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 250,
-    "qualities": ["hampering_4", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"]
   },
   {
     "id": "templars_plate_armor",
     "name": "Латная броня храмовника",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 100,
-    "qualities": ["hampering_4", "blessed"]
+    "qualities": ["hampering", "blessed"]
   },
   {
     "id": "wrath_armor",
     "name": "Броня Гнева",
     "slot": "body",
-    "defense": 8,
+    "armor": 8,
     "cost": 100,
-    "qualities": ["hampering_4", "vengeful"]
+    "qualities": ["hampering", "vengeful"]
   }
 ]

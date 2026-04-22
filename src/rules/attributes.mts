@@ -50,8 +50,16 @@ export const SECONDARY_FORMULAS: Record<string, SecondaryFormulaRule> = {
     base: (char) => {
       const equipment = char.equipment as Record<string, unknown> | undefined;
       const armorObj = equipment?.armor as Record<string, unknown> | undefined;
-      const body = armorObj?.body as { defense?: number } | null | undefined;
-      return body?.defense ?? 0;
+      // TODO(phase6-chunk-D): drop the `body.defense` fallback once existing
+      // characters are wiped during the schema migration. The canonical
+      // reference field is `armor` (renamed from `defense` in Chunk A);
+      // legacy stored characters may still carry the old key until they are
+      // re-saved. See `.github/plans/phase6-plan.md` Chunk D.
+      const body = armorObj?.body as
+        | { armor?: number; defense?: number }
+        | null
+        | undefined;
+      return body?.armor ?? body?.defense ?? 0;
     },
     formula: (base) => base,
   },

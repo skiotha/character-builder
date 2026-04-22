@@ -157,7 +157,7 @@
     "type": "natural",
     "damage": 4,
     "cost": 0,
-    "qualities": ["short"]
+    "qualities": ["own", "short"]
   },
   {
     "id": "war_claws",
@@ -165,7 +165,7 @@
     "type": "natural",
     "damage": 4,
     "cost": 1,
-    "qualities": ["short", "deep_wounds"]
+    "qualities": ["own", "short", "deep_wounds"]
   },
   {
     "id": "battle_fan",
@@ -181,7 +181,7 @@
     "type": "exotic",
     "damage": 4,
     "cost": 15,
-    "qualities": ["special", "unwieldy", "short", "concealed"]
+    "qualities": ["own", "special", "unwieldy", "short", "concealed"]
   },
   {
     "id": "whip",

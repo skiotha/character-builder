@@ -182,7 +182,17 @@ describe("SECONDARY_FORMULAS", () => {
     });
 
     describe("base", () => {
-      it("reads equipment.armor.body.defense", () => {
+      it("reads equipment.armor.body.armor", () => {
+        const char = makeCharacter({
+          equipment: { armor: { body: { armor: 3 }, plug: null } },
+        });
+        assert.equal(rule.base(char), 3);
+      });
+
+      it("falls back to legacy body.defense for un-resaved characters", () => {
+        // TODO(phase6-chunk-D): drop this case together with the fallback in
+        // `src/rules/attributes.mts` once stored characters are wiped during
+        // the schema migration.
         const char = makeCharacter({
           equipment: { armor: { body: { defense: 3 }, plug: null } },
         });
@@ -202,7 +212,7 @@ describe("SECONDARY_FORMULAS", () => {
 
       it("ignores statOverride (armor reads equipment, not a primary)", () => {
         const char = makeCharacter({
-          equipment: { armor: { body: { defense: 5 }, plug: null } },
+          equipment: { armor: { body: { armor: 5 }, plug: null } },
         });
         assert.equal(rule.base(char, "strong"), 5);
       });
