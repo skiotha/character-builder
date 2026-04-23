@@ -105,7 +105,11 @@ client renders all views from `(schema, data, role)` — see
 ### Schema & Reference
 
 - `GET /api/v1/schema` — character schema + UI metadata (ETag-cacheable)
-- `GET /api/v1/abilities` — ability catalogue
+- `GET /api/v1/traits` — merged abilities + spells (each entry stamped `source: "ability" | "spell"`)
+- `GET /api/v1/talents` — merged boons + sins (each entry stamped `source: "boon" | "sin"`)
+- `GET /api/v1/rituals` — ritual catalogue
+- `GET /api/v1/weapons` — weapon catalogue
+- `GET /api/v1/armor` — armor catalogue
 
 ### DM & Recovery
 

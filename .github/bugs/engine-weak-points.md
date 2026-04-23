@@ -142,7 +142,7 @@ _Items #15, #16, #17 moved to [`api-infra-bugs.md`](api-infra-bugs.md)._
 - **Status:** 📋 Phase 6 Chunks C/E
 
 ### 13. 📋 Effect data in reference files is free-text, not normalized
-- **Where:** `data/abilities.en.json`, `data/spells.en.json` — ~654 tier effects
+- **Where:** `reference/abilities.en.json`, `reference/spells.en.json` — ~654 tier effects
 - **Impact:** Engine can't process any ability effect until normalization is done.
 - **Status:** 📋 Phase 6 Chunk F (bulk normalization)
 

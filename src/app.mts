@@ -10,7 +10,11 @@ import { recalculateDerivedFields } from "#rules";
 import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
 import {
   handleValidateDM,
-  handleGetAbilities,
+  handleGetTraits,
+  handleGetTalents,
+  handleGetRituals,
+  handleGetWeapons,
+  handleGetArmor,
   handleGetCharacters,
   handleUpdateCharacter,
   handleCreateCharacter,
@@ -228,9 +232,20 @@ async function handleApi(
       return await handleGetCharacters(req, res, url);
     }
 
-    // GET /api/v1/abilities
-    if (req.method === "GET" && pathParts[0] === "abilities") {
-      return await handleGetAbilities(req, res);
+    // GET /api/v1/traits | /talents | /rituals | /weapons | /armor
+    if (req.method === "GET" && pathParts[0] && !pathParts[1]) {
+      switch (pathParts[0]) {
+        case "traits":
+          return await handleGetTraits(req, res);
+        case "talents":
+          return await handleGetTalents(req, res);
+        case "rituals":
+          return await handleGetRituals(req, res);
+        case "weapons":
+          return await handleGetWeapons(req, res);
+        case "armor":
+          return await handleGetArmor(req, res);
+      }
     }
 
     // GET /api/v1/schema

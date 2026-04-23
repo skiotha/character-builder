@@ -36,6 +36,7 @@ Key layers:
 - `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
 - `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
+- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor}` (locale-aware, mtime-cached). **Not** served as static files.
 - `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
 ## Key Design Decisions
@@ -101,6 +102,8 @@ The server maps URLs to the filesystem as follows:
 | `/assets/**` | `public/assets/` | Fonts, icons, images. Stripped of `/assets/` prefix. |
 | `/uploads/portraits/**` | `data/uploads/portraits/` | Character portrait images. |
 | `/**` (everything else) | `public/` | SPA client files (`.html`, `.mjs`, `.css`). Falls back to `index.html` for client-side routing. |
+
+> Note: `reference/` is **not** served as static files. Its contents are exposed only through `/api/v1/{traits,talents,rituals,weapons,armor}` (which apply locale resolution and merging).
 
 When rewriting or moving static file references, update both the HTML/CSS/JS `href`/`src` attributes **and** ensure the files exist at the corresponding filesystem path.
 

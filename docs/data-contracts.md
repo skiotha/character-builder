@@ -194,10 +194,10 @@ Sourced from the reference files in `data/`:
 
 | Domain          | Allowed values                                                                                                                                             |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Weapon `type`   | See `data/weapons.{locale}.json` `type` field. Includes `melee`, `ranged`, `thrown`, `natural`, etc.                                                       |
-| Weapon `quality`| See `data/weapons.{locale}.json` `qualities`. Includes `own` (restricted to `natural_weapon`, `war_claws`, `heels`).                                       |
-| Weapon `id`     | `id` field of any entry in `data/weapons.{locale}.json`.                                                                                                   |
-| Armor `quality` | See `data/armor.{locale}.json` `qualities`. Includes `hampering` (single literal, no `_N` suffix — magnitude is implicit in the armor's `armor` value).    |
+| Weapon `type`   | See `reference/weapons.{locale}.json` `type` field. Includes `melee`, `ranged`, `thrown`, `natural`, etc.                                                       |
+| Weapon `quality`| See `reference/weapons.{locale}.json` `qualities`. Includes `own` (restricted to `natural_weapon`, `war_claws`, `heels`).                                       |
+| Weapon `id`     | `id` field of any entry in `reference/weapons.{locale}.json`.                                                                                                   |
+| Armor `quality` | See `reference/armor.{locale}.json` `qualities`. Includes `hampering` (single literal, no `_N` suffix — magnitude is implicit in the armor's `armor` value).    |
 | Armor `slot`    | `body` \| `plug`. **There is no `armor.type` field.**                                                                                                       |
 
 The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. (Existing stored characters with `equipment.armor.body.defense` continue to read correctly via a transition fallback in the reader; the fallback is removed in Chunk D.)
@@ -232,7 +232,7 @@ Rituals use a level model:
 { "id": "string", "level": 1 }
 ```
 
-The `id` references the canonical definition in the corresponding reference data file (e.g. `data/abilities.en.json` for traits with `source: "ability"`).
+The `id` references the canonical definition in the corresponding reference data file (e.g. `reference/abilities.{locale}.json` for traits with `source: "ability"`).
 
 ---
 

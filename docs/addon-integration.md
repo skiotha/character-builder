@@ -261,23 +261,25 @@ The script sends one request per changed character. It does **not** batch. Expec
 
 ## 7. Abilities / Static Data Endpoint
 
-The addon ships a baked static database (generated at build time from JSON). The source JSON currently lives in the addon repo (`temp/abilities.en.json` and similar). If the website becomes the canonical source for abilities, spells, rituals, etc., the build script will need to fetch them:
+The addon ships a baked static database (generated at build time from JSON). The source JSON currently lives in the addon repo (`temp/abilities.en.json` and similar). If the website becomes the canonical source for abilities, spells, rituals, etc., the build script will need to either fetch them from the API or read them directly from the website's `reference/` directory:
 
-### 7.1 Endpoint (optional, low priority)
+### 7.1 Endpoints
 
 ```
-GET /api/v1/abilities
-GET /api/v1/spells
-GET /api/v1/rituals
-GET /api/v1/talents
-GET /api/v1/items
-GET /api/v1/rules
+GET /api/v1/traits?locale=en    # merged abilities + spells; each entry stamped { source: "ability" | "spell" }
+GET /api/v1/talents?locale=en   # merged boons + sins;       each entry stamped { source: "boon" | "sin" }
+GET /api/v1/rituals?locale=en
+GET /api/v1/weapons?locale=en
+GET /api/v1/armor?locale=en
 ```
+
+Locale is resolved as: `?locale=` query → first matching primary subtag in `Accept-Language` → `en` default. Unknown locales return `400`.
 
 These return the full dataset for each category as JSON arrays. The addon's `scripts/build.py` fetches them at build time and converts to Lua table literals. The addon **never** calls these at runtime.
 
-> `/api/v1/abilities` already exists. The others can be added as the data is
-> populated on the website.
+> The split files (`reference/abilities.en.json`, `reference/spells.en.json`, …) are
+> still on disk if the addon prefers reading them directly instead of via the API.
+> `items` and `rules` endpoints are not yet implemented.
 
 ---
 

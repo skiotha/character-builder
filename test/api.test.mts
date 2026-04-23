@@ -24,6 +24,9 @@ tempDir = await createTempDir();
 mock.module("#config", {
   namedExports: {
     DATA_DIR: tempDir.dir,
+    REFERENCE_DIR: tempDir.referenceDir,
+    LOCALES: ["en", "ru"] as const,
+    DEFAULT_LOCALE: "en" as const,
     ENCODING: "utf8" as BufferEncoding,
     DM_TOKEN: TEST_DM_TOKEN,
     MIME_TYPES: {
@@ -835,23 +838,70 @@ describe("GET /api/v1/config", () => {
   });
 });
 
-describe("GET /api/v1/abilities", () => {
-  it("returns 200 with abilities data", async () => {
-    const res = await fetch(`${BASE}/api/v1/abilities`);
+describe("GET /api/v1/traits (merged abilities+spells)", () => {
+  it("returns 200 with merged entries each carrying a source", async () => {
+    const res = await fetch(`${BASE}/api/v1/traits?locale=en`);
 
     assert.equal(res.status, 200);
-    const body = (await res.json()) as unknown[];
+    const body = (await res.json()) as Array<{ id: string; source: string }>;
     assert.ok(Array.isArray(body));
     assert.ok(body.length > 0);
+    const sources = new Set(body.map((e) => e.source));
+    assert.ok(sources.has("ability"));
+    assert.ok(sources.has("spell"));
   });
 
   it("includes Cache-Control header", async () => {
-    const res = await fetch(`${BASE}/api/v1/abilities`);
+    const res = await fetch(`${BASE}/api/v1/traits?locale=en`);
 
     assert.equal(res.status, 200);
     const cc = res.headers.get("cache-control");
     assert.ok(cc?.includes("max-age=3600"));
-    // Consume body
+    await res.text();
+  });
+
+  it("rejects an unsupported locale with 400", async () => {
+    const res = await fetch(`${BASE}/api/v1/traits?locale=fr`);
+
+    assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.match(body.error, /Unsupported locale/);
+  });
+
+  it("falls back to en when no query and no Accept-Language", async () => {
+    const res = await fetch(`${BASE}/api/v1/traits`);
+
+    assert.equal(res.status, 200);
+    await res.text();
+  });
+
+  it("honours Accept-Language", async () => {
+    const res = await fetch(`${BASE}/api/v1/traits`, {
+      headers: { "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8" },
+    });
+
+    assert.equal(res.status, 200);
+    await res.text();
+  });
+});
+
+describe("GET /api/v1/talents (merged boons+sins)", () => {
+  it("returns 200 with both sources stamped", async () => {
+    const res = await fetch(`${BASE}/api/v1/talents?locale=en`);
+
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as Array<{ source: string }>;
+    const sources = new Set(body.map((e) => e.source));
+    assert.ok(sources.has("boon"));
+    assert.ok(sources.has("sin"));
+  });
+});
+
+describe("GET /api/v1/abilities", () => {
+  it("returns 404 (endpoint removed)", async () => {
+    const res = await fetch(`${BASE}/api/v1/abilities`);
+
+    assert.equal(res.status, 404);
     await res.text();
   });
 });

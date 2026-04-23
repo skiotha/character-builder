@@ -14,9 +14,14 @@ const LOCAL_ADDRESS: string =
 
 const PUBLIC_DIR: string = join(PROJECT_ROOT, "public");
 const DATA_DIR: string = join(PROJECT_ROOT, "data");
+const REFERENCE_DIR: string = join(PROJECT_ROOT, "reference");
 
 const ENCODING: BufferEncoding = "utf8";
 const API_ROUTE: string = "/api/v1";
+
+const LOCALES = ["en", "ru"] as const;
+type Locale = (typeof LOCALES)[number];
+const DEFAULT_LOCALE: Locale = "en";
 
 const DM_TOKEN: string | undefined = process.env.NAGARA_DM_TOKEN;
 
@@ -77,8 +82,11 @@ export {
   SSL,
   PUBLIC_DIR,
   DATA_DIR,
+  REFERENCE_DIR,
   PROJECT_ROOT,
   DM_TOKEN,
   CORS_ORIGINS,
+  LOCALES,
+  DEFAULT_LOCALE,
 };
-export type { SSLOptions };
+export type { SSLOptions, Locale };

@@ -46,7 +46,7 @@ chunks that resolve them.
 | Chunk | Focus | Code | Data | Tests | Docs | Status |
 |-------|-------|------|------|-------|------|--------|
 | A | Decisions, vocabulary lock & armor refactor | — | small | — | ADRs | ✅ Done (2026-04-22) |
-| B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium | ⏳ Not started |
+| B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium | ✅ Done |
 | C | Typed pipeline foundation (no combat fanout) | large | — | large | — | ⏳ Not started |
 | D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small | ⏳ Not started |
 | E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ⏳ Not started |
@@ -182,6 +182,69 @@ into a stable state before any code moves.
 ---
 
 ## Chunk B — Reference Catalog Relocation
+
+> **✅ Completed 2026-04-23.** Outcome diverged from the original outline in
+> three ways:
+>
+> - The locale-less `abilities.json` reconciliation in step 3 turned out to
+>   be moot: `src/models/abilities.mts` had been reading a non-existent
+>   `data/abilities.json` (only the `.en/.ru` variants ever existed on
+>   disk). The whole module was deleted and replaced with a generic
+>   `src/models/reference.mts` loader covering all seven topics.
+> - **Reference data is no longer served as static files.** The decision
+>   in step 5 went the other way: `reference/` is exposed only through the
+>   API, never via the static handler. This let us move locale resolution
+>   and the abilities+spells / boons+sins merging entirely to the server.
+> - The original single endpoint `GET /api/v1/abilities` was dropped (now
+>   404) in favor of five locale-aware endpoints matching the character
+>   schema's field names: `/api/v1/traits` (merged abilities+spells with
+>   `source: "ability" | "spell"`), `/api/v1/talents` (merged boons+sins
+>   with `source: "boon" | "sin"`), `/api/v1/rituals`, `/api/v1/weapons`,
+>   `/api/v1/armor`. Locale resolution: `?locale=` query → first matching
+>   primary subtag in `Accept-Language` → `en` default; supported set is
+>   hard-coded as `["en", "ru"]`; unknown locale returns 400.
+>
+> Live deliverables:
+>
+> - **Code:** `src/lib/config.mts` exports `REFERENCE_DIR`, `LOCALES`,
+>   `DEFAULT_LOCALE`, `Locale`. New `src/lib/locale.mts` (`parseLocale`).
+>   New `src/models/reference.mts` with mtime-cached `getTopic` /
+>   `getMerged`, asserts id-uniqueness across merge components and names
+>   both source files in the error. New `src/routes/handleGetReference.mts`
+>   factory exposing the five handlers. Old `src/models/abilities.mts` and
+>   `src/routes/handleGetAbilities.mts` deleted. `src/app.mts` rewires the
+>   five paths and falls through to 404 for `/api/v1/abilities`.
+> - **Data:** 14 reference JSON files moved with `git mv` (history
+>   preserved). On disk the files stay split per topic + locale; the merge
+>   for `traits`/`talents` is API-only. Sibling projects (Discord bot, WoW
+>   addon) read split files directly from disk.
+> - **Client:** `public/components/trait-list.mjs` now fetches
+>   `/api/v1/traits?locale=…` (locale derived from `navigator.language`).
+>   `public/api.mjs` `getAbilities()` (currently unused) updated to hit
+>   `/traits`.
+> - **Tests:** new `test/locale.test.mts` (9 tests) and
+>   `test/reference.test.mts` (4 tests covering cache hit, mtime
+>   invalidation, `source` stamping, duplicate-id error). `test/api.test.mts`
+>   replaces the old abilities block with three new blocks covering
+>   `/traits` (5 tests including Cache-Control, locale=fr → 400,
+>   Accept-Language honoured, default fallback), `/talents` (sources
+>   stamped), and `/abilities` (404). `test/helpers/{temp-dir,http}.mts`
+>   gained a `referenceDir` and seed all seven topics × two locales. The
+>   three `mock.module("#config")` sites in api/storage/character-service
+>   tests gained `REFERENCE_DIR`/`LOCALES`/`DEFAULT_LOCALE`. Final count:
+>   464 / 464 tests + typecheck green.
+> - **Docs:** updated `docs/architecture.md` (endpoint table + reference
+>   note), `docs/bot-integration.md` (`data/` → `reference/` table; API
+>   marked website-internal), `docs/addon-integration.md` §7 (replaced
+>   `/api/v1/abilities` with the five new endpoints, documented locale
+>   resolution), `docs/data-contracts.md` and `docs/deferred-tasks.md`
+>   (path updates), `README.md`, `.github/bugs/engine-weak-points.md`,
+>   and `.github/copilot-instructions.md` (URL→fs table now notes
+>   `reference/` is API-only; `reference/` listed as a top-level project
+>   directory).
+> - **Memory:** new repo memory `/memories/repo/reference-catalog.md`
+>   capturing the relocation, endpoint surface, locale policy, and
+>   sibling-project expectations.
 
 **Steps** (already pre-planned in roadmap Gate)
 

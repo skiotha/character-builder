@@ -146,13 +146,13 @@ export async function validateToken(playerId) {
   }
 }
 
-export async function getAbilities() {
+export async function getTraits() {
   try {
-    const response = await fetch(`${API_BASE}/abilities`);
+    const response = await fetch(`${API_BASE}/traits`);
 
     return await response.json();
   } catch (error) {
-    console.log("Error getting abilities from the server:", error);
+    console.log("Error getting traits from the server:", error);
     return false;
   }
 }

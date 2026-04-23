@@ -19,6 +19,9 @@ tempDir = await createTempDir();
 mock.module("#config", {
   namedExports: {
     DATA_DIR: tempDir.dir,
+    REFERENCE_DIR: tempDir.referenceDir,
+    LOCALES: ["en", "ru"] as const,
+    DEFAULT_LOCALE: "en" as const,
     ENCODING: "utf8" as BufferEncoding,
     DM_TOKEN: TEST_DM_TOKEN,
   },

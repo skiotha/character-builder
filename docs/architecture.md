@@ -102,9 +102,19 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 | `handleDeleteCharacter`  | `/api/v1/characters/:id`          | DELETE |
 | `handleUploadPortrait`  | `/api/v1/characters/:id/portrait` | POST   |
 | `handleCharacterStream` | `/api/v1/characters/:id/stream`   | GET    |
-| `handleGetAbilities`    | `/api/v1/abilities`               | GET    |
+| `handleGetTraits`       | `/api/v1/traits`                  | GET    |
+| `handleGetTalents`      | `/api/v1/talents`                 | GET    |
+| `handleGetRituals`      | `/api/v1/rituals`                 | GET    |
+| `handleGetWeapons`      | `/api/v1/weapons`                 | GET    |
+| `handleGetArmor`        | `/api/v1/armor`                   | GET    |
 | `handleValidateDM`      | `/api/v1/validate-dm`             | POST   |
 | `handleGetSchema`       | `/api/v1/schema`                  | GET    |
+
+> Reference endpoints accept `?locale=` (`en`/`ru`); fall back to `Accept-Language`,
+> then to `en`. `/traits` merges `abilities` + `spells` and `/talents` merges
+> `boons` + `sins`, with each entry stamped `source: "ability" | "spell" | "boon" | "sin"`.
+> Reference JSON files live in `reference/` (not `data/`) and are **not** served as
+> static files — only via these API endpoints.
 
 > **Note:** View endpoints (`/api/v1/view/`) were removed in Phase 3.
 > The server is now a pure JSON API. Client renders all views from data

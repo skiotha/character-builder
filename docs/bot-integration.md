@@ -34,15 +34,21 @@ The website is the **canonical long-term store** for character data. The Discord
 
 The bot reads the following files from the website's `data/` directory:
 
-| File                           | Purpose                                |
-| ------------------------------ | -------------------------------------- |
-| `data/index.json`              | Character search by name, ID lookup    |
-| `data/characters/<id>.json`    | Full character data for display        |
-| `data/abilities.{locale}.json` | Ability definitions (trait reference)   |
-| `data/spells.{locale}.json`    | Spell definitions (trait reference)     |
-| `data/boons.{locale}.json`     | Boon definitions (talent reference)     |
-| `data/sins.{locale}.json`      | Sin definitions (talent reference)      |
-| `data/rituals.{locale}.json`   | Ritual definitions (ritual reference)   |
+| File                                | Purpose                                |
+| ----------------------------------- | -------------------------------------- |
+| `data/index.json`                   | Character search by name, ID lookup    |
+| `data/characters/<id>.json`         | Full character data for display        |
+| `reference/abilities.{locale}.json` | Ability definitions (trait reference)  |
+| `reference/spells.{locale}.json`    | Spell definitions (trait reference)    |
+| `reference/boons.{locale}.json`     | Boon definitions (talent reference)    |
+| `reference/sins.{locale}.json`      | Sin definitions (talent reference)     |
+| `reference/rituals.{locale}.json`   | Ritual definitions (ritual reference)  |
+| `reference/weapons.{locale}.json`   | Weapon definitions                     |
+| `reference/armor.{locale}.json`     | Armor definitions                      |
+
+> The website's `/api/v1/{traits,talents,rituals,weapons,armor}` endpoints are
+> intended for the website's own client and are **not** part of the bot's stable
+> contract. The bot reads the split files directly from disk.
 
 `{locale}` is a language code (`en`, `ru`). The bot selects the locale
 matching the Discord server's configured language.

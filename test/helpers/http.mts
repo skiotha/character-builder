@@ -20,12 +20,26 @@ interface TestServer {
  * function.
  */
 async function startTestServer(tempDir: TempDir): Promise<TestServer> {
-  // Seed abilities.json so GET /api/v1/abilities doesn't 500
-  const abilitiesPath = path.join(tempDir.dir, "abilities.json");
-  await fs.writeFile(
-    abilitiesPath,
-    JSON.stringify([{ id: "test-ability", name: "Test Ability" }]),
-  );
+  // Seed reference catalog so /api/v1/traits and friends don't 500.
+  // abilities + spells are merged into /traits; boons + sins into /talents;
+  // rituals/weapons/armor are single-source.
+  const seedTopics: Array<[string, unknown]> = [
+    ["abilities", [{ id: "test-ability", name: "Test Ability" }]],
+    ["spells", [{ id: "test-spell", name: "Test Spell" }]],
+    ["boons", [{ id: "test-boon", name: "Test Boon" }]],
+    ["sins", [{ id: "test-sin", name: "Test Sin" }]],
+    ["rituals", [{ id: "test-ritual", name: "Test Ritual" }]],
+    ["weapons", [{ id: "test-weapon", name: "Test Weapon" }]],
+    ["armor", [{ id: "test-armor", name: "Test Armor" }]],
+  ];
+  for (const [topic, payload] of seedTopics) {
+    for (const locale of ["en", "ru"]) {
+      await fs.writeFile(
+        path.join(tempDir.referenceDir, `${topic}.${locale}.json`),
+        JSON.stringify(payload),
+      );
+    }
+  }
 
   const { default: app } = await import("../../src/app.mts");
 

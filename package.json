@@ -32,6 +32,7 @@
     "#config": "./src/lib/config.mts",
     "#logger": "./src/lib/logger.mts",
     "#auth": "./src/lib/auth.mts",
+    "#locale": "./src/lib/locale.mts",
     "#types": "./src/types.mts",
     "#rpg-types": "./src/rpg-types.mts",
     "#models": "./src/models/index.mts",

@@ -58,12 +58,12 @@ But the source files store effects like this:
 
 | File | Entries | Effect Structure | Status |
 |------|---------|-----------------|--------|
-| `data/abilities.en.json` | 169 abilities × 3 tiers | `{ target, action, value, description }` | Free-text, ~507 tier effects |
+| `reference/abilities.en.json` | 169 abilities × 3 tiers | `{ target, action, value, description }` | Free-text, ~507 tier effects |
 | `data/abilities.normalized-effects.json` | Same 169 | `{ level, description, actions[] }` with `{ effect, target, value? }` | Partial normalization attempt |
-| `data/spells.en.json` | 49 spells × 3 tiers | Same free-text as abilities | ~147 tier effects |
-| `data/boons.en.json` | 53 | `description` string only | No structured effects |
-| `data/sins.en.json` | 19 | `description` string only | No structured effects |
-| `data/rituals.en.json` | 68 | `description` string only | No structured effects |
+| `reference/spells.en.json` | 49 spells × 3 tiers | Same free-text as abilities | ~147 tier effects |
+| `reference/boons.en.json` | 53 | `description` string only | No structured effects |
+| `reference/sins.en.json` | 19 | `description` string only | No structured effects |
+| `reference/rituals.en.json` | 68 | `description` string only | No structured effects |
 
 ### Normalization Tiers
 
@@ -241,7 +241,7 @@ tier-data shape carries `attackAttribute`, `damage`, and `trigger` directly.
 
 ### Missing Files
 
-#### `data/weapons.en.json`
+#### `reference/weapons.en.json`
 
 Canonical weapon reference data. Characters store `equipment.weapons: Weapon[]`
 with inline weapon objects. This reference file provides the pick-list for the
@@ -298,7 +298,7 @@ UI weapon selector and validates weapon properties.
 - `damage` — die size as number (4 = d4, 6 = d6, 8 = d8, etc.)
 - `qualities` — string array: `"long"`, `"short"`, `"precise"`, `"massive"`, `"blunt"`, `"entangling"`, `"concealed"`, `"unwieldy"`, etc.
 
-#### `data/armor.en.json`
+#### `reference/armor.en.json`
 
 Canonical armor reference data. `equipment.armor.body` and `equipment.armor.plug`
 reference these. **Shipped in Chunk A** with the locked vocabulary:

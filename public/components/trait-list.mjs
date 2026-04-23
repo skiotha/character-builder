@@ -7,7 +7,8 @@
  *   LearnedTrait = { id: string, tier: "novice" | "adept" | "master", source: "ability" | "spell" }
  *
  * Reference data (full name, descriptions) is fetched lazily from
- * GET /api/v1/abilities and cached in module scope.
+ * GET /api/v1/traits?locale=… and cached in module scope. Each entry
+ * carries a `source: "ability" | "spell"` discriminator.
  *
  * @param {string} path - Schema field path (e.g. "traits")
  * @param {object} fieldSchema - Serialized schema field descriptor
@@ -23,6 +24,11 @@ const TIER_ICONS = {
   master: "/common/icons/icon-grade-master.svg",
 };
 
+function currentLocale() {
+  const primary = (navigator.language || "en").split("-")[0].toLowerCase();
+  return primary === "ru" ? "ru" : "en";
+}
+
 /** @type {Map<string, object>|null} */
 let traitLibrary = null;
 let libraryPromise = null;
@@ -35,9 +41,9 @@ async function ensureLibrary() {
   if (traitLibrary) return traitLibrary;
   if (libraryPromise) return libraryPromise;
 
-  libraryPromise = fetch("/api/v1/abilities")
+  libraryPromise = fetch(`/api/v1/traits?locale=${currentLocale()}`)
     .then((res) => {
-      if (!res.ok) throw new Error(`Abilities fetch failed: ${res.status}`);
+      if (!res.ok) throw new Error(`Traits fetch failed: ${res.status}`);
       return res.json();
     })
     .then((data) => {

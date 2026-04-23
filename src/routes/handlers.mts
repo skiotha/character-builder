@@ -1,4 +1,10 @@
-export { handleGetAbilities } from "./handleGetAbilities.mts";
+export {
+  handleGetTraits,
+  handleGetTalents,
+  handleGetRituals,
+  handleGetWeapons,
+  handleGetArmor,
+} from "./handleGetReference.mts";
 export { handleGetCharacters } from "./handleGetCharacters.mts";
 export { handleUploadPortrait } from "./handleUploadPortrait.mts";
 export { handleUpdateCharacter } from "./handleUpdateCharacter.mts";
