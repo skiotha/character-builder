@@ -274,6 +274,41 @@ into a stable state before any code moves.
 
 ## Chunk C — Typed Pipeline Foundation (Combat Phase Stubbed)
 
+> **Status: complete.** Storage was wiped at chunk start (no `schemaVersion`
+> bump; on-disk shape change deferred to D). Engine rewritten end-to-end
+> against typed `Character` state and the ADR-015 effect vocabulary.
+> `RawEffect` retained as the deprecated wire shape; only `effects.mts`
+> knows about it (deletion in H). Combat fanout, weapon predicates, talents
+> collection, and equipment effects are all stubbed/deferred per the plan.
+> All 472 tests pass; typecheck clean.
+>
+> **Deliverables**
+> - ADR-015 type vocabulary in `src/rpg-types.mts` (`EffectTarget` 5-kind
+>   union, `WeaponPredicate`, `EffectModifier` discriminated union with
+>   `remove`, `EffectFlag`, `SecondaryAttributeName`, `CombatSlotField`,
+>   `EffectPhase`, `ResolvedEffect`, `TriggerKind`, `Action`,
+>   `SpecialAttack`, `Reaction`, `CombatSlot`, new 3-slot `Combat`).
+> - New `src/rules/registry-types.mts` (`Registry` interface) plus banner
+>   stub `src/rules/registry.mts` (real loader is Chunk G).
+> - Rewritten `src/rules/effects.mts`: `normalizeRawEffect`,
+>   `collectAllEffects` (traits + `character.effects[]` only), `groupByPhase`.
+> - Rewritten `src/rules/attributes.mts` (typed `SECONDARY_FORMULAS`,
+>   typed `clampValues` — sole toughness clamp site).
+> - Rewritten `src/rules/applicator.mts` (phase-keyed handlers, exhaustive
+>   `target.kind` switch, `applyWeaponQuality` stub).
+> - Rewritten `src/rules/derived.mts` (`recalculate(char, registry)` with
+>   total phase order; stubbed `deriveCombat` synthesizes
+>   `natural_weapon` slot 2; `enforceConsistency` trimmed to XP guard +
+>   equipment defaulting).
+> - `src/app.mts` wires an inline `emptyRegistry` stub into
+>   `initCharacterService` with `TODO(phase6-chunk-G)`.
+> - Test helpers: `test/helpers/registry.mts` (`createInMemoryRegistry`,
+>   `emptyRegistry`); `test/helpers/fixtures.mts` split into legacy
+>   `makeCharacter` (schema-conformant, for storage/api/validation tests)
+>   and `makeTypedCharacter` (typed `Character` for engine tests).
+> - New `test/rules/effects.test.mts`; rewritten
+>   `test/rules/{attributes,applicator,derived}.test.mts`.
+>
 Rewrite the rules engine with typed state and ADR-010 phases. Combat fanout
 deferred to Chunk E so the schema change can be done independently.
 
@@ -330,7 +365,7 @@ deferred to Chunk E so the schema change can be done independently.
    - `test/rules/applicator.test.mts`
    - `test/rules/derived.test.mts`
 8. Add `test/rules/effects.test.mts` covering `collectAllEffects` (multi-source
-   merge, nested unwinding, expired filtering).
+   merge, nested unwinding, ignores `duration` on legacy input).
 
 **Closes weak-point bugs**: #1, #2, #4, #5 (partial), #6, #18, #19, #20, #21,
 #22.
@@ -379,6 +414,20 @@ SSE sanitizer, client renderer. Existing characters wiped.
    `test/rules/attributes.test.mts`. After the wipe in step 5 nothing on
    disk carries the old `defense` key.
 7. Regenerate test fixtures in `test/helpers/fixtures.mts` for new shape.
+   The Chunk-C transitional split (`makeCharacter` legacy /
+   `makeTypedCharacter` typed) collapses back into a **single** typed
+   `makeCharacter(): Character` factory. Delete `makeTypedCharacter` and
+   migrate the engine tests (`test/rules/*.test.mts`) over. The two
+   factories exist only because the on-disk schema (asserted by
+   storage/api/validation/sanitization tests) still carries the legacy
+   `combat.weapons` shape and lacks `flags` / `specialAttacks` /
+   `reactions`; once steps 1–3 land they converge.
+8. Tighten `RecalcFn` in `src/models/index.mts` (search
+   `TODO(phase6-chunk-D)`) from `(c: Record<string, unknown>) =>
+   Record<string, unknown>` to `(c: Character) => Character`. Drop the
+   `as unknown as Character` adapter cast in `src/app.mts`. Threads
+   typed `Character` end-to-end through the mutation gate, completing
+   Chunk C step 6 of the original plan.
 8. Update affected tests (storage, validation, sanitization, schema-serializer,
    data-contracts, sse, api). Expect significant churn.
 9. Update repo memory (`character-builder.md`) with new shape.
@@ -523,6 +572,18 @@ back-and-forth.
 
 **Steps**
 
+0. Delete `RawEffect`, `normalizeRawEffect`, and the translator's
+   warn paths from `src/rpg-types.mts` and `src/rules/effects.mts`.
+   Reference data must be authored in the typed `ResolvedEffect` shape
+   directly by this point (Chunks F + G ensure this); the legacy wire
+   shape has no remaining producers.
+0a. Audit whether `{ kind: "combat"; field: "flags" }` is reached by any
+    normalized effect in the real catalog (post-Chunk-F authoring). If
+    zero producers exist, drop `"flags"` from `CombatSlotField`, drop
+    the field from `CombatSlot`, remove its handling from the per-slot
+    fanout (Chunk E) and the validators below. `CombatSlot.flags` was
+    introduced in Chunk C on symmetry grounds with `qualities`; it stays
+    only if the authored rule-set actually uses it.
 1. Implement real `rpgValidators` (currently all return `true`):
    - Attribute budget validation.
    - Health range.
@@ -584,6 +645,16 @@ back-and-forth.
   `combat.carried` references three of them (or null for slots 0/1).
 - **Effect `priority`**: removed — phase ordering replaces it. If reference
   data has `priority` it's ignored.
+- **Phase order is total**: `setBase → formula → addFlat → multiply → cap →
+  flag`. Within a single phase, effect order is undefined and must be
+  semantically order-independent. The applicator does not sort within a
+  phase.
+- **Engine ignores effect lifecycle entirely**: `duration` was dropped from
+  the type vocabulary in Chunk C; the engine never reads it. Temporary /
+  expirable state belongs to sibling apps (Discord bot, WoW addon), which
+  add and remove `character.effects[]` entries at the appropriate moments
+  and re-call recalc. The `enforceConsistency` step deliberately does not
+  prune effects from the result.
 - **Trigger enum is opaque to the engine**: engine validates only that a
   trigger value belongs to the known enum. It runs no per-trigger logic.
   Sibling apps decide what each trigger means at gameplay time. Adding a

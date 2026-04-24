@@ -2,181 +2,248 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  applyEffect,
-  applyEquipmentBonuses,
+  applyAddFlat,
+  applyCap,
+  applyFlag,
+  applyMultiply,
+  applySetBase,
 } from "../../src/rules/applicator.mts";
+import type { Character, ResolvedEffect } from "../../src/rpg-types.mts";
+import { makeTypedCharacter } from "../helpers/fixtures.mts";
 
-// NOTE: The current applicator uses pre-canonical modifier verbs:
-//   add / mul / set / advantage
-// Phase 6 will rename these to:
-//   setBase / addFlat / multiply / cap
-// These tests document current (pre-ADR-010) behavior as a regression baseline.
+function asChar(): Character {
+  return makeTypedCharacter();
+}
 
-// ── applyEffect ──────────────────────────────────────────────────
+// ── applySetBase ─────────────────────────────────────────────────
 
-describe("applyEffect", () => {
-  // ── add ──────────────────────────────────────────────────────
-
-  describe("add modifier", () => {
-    it("adds value to existing number", () => {
-      const char: Record<string, unknown> = { stats: { hp: 10 } };
-      applyEffect(char, "stats.hp", { type: "add", value: 5 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 15);
-    });
-
-    it("treats missing target as 0", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "stats.hp", { type: "add", value: 7 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 7);
-    });
+describe("applySetBase", () => {
+  it("returns override map keyed by secondary stat", () => {
+    const effects: ResolvedEffect[] = [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "setBase", value: "vigilant" },
+      },
+    ];
+    const overrides = applySetBase(effects);
+    assert.equal(overrides.get("toughness"), "vigilant");
   });
 
-  // ── mul ──────────────────────────────────────────────────────
-
-  describe("mul modifier", () => {
-    it("multiplies existing value", () => {
-      const char: Record<string, unknown> = { stats: { hp: 10 } };
-      applyEffect(char, "stats.hp", { type: "mul", value: 2 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 20);
-    });
-
-    it("missing target → 0 × value = 0", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "stats.hp", { type: "mul", value: 3 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 0);
-    });
+  it("ignores non-setBase modifiers", () => {
+    const effects: ResolvedEffect[] = [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "addFlat", value: 5 },
+      },
+    ];
+    const overrides = applySetBase(effects);
+    assert.equal(overrides.size, 0);
   });
 
-  // ── set ──────────────────────────────────────────────────────
-
-  describe("set modifier", () => {
-    it("replaces current value regardless", () => {
-      const char: Record<string, unknown> = { stats: { hp: 10 } };
-      applyEffect(char, "stats.hp", { type: "set", value: 99 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 99);
-    });
-
-    it("sets value on missing target", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "stats.hp", { type: "set", value: 42 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 42);
-    });
-  });
-
-  // ── advantage ────────────────────────────────────────────────
-
-  describe("advantage modifier", () => {
-    it("sets path.advantage = true", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "checks.attack", { type: "advantage", value: true });
-      const checks = char.checks as Record<string, unknown>;
-      const attack = checks.attack as Record<string, unknown>;
-      assert.equal(attack.advantage, true);
-    });
-  });
-
-  // ── unknown modifier ────────────────────────────────────────
-
-  describe("unknown modifier type", () => {
-    it("preserves current value (no-op)", () => {
-      const char: Record<string, unknown> = { stats: { hp: 10 } };
-      applyEffect(char, "stats.hp", { type: "unknown_modifier", value: 5 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 10);
-    });
-
-    it("writes 0 when target is missing (currentValue defaults to 0)", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "stats.hp", { type: "bogus", value: 5 });
-      assert.equal((char.stats as Record<string, unknown>).hp as number, 0);
-    });
-  });
-
-  // ── deep paths ───────────────────────────────────────────────
-
-  describe("deep paths", () => {
-    it("handles deeply nested target path", () => {
-      const char: Record<string, unknown> = {
-        a: { b: { c: { d: 1 } } },
-      };
-      applyEffect(char, "a.b.c.d", { type: "add", value: 9 });
-      const a = char.a as Record<string, unknown>;
-      const b = a.b as Record<string, unknown>;
-      const c = b.c as Record<string, unknown>;
-      assert.equal(c.d, 10);
-    });
-
-    it("creates intermediate objects for missing path segments", () => {
-      const char: Record<string, unknown> = {};
-      applyEffect(char, "x.y.z", { type: "set", value: 7 });
-      const x = char.x as Record<string, unknown>;
-      const y = x.y as Record<string, unknown>;
-      assert.equal(y.z, 7);
-    });
+  it("last write wins", () => {
+    const effects: ResolvedEffect[] = [
+      {
+        source: "a",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "setBase", value: "quick" },
+      },
+      {
+        source: "b",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "setBase", value: "vigilant" },
+      },
+    ];
+    const overrides = applySetBase(effects);
+    assert.equal(overrides.get("defense"), "vigilant");
   });
 });
 
-// ── applyEquipmentBonuses ────────────────────────────────────────
+// ── applyAddFlat ─────────────────────────────────────────────────
 
-describe("applyEquipmentBonuses", () => {
-  it("applies weapon effects to character", () => {
-    const char: Record<string, unknown> = {
-      equipment: {
-        weapons: [
-          {
-            name: "Enchanted Sword",
-            effects: [
-              { target: "stats.damage", modifier: { type: "add", value: 3 } },
-            ],
-          },
-        ],
+describe("applyAddFlat", () => {
+  it("adds to scalar secondary stat", () => {
+    const char = asChar();
+    char.attributes.secondary.defense = 10;
+    applyAddFlat(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "addFlat", value: 3 },
       },
-    };
-    applyEquipmentBonuses(char);
-    assert.equal((char.stats as Record<string, unknown>).damage as number, 3);
+    ]);
+    assert.equal(char.attributes.secondary.defense, 13);
   });
 
-  it("no crash when weapon has no effects", () => {
-    const char: Record<string, unknown> = {
-      equipment: { weapons: [{ name: "Plain Sword" }] },
-    };
-    assert.doesNotThrow(() => applyEquipmentBonuses(char));
-  });
-
-  it("no-op when weapons array is empty", () => {
-    const char: Record<string, unknown> = {
-      equipment: { weapons: [] },
-    };
-    assert.doesNotThrow(() => applyEquipmentBonuses(char));
-  });
-
-  it("no crash when equipment key is missing", () => {
-    const char: Record<string, unknown> = {};
-    assert.doesNotThrow(() => applyEquipmentBonuses(char));
-  });
-
-  it("applies multiple effects from multiple weapons in order", () => {
-    const char: Record<string, unknown> = {
-      stats: { damage: 0 },
-      equipment: {
-        weapons: [
-          {
-            name: "Sword",
-            effects: [
-              { target: "stats.damage", modifier: { type: "add", value: 2 } },
-              { target: "stats.armor", modifier: { type: "set", value: 1 } },
-            ],
-          },
-          {
-            name: "Dagger",
-            effects: [
-              { target: "stats.damage", modifier: { type: "add", value: 3 } },
-            ],
-          },
-        ],
+  it("adds to toughness.max", () => {
+    const char = asChar();
+    char.attributes.secondary.toughness.max = 10;
+    applyAddFlat(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "addFlat", value: 5 },
       },
+    ]);
+    assert.equal(char.attributes.secondary.toughness.max, 15);
+  });
+
+  it("ignores non-addFlat modifiers", () => {
+    const char = asChar();
+    char.attributes.secondary.defense = 10;
+    applyAddFlat(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "multiply", value: 2 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.defense, 10);
+  });
+});
+
+// ── applyMultiply ────────────────────────────────────────────────
+
+describe("applyMultiply", () => {
+  it("multiplies and rounds scalar secondary stat", () => {
+    const char = asChar();
+    char.attributes.secondary.defense = 10;
+    applyMultiply(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "multiply", value: 1.5 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.defense, 15);
+  });
+
+  it("multiplies toughness.max", () => {
+    const char = asChar();
+    char.attributes.secondary.toughness.max = 10;
+    applyMultiply(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "multiply", value: 2 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.toughness.max, 20);
+  });
+});
+
+// ── applyCap ─────────────────────────────────────────────────────
+
+describe("applyCap", () => {
+  it("caps scalar secondary stat", () => {
+    const char = asChar();
+    char.attributes.secondary.defense = 100;
+    applyCap(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "cap", value: 50 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.defense, 50);
+  });
+
+  it("does not raise value below cap", () => {
+    const char = asChar();
+    char.attributes.secondary.defense = 5;
+    applyCap(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "defense" },
+        modifier: { type: "cap", value: 20 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.defense, 5);
+  });
+});
+
+// ── applyFlag ────────────────────────────────────────────────────
+
+describe("applyFlag", () => {
+  it("adds a flag", () => {
+    const char = asChar();
+    applyFlag(char, [
+      {
+        source: "test",
+        target: { kind: "flag", name: "darkvision" },
+        modifier: { type: "addFlat", value: 1 },
+      },
+    ]);
+    assert.deepEqual(char.flags, ["darkvision"]);
+  });
+
+  it("removes a flag", () => {
+    const char = asChar();
+    char.flags = ["darkvision", "flight"];
+    applyFlag(char, [
+      {
+        source: "test",
+        target: { kind: "flag", name: "darkvision" },
+        modifier: { type: "remove" },
+      },
+    ]);
+    assert.deepEqual(char.flags, ["flight"]);
+  });
+
+  it("does not duplicate flags", () => {
+    const char = asChar();
+    char.flags = ["darkvision"];
+    applyFlag(char, [
+      {
+        source: "test",
+        target: { kind: "flag", name: "darkvision" },
+        modifier: { type: "addFlat", value: 1 },
+      },
+    ]);
+    assert.deepEqual(char.flags, ["darkvision"]);
+  });
+
+  it("adds armor quality when body armor present", () => {
+    const char = asChar();
+    char.equipment.armor.body = { name: "Leather", qualities: [] };
+    applyFlag(char, [
+      {
+        source: "test",
+        target: { kind: "armorQuality", quality: "reinforced" },
+        modifier: { type: "addFlat", value: 1 },
+      },
+    ]);
+    assert.deepEqual(char.equipment.armor.body.qualities, ["reinforced"]);
+  });
+
+  it("removes armor quality", () => {
+    const char = asChar();
+    char.equipment.armor.body = {
+      name: "Leather",
+      qualities: ["reinforced", "padded"],
     };
-    applyEquipmentBonuses(char);
-    assert.equal((char.stats as Record<string, unknown>).damage as number, 5);
-    assert.equal((char.stats as Record<string, unknown>).armor as number, 1);
+    applyFlag(char, [
+      {
+        source: "test",
+        target: { kind: "armorQuality", quality: "reinforced" },
+        modifier: { type: "remove" },
+      },
+    ]);
+    assert.deepEqual(char.equipment.armor.body.qualities, ["padded"]);
+  });
+
+  it("no-op when armor body is null", () => {
+    const char = asChar();
+    char.equipment.armor.body = null;
+    assert.doesNotThrow(() =>
+      applyFlag(char, [
+        {
+          source: "test",
+          target: { kind: "armorQuality", quality: "reinforced" },
+          modifier: { type: "addFlat", value: 1 },
+        },
+      ]),
+    );
   });
 });

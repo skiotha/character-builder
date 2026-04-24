@@ -6,7 +6,7 @@ import { URL } from "node:url";
 import { requireDmToken } from "#auth";
 import * as nagara from "#models";
 import * as backup from "./lib/backup.mts";
-import { recalculateDerivedFields } from "#rules";
+import { recalculate } from "#rules";
 import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
 import {
   handleValidateDM,
@@ -36,18 +36,31 @@ import {
 } from "#config";
 
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { NagaraRequest } from "#types";
+import type { NagaraRequest, Character } from "#types";
+import type { Registry } from "#rules";
 
 const getCharacterHandler = createCharacterRoute();
 const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
+// TODO(phase6-chunk-G): replace with createRegistry() loading from
+// REFERENCE_DIR. Chunk C ships an empty stub so character.traits[] always
+// resolves to no effects (the engine warns and skips on miss).
+const emptyRegistry: Registry = {
+  lookupTrait: () => null,
+  lookupTalent: () => null,
+};
+
 // Wire the character service once at startup (ADR-013). Domain mutations
 // throw until this runs, so it must happen at module top-level — before
 // any request can land.
 nagara.initCharacterService({
-  recalc: recalculateDerivedFields,
+  recalc: (character) =>
+    recalculate(
+      character as unknown as Character,
+      emptyRegistry,
+    ) as unknown as Record<string, unknown>,
   broadcast: broadcastToCharacter,
   broadcastDeleted: broadcastCharacterDeleted,
 });

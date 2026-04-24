@@ -16,6 +16,14 @@ import type { DeleteResult } from "#types";
 // forgotten — this catches both production wiring mistakes and tests that
 // exercise mutations without setting up stubs.
 
+// TODO(phase6-chunk-D): tighten the storage layer to typed `Character` end-
+// to-end. Today storage reads/writes `Record<string, unknown>` (no schema
+// parser, no validation at the boundary), so `RecalcFn` is intentionally
+// loose to keep the cast surface tiny — a single `as unknown as Character`
+// adapter in `src/app.mts` wires the typed `recalculate(...)` into this
+// untyped slot. Chunk D introduces the schema-driven parser, after which
+// this becomes `(c: Character) => Character` and the adapter cast goes
+// away.
 type RecalcFn = (character: Record<string, unknown>) => Record<string, unknown>;
 
 type BroadcastFn = (

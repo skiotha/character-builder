@@ -32,23 +32,131 @@ export interface CharacterAttributes {
   secondary: SecondaryAttributes;
 }
 
-// ── Effects ───────────────────────────────────────────────────────
+// ── Effects (raw / wire shape) ───────────────────────────────────
+//
+// `RawEffect` is the legacy untyped wire shape used by `character.effects[]`,
+// `Weapon.effects[]`, and `ArmorPiece` index-signature metadata. It is
+// translated into `ResolvedEffect` at the boundary by
+// `src/rules/effects.mts#normalizeRawEffect`. No code under `src/rules/`
+// other than `effects.mts` should consume `RawEffect` directly.
+//
+// Lifecycle (`duration`) is **not** modeled by the engine — sibling apps
+// own temporary state. The `duration` field is ignored at normalization
+// time. `priority` is likewise ignored (phase ordering replaces it).
+//
+// Scheduled for removal in Phase 6 / Chunk H once the reference catalog
+// is fully normalized to the new vocabulary (Chunk F).
 
-export interface EffectModifier {
+/** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
+export interface RawEffectModifier {
   type: string;
-  value: number;
+  value?: unknown;
 }
 
-export interface Effect {
+/** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
+export interface RawEffect {
   id?: string;
   source?: string;
   name?: string;
   description?: string;
-  target: string;
-  modifier: EffectModifier;
-  priority?: number;
+  target?: unknown;
+  modifier: RawEffectModifier;
+  appliesTo?: unknown;
+  /** Ignored by the engine — sibling apps own lifecycle. */
   duration?: string | null;
+  /** Ignored by the engine — phase ordering replaces priority. */
+  priority?: number;
+  /** Nested effects unwound by `collectAllEffects`. */
+  effects?: RawEffect[];
 }
+
+// ── Effects (typed engine shape, ADR-015) ────────────────────────
+
+export type SecondaryAttributeName = keyof SecondaryAttributes;
+
+export type CombatSlotField =
+  | "attackAttribute"
+  | "baseDamage"
+  | "bonusDamage"
+  | "qualities"
+  | "flags";
+
+export type EffectFlag =
+  | "poisonImmunity"
+  | "diseaseImmunity"
+  | "darkvision"
+  | "infravision"
+  | "trueSight"
+  | "flight"
+  | "swim"
+  | "climb"
+  | "undead"
+  | "abomination";
+// NOTE: This is a placeholder starting set. The authoring pass in Chunk F
+// will surface the real vocabulary; this enum is expected to expand.
+
+export type EffectTarget =
+  | { kind: "secondary"; stat: SecondaryAttributeName }
+  | { kind: "combat"; field: CombatSlotField }
+  | { kind: "weaponQuality"; quality: string }
+  | { kind: "armorQuality"; quality: string }
+  | { kind: "flag"; name: EffectFlag };
+
+export type WeaponPredicate =
+  | { kind: "any" }
+  | { kind: "type"; values: string[] }
+  | { kind: "quality"; values: string[] }
+  | { kind: "id"; values: string[] };
+
+export type EffectModifier =
+  | { type: "setBase"; value: PrimaryAttributeName }
+  | { type: "addFlat"; value: number }
+  | { type: "multiply"; value: number }
+  | { type: "cap"; value: number }
+  | { type: "remove" };
+
+export type EffectPhase =
+  | "setBase"
+  | "formula"
+  | "addFlat"
+  | "multiply"
+  | "cap"
+  | "flag";
+
+export interface ResolvedEffect {
+  source: string;
+  target: EffectTarget;
+  modifier: EffectModifier;
+  appliesTo?: WeaponPredicate[];
+}
+
+// ── Triggered Actions (ADR-014) ──────────────────────────────────
+
+export type TriggerKind =
+  | "manual"
+  | "onTurnStart"
+  | "onTurnEnd"
+  | "onAttacked"
+  | "onDamaged"
+  | "onCrit"
+  | "onAllyDamaged"
+  | "onSpellCast"
+  | "onMovement"
+  | "onSightOf"
+  | "onRageStart"
+  | "onRageEnd";
+
+export interface Action {
+  source: string;
+  name: string;
+  trigger: TriggerKind;
+  attackAttribute?: PrimaryAttributeName;
+  damage?: number;
+  effects?: ResolvedEffect[];
+}
+
+export type SpecialAttack = Action & { trigger: "manual" };
+export type Reaction = Action & { trigger: Exclude<TriggerKind, "manual"> };
 
 // ── Learned Traits, Talents & Progression ────────────────────────
 
@@ -75,13 +183,25 @@ export interface LearnedTalent {
   source: TalentSource;
 }
 
-// ── Combat ────────────────────────────────────────────────────────
+// ── Combat (ADR-014: per-slot, derived) ──────────────────────────
+//
+// Slot 0 = primary, slot 1 = secondary, slot 2 = non-disarmable (`own`
+// quality, required, never null). Slots 0/1 may be null when empty.
+//
+// All `CombatSlot` fields are server-derived. The combat phase is stubbed
+// in Chunk C; per-slot fanout and weapon predicates land in Chunk E.
 
-export interface Combat {
+export interface CombatSlot {
+  weaponIndex: number;
   attackAttribute: PrimaryAttributeName;
   baseDamage: number;
-  bonusDamage: number[];
-  weapons: number[];
+  bonusDamage: number;
+  qualities: string[];
+  flags: string[];
+}
+
+export interface Combat {
+  carried: [CombatSlot | null, CombatSlot | null, CombatSlot];
 }
 
 // ── Equipment ─────────────────────────────────────────────────────
@@ -92,13 +212,19 @@ export interface Weapon {
   subtype?: string;
   damage?: number;
   qualities?: string[];
-  effects?: Effect[];
+  // TODO(phase6-chunk-E): equipment effects flow through normalizeRawEffect
+  // when the per-slot combat fanout lands. Inert in Chunk C.
+  effects?: RawEffect[];
 }
 
 export interface ArmorPiece {
   name?: string;
+  /** @deprecated TODO(phase6-chunk-D) — renamed to `armor`. */
   defense?: number;
+  armor?: number;
   qualities?: string[];
+  // TODO(phase6-chunk-E): armor-quality effects flow through the engine
+  // when the per-slot combat fanout lands.
   [key: string]: unknown;
 }
 
@@ -213,11 +339,20 @@ export interface Character {
   rituals: LearnedRitual[];
   talents: LearnedTalent[];
   traditions: string[];
-  effects: Effect[];
+  /** Manual / persistent overrides authored by player or DM. Lifecycle is
+   *  sibling-app-owned; the engine treats every entry as permanent. */
+  effects: RawEffect[];
   affiliations: Affiliation[];
   background: CharacterBackground;
   equipment: CharacterEquipment;
   portrait: CharacterPortrait;
+  // ── Server-derived (ADR-014) ────────────────────────────────────
+  /** Active boolean flags written by the `flag` phase of recalc. */
+  flags: string[];
+  /** Trigger === "manual" actions. Derived; never accept from input. */
+  specialAttacks: SpecialAttack[];
+  /** Trigger !== "manual" actions. Derived; never accept from input. */
+  reactions: Reaction[];
   deleted?: boolean;
   deletedAt?: string;
   deletedBy?: string;

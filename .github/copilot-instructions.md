@@ -148,6 +148,28 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Scripts: `scripts/*.mts`
 - RPG rules: `rpg/{locale}/**/*.md` (Obsidian Markdown vault)
 
+## Operational Scripts
+
+- `scripts/watcher.mts` — dev runner (`npm run start:dev`); forks
+  `src/server.mts` and restarts on crash.
+- `scripts/hard-delete.mts` — manual character cleanup that wraps
+  `storage.hardDeleteCharacter` (so the JSON file, the per-character
+  `data/uploads/portraits/<id>/` directory, **and** every `data/index.json`
+  entry stay in sync). Reach for it whenever you would otherwise
+  `Remove-Item` a character file by hand. Modes:
+  - `node --experimental-strip-types scripts/hard-delete.mts <id>...`
+    — delete one or more characters by id.
+  - `node --experimental-strip-types scripts/hard-delete.mts --all`
+    — wipe every character (used at chunk boundaries).
+  - `node --experimental-strip-types scripts/hard-delete.mts
+    --orphan-portraits` — sweep `data/uploads/portraits/` for directories
+    whose id is no longer in the index (cleans up after past manual
+    deletes that left dangling portraits).
+  - Combine with `--dry-run` to preview without writing. ADR-013
+  carve-out: this script imports `src/models/storage.mts` directly
+  (sibling to `src/lib/backup.mts`); request handlers must keep going
+  through `#models`.
+
 ## Roadmap
 
 See `docs/roadmap.md` for the full phased work plan. Quick reference:

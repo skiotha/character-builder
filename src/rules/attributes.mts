@@ -1,89 +1,81 @@
+// ── Secondary attribute formulas (Phase 6 / Chunk C) ───────────────
+//
+// Typed re-implementation of the secondary attribute base/formula table.
+// `setBase` overrides are applied by `derived.recalculate` before this
+// table runs; the override map is passed in here.
+//
+// Armor is sourced from `equipment.armor.body.armor` with a legacy
+// `defense` fallback. The fallback is scheduled for removal once Chunk D
+// finishes the rename. Storage was wiped in Chunk C / Phase 1, so the
+// fallback should already be dead — but the canonical lint lives in
+// Chunk D.
+
+import type {
+  Character,
+  PrimaryAttributeName,
+  SecondaryAttributeName,
+} from "#rpg-types";
+
 interface SecondaryFormulaRule {
-  default: string;
-  base: (char: Record<string, unknown>, statOverride?: string) => number;
+  defaultPrimary: PrimaryAttributeName | null;
+  base: (character: Character, override?: PrimaryAttributeName) => number;
   formula: (base: number) => number;
 }
 
-export const SECONDARY_FORMULAS: Record<string, SecondaryFormulaRule> = {
+function readPrimary(character: Character, stat: PrimaryAttributeName): number {
+  return character.attributes.primary[stat] ?? 0;
+}
+
+export const SECONDARY_FORMULAS: Record<
+  SecondaryAttributeName,
+  SecondaryFormulaRule
+> = {
   toughness: {
-    default: "strong",
-    base: (char, statOverride) => {
-      const stat = statOverride || "strong";
-      const primary = (char.attributes as Record<string, unknown> | undefined)
-        ?.primary as Record<string, number> | undefined;
-      return primary?.[stat] ?? 0;
-    },
+    defaultPrimary: "strong",
+    base: (char, override) => readPrimary(char, override ?? "strong"),
     formula: (base) => Math.max(base, 10),
   },
   painThreshold: {
-    default: "strong",
-    base: (char, statOverride) => {
-      const stat = statOverride || "strong";
-      const primary = (char.attributes as Record<string, unknown> | undefined)
-        ?.primary as Record<string, number> | undefined;
-      return primary?.[stat] ?? 0;
-    },
+    defaultPrimary: "strong",
+    base: (char, override) => readPrimary(char, override ?? "strong"),
     formula: (base) => Math.ceil(base * 0.5),
   },
   corruptionThreshold: {
-    default: "resolute",
-    base: (char, statOverride) => {
-      const stat = statOverride || "resolute";
-      const primary = (char.attributes as Record<string, unknown> | undefined)
-        ?.primary as Record<string, number> | undefined;
-      return primary?.[stat] ?? 0;
-    },
+    defaultPrimary: "resolute",
+    base: (char, override) => readPrimary(char, override ?? "resolute"),
     formula: (base) => Math.ceil(base * 0.5),
   },
   defense: {
-    default: "quick",
-    base: (char, statOverride) => {
-      const stat = statOverride || "quick";
-      const primary = (char.attributes as Record<string, unknown> | undefined)
-        ?.primary as Record<string, number> | undefined;
-      return primary?.[stat] ?? 0;
-    },
+    defaultPrimary: "quick",
+    base: (char, override) => readPrimary(char, override ?? "quick"),
     formula: (base) => base,
   },
   armor: {
-    default: "equipment",
+    defaultPrimary: null,
     base: (char) => {
-      const equipment = char.equipment as Record<string, unknown> | undefined;
-      const armorObj = equipment?.armor as Record<string, unknown> | undefined;
-      // TODO(phase6-chunk-D): drop the `body.defense` fallback once existing
-      // characters are wiped during the schema migration. The canonical
-      // reference field is `armor` (renamed from `defense` in Chunk A);
-      // legacy stored characters may still carry the old key until they are
-      // re-saved. See `.github/plans/phase6-plan.md` Chunk D.
-      const body = armorObj?.body as
-        | { armor?: number; defense?: number }
-        | null
-        | undefined;
-      return body?.armor ?? body?.defense ?? 0;
+      const body = char.equipment?.armor?.body;
+      if (!body) return 0;
+      // TODO(phase6-chunk-D): drop the `defense` fallback once the rename
+      // lint passes. Storage was wiped in Phase 1 of Chunk C, so any
+      // surviving `defense` value comes from a Chunk-D-pre-merge fixture.
+      return body.armor ?? body.defense ?? 0;
     },
     formula: (base) => base,
   },
   corruptionMax: {
-    default: "resolute",
-    base: (char, statOverride) => {
-      const stat = statOverride || "resolute";
-      const primary = (char.attributes as Record<string, unknown> | undefined)
-        ?.primary as Record<string, number> | undefined;
-      return primary?.[stat] ?? 0;
-    },
+    defaultPrimary: "resolute",
+    base: (char, override) => readPrimary(char, override ?? "resolute"),
     formula: (base) => base,
   },
 };
 
-export function clampValues(character: Record<string, unknown>): void {
-  const attrs = character.attributes as
-    | Record<string, Record<string, unknown>>
-    | undefined;
-  const toughness = attrs?.secondary?.toughness as
-    | { current: number; max: number }
-    | undefined;
-
-  if (toughness) {
-    toughness.current = Math.max(0, Math.min(toughness.current, toughness.max));
-  }
+/**
+ * Clamp `toughness.current` into `[0, toughness.max]`. Called once at the
+ * very end of `recalculate` — this is now the **only** site that touches
+ * toughness bounds (legacy `enforceConsistency` clamp removed).
+ */
+export function clampValues(character: Character): void {
+  const toughness = character.attributes?.secondary?.toughness;
+  if (!toughness) return;
+  toughness.current = Math.max(0, Math.min(toughness.current, toughness.max));
 }

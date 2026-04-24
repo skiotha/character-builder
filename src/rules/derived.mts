@@ -1,132 +1,192 @@
+// ── Derived field recalculation (Phase 6 / Chunk C) ────────────────
+//
+// Single entry point invoked by `models/index.mts` on every save. The
+// pipeline is now phase-keyed (ADR-010 / ADR-015) and consumes typed
+// `ResolvedEffect`s collected from the registry + character overrides.
+//
+// Pipeline order:
+//   1. clone the input character
+//   2. collect + group effects by phase
+//   3. setBase  → build SecondaryAttribute → PrimaryAttribute override map
+//   4. formula  → SECONDARY_FORMULAS, using the override map
+//   5. addFlat  → numeric +
+//   6. multiply → numeric * (rounded)
+//   7. cap      → numeric min (non-combat only; combat caps land in Chunk E)
+//   8. flag     → set membership (flags, armor/weapon qualities)
+//   9. clamp    → toughness.current ∈ [0, toughness.max]
+//   10. deriveCombat       (STUBBED — Chunk E lands per-slot fanout)
+//   11. enforceConsistency (XP guard + equipment defaulting only;
+//                           toughness clamp + expired-effect prune are
+//                           gone — the engine has no lifecycle.)
+
+import type { Character, CombatSlot, Weapon } from "#rpg-types";
+import type { Registry } from "./registry-types.mts";
+
+import {
+  applyAddFlat,
+  applyCap,
+  applyFlag,
+  applyMultiply,
+  applySetBase,
+} from "./applicator.mts";
 import { SECONDARY_FORMULAS, clampValues } from "./attributes.mts";
-import { applyEffect, applyEquipmentBonuses } from "./applicator.mts";
+import { collectAllEffects, groupByPhase } from "./effects.mts";
 
-interface RuleEffect {
-  target?: string;
-  modifier: { type: string; value: unknown };
-  priority?: number;
-  duration?: string;
-  effects?: RuleEffect[];
-}
-
-export function recalculateDerivedFields(
-  character: Record<string, unknown>,
-): Record<string, unknown> {
+export function recalculate(
+  character: Character,
+  registry: Registry,
+): Character {
   const result = structuredClone(character);
 
-  const directEffects = (result.effects || []) as RuleEffect[];
+  // Ensure derived collections exist before the engine writes to them.
+  if (!Array.isArray(result.flags)) result.flags = [];
+  if (!Array.isArray(result.specialAttacks)) result.specialAttacks = [];
+  if (!Array.isArray(result.reactions)) result.reactions = [];
 
-  const allEffects: RuleEffect[] = directEffects.filter(
-    (effect) => !isExpired(effect),
-  );
+  const effects = collectAllEffects(result, registry);
+  const phases = groupByPhase(effects);
 
-  allEffects.sort((a, b) => (a.priority || 10) - (b.priority || 10));
+  // ── 1. setBase ───────────────────────────────────────────────────
+  const overrides = applySetBase(phases.get("setBase") ?? []);
 
-  const overrides: Record<string, string> = {};
+  // ── 2. formula ───────────────────────────────────────────────────
+  if (result.attributes?.secondary) {
+    const secondary = result.attributes.secondary as unknown as Record<
+      string,
+      unknown
+    >;
+    for (const [stat, rule] of Object.entries(SECONDARY_FORMULAS)) {
+      const override = overrides.get(stat as never);
+      const baseValue = rule.base(result, override);
+      const calculated = rule.formula(baseValue);
 
-  for (const effect of allEffects) {
-    if (
-      effect.target?.startsWith("rules.") &&
-      effect.modifier.type === "setBase"
-    ) {
-      // TODO Phase 6 (ADR-011): typed effect targets — drop `!` once `target`
-      // becomes a discriminated union and `split(".")[1]` is unnecessary.
-      const stat = effect.target.split(".")[1]!;
-      overrides[stat] = effect.modifier.value as string;
+      if (stat === "toughness") {
+        result.attributes.secondary.toughness = {
+          ...result.attributes.secondary.toughness,
+          max: calculated,
+        };
+      } else {
+        secondary[stat] = calculated;
+      }
     }
   }
 
-  const attrs = result.attributes as
-    | Record<string, Record<string, unknown>>
-    | undefined;
-  if (!attrs?.secondary) return result;
+  // ── 3-5. addFlat → multiply → cap ────────────────────────────────
+  applyAddFlat(result, phases.get("addFlat") ?? []);
+  applyMultiply(result, phases.get("multiply") ?? []);
+  applyCap(result, phases.get("cap") ?? []);
 
-  for (const [stat, rule] of Object.entries(SECONDARY_FORMULAS)) {
-    const baseValue = rule.base(result, overrides[stat]);
-    const calculated = rule.formula(baseValue);
+  // ── 6. flag ──────────────────────────────────────────────────────
+  applyFlag(result, phases.get("flag") ?? []);
 
-    if (typeof attrs.secondary[stat] === "object") {
-      attrs.secondary[stat] = {
-        ...(attrs.secondary[stat] as Record<string, unknown>),
-        max: calculated,
-      };
-    } else {
-      attrs.secondary[stat] = calculated;
-    }
-  }
-
-  for (const effect of allEffects) {
-    if (effect.target && !effect.target.startsWith("rules.")) {
-      applyEffect(result, effect.target, effect.modifier);
-    }
-  }
-
-  applyEquipmentBonuses(result);
-
+  // ── 7. clamp ─────────────────────────────────────────────────────
   clampValues(result);
 
+  // ── 8. deriveCombat (stub) ───────────────────────────────────────
+  deriveCombat(result);
+
+  // ── 9. enforceConsistency (trimmed) ──────────────────────────────
   enforceConsistency(result);
 
   return result;
 }
 
-function isExpired(effect: RuleEffect): boolean {
-  return !!effect.duration && new Date(effect.duration) < new Date();
+// ── Combat (stubbed for Chunk C) ───────────────────────────────────
+//
+// The full per-slot combat fanout — weapon predicates, attack-attribute
+// resolution, weapon quality propagation, special attack / reaction
+// derivation — lands in Chunk E. Chunk C only guarantees the 3-slot
+// `carried` shape exists and that slot 2 references a weapon with the
+// `own` quality (synthesizing `natural_weapon` if needed, per ADR-014).
+
+const NATURAL_WEAPON: Weapon = {
+  name: "natural_weapon",
+  type: "natural",
+  damage: 0,
+  qualities: ["own"],
+};
+
+function deriveCombat(character: Character): void {
+  const equipment = character.equipment;
+  const weapons = (equipment?.weapons ?? []) as Weapon[];
+
+  // Locate or synthesize the `own` weapon (slot 2 anchor).
+  let ownIndex = weapons.findIndex(
+    (w) => Array.isArray(w?.qualities) && w.qualities.includes("own"),
+  );
+  if (ownIndex === -1) {
+    weapons.push({ ...NATURAL_WEAPON });
+    ownIndex = weapons.length - 1;
+    if (equipment) equipment.weapons = weapons;
+  }
+
+  const ownSlot: CombatSlot = synthesizeSlot(weapons[ownIndex]!, ownIndex);
+
+  // Preserve existing slot 0 / 1 only if they are well-formed CombatSlot
+  // objects; otherwise reset to null. Chunk E refines this with weapon
+  // predicate resolution.
+  const existing = character.combat?.carried;
+  const slot0 = isWellFormedSlot(existing?.[0]) ? existing[0]! : null;
+  const slot1 = isWellFormedSlot(existing?.[1]) ? existing[1]! : null;
+
+  character.combat = { carried: [slot0, slot1, ownSlot] };
+
+  // Derived collections — engine never trusts client input here.
+  character.specialAttacks = [];
+  character.reactions = [];
 }
 
-function enforceConsistency(
-  character: Record<string, unknown>,
-): Record<string, unknown> {
-  const attrs = character.attributes as
-    | Record<string, Record<string, unknown>>
-    | undefined;
-  if (attrs?.secondary?.toughness) {
-    const t = attrs.secondary.toughness as { current: number; max: number };
-    t.current = Math.max(0, Math.min(t.current, t.max));
-  }
-
-  const experience = character.experience as Record<string, number> | undefined;
-  if (
-    experience &&
-    experience.unspent !== undefined &&
-    experience.unspent < 0
-  ) {
-    console.warn(`Negative XP for ${character.id as string}, resetting to 0`);
-    experience.unspent = 0;
-  }
-
-  if (Array.isArray(character.effects)) {
-    character.effects = (character.effects as RuleEffect[]).filter(
-      (effect) => !isExpired(effect),
-    );
-  }
-
-  const equipment = (character.equipment || {}) as Record<string, unknown>;
-  character.equipment = equipment;
-  equipment.weapons = equipment.weapons || [];
-  equipment.armor = equipment.armor || {
-    body: null,
-    plug: null,
+function synthesizeSlot(weapon: Weapon, weaponIndex: number): CombatSlot {
+  return {
+    weaponIndex,
+    attackAttribute: "accurate",
+    baseDamage: (weapon.damage as number) ?? 0,
+    bonusDamage: 0,
+    qualities: [...(weapon.qualities ?? [])],
+    flags: [],
   };
-
-  deriveCombat(character);
-
-  return character;
 }
 
-function deriveCombat(character: Record<string, unknown>): void {
-  const combat = (character.combat || {}) as Record<string, unknown>;
-  character.combat = combat;
+function isWellFormedSlot(value: unknown): value is CombatSlot {
+  if (typeof value !== "object" || value === null) return false;
+  const slot = value as Partial<CombatSlot>;
+  return (
+    typeof slot.weaponIndex === "number" &&
+    typeof slot.attackAttribute === "string" &&
+    typeof slot.baseDamage === "number" &&
+    typeof slot.bonusDamage === "number" &&
+    Array.isArray(slot.qualities) &&
+    Array.isArray(slot.flags)
+  );
+}
 
-  const equipment = character.equipment as Record<string, unknown> | undefined;
-  const weapons = (equipment?.weapons || []) as Array<Record<string, unknown>>;
-  const weaponSlots = (combat.weapons || []) as number[];
+// ── Consistency guards (trimmed) ───────────────────────────────────
+//
+// Removed in Chunk C:
+//   * Expired-effect prune — engine has no lifecycle.
+//   * Toughness clamp — `clampValues` is now the only site.
+//
+// Retained:
+//   * XP non-negativity guard.
+//   * Equipment defaulting (so downstream code never trips on undefined).
+//
+// TODO(phase6-chunk-H?): reassess — much of this defaulting is also done
+// at the schema/storage boundary. Once Chunk H lands, we may remove
+// `enforceConsistency` entirely.
 
-  const primaryIndex = weaponSlots[0];
-  const primaryWeapon =
-    primaryIndex !== undefined ? weapons[primaryIndex] : undefined;
+function enforceConsistency(character: Character): void {
+  if (
+    character.experience &&
+    typeof character.experience.unspent === "number" &&
+    character.experience.unspent < 0
+  ) {
+    console.warn(`Negative XP for ${character.id}, resetting to 0`);
+    character.experience.unspent = 0;
+  }
 
-  combat.attackAttribute = combat.attackAttribute || "accurate";
-  combat.baseDamage = (primaryWeapon?.damage as number) ?? 0;
-  combat.bonusDamage = combat.bonusDamage || [];
+  // Equipment defaulting.
+  const equipment = (character.equipment ?? {}) as Character["equipment"];
+  character.equipment = equipment;
+  if (!Array.isArray(equipment.weapons)) equipment.weapons = [];
+  if (!equipment.armor) equipment.armor = { body: null, plug: null };
 }

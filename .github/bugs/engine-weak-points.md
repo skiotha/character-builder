@@ -22,6 +22,13 @@
 > H = polish.
 ## CRITICAL — Must Fix Before Building On
 
+### 31. `applyFlag`/quality mutators never reset derived set membership
+- **Where:** `src/rules/applicator.mts` — `applyFlagSet`, `applyArmorQuality`, `applyWeaponQuality`.
+- **Impact:** Each recalc clones the incoming `Character` via `structuredClone`, so the **previous** run's `character.flags` (and armor/weapon `qualities` set membership written by the engine) is carried forward. `applyFlag` only adds names from currently-live effects and only removes names when an effect with `modifier.type === "remove"` is present. If a trait/spell/effect that used to add a flag is unlearned or removed between saves, the flag is **never cleaned up** — it sticks on the character forever until something explicitly issues a `remove`.
+- **Repro:** Save a character with trait A that adds `flag: darkvision` → `flags: ["darkvision"]`. Remove trait A. Save again. Expected: `flags: []`. Actual: `flags: ["darkvision"]`.
+- **Fix (planned):** `derived.mts#recalculate` should reset all engine-owned set members at the start of the pipeline — `result.flags = []`, and (once Chunk E lands) the equivalent for armor/weapon qualities that are engine-contributed vs. authored on the equipment record. Needs care: equipment `qualities` that are intrinsic to the weapon/armor must *not* be wiped — only the engine-added overlay. Options: (a) track engine-added qualities in a separate derived set, (b) rebuild equipment `qualities` from `catalog qualities ∪ engine-added`, or (c) snapshot-diff.
+- **Status:** ❌ Open — discovered during Chunk C follow-up (2026-04-24). Target fix: **Chunk E** when per-slot combat fanout touches the same mutators, or earlier if a regression surfaces. Tracks cleanly alongside the `combat.flags` reachability audit in Chunk H.
+
 ### 18. Crash on undefined effect target
 - **Where:** `src/rules/derived.mts` line ~57 — `applyEffect(result, effect.target!, effect.modifier)`
 - **Impact:** Guard `!effect.target?.startsWith("rules.")` evaluates `true` when `target` is `undefined`. The `!` non-null assertion then passes `undefined` to `applyEffect` → `getNestedValue(char, undefined)` → `undefined.split(".")` → runtime `TypeError` crash.
