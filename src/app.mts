@@ -56,11 +56,7 @@ const emptyRegistry: Registry = {
 // throw until this runs, so it must happen at module top-level — before
 // any request can land.
 nagara.initCharacterService({
-  recalc: (character) =>
-    recalculate(
-      character as unknown as Character,
-      emptyRegistry,
-    ) as unknown as Record<string, unknown>,
+  recalc: (character) => recalculate(character, emptyRegistry),
   broadcast: broadcastToCharacter,
   broadcastDeleted: broadcastCharacterDeleted,
 });

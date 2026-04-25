@@ -19,6 +19,67 @@ const rpgValidators = {
   corruptionThresholdValid: (): boolean => true,
 };
 
+// ── Combat carried-tuple validator (ADR-014) ─────────────────────
+//
+// Enforces the 3-slot shape on input. The only writable inner field is
+// `weaponIndex`; everything else is recalc output and any other key in
+// the slot object is rejected. Slot 2 is required and must point at a
+// weapon that has the `own` quality (the `natural_weapon` seed satisfies
+// this by default — see deriveCombat in src/rules/derived.mts).
+function validateCombatCarried(
+  value: unknown,
+  allData: Record<string, unknown>,
+): true | string {
+  if (!Array.isArray(value) || value.length !== 3) {
+    return "combat.carried must be a 3-element array";
+  }
+
+  const equipment = allData?.equipment as { weapons?: unknown[] } | undefined;
+  const weapons = Array.isArray(equipment?.weapons) ? equipment!.weapons : [];
+
+  for (let i = 0; i < 3; i++) {
+    const slot = value[i];
+
+    if (slot === null) {
+      if (i === 2) return "combat.carried[2] is required (own-weapon slot)";
+      continue;
+    }
+
+    if (typeof slot !== "object" || Array.isArray(slot)) {
+      return `combat.carried[${i}] must be null or { weaponIndex: number }`;
+    }
+
+    const keys = Object.keys(slot as Record<string, unknown>);
+    if (keys.length !== 1 || keys[0] !== "weaponIndex") {
+      return `combat.carried[${i}] only accepts the "weaponIndex" key`;
+    }
+
+    const weaponIndex = (slot as { weaponIndex: unknown }).weaponIndex;
+    if (
+      typeof weaponIndex !== "number" ||
+      !Number.isInteger(weaponIndex) ||
+      weaponIndex < 0 ||
+      weaponIndex >= weapons.length
+    ) {
+      return `combat.carried[${i}].weaponIndex out of range`;
+    }
+
+    if (i === 2) {
+      const weapon = weapons[weaponIndex] as
+        | { qualities?: unknown[] }
+        | undefined;
+      const qualities = Array.isArray(weapon?.qualities)
+        ? (weapon!.qualities as unknown[])
+        : [];
+      if (!qualities.includes("own")) {
+        return "combat.carried[2] must reference a weapon with the `own` quality";
+      }
+    }
+  }
+
+  return true;
+}
+
 const capitalize = (value: string): string =>
   value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -79,16 +140,9 @@ export const SCHEMA_SECTIONS: SchemaSection[] = [
     displayId: "equipment",
   },
   {
-    id: "information.combat",
-    label: "Combat",
-    order: 3,
-    parent: "information",
-    displayId: "combat",
-  },
-  {
     id: "information.corruption",
     label: "Corruption",
-    order: 4,
+    order: 3,
     parent: "information",
     displayId: "corruption",
   },
@@ -146,7 +200,7 @@ export const CHARACTER_SCHEMA: Record<
     required: true,
     serverControlled: true,
     generated: true,
-    default: 1,
+    default: 2,
     permissions: perm_server,
     ui: { hidden: true },
   },
@@ -350,58 +404,27 @@ export const CHARACTER_SCHEMA: Record<
     },
   },
 
-  // ── Combat ──────────────────────────────────────────────────
+  // ── Combat (ADR-014: per-slot) ──────────────────────────────
+  //
+  // The 3-slot `carried` tuple is the ONLY writable combat surface.
+  // Per-slot derived fields (`attackAttribute`, `baseDamage`, `bonusDamage`,
+  // `qualities`, `flags`) plus top-level `specialAttacks` and `reactions`
+  // are pure recalc output — not registered in the schema, not validated
+  // on input, sanitizer (denylist) lets them through.
 
   combat: {
     type: "object",
-    derived: true,
     permissions: perm_default,
 
-    attackAttribute: {
-      type: "string",
-      derived: true,
-      default: "accurate",
-      permissions: perm_default,
-      ui: {
-        section: "information.combat",
-        label: "Attack Attribute",
-        order: 1,
-        displayAs: "readonly",
-      },
-    },
-
-    baseDamage: {
-      type: "number",
-      derived: true,
-      default: 0,
-      permissions: perm_default,
-      ui: {
-        section: "information.combat",
-        label: "Base Damage",
-        order: 2,
-        displayAs: "readonly",
-      },
-    },
-
-    bonusDamage: {
-      type: "array",
-      derived: true,
-      permissions: perm_default,
-      ui: {
-        section: "information.combat",
-        label: "Bonus Damage",
-        order: 3,
-        displayAs: "readonly",
-      },
-    },
-
-    weapons: {
+    carried: {
       type: "array",
       permissions: perm_default,
+      default: [null, null, { weaponIndex: 0 }],
+      validate: validateCombatCarried,
       ui: {
-        section: "information.combat",
-        label: "Weapon Slots",
-        order: 4,
+        section: "information.equipment",
+        label: "Carried Weapons",
+        order: 11,
         component: "weapon-slots",
       },
     },
@@ -531,12 +554,7 @@ export const CHARACTER_SCHEMA: Record<
   effects: {
     type: "array",
     permissions: perm_dm_write,
-    ui: {
-      section: "information.combat",
-      label: "Active Effects",
-      order: 5,
-      component: "effect-list",
-    },
+    ui: { hidden: true },
   },
 
   // ── Affiliations ────────────────────────────────────────────
@@ -670,6 +688,15 @@ export const CHARACTER_SCHEMA: Record<
     weapons: {
       type: "array",
       permissions: perm_default,
+      // ADR-014: index 0 is the synthetic natural-weapon anchor for slot 2.
+      default: [
+        {
+          name: "natural_weapon",
+          type: "natural",
+          damage: 0,
+          qualities: ["own"],
+        },
+      ],
       ui: {
         section: "information.equipment",
         label: "Weapons",

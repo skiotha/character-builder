@@ -55,10 +55,7 @@ export const SECONDARY_FORMULAS: Record<
     base: (char) => {
       const body = char.equipment?.armor?.body;
       if (!body) return 0;
-      // TODO(phase6-chunk-D): drop the `defense` fallback once the rename
-      // lint passes. Storage was wiped in Phase 1 of Chunk C, so any
-      // surviving `defense` value comes from a Chunk-D-pre-merge fixture.
-      return body.armor ?? body.defense ?? 0;
+      return body.armor ?? 0;
     },
     formula: (base) => base,
   },

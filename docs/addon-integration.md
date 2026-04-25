@@ -84,7 +84,7 @@ For clarity, the exported object should contain exactly:
   "id":              "uuid",
   "characterName":   "string",
   "lastModified":    "ISO-8601 string",
-  "schemaVersion":   1,              // see §3
+  "schemaVersion":   2,              // see §3
 
   "experience":      { "total", "unspent" },
   "corruption":      { "permanent", "temporary" },
@@ -104,7 +104,7 @@ For clarity, the exported object should contain exactly:
   "traditions":      [],
 
   "combat": {
-    "attackAttribute", "baseDamage", "bonusDamage", "weapons"
+    "carried": [Slot|null, Slot|null, Slot]   // ADR-014; Slot = { weaponIndex }; slot 2 required (own quality)
   },
 
   "equipment": {

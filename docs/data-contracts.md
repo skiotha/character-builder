@@ -21,7 +21,7 @@ This is the **source of truth** — all other formats derive from it.
   "player":        "string",            // display name
   "created":       "ISO-8601",          // set once on creation
   "lastModified":  "ISO-8601",          // updated on every save
-  "schemaVersion": 1,                   // wire format version for cross-project compat
+  "schemaVersion": 2,                   // wire format version for cross-project compat
 
   // ── Identity ──
   "characterName": "string",            // 3–16 chars, letters/spaces/hyphens/apostrophes
@@ -72,12 +72,18 @@ This is the **source of truth** — all other formats derive from it.
   // ── Mystical Traditions ──
   "traditions":  [],                    // array of tradition name strings
 
-  // ── Combat ──
+  // ── Combat (ADR-014: per-slot) ──
+  // The 3-slot `carried` tuple is the ONLY writable combat surface.
+  // Slot 2 is required and must reference a weapon with the `own` quality.
+  // Per-slot derived fields (attackAttribute / baseDamage / bonusDamage /
+  // qualities / flags) plus top-level specialAttacks / reactions are
+  // pure recalc output — present in API responses, NOT in PATCH payloads.
   "combat": {
-    "attackAttribute": "accurate",      // derived: primary attribute used for attacks
-    "baseDamage":      0,               // derived: base weapon damage
-    "bonusDamage":     [],              // derived: bonus damage dice
-    "weapons":         []               // slot indices into equipment.weapons[]
+    "carried": [
+      null,                             // slot 0: { "weaponIndex": number } | null
+      null,                             // slot 1: { "weaponIndex": number } | null
+      { "weaponIndex": 0 }              // slot 2: required, references own-quality weapon
+    ]
   },
 
   // ── Equipment ──
@@ -200,20 +206,31 @@ Sourced from the reference files in `data/`:
 | Armor `quality` | See `reference/armor.{locale}.json` `qualities`. Includes `hampering` (single literal, no `_N` suffix — magnitude is implicit in the armor's `armor` value).    |
 | Armor `slot`    | `body` \| `plug`. **There is no `armor.type` field.**                                                                                                       |
 
-The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. (Existing stored characters with `equipment.armor.body.defense` continue to read correctly via a transition fallback in the reader; the fallback is removed in Chunk D.)
+The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. The transition fallback for `equipment.armor.body.defense` was removed in Chunk D; existing characters must be re-saved or wiped.
 
-#### Combat shape
+#### Combat shape (Chunk D, ADR-014)
+
+Writable storage shape — the only thing PATCH accepts:
 
 ```jsonc
 {
-  "carried": [Slot | null, Slot | null, Slot],   // exactly 3 entries; slot 2 required
-  "attackAttribute": "accurate",
-  "baseDamage": 0,
-  "bonusDamage": []
+  "carried": [Slot | null, Slot | null, Slot]   // exactly 3 entries; slot 2 required
 }
 ```
 
-Slot 2 is invariably non-null and must reference a weapon with the `own` quality (default `natural_weapon`). There is no `combat.active` field; the combat phase fans out per slot. `SpecialAttack[]` and `Reaction[]` are derived arrays produced by the engine; their shape is documented in ADR-014.
+Where `Slot = { "weaponIndex": number }` (no other inner keys are accepted).
+Slot 2 must reference a weapon in `equipment.weapons` with the `own` quality
+(default `natural_weapon`, seeded at index 0 on creation).
+
+Derived (recalc-only, present in API responses but rejected on PATCH):
+
+- Per-slot inner fields: `attackAttribute`, `baseDamage`, `bonusDamage`,
+  `qualities`, `flags`.
+- Top-level `flags`, `specialAttacks`, `reactions` arrays on the character.
+
+The combat phase fans out per slot; `SpecialAttack[]` and `Reaction[]`
+are distinguished by `trigger === "manual"`. Tier stacking is additive.
+Full shape documented in ADR-014.
 
 ### 1.2 Learned Trait / Talent / Ritual
 

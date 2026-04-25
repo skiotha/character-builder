@@ -107,7 +107,7 @@
 - **Where:** `src/rules/derived.mts` — `deriveCombat()` — `combat.attackAttribute = combat.attackAttribute || "accurate"`
 - **Impact:** If an effect sets `combat.attackAttribute` to `""` or `0` (falsy but intentional), the `||` operator overwrites it with `"accurate"`. More importantly, this runs AFTER the effect pipeline, so any effect that DID set the attribute gets overwritten if the field already has a truthy value from character data.
 - **Fix:** Subsumed by per-slot fanout in ADR-014 — each populated slot contributes its own attack profile, with `attackAttribute` defaulting from the weapon and overridable via `{ kind: "combat", field: "attackAttribute" }` effects.
-- **Status:** ❌ Open — Phase 6 Chunk D. Discovered in Phase 4 Session 4 testing.
+- **Status:** ✅ Resolved — Phase 6 Chunk D. `combat.attackAttribute` no longer exists at the top level; per-slot inner field is recalc-derived from the slot's weapon. The `||` fallback is gone.
 
 ### 7. `deriveCombat()` buried inside `enforceConsistency()`
 - **Where:** `src/rules/derived.mts` — enforceConsistency() does: clamp toughness, reset negative XP, filter expired effects, ensure equipment defaults, AND derive combat
@@ -119,13 +119,13 @@
 - **Where:** `src/rules/derived.mts` — `const primaryIndex = weaponSlots[0]`
 - **Impact:** Characters with dual-wield weapons won't get correct bonusDamage.
 - **Fix:** Subsumed by per-slot fanout in ADR-014 — `combat.carried` is `[Slot|null, Slot|null, Slot]` and each populated slot independently produces an attack profile, replacing the `weapons[]` index list.
-- **Status:** 📋 Phase 6 Chunk D (subsumes deferred-tasks §3a)
+- **Status:** ✅ Resolved — Phase 6 Chunk D. `combat.carried` is now `[Slot|null, Slot|null, Slot]` and `deriveCombat` synthesises a per-slot profile for every populated slot (ADR-014).
 
 ### 9. `bonusDamage` always empty / `attackAttribute` hardcoded to "accurate"
 - **Where:** `src/rules/derived.mts` — `combat.bonusDamage = combat.bonusDamage || []`
 - **Impact:** No ability-driven bonus damage or attack attribute override.
 - **Fix:** Per-slot fanout (Chunk D) populates these from each slot's weapon and from `{ kind: "combat", field: "bonusDamage" / "attackAttribute" }` effects (Chunk E wires the ability data).
-- **Status:** 📋 Phase 6 Chunks D + E (subsumes deferred-tasks §3b, §3c)
+- **Status:** 📋 Phase 6 Chunk D (schema) ✅ + Chunk E (wiring) 🔴. Chunk D collapsed the scalar `combat` block to `{ carried }` and made per-slot inner fields recalc-derived. Chunk E will wire ability-driven bonus damage / attribute overrides via `{ kind: "combat", field: ... }` effects.
 
 ### 10. `effects.mts` and `registry.mts` are empty files
 - **Where:** `src/rules/effects.mts`, `src/rules/registry.mts`

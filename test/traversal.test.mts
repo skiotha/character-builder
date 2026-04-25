@@ -215,8 +215,12 @@ describe("getFieldPathsByProperty", () => {
       paths.includes("attributes.secondary.corruptionThreshold"),
       "corruptionThreshold has rpgValidators.corruptionThresholdValid",
     );
-    // Exactly the 5 schema fields with validate functions
-    assert.equal(paths.length, 5);
+    assert.ok(
+      paths.includes("combat.carried"),
+      "combat.carried has validateCombatCarried",
+    );
+    // Exactly the 6 schema fields with validate functions
+    assert.equal(paths.length, 6);
   });
 });
 

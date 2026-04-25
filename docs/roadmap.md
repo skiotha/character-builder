@@ -587,6 +587,32 @@ Discord bot.
 - [ ] Static data endpoints: `/api/v1/spells`, `/api/v1/rituals`, etc.
       (for addon build script)
 - [ ] GitHub Actions CI: run `npm run typecheck` and `npm test` on push
+- [ ] **Weapon-slots UI: replace `<select>` with clickable weapon cards
+      (Chunk-D follow-up).** Each populated slot shows the weapon as a
+      card (name, damage, qualities, art). Clicking a card opens a
+      `<dialog>` with a filtered list of candidate weapons (slot 2
+      filtered to `qualities.includes("own")`); selection swaps the card
+      in-place. Empty slots show a "+ Add weapon" placeholder card. Aligns
+      with the design mockups; supersedes the placeholder dropdown
+      renderer in `public/components/weapon-slots.mjs`.
+- [ ] **Weapon-slots renderer parity: creation vs character view
+      (Chunk-D follow-up).** The current renderer assumes a saved
+      character: it reads `equipment.weapons` from
+      `nagara.getState().currentCharacter` and PATCHes
+      `/characters/:id`. In creation view there is no `id` and no
+      `currentCharacter` yet (the form sources from the stale
+      `DEFAULT_CHARACTER` in `public/utils/rpg.mjs`, which still mirrors
+      the pre-Chunk-D `combat` shape and has an empty `equipment.weapons`
+      list). Before this widget can ship for real:
+      - Update `DEFAULT_CHARACTER` to the Chunk-D shape (`combat: { carried }`,
+        seed `equipment.weapons[0]` with `natural_weapon` from the
+        catalog).
+      - Make the renderer read the form's local data in creation mode and
+        defer persistence to the form's submit handler instead of
+        per-change PATCHes.
+      - Same widget code, two modes: live PATCH in view, deferred-buffer
+        in creation. Decide the seam (mode prop, or a small
+        `WeaponSlotsHost` wrapper) when the cards UI lands.
 
 ### Client-Side Test Coverage
 
@@ -625,6 +651,22 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       collision risk is fully known. Check for duplicate IDs across the
       rendered DOM.
 - [ ] Audit remaining `data-*` attributes for dead or redundant usage
+- [ ] **Lean & spec-compliant client HTML audit (Chunk-D follow-up).**
+      Walk every renderer and component in `public/` and prune attributes
+      that don't earn their keep:
+      - Form controls without `name` / `id` (current example:
+        `weapon-slots.mjs` builds `<select>` elements with only
+        `data-slot`; they're unsubmittable and unlabelled). Either give
+        them proper `name`/`id`/`<label>` wiring or justify the omission.
+      - Wrapper elements with classes that duplicate the tag's semantics
+        (current example: `weapon-slots.mjs` adds `class="weapon-slot"`
+        to each `<li>` inside `ol.weapon-slots` — `@scope` already gives
+        us `ol.weapon-slots > li` for free per the styling guidelines).
+      - Decorative `<div>` / `<span>` where a more specific element
+        applies, per `.github/instructions/hypertext.instructions.md`.
+      Goal: every attribute on every element either feeds a W3C-defined
+      behaviour, an `@scope` selector, or an explicit JS hook — nothing
+      else.
 
 ### Responsive Design & Styling
 

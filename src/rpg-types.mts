@@ -185,11 +185,17 @@ export interface LearnedTalent {
 
 // ── Combat (ADR-014: per-slot, derived) ──────────────────────────
 //
-// Slot 0 = primary, slot 1 = secondary, slot 2 = non-disarmable (`own`
-// quality, required, never null). Slots 0/1 may be null when empty.
+// Slot naming convention (canonical — use these names everywhere, never
+// numeric indices in prose, UI labels or commit messages):
 //
-// All `CombatSlot` fields are server-derived. The combat phase is stubbed
-// in Chunk C; per-slot fanout and weapon predicates land in Chunk E.
+//   index 0 → "main-hand" — carried weapon, optional, may be null
+//   index 1 → "off-hand"  — carried weapon, optional, may be null
+//   index 2 → "own"       — innate weapon, required, never null,
+//                            must reference a weapon with the `own` quality
+//
+// All `CombatSlot` fields except `weaponIndex` are server-derived. The
+// combat phase is stubbed in Chunk C; per-slot fanout and weapon
+// predicates land in Chunk E.
 
 export interface CombatSlot {
   weaponIndex: number;
@@ -219,8 +225,6 @@ export interface Weapon {
 
 export interface ArmorPiece {
   name?: string;
-  /** @deprecated TODO(phase6-chunk-D) — renamed to `armor`. */
-  defense?: number;
   armor?: number;
   qualities?: string[];
   // TODO(phase6-chunk-E): armor-quality effects flow through the engine

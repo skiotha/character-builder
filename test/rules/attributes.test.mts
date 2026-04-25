@@ -166,16 +166,6 @@ describe("SECONDARY_FORMULAS", () => {
         assert.equal(rule.base(char), 3);
       });
 
-      it("falls back to legacy body.defense for un-resaved characters", () => {
-        // TODO(phase6-chunk-D): drop this case together with the fallback in
-        // `src/rules/attributes.mts` once stored characters are wiped during
-        // the schema migration.
-        const char = makeTypedCharacter({
-          equipment: { armor: { body: { defense: 3 }, plug: null } },
-        });
-        assert.equal(rule.base(char), 3);
-      });
-
       it("returns 0 when armor body is null", () => {
         const char = makeTypedCharacter({
           equipment: { armor: { body: null, plug: null } },

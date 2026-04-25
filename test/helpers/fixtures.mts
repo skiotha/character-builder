@@ -57,10 +57,23 @@ function makePrimaryAttributes(
 }
 
 /**
- * Schema-conformant fixture for storage / API / validation / sanitization
- * tests. Mirrors the on-disk shape declared by `CHARACTER_SCHEMA` (i.e. the
- * pre-Chunk-D legacy combat shape, no `flags` / `specialAttacks` /
- * `reactions`). Engine-facing tests should use `makeTypedCharacter` instead.
+ * Schema-conformant fixture in the **input/PATCH-body shape**.
+ *
+ * Returns the shape a client posts or PATCHes — i.e. what survives
+ * `validateCharacterCreation` / sanitiser denylist before recalc runs.
+ * Derived collections (`flags`, `specialAttacks`, `reactions`) and the
+ * derived per-slot fields on `combat.carried[*]` are deliberately omitted
+ * because they are pure recalc output and would be rejected as
+ * `UNKNOWN_FIELD` if a client tried to send them.
+ *
+ * Use this in: validation / sanitization / API / storage round-trip /
+ * character-service tests where the fixture stands in for incoming data.
+ *
+ * Use `makeTypedCharacter` instead when the test needs the post-recalc
+ * `Character` shape (rules engine unit tests).
+ *
+ * Hard-coded so tests break explicitly when the schema changes, rather
+ * than silently adapting via `generateDefaultCharacter()`.
  */
 function makeCharacter(
   overrides?: Record<string, unknown>,
@@ -68,82 +81,7 @@ function makeCharacter(
   const base: Record<string, unknown> = {
     id: "test-id-0000-0000-000000000000",
     backupCode: "Iron-Wolf-123",
-    schemaVersion: 1,
-    characterName: "Testara",
-    playerId: "player-1",
-    player: "Test Player",
-    created: "2025-01-01T00:00:00.000Z",
-    lastModified: "2025-01-01T00:00:00.000Z",
-    attributes: {
-      primary: makePrimaryAttributes(),
-      secondary: {
-        toughness: { max: 10, current: 10 },
-        defense: 10,
-        armor: 0,
-        painThreshold: 5,
-        corruptionThreshold: 5,
-        corruptionMax: 10,
-      },
-    },
-    experience: { total: 50, unspent: 50 },
-    corruption: { permanent: 0, temporary: 0 },
-    background: {
-      age: 30,
-      race: "Human",
-      shadow: "",
-      profession: "",
-      journal: { open: [], done: [], rumours: [] },
-      notes: [],
-      kinkList: [],
-    },
-    equipment: {
-      money: 5,
-      weapons: [],
-      ammunition: [],
-      armor: { body: null, plug: null },
-      runes: [],
-      assassin: [],
-      tools: [],
-      inventory: { carried: [], home: [] },
-      artifacts: [],
-    },
-    combat: {
-      weapons: [],
-      attackAttribute: "accurate",
-      baseDamage: 0,
-      bonusDamage: [],
-    },
-    traits: [],
-    rituals: [],
-    talents: [],
-    traditions: [],
-    effects: [],
-    affiliations: [],
-    location: "",
-    portrait: {
-      path: "",
-      crop: { x: 0, y: 0, scale: 1, rotation: 0 },
-      dimensions: { width: 0, height: 0 },
-      status: "none",
-    },
-  };
-
-  if (!overrides) return base;
-  return simpleMerge(base, overrides);
-}
-
-/**
- * Engine-facing fixture: returns the typed `Character` shape introduced in
- * Phase 6 Chunk C — new `combat.carried` tuple with synthetic
- * `natural_weapon` slot 2, plus `flags` / `specialAttacks` / `reactions`
- * arrays. Use this for rules / applicator / derived tests. Schema-validated
- * tests should use `makeCharacter` instead until Chunk D updates the schema.
- */
-function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
-  const base: Record<string, unknown> = {
-    id: "test-id-0000-0000-000000000000",
-    backupCode: "Iron-Wolf-123",
-    schemaVersion: 1,
+    schemaVersion: 2,
     characterName: "Testara",
     playerId: "player-1",
     player: "Test Player",
@@ -191,18 +129,7 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
       artifacts: [],
     },
     combat: {
-      carried: [
-        null,
-        null,
-        {
-          weaponIndex: 0,
-          attackAttribute: "accurate",
-          baseDamage: 0,
-          bonusDamage: 0,
-          qualities: ["own"],
-          flags: [],
-        },
-      ],
+      carried: [null, null, { weaponIndex: 0 }],
     },
     traits: [],
     rituals: [],
@@ -210,9 +137,6 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
     traditions: [],
     effects: [],
     affiliations: [],
-    flags: [],
-    specialAttacks: [],
-    reactions: [],
     location: "",
     portrait: {
       path: "",
@@ -222,8 +146,46 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
     },
   };
 
-  const merged = overrides ? simpleMerge(base, overrides) : base;
-  return merged as unknown as Character;
+  return overrides ? simpleMerge(base, overrides) : base;
+}
+
+/**
+ * Schema-conformant fixture in the **post-recalc, in-memory shape**.
+ *
+ * Returns a fully-typed `Character` with the derived collections and
+ * per-slot inner fields that `recalculateDerivedFields` would normally
+ * produce. Use this in rules-engine unit tests that bypass the recalc
+ * pipeline and call individual rule functions directly (which expect a
+ * complete `Character`).
+ *
+ * Builds on `makeCharacter` and only enriches the recalc-output bits.
+ */
+function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
+  const stored = makeCharacter(overrides);
+  // Layer on derived collections that recalc would normally produce.
+  const carried = (stored as { combat: { carried: unknown[] } }).combat.carried;
+  const slot2 = carried[2] as { weaponIndex: number };
+  const enriched: Record<string, unknown> = {
+    ...stored,
+    flags: [],
+    specialAttacks: [],
+    reactions: [],
+    combat: {
+      carried: [
+        carried[0],
+        carried[1],
+        {
+          weaponIndex: slot2.weaponIndex,
+          attackAttribute: "accurate",
+          baseDamage: 0,
+          bonusDamage: 0,
+          qualities: ["own"],
+          flags: [],
+        },
+      ],
+    },
+  };
+  return enriched as unknown as Character;
 }
 
 export { makeCharacter, makeTypedCharacter, makePrimaryAttributes };

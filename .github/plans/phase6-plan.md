@@ -47,8 +47,8 @@ chunks that resolve them.
 |-------|-------|------|------|-------|------|--------|
 | A | Decisions, vocabulary lock & armor refactor | — | small | — | ADRs | ✅ Done (2026-04-22) |
 | B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium | ✅ Done |
-| C | Typed pipeline foundation (no combat fanout) | large | — | large | — | ⏳ Not started |
-| D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small | ⏳ Not started |
+| C | Typed pipeline foundation (no combat fanout) | large | — | large | — | ✅ Done |
+| D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small | ✅ Done (2026-04-25) |
 | E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ⏳ Not started |
 | F | Effect normalization (data, collaborative) | — | huge | — | — | ⏳ Not started |
 | G | Wire ability/spell registry into recalc | small | — | medium | — | ⏳ Not started |
@@ -381,6 +381,52 @@ deferred to Chunk E so the schema change can be done independently.
 
 ## Chunk D — Schema Migration: `Combat` + `SpecialAttack[]`
 
+**Status:** ✅ Complete (471/471 tests passing). Schema collapsed to
+`combat: { carried }`, schemaVersion bumped 1 → 2, derived per-slot inner
+fields + top-level `flags`/`specialAttacks`/`reactions` are pure recalc
+output (no schema entry, sanitizer denylist lets them through), client
+`weapon-slots` renderer wired in, `data/` wiped.
+
+**Divergences from the original outline**
+
+- **Step 1 — derived fields stay out of the schema.** The plan called for
+  per-slot `attackAttribute`/`baseDamage`/`bonusDamage`/`qualities`/`flags`
+  and the new `specialAttacks` / `reactions` collections to live in the
+  schema as read-only entries. We kept them out entirely: the schema only
+  describes `combat.carried[i].weaponIndex`. Derived fields ride through
+  the SSE/serializer because the sanitizer is a denylist (passes unknown
+  fields), and validators reject any client input that tries to set them
+  via the same denylist mechanism. Result: one source of truth (rules
+  engine) instead of two (schema + engine), and authoring new derived
+  fields stays a one-line change in `src/rules/`.
+- **Step 4 — client widget is a placeholder.** The `weapon-slots`
+  component override renders the 3-slot grid and the SSE round-trip works,
+  but the `<select>` elements have only `data-slot` (no `name`), so the
+  creation form serializer skips them and the server fills `combat.carried`
+  + `equipment.weapons[0]` from schema `default` values instead. Edit-in-
+  view PATCHes the tuple explicitly. A proper clickable-card widget plus a
+  creation/view parity pass are logged in [`docs/roadmap.md`](../../docs/roadmap.md)
+  Phase 8.
+- **Step 7 — kept the two-factory split.** `makeCharacter` (input/PATCH-
+  body shape) and `makeTypedCharacter` (post-recalc `Character`) did NOT
+  collapse. Engine unit tests in `test/rules/*` need the recalc-output
+  shape; storage / api / validation / sanitization tests need the input
+  shape (otherwise derived fields trip the denylist). Building one fixture
+  on top of the other keeps the duplication minimal. Both are documented
+  with explicit "input" / "post-recalc" JSDocs.
+- **Bonus — slot naming convention codified.** index 0 = main-hand,
+  index 1 = off-hand, index 2 = own. Pinned in JSDoc on
+  [`src/rpg-types.mts`](../../src/rpg-types.mts) `Combat`, in the ADR-014
+  bullet of [`copilot-instructions.md`](../copilot-instructions.md), and in
+  the `weapon-slots` component labels. The numeric tuple is treated as an
+  implementation detail.
+- **Bonus — schema-default audit logged.** `equipment.weapons` schema
+  default inlines a stripped-down `natural_weapon` entry (damage 0, only
+  `own` quality) instead of reusing the canonical entry from
+  `reference/weapons.en.json` (damage 4, `[own, short]`). Fix logged in
+  Chunk F's "F-side audit: schema defaults that hard-code reference data"
+  subsection.
+
 Adopts the new shape end-to-end: server schema, validators, serializer,
 SSE sanitizer, client renderer. Existing characters wiped.
 
@@ -428,9 +474,9 @@ SSE sanitizer, client renderer. Existing characters wiped.
    `as unknown as Character` adapter cast in `src/app.mts`. Threads
    typed `Character` end-to-end through the mutation gate, completing
    Chunk C step 6 of the original plan.
-8. Update affected tests (storage, validation, sanitization, schema-serializer,
+9. Update affected tests (storage, validation, sanitization, schema-serializer,
    data-contracts, sse, api). Expect significant churn.
-9. Update repo memory (`character-builder.md`) with new shape.
+10. Update repo memory (`character-builder.md`) with new shape.
 
 **Verification**
 
@@ -520,6 +566,29 @@ back-and-forth.
 
 1. All reference JSON files parse as valid JSON.
 2. (See Chunk G for semantic validation.)
+
+### F-side audit: schema defaults that hard-code reference data
+
+> Marked during Chunk D wrap-up. Do not address until F+G land.
+
+`src/models/character.mts` currently inlines a copy of the `natural_weapon`
+object as `equipment.weapons.default` (and `combat.carried[2]` points at
+index 0). The canonical record lives in `reference/weapons.en.json` under
+`id: "natural_weapon"`. If the catalog entry drifts (qualities renamed,
+damage retuned, name relocalised) the schema default goes stale silently.
+
+Options to consider once the registry exists (Chunk G):
+
+- Replace the inlined default with a `{ ref: "natural_weapon" }` placeholder
+  that `generateDefaultCharacter` resolves through the registry at creation
+  time (single source of truth, locale-aware).
+- Or keep the inlined default but add a startup invariant test that
+  asserts `schema.equipment.weapons.default[0]` deep-equals the
+  `natural_weapon` entry in the EN catalog. Cheap lint, no runtime
+  coupling, breaks the build on drift.
+
+Decide between those (or a third option) when F is done and the registry
+shape is firm. Until then the inlined copy is acceptable.
 
 ---
 

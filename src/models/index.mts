@@ -3,6 +3,7 @@ import * as storage from "./storage.mts";
 import { validateDmToken } from "#auth";
 
 import type { DeleteResult } from "#types";
+import type { Character } from "#rpg-types";
 
 // ── Service binding (ADR-013) ───────────────────────────────────────
 //
@@ -16,15 +17,7 @@ import type { DeleteResult } from "#types";
 // forgotten — this catches both production wiring mistakes and tests that
 // exercise mutations without setting up stubs.
 
-// TODO(phase6-chunk-D): tighten the storage layer to typed `Character` end-
-// to-end. Today storage reads/writes `Record<string, unknown>` (no schema
-// parser, no validation at the boundary), so `RecalcFn` is intentionally
-// loose to keep the cast surface tiny — a single `as unknown as Character`
-// adapter in `src/app.mts` wires the typed `recalculate(...)` into this
-// untyped slot. Chunk D introduces the schema-driven parser, after which
-// this becomes `(c: Character) => Character` and the adapter cast goes
-// away.
-type RecalcFn = (character: Record<string, unknown>) => Record<string, unknown>;
+type RecalcFn = (character: Character) => Character;
 
 type BroadcastFn = (
   characterId: string,
@@ -66,10 +59,12 @@ async function createCharacter(
     ...characterData,
     id: generateId(),
     backupCode: generateBackupCode(),
-    schemaVersion: 1,
+    schemaVersion: 2,
   };
 
-  const recalculated = recalc(stamped);
+  const recalculated = recalc(
+    stamped as unknown as Character,
+  ) as unknown as Record<string, unknown>;
 
   // No broadcast on create — there can be no subscribers for a brand-new id.
   return await storage.saveCharacter(recalculated);
@@ -81,7 +76,12 @@ async function updateCharacter(
 ): Promise<Record<string, unknown>> {
   const { recalc, broadcast } = requireService();
 
-  const updated = await storage.updateCharacter(id, updates, recalc);
+  const updated = await storage.updateCharacter(
+    id,
+    updates,
+    (c) =>
+      recalc(c as unknown as Character) as unknown as Record<string, unknown>,
+  );
 
   broadcast(id, updated);
 

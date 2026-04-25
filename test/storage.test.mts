@@ -466,7 +466,7 @@ describe("createCharacter", () => {
   it("stamps schemaVersion on created character", async () => {
     const charData = makeCharacter();
     const result = await service.createCharacter("player-create3", charData);
-    assert.equal(result.schemaVersion, 1);
+    assert.equal(result.schemaVersion, 2);
   });
 });
 

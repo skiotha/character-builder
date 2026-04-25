@@ -5,6 +5,7 @@ import { createTempDir } from "./helpers/temp-dir.mts";
 import { makeCharacter } from "./helpers/fixtures.mts";
 
 import type { TempDir } from "./helpers/temp-dir.mts";
+import type { Character } from "../src/rpg-types.mts";
 
 // ── Setup: mock #config before importing models ───────────────────
 
@@ -66,7 +67,7 @@ describe("initCharacterService", () => {
 // ══════════════════════════════════════════════════════════════════
 
 interface Spies {
-  recalcCalls: Record<string, unknown>[];
+  recalcCalls: Character[];
   broadcastCalls: { id: string; character: Record<string, unknown> }[];
   broadcastDeletedCalls: string[];
 }
@@ -115,7 +116,7 @@ describe("service.createCharacter", () => {
 
     assert.ok(typeof result.id === "string" && result.id.length > 0);
     assert.ok(typeof result.backupCode === "string");
-    assert.equal(result.schemaVersion, 1);
+    assert.equal(result.schemaVersion, 2);
   });
 });
 

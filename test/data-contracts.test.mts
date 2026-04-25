@@ -40,7 +40,7 @@ describe("character shape (top-level)", () => {
 
   it("schemaVersion is present and numeric", () => {
     assert.equal(typeof char.schemaVersion, "number");
-    assert.equal(char.schemaVersion, 1);
+    assert.equal(char.schemaVersion, 2);
   });
 });
 
@@ -103,20 +103,21 @@ describe("combat contract", () => {
   const char = makeCharacter();
   const combat = char.combat as Record<string, unknown>;
 
-  it("has attackAttribute", () => {
-    assert.equal(typeof combat.attackAttribute, "string");
+  it("has carried as a 3-element array", () => {
+    assert.ok(Array.isArray(combat.carried));
+    assert.equal((combat.carried as unknown[]).length, 3);
   });
 
-  it("has baseDamage as number", () => {
-    assert.equal(typeof combat.baseDamage, "number");
+  it("slot 2 references a weapon by index", () => {
+    const slot2 = (combat.carried as unknown[])[2] as Record<string, unknown>;
+    assert.equal(typeof slot2.weaponIndex, "number");
   });
 
-  it("has bonusDamage as array", () => {
-    assert.ok(Array.isArray(combat.bonusDamage));
+  it("slots 0 and 1 are null in the default fixture", () => {
+    const carried = combat.carried as unknown[];
+    assert.equal(carried[0], null);
+    assert.equal(carried[1], null);
   });
-
-  // combat.weapons is part of the schema but not in the default fixture
-  // because it's derived. The fixture includes it for completeness.
 });
 
 // ══════════════════════════════════════════════════════════════════
