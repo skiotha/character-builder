@@ -85,6 +85,23 @@ type EffectModifier =
 
 **Why `remove` is safe under the additive-only pipeline:** in the authoring vocabulary, *negative* qualities (e.g. `hampering`, `unwieldy`, `cumbersome`) are **only ever removed**, and *positive* qualities are **only ever added**. There is no case where two effects fight over the presence of the same quality. This is documented as an authoring invariant in the data-contracts vocabulary section.
 
+### 3a. Set-membership authoring convention
+
+`weaponQuality`, `armorQuality`, and `flag` targets address *set membership*, not numeric state. The canonical authoring shape is:
+
+- **Add** a value: `{ "type": "addFlat", "value": 1 }`
+- **Remove** a value: `{ "type": "remove" }`
+
+The applicator treats the numeric value of `addFlat` as **ignored** for these three target kinds — only the verb matters. `1` is the canonical literal so authoring stays uniform; other numbers are accepted but produce no different result. `multiply` and `cap` are not meaningful for set-membership targets and the registry deserializer (Chunk G) rejects them.
+
+This convention keeps the `EffectModifier` union narrow (no separate `add` verb) while letting the applicator reuse the same `addFlat` handler dispatch for both numeric (`secondary`, `combat`) and set-membership targets.
+
+### 3b. `attackAttribute` accepts `setBase` only
+
+The combat target field `attackAttribute` is non-numeric — it names a primary attribute the slot rolls against (e.g. `"accurate"`, `"strong"`). Only the `setBase` modifier is meaningful for it. The registry deserializer (Chunk G) and the runtime parser (`src/rules/effects.mts`) reject `addFlat`, `multiply`, `cap`, and `remove` on `combat.attackAttribute`.
+
+Per-slot default is `"accurate"` (set in `deriveCombatSlots`); a `setBase` effect overrides it.
+
 ### 4. No `priority` field
 
 Effect ordering is determined by the phase the modifier belongs to, in the fixed order defined by [ADR-010](010-effect-resolution-pipeline.md):

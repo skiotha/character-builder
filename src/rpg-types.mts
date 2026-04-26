@@ -74,12 +74,12 @@ export interface RawEffect {
 
 export type SecondaryAttributeName = keyof SecondaryAttributes;
 
-export type CombatSlotField =
-  | "attackAttribute"
-  | "baseDamage"
-  | "bonusDamage"
-  | "qualities"
-  | "flags";
+// `CombatSlotField` enumerates the *numeric / scalar* per-slot fields a
+// `combat`-targeted effect may address. Per-slot `qualities` and `flags`
+// are set-membership; effects mutate them via `weaponQuality` /
+// `flag` targets (with `appliesTo` narrowing the slot), not via a
+// dedicated `combat` field. See ADR-015 §3a.
+export type CombatSlotField = "attackAttribute" | "baseDamage" | "bonusDamage";
 
 export type EffectFlag =
   | "poisonImmunity"
@@ -211,25 +211,36 @@ export interface Combat {
 }
 
 // ── Equipment ─────────────────────────────────────────────────────
+//
+// `Weapon` / `ArmorPiece` model an *instance* the character carries.
+// Reference catalog entries (`reference/weapons.*.json`,
+// `reference/armor.*.json`) currently use a structurally compatible shape
+// but are loaded as plain JSON; the registry deserializer (Chunk G) will
+// validate them against this shape. Effects on equipment are typed
+// `ResolvedEffect[]` — Chunk F authoring produces this shape directly.
 
 export interface Weapon {
-  name?: string;
-  type?: string;
-  subtype?: string;
-  damage?: number;
-  qualities?: string[];
-  // TODO(phase6-chunk-E): equipment effects flow through normalizeRawEffect
-  // when the per-slot combat fanout lands. Inert in Chunk C.
-  effects?: RawEffect[];
+  id: string;
+  name: string;
+  type: string;
+  damage: number;
+  qualities: string[];
+  cost?: number | string;
+  /** Effects intrinsic to this weapon. When the weapon occupies a
+   *  combat slot, these effects are applied to that slot only
+   *  (implicit `appliesTo` = this weapon). */
+  effects?: ResolvedEffect[];
 }
 
 export interface ArmorPiece {
-  name?: string;
-  armor?: number;
-  qualities?: string[];
-  // TODO(phase6-chunk-E): armor-quality effects flow through the engine
-  // when the per-slot combat fanout lands.
-  [key: string]: unknown;
+  id: string;
+  name: string;
+  armor: number;
+  qualities: string[];
+  cost?: number | string;
+  /** Effects intrinsic to this armor piece. Applied globally during
+   *  recalc (collected by `collectAllEffects`). */
+  effects?: ResolvedEffect[];
 }
 
 export interface Rune {

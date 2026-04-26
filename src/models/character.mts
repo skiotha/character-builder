@@ -691,6 +691,7 @@ export const CHARACTER_SCHEMA: Record<
       // ADR-014: index 0 is the synthetic natural-weapon anchor for slot 2.
       default: [
         {
+          id: "natural_weapon",
           name: "natural_weapon",
           type: "natural",
           damage: 0,

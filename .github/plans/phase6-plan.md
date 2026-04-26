@@ -49,7 +49,7 @@ chunks that resolve them.
 | B | Reference catalog relocation (`data/` → `reference/`) | medium | move | medium | medium | ✅ Done |
 | C | Typed pipeline foundation (no combat fanout) | large | — | large | — | ✅ Done |
 | D | Schema migration: `Combat` + `specialAttacks` | large | wipe chars | large | small | ✅ Done (2026-04-25) |
-| E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ⏳ Not started |
+| E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ✅ Done |
 | F | Effect normalization (data, collaborative) | — | huge | — | — | ⏳ Not started |
 | G | Wire ability/spell registry into recalc | small | — | medium | — | ⏳ Not started |
 | H | Validators, sibling docs, cleanup | medium | — | medium | large | ⏳ Not started |
@@ -494,39 +494,212 @@ SSE sanitizer, client renderer. Existing characters wiped.
 Make the engine actually use weapon predicates. Synthetic test data only;
 real reference data comes in Chunk F.
 
-**Steps**
+> **✅ Completed 2026-04-25.** 498 / 498 tests + typecheck green. Outcome
+> tracked deviations from the original outline:
+>
+> - **E.0.5 snapshot test was a partial mitigation, not a resolution.**
+>   The F-side audit (three sources of truth for `natural_weapon`)
+>   remains open — the test only locks the schema default against
+>   *self*-drift, and Chunk E.1 introduced a third copy as the
+>   `NATURAL_WEAPON` constant in `src/rules/derived.mts` (defensive
+>   fallback when no `own` weapon is present). Audit note in this
+>   plan was updated mid-session to reflect this; final unification
+>   moved to **Chunk H step 8** (registry-driven `{ ref: ... }`
+>   default once Chunk G's registry exists).
+> - **Bug #31 partially closed.** Top-level `character.flags` and
+>   per-slot `flags` reset between recalcs is fixed; the
+>   `armor.body`/`plug` overlay-qualities reset is still deferred to
+>   Chunk G or H (commented in `recalculate`).
+> - **Combat tests landed at 26 cases, not the planned ~16** — the
+>   per-slot/predicate matrix expanded once `weapon.effects[]` scoping
+>   and per-slot `flags` reset got their own regression coverage.
+> - **End-of-session architectural review surfaced two follow-on
+>   refactors** that gate Chunk F: locale-merged reference files and
+>   a quality registry. Captured in the new
+>   [phase6-chunkF-prereqs-plan.md](phase6-chunkF-prereqs-plan.md);
+>   inserted as **Chunk F.0** above the Chunk F header.
+> - **End-of-session UI gap surfaced.** The `weapon-slots` widget is
+>   wired but the catalog-fed pickers (`equipment-list`, `armor-slot`,
+>   trait/talent/ritual/tradition/effect lists) remain stubs, so a
+>   freshly-created character has no way to populate
+>   `equipment.weapons[]` from the catalog. Captured as the new
+>   **Chunk I — Catalog-Driven Client Pickers**, sequenced after H.
+>
+> Live deliverables:
+>
+> - **Code (engine):** `src/rules/derived.mts` `deriveCombatSlots`
+>   replaces the Chunk-C stub (per-slot reset + filter + apply +
+>   `weapon.effects[]` scoped to the carrying slot, with a defensive
+>   `NATURAL_WEAPON` synth when `combat.carried[2]` cannot resolve an
+>   `own` weapon). New `src/rules/predicates.mts` with
+>   `matchesPredicates` (AND across predicates, OR within `values[]`,
+>   match-all on undefined / `any`). `src/rules/applicator.mts`
+>   `applyWeaponQuality` de-stubbed (mirror of `applyArmorQuality`).
+>   `src/rules/effects.mts` `collectAllEffects` walks
+>   `equipment.armor.body?.effects` / `plug?.effects` globally (typed
+>   `ResolvedEffect[]` pass-through); weapon effects deliberately not
+>   collected globally. `recalculate` resets `result.flags = []`
+>   before the phase pipeline and wires `deriveCombatSlots` after
+>   global non-combat phases, before `enforceConsistency`.
+> - **Code (E.0 prep):** ADR-015 §3a / §3b appended.
+>   `src/rpg-types.mts` `Weapon` and `ArmorPiece` crystallized
+>   (required fields locked; `subtype` and open index signature
+>   removed; `effects?: ResolvedEffect[]` end-to-end).
+>   `src/models/character.mts` `equipment.weapons.default[0]` carries
+>   `id: "natural_weapon"`. `src/rules/effects.mts` `parseTarget` /
+>   `parseModifier` shrunk `CombatSlotField` to `attackAttribute |
+>   baseDamage | bonusDamage`; rejects non-`setBase` on
+>   `combat.attackAttribute` and `setBase` on other combat fields.
+> - **Tests:** new `test/rules/combat.test.mts` (26 cases covering
+>   predicate kinds, AND/OR composition, multi-slot independence,
+>   slot-2 own-quality, negative `addFlat`/`cap`, `addFlat`
+>   accumulation, `attackAttribute setBase`, parse-time rejection of
+>   `attackAttribute` arithmetic / `remove`, `weaponQuality` and
+>   `armorQuality` add/remove, Bug #31 regression for both top-level
+>   and per-slot `flags`, armor `effects[]` global collection,
+>   `weapon.effects[]` per-slot scoping). Snapshot invariant test
+>   added in `test/validation.test.mts` for the schema default.
+>   Fixtures in `test/helpers/fixtures.mts` updated with `id` field.
+> - **Plan / bugs:** `.github/bugs/engine-weak-points.md` closed #7,
+>   #9 (#8 was already resolved earlier), #23, and #31 (with armor
+>   overlay caveat). New gate plan
+>   `phase6-chunkF-prereqs-plan.md`. New Chunk I authored. F-side
+>   audit note rewritten + Chunk H step 8 added to drive final
+>   resolution.
+> - **Memory:** repo memory `/memories/repo/character-builder-chunk-e.md`
+>   captures crystallized `Weapon` / `ArmorPiece` shape, shrunk
+>   `CombatSlotField`, the three-copies debt, and the per-slot
+>   pipeline conventions.
 
-1. Implement `deriveCombatSlots(char, registry, effects)`:
-   - For each non-empty slot in `combat.carried`:
-     - Resolve weapon from `equipment.weapons[weaponIndex]`.
-     - Build slot's local effect set: filter combat-targeted effects by
-       `appliesTo(weapon)` (default match). Predicate matching is exhaustive
-       switch on `kind`.
-     - Run `setBase` → `addFlat` → `multiply` → `cap` against the slot's
-       fields (`attackAttribute`, `baseDamage`, `bonusDamage`,
-       `qualities`, `flags`).
-     - Apply weapon-mounted effects (from `weapon.effects`) into the same
-       slot pipeline.
-   - Slot defaults: `attackAttribute = "accurate"` (use `??` not `||`).
-     Closes Bug #23.
-2. Implement `applyEquipmentBonuses` rewrite for per-slot model.
-3. Wire `deriveCombatSlots` into `derived.mts` after global phases.
-4. Add `test/rules/combat.test.mts`:
-   - Predicate matching by type / quality / id (each kind).
-   - Predicate AND composition.
+**Phase E.0 — Prep (docs + interfaces, no engine work)**
+
+1. **ADR-015 §3a** — record the set-membership authoring convention:
+   `addFlat: 1` to add, `remove` to remove, applicator ignores the
+   numeric value of `addFlat` for `weaponQuality` / `armorQuality` /
+   `flag` targets. Keeps the modifier union narrow without a separate
+   `add` verb.
+2. **ADR-015 §3b** — record that `combat.attackAttribute` accepts only
+   `setBase`. Arithmetic on attack attribute is rejected by the runtime
+   parser (`src/rules/effects.mts`) and the registry deserializer.
+3. **Crystallize `Weapon` and `ArmorPiece`** in `src/rpg-types.mts`:
+   required fields (`id`, `name`, `type`/`armor`, `damage`/—,
+   `qualities`); optional `effects?: ResolvedEffect[]`, `cost?`. Drop
+   `subtype` from `Weapon` and the open `[key: string]: unknown`
+   index signature from `ArmorPiece`. `effects` is `ResolvedEffect[]`
+   end-to-end (reference data feeds it through the registry
+   deserializer in G; equipment never produces `RawEffect`).
+4. **Schema default** in `src/models/character.mts`: add
+   `id: "natural_weapon"` to `equipment.weapons.default[0]`. Damage
+   stays 0; the catalog reconciliation (catalog has damage 4, qualities
+   `[own, short]`) is intentionally deferred to Chunk F.
+5. **Snapshot invariant test** (in `test/validation.test.mts`'s
+   `generateDefaultCharacter` block): assert
+   `equipment.weapons[0]` deep-equals the hardcoded snapshot. Resolves
+   the F-side audit (option 2 — schema default + snapshot test).
+6. **Fixtures** in `test/helpers/fixtures.mts`: weapon factories add
+   the `id` field.
+7. **Tighten `parseTarget` / `parseModifier`** in
+   `src/rules/effects.mts`: shrink `CombatSlotField` to
+   `attackAttribute | baseDamage | bonusDamage` (drop `qualities` and
+   `flags`); reject non-`setBase` modifiers on
+   `combat.attackAttribute`; reject `setBase` on other combat fields.
+   Per-slot `qualities` / `flags` mutation flows through `weaponQuality`
+   / `flag` targets with `appliesTo` narrowing.
+
+**Phase E.1 — Per-slot combat fanout (engine)**
+
+1. In `src/rules/derived.mts` `recalculate`: reset `result.flags = []`
+   before running the phase pipeline. Closes Bug #31 for top-level
+   flags. (`armor.body` overlay reset deferred to G/H — comment.)
+2. Implement `deriveCombatSlots(char, registry, effects)` replacing
+   the Chunk-C `deriveCombat` stub:
+   - For each non-null slot in `combat.carried`:
+     - Resolve `weapon = equipment.weapons[slot.weaponIndex]`.
+     - Reset derived per-slot state from the weapon:
+       `qualities = [...weapon.qualities]`, `flags = []`,
+       `attackAttribute = "accurate"` (use `??` not `||`,
+       closes Bug #23), `baseDamage = weapon.damage`,
+       `bonusDamage = 0`.
+     - Filter combat-targeted effects by `matchesPredicates(weapon,
+       effect.appliesTo)` (default empty / `any` = match).
+     - Run phases against the slot's numeric fields:
+       `setBase` (attackAttribute only) → `addFlat` → `multiply` →
+       `cap`. `flag`-phase effects with `weaponQuality` / `flag`
+       targets mutate slot membership when their `appliesTo` matches.
+     - Apply `weapon.effects[]` into the same slot pipeline with an
+       implicit `appliesTo = this weapon` (no need to author).
+   - Drop the Chunk-C "preserve old slot if well-formed" path: derived
+     fields are now recomputed from scratch every recalc.
+3. Implement `matchesPredicates(weapon, predicates)` in
+   `src/rules/applicator.mts` (or new `predicates.mts`). Exhaustive
+   switch on `kind`. Multiple predicates AND-compose; `values[]`
+   within one predicate OR-compose. `undefined` / `[]` means match-all.
+4. De-stub `applyWeaponQuality` (per-slot, same add/remove semantics
+   as `applyArmorQuality`). Driven by `deriveCombatSlots`'s per-slot
+   filter, not the global flag phase.
+5. In `src/rules/effects.mts` `collectAllEffects`: walk
+   `equipment.armor.body?.effects` and `equipment.armor.plug?.effects`
+   (typed `ResolvedEffect[]` pass-through, no normalization).
+   Weapon effects are NOT collected globally — they enter per-slot
+   in step 2.
+6. Wire `deriveCombatSlots` into `recalculate` after the global
+   non-combat phases and before `enforceConsistency`.
+7. Add `test/rules/combat.test.mts` (~16 cases):
+   - Predicate kinds (`any`, `id`, `type`, `quality`).
+   - AND / OR composition.
    - Multi-slot independence (Behemoth on slot 0 doesn't affect slot 1).
-   - Empty slot handling (slot 0/1 may be null; slot 2 always present).
+   - Empty slot handling (slots 0 / 1 may be null; slot 2 always
+     present).
    - Slot 2 own-quality enforcement.
    - Negative `addFlat` (Axe Patterns adept) and negative `cap`.
-   - `addFlat` accumulates across multiple effects.
+   - `addFlat` accumulation across multiple effects.
+   - `attackAttribute` `setBase` overrides default.
+   - `attackAttribute` arithmetic / `remove` rejected at parse time.
+   - `weaponQuality` add and remove per slot.
+   - `armorQuality` add/remove on body and plug.
+   - Bug #31 regression: top-level `character.flags` and per-slot
+     `flags` reset between recalcs.
+   - Armor `effects[]` collected globally (no-op smoke test).
+   - `weapon.effects[]` scoped to the carrying slot only.
 
-**Closes weak-point bugs**: #7, #8, #9, #23.
+**Phase E.2 — End-of-chunk**
+
+1. Update `.github/bugs/engine-weak-points.md`: close #7, #8, #9, #23;
+   close #31 (slot side + top-level `character.flags`; armor body
+   overlay caveat noted, deferred to G/H).
+2. Update `/memories/repo/character-builder.md` repo memory with
+   the crystallized `Weapon` / `ArmorPiece` shape and shrunk
+   `CombatSlotField`.
 
 **Verification**
 
 1. `npm test` green; combat tests cover all predicate kinds.
 2. With synthetic Behemoth + Polearm + Marksmanship effects, each slot
    computes independent `bonusDamage` and `attackAttribute`.
+
+---
+
+## Chunk F.0 — Prerequisite: Reference Layout Refactor (GATE)
+
+> **Blocks Chunk F.** Two structural reference-data refactors must land
+> first so the bulk authoring pass operates on the final shape from edit
+> one (otherwise every reference file gets re-touched twice). Tracked in
+> its own plan:
+>
+> - **[phase6-chunkF-prereqs-plan.md](phase6-chunkF-prereqs-plan.md)**
+>   - **Task 1 — Single-file locale merge.** Collapse
+>     `<topic>.{en,ru}.json` pairs into one `<topic>.json` per topic with
+>     embedded `LocalizedString` nodes; loader projects to the requested
+>     locale at read time. Eliminates silent en/ru mechanical drift.
+>     New ADR-016.
+>   - **Task 2 — Quality registry.** Introduce
+>     `reference/qualities.json` mapping each quality id to its
+>     localized name + canonical effects. `weapon.effects[]` /
+>     `armor.effects[]` become rare (bespoke-only); engine fans out
+>     quality effects with the same implicit `appliesTo` scoping as
+>     Chunk E. New ADR-017.
+>
+> Sub-sequence is F.0a–F.0g. Once F.0g lands the gate opens.
 
 ---
 
@@ -570,25 +743,41 @@ back-and-forth.
 ### F-side audit: schema defaults that hard-code reference data
 
 > Marked during Chunk D wrap-up. Do not address until F+G land.
+>
+> **Status update (Chunk E.0.5):** a snapshot test in
+> `test/validation.test.mts` now locks the schema default against silent
+> *self*-drift (the default cannot be edited without updating the
+> snapshot). This is a temporary lint, **not** a resolution — it does
+> not unify the schema-default copy with the catalog copy, and it does
+> not cover the **third** source of truth introduced during Chunk E.1:
+> a `NATURAL_WEAPON` constant in `src/rules/derived.mts` that
+> `deriveCombatSlots` synthesizes when no `own` weapon is present.
+>
+> So as of Chunk E there are three copies of `natural_weapon` (schema
+> default, engine fallback, catalog) and they already disagree on
+> `name` / `damage` / `qualities`. Address in Chunk H per the options
+> below.
 
 `src/models/character.mts` currently inlines a copy of the `natural_weapon`
 object as `equipment.weapons.default` (and `combat.carried[2]` points at
 index 0). The canonical record lives in `reference/weapons.en.json` under
-`id: "natural_weapon"`. If the catalog entry drifts (qualities renamed,
-damage retuned, name relocalised) the schema default goes stale silently.
+`id: "natural_weapon"`. `src/rules/derived.mts` carries a third copy as a
+defensive fallback. If any of the three drifts the others go stale silently.
 
 Options to consider once the registry exists (Chunk G):
 
-- Replace the inlined default with a `{ ref: "natural_weapon" }` placeholder
-  that `generateDefaultCharacter` resolves through the registry at creation
-  time (single source of truth, locale-aware).
-- Or keep the inlined default but add a startup invariant test that
-  asserts `schema.equipment.weapons.default[0]` deep-equals the
-  `natural_weapon` entry in the EN catalog. Cheap lint, no runtime
-  coupling, breaks the build on drift.
+- Replace the inlined default(s) with a `{ ref: "natural_weapon" }`
+  placeholder that `generateDefaultCharacter` resolves through the
+  registry at creation time, and have `deriveCombatSlots` synthesize
+  its fallback from the same registry lookup (single source of truth,
+  locale-aware).
+- Or keep the inlined defaults but add a startup invariant test that
+  asserts `schema.equipment.weapons.default[0]`, the engine fallback
+  constant, and the EN catalog entry all deep-equal each other. Cheap
+  lint, no runtime coupling, breaks the build on drift.
 
 Decide between those (or a third option) when F is done and the registry
-shape is firm. Until then the inlined copy is acceptable.
+shape is firm. Until then the three copies are accepted as a known debt.
 
 ---
 
@@ -645,14 +834,15 @@ shape is firm. Until then the inlined copy is acceptable.
    warn paths from `src/rpg-types.mts` and `src/rules/effects.mts`.
    Reference data must be authored in the typed `ResolvedEffect` shape
    directly by this point (Chunks F + G ensure this); the legacy wire
-   shape has no remaining producers.
-0a. Audit whether `{ kind: "combat"; field: "flags" }` is reached by any
-    normalized effect in the real catalog (post-Chunk-F authoring). If
-    zero producers exist, drop `"flags"` from `CombatSlotField`, drop
-    the field from `CombatSlot`, remove its handling from the per-slot
-    fanout (Chunk E) and the validators below. `CombatSlot.flags` was
-    introduced in Chunk C on symmetry grounds with `qualities`; it stays
-    only if the authored rule-set actually uses it.
+   shape has no remaining producers. Equipment effects are already
+   typed `ResolvedEffect[]` end-to-end (crystallized in Chunk E.0.3).
+0a. *(Preempted by Chunk E.0.7.)* `"qualities"` and `"flags"` were
+    dropped from `CombatSlotField` during Chunk E.0 prep — per-slot
+    set-membership flows through `weaponQuality` / `flag` targets with
+    `appliesTo` narrowing, not via a dedicated combat field. The
+    `CombatSlot.flags` array remains as the engine's per-slot output
+    surface (populated by `flag` effects whose `appliesTo` matches the
+    slot's weapon).
 1. Implement real `rpgValidators` (currently all return `true`):
    - Attribute budget validation.
    - Health range.
@@ -670,8 +860,15 @@ shape is firm. Until then the inlined copy is acceptable.
      `appliesTo` predicate semantics, weapon swap is sibling-side concern.
    - `docs/bot-integration.md` — same.
 6. Update `docs/roadmap.md` Phase 6 — replace Step 0/5 with reference to
-   chunks A–H; mark completed.
+   chunks A–I; mark completed.
 7. Update repo memory (`character-builder.md`, `nagara-rpg-rules.md`).
+8. **Resolve the F-side audit** (three copies of `natural_weapon`):
+   pick one of the two options recorded under Chunk F. Recommended
+   path is the `{ ref: ... }` registry-driven default — by this point
+   the Chunk-G registry exists and `generateDefaultCharacter` can
+   resolve refs at creation time, and `deriveCombatSlots` can
+   synthesize its fallback from the same lookup. Drop the temporary
+   E.0.5 snapshot test once unified.
 
 **Verification**
 
@@ -681,6 +878,87 @@ shape is firm. Until then the inlined copy is acceptable.
 3. Docs reviewed; no stale references to `combat.active`,
    `combat.bonusDamage: number[]`, dotted-path effect targets, or
    `add`/`mul`/`set` modifier verbs.
+4. Only one in-code definition of `natural_weapon` remains (the
+   catalog entry); schema default and engine fallback both resolve
+   through it.
+
+---
+
+## Chunk I — Catalog-Driven Client Pickers
+
+> Closes the gap between "engine works" and "user can actually use it."
+> Until this lands, the per-slot weapon dropdown is empty for any new
+> character (only the seeded `natural_weapon` shows up, and only in
+> the own slot), and there is no way to add traits, talents, rituals,
+> spells, armor, or extra weapons through the UI.
+
+**Context**
+
+The schema-driven renderer registers seven catalog-fed components as
+stubs in `public/renderers/component-registry.mjs`:
+
+- `equipment-list` — `equipment.weapons`, `equipment.ammunition`
+- `armor-slot` — `equipment.armor.body`, `equipment.armor.plug`
+- `trait-list` — `traits[]` (currently renders read-only; needs picker)
+- `talent-list` — `talents[]` (same)
+- `ritual-list` — `rituals[]`
+- `tradition-list` — `traditions[]`
+- `effect-list` — `effects[]` (DM/admin only — manual effect injection)
+- `affiliation-list`, `notes-list` — non-catalog, plain editors
+
+Each catalog-fed component needs to: (a) fetch the relevant
+`/api/v1/{traits,talents,rituals,weapons,armor}` endpoint on mount;
+(b) render an add/remove UI (typically a `<select>` of catalog
+entries plus a list of current selections); (c) PATCH the resulting
+array back through the existing API. The shape the client sends is
+already validated server-side by Chunk H's `rpgValidators` (e.g.
+weapon-ref validity, trait-ref validity).
+
+**Steps**
+
+1. **Authoring spec for client pickers** (`docs/client-pickers.md`):
+   - For each of the seven components: which `/api/v1/*` endpoint
+     it consumes, the shape of catalog entries it renders, the
+     PATCH body shape it emits, the validation it relies on.
+   - Locale handling: pickers honor the user's locale via the same
+     `?locale=` query the existing `weapon-slots` already uses
+     implicitly through pre-loaded `equipment.weapons[]`.
+   - Permission model: read-only when the schema field's permissions
+     reject the current role (mirrors existing `weapon-slots`).
+2. **Implement `equipment-list`** (highest priority — unblocks the
+   per-slot picker). Adds/removes weapons by id; PATCH replaces the
+   whole `equipment.weapons[]` array. Special handling: cannot
+   remove an entry currently referenced by `combat.carried`; cannot
+   remove the seeded `natural_weapon` (or auto-replace with another
+   `own` weapon).
+3. **Implement `armor-slot`** for `body` and `plug`. Single-select;
+   PATCH replaces the slot object. `null` clears the slot.
+4. **Implement `trait-list` / `talent-list` pickers** (the existing
+   `renderTraitList` / `renderTalentList` are display-only — extend
+   with add/remove). Each entry stores `{ id, tier }`; tier picker
+   surfaced inline.
+5. **Implement `ritual-list` / `tradition-list`**. Add/remove by id;
+   array of ids on the character.
+6. **Implement `effect-list`** (DM-only). Free-form editor for the
+   `effects[]` array — JSON textarea with structural validation, or
+   structured form. Simplest viable shape.
+7. **End-to-end manual test**: create a fresh character via UI,
+   add a weapon to `equipment.weapons[]`, see it appear in the
+   slot dropdown, assign it to slot 0, see derived `baseDamage` /
+   `attackAttribute` update, add a trait, see its effects propagate
+   to the slot.
+8. Update `.github/copilot-instructions.md` and
+   `/memories/repo/character-builder.md` — note that all schema
+   stub components are now real; no more stubs in `STUB_COMPONENTS`.
+
+**Verification**
+
+1. No entries in `STUB_COMPONENTS` in
+   `public/renderers/component-registry.mjs` (or only `notes-list` /
+   `affiliation-list` if they remain non-catalog placeholders).
+2. Manual round-trip: create → equip → assign → recalc visible in UI.
+3. Sibling-project parity check: any catalog-fed picker shape change
+   here is reflected in `docs/{addon,bot}-integration.md`.
 
 ---
 
@@ -735,11 +1013,17 @@ A → B can proceed in parallel (A is docs, B is code/move).
 C blocks on A.
 D blocks on C.
 E blocks on D.
+F.0 (gate, separate plan) blocks on E and blocks F.
 G blocks on E (uses real registry).
-F blocks on A's authoring spec; runs as a long user-owned bulk edit.
+F blocks on A's authoring spec AND on F.0; runs as a long user-owned bulk edit.
 G's reference-lint test (G step 6) blocks on F being complete.
 H blocks on G.
+I blocks on H (validators must exist before pickers can rely on them) but
+can begin the per-component pickers (steps 2–6) opportunistically as soon
+as the matching schema field is stable — `equipment-list` in particular
+can ship right after E since `equipment.weapons[]` is already final.
 
-Suggested execution: A → B → C → D → E → G (registry + tests landing first;
-lint-over-real-data turned on once F finishes) → H. F runs independently in
-user time after A ships.
+Suggested execution: A → B → C → D → E → F.0 → G (registry + tests landing
+first; lint-over-real-data turned on once F finishes) → H → I. F runs
+independently in user time after A and F.0 ship. Chunk I closes Phase 6
+with a manually usable app.

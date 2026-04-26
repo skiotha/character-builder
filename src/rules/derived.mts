@@ -1,25 +1,37 @@
-// ── Derived field recalculation (Phase 6 / Chunk C) ────────────────
+// ── Derived field recalculation (Phase 6 / Chunk E) ────────────────
 //
 // Single entry point invoked by `models/index.mts` on every save. The
-// pipeline is now phase-keyed (ADR-010 / ADR-015) and consumes typed
-// `ResolvedEffect`s collected from the registry + character overrides.
+// pipeline is phase-keyed (ADR-010 / ADR-015) and consumes typed
+// `ResolvedEffect`s collected from the registry + character overrides
+// + armor-mounted effects.
 //
 // Pipeline order:
-//   1. clone the input character
+//   1. clone the input character; reset derived collections
+//      (`flags`, `specialAttacks`, `reactions`) to empty so previously
+//      written values can never leak across recalcs (closes Bug #31).
 //   2. collect + group effects by phase
 //   3. setBase  → build SecondaryAttribute → PrimaryAttribute override map
 //   4. formula  → SECONDARY_FORMULAS, using the override map
 //   5. addFlat  → numeric +
 //   6. multiply → numeric * (rounded)
-//   7. cap      → numeric min (non-combat only; combat caps land in Chunk E)
-//   8. flag     → set membership (flags, armor/weapon qualities)
+//   7. cap      → numeric min (non-combat only; combat caps are per-slot)
+//   8. flag     → set membership (character.flags, armor qualities)
 //   9. clamp    → toughness.current ∈ [0, toughness.max]
-//   10. deriveCombat       (STUBBED — Chunk E lands per-slot fanout)
-//   11. enforceConsistency (XP guard + equipment defaulting only;
-//                           toughness clamp + expired-effect prune are
-//                           gone — the engine has no lifecycle.)
+//   10. deriveCombatSlots — per-slot fanout: weapon predicates,
+//                           setBase / addFlat / multiply / cap on
+//                           `attackAttribute` / `baseDamage` /
+//                           `bonusDamage`, weaponQuality add/remove,
+//                           plus weapon.effects[] with implicit
+//                           appliesTo = the carrying weapon.
+//   11. enforceConsistency (XP guard + equipment defaulting only).
 
-import type { Character, CombatSlot, Weapon } from "#rpg-types";
+import type {
+  Character,
+  CombatSlot,
+  PrimaryAttributeName,
+  ResolvedEffect,
+  Weapon,
+} from "#rpg-types";
 import type { Registry } from "./registry-types.mts";
 
 import {
@@ -28,6 +40,7 @@ import {
   applyFlag,
   applyMultiply,
   applySetBase,
+  matchesPredicates,
 } from "./applicator.mts";
 import { SECONDARY_FORMULAS, clampValues } from "./attributes.mts";
 import { collectAllEffects, groupByPhase } from "./effects.mts";
@@ -38,10 +51,16 @@ export function recalculate(
 ): Character {
   const result = structuredClone(character);
 
-  // Ensure derived collections exist before the engine writes to them.
-  if (!Array.isArray(result.flags)) result.flags = [];
-  if (!Array.isArray(result.specialAttacks)) result.specialAttacks = [];
-  if (!Array.isArray(result.reactions)) result.reactions = [];
+  // Always reset engine-owned collections so prior recalc output never
+  // leaks into the next pass. Bug #31.
+  result.flags = [];
+  result.specialAttacks = [];
+  result.reactions = [];
+  // TODO(phase6-chunk-G/H): also reset armor.body / armor.plug overlay
+  // qualities written by the previous recalc. Currently armorQuality
+  // effects mutate the persisted object, which can compound across
+  // recalcs. Catalog reconciliation lands in F+G; engine overlay split
+  // is the cleaner fix.
 
   const effects = collectAllEffects(result, registry);
   const phases = groupByPhase(effects);
@@ -82,8 +101,8 @@ export function recalculate(
   // ── 7. clamp ─────────────────────────────────────────────────────
   clampValues(result);
 
-  // ── 8. deriveCombat (stub) ───────────────────────────────────────
-  deriveCombat(result);
+  // ── 8. deriveCombatSlots ─────────────────────────────────────────
+  deriveCombatSlots(result, effects);
 
   // ── 9. enforceConsistency (trimmed) ──────────────────────────────
   enforceConsistency(result);
@@ -91,22 +110,36 @@ export function recalculate(
   return result;
 }
 
-// ── Combat (stubbed for Chunk C) ───────────────────────────────────
+// ── Per-slot combat fanout (ADR-014) ───────────────────────────────
 //
-// The full per-slot combat fanout — weapon predicates, attack-attribute
-// resolution, weapon quality propagation, special attack / reaction
-// derivation — lands in Chunk E. Chunk C only guarantees the 3-slot
-// `carried` shape exists and that slot 2 references a weapon with the
-// `own` quality (synthesizing `natural_weapon` if needed, per ADR-014).
+// For each non-null carried slot:
+//   1. Resolve the weapon by index. If missing or malformed, the slot
+//      is left null (slots 0/1) or replaced with the synthesized
+//      natural_weapon (slot 2 — required, ADR-014).
+//   2. Reset derived per-slot state from the weapon (qualities cloned,
+//      flags empty, attackAttribute = "accurate", baseDamage =
+//      weapon.damage, bonusDamage = 0).
+//   3. Build the slot-local effect set:
+//        - Global effects with target.kind ∈ {combat, weaponQuality}
+//          whose `appliesTo` matches this weapon (default match).
+//        - Plus `weapon.effects[]` with an implicit appliesTo of "this
+//          weapon" (always matches; predicates on weapon.effects are
+//          honored if authored).
+//   4. Apply the slot-local effects in phase order:
+//        setBase → addFlat → multiply → cap → flag (weaponQuality only).
 
 const NATURAL_WEAPON: Weapon = {
+  id: "natural_weapon",
   name: "natural_weapon",
   type: "natural",
   damage: 0,
   qualities: ["own"],
 };
 
-function deriveCombat(character: Character): void {
+function deriveCombatSlots(
+  character: Character,
+  globalEffects: ResolvedEffect[],
+): void {
   const equipment = character.equipment;
   const weapons = (equipment?.weapons ?? []) as Weapon[];
 
@@ -120,44 +153,126 @@ function deriveCombat(character: Character): void {
     if (equipment) equipment.weapons = weapons;
   }
 
-  const ownSlot: CombatSlot = synthesizeSlot(weapons[ownIndex]!, ownIndex);
+  // Pre-filter relevant effects once. Per-slot iteration then narrows
+  // by `appliesTo` against the slot's weapon.
+  const combatEffects = globalEffects.filter(
+    (e) => e.target.kind === "combat" || e.target.kind === "weaponQuality",
+  );
 
-  // Preserve existing slot 0 / 1 only if they are well-formed CombatSlot
-  // objects; otherwise reset to null. Chunk E refines this with weapon
-  // predicate resolution.
   const existing = character.combat?.carried;
-  const slot0 = isWellFormedSlot(existing?.[0]) ? existing[0]! : null;
-  const slot1 = isWellFormedSlot(existing?.[1]) ? existing[1]! : null;
-
-  character.combat = { carried: [slot0, slot1, ownSlot] };
-
-  // Derived collections — engine never trusts client input here.
-  character.specialAttacks = [];
-  character.reactions = [];
-}
-
-function synthesizeSlot(weapon: Weapon, weaponIndex: number): CombatSlot {
-  return {
-    weaponIndex,
+  const slot0 = buildSlot(weapons, existing?.[0]?.weaponIndex, combatEffects);
+  const slot1 = buildSlot(weapons, existing?.[1]?.weaponIndex, combatEffects);
+  const slot2 = buildSlot(weapons, ownIndex, combatEffects) ?? {
+    weaponIndex: ownIndex,
     attackAttribute: "accurate",
-    baseDamage: (weapon.damage as number) ?? 0,
+    baseDamage: 0,
     bonusDamage: 0,
-    qualities: [...(weapon.qualities ?? [])],
+    qualities: ["own"],
     flags: [],
   };
+
+  character.combat = { carried: [slot0, slot1, slot2] };
 }
 
-function isWellFormedSlot(value: unknown): value is CombatSlot {
-  if (typeof value !== "object" || value === null) return false;
-  const slot = value as Partial<CombatSlot>;
-  return (
-    typeof slot.weaponIndex === "number" &&
-    typeof slot.attackAttribute === "string" &&
-    typeof slot.baseDamage === "number" &&
-    typeof slot.bonusDamage === "number" &&
-    Array.isArray(slot.qualities) &&
-    Array.isArray(slot.flags)
-  );
+function buildSlot(
+  weapons: Weapon[],
+  weaponIndex: number | undefined,
+  combatEffects: ResolvedEffect[],
+): CombatSlot | null {
+  if (typeof weaponIndex !== "number") return null;
+  const weapon = weapons[weaponIndex];
+  if (!weapon) return null;
+
+  // Reset derived state from the weapon.
+  const slot: CombatSlot = {
+    weaponIndex,
+    attackAttribute: "accurate",
+    baseDamage: weapon.damage,
+    bonusDamage: 0,
+    qualities: [...weapon.qualities],
+    flags: [],
+  };
+
+  // Slot-local effect set.
+  const local: ResolvedEffect[] = [];
+  for (const effect of combatEffects) {
+    if (matchesPredicates(weapon, effect.appliesTo)) local.push(effect);
+  }
+  // Weapon-mounted effects: implicit appliesTo = this weapon.
+  // Authored predicates (if any) still apply.
+  for (const effect of weapon.effects ?? []) {
+    if (matchesPredicates(weapon, effect.appliesTo)) local.push(effect);
+  }
+
+  applySlotPhases(slot, local);
+  return slot;
+}
+
+function applySlotPhases(slot: CombatSlot, effects: ResolvedEffect[]): void {
+  // setBase: only `combat.attackAttribute` (parser enforces).
+  for (const effect of effects) {
+    if (effect.modifier.type !== "setBase") continue;
+    if (effect.target.kind !== "combat") continue;
+    if (effect.target.field !== "attackAttribute") continue;
+    slot.attackAttribute = effect.modifier.value as PrimaryAttributeName;
+  }
+
+  // addFlat: numeric combat fields.
+  for (const effect of effects) {
+    if (effect.modifier.type !== "addFlat") continue;
+    if (effect.target.kind !== "combat") continue;
+    applyNumericSlotField(
+      slot,
+      effect.target.field,
+      (v) => v + (effect.modifier as { value: number }).value,
+    );
+  }
+
+  // multiply: numeric combat fields.
+  for (const effect of effects) {
+    if (effect.modifier.type !== "multiply") continue;
+    if (effect.target.kind !== "combat") continue;
+    applyNumericSlotField(slot, effect.target.field, (v) =>
+      Math.round(v * (effect.modifier as { value: number }).value),
+    );
+  }
+
+  // cap: numeric combat fields.
+  for (const effect of effects) {
+    if (effect.modifier.type !== "cap") continue;
+    if (effect.target.kind !== "combat") continue;
+    applyNumericSlotField(slot, effect.target.field, (v) =>
+      Math.min(v, (effect.modifier as { value: number }).value),
+    );
+  }
+
+  // flag phase: weaponQuality add/remove (ADR-015 §3a — addFlat = add,
+  // remove = remove, numeric value of addFlat ignored).
+  for (const effect of effects) {
+    if (effect.target.kind !== "weaponQuality") continue;
+    const quality = effect.target.quality;
+    if (effect.modifier.type === "remove") {
+      slot.qualities = slot.qualities.filter((q) => q !== quality);
+    } else if (
+      effect.modifier.type === "addFlat" &&
+      !slot.qualities.includes(quality)
+    ) {
+      slot.qualities = [...slot.qualities, quality];
+    }
+  }
+}
+
+function applyNumericSlotField(
+  slot: CombatSlot,
+  field: "attackAttribute" | "baseDamage" | "bonusDamage",
+  fn: (current: number) => number,
+): void {
+  if (field === "baseDamage") {
+    slot.baseDamage = fn(slot.baseDamage);
+  } else if (field === "bonusDamage") {
+    slot.bonusDamage = fn(slot.bonusDamage);
+  }
+  // attackAttribute is non-numeric — parser rejects arithmetic on it.
 }
 
 // ── Consistency guards (trimmed) ───────────────────────────────────

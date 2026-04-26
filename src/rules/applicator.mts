@@ -1,19 +1,52 @@
-// ── Effect application (Phase 6 / Chunk C) ─────────────────────────
+// ── Effect application (Phase 6 / Chunk E) ─────────────────────────
 //
 // Phase-keyed handlers consuming typed `ResolvedEffect`s. Each handler is
 // total over the relevant target kinds for its phase; cross-phase calls
 // are a programmer error and trigger an exhaustive `never` check.
 //
-// Combat handlers are STUBS in Chunk C — per-slot fanout lands in
-// Chunk E. Equipment-effect collection is also deferred (see
-// `effects.collectAllEffects`).
+// Combat-target effects are applied per-slot by `deriveCombatSlots` in
+// `derived.mts`, not here. The global handlers below skip them.
 
 import type {
   Character,
   PrimaryAttributeName,
   ResolvedEffect,
   SecondaryAttributeName,
+  Weapon,
+  WeaponPredicate,
 } from "#rpg-types";
+
+// ── Weapon predicate matcher ───────────────────────────────────────
+//
+// Multiple predicates AND-compose; `values[]` within a single predicate
+// OR-composes. `undefined` / `[]` / `[{ kind: "any" }]` all mean
+// match-all.
+
+export function matchesPredicates(
+  weapon: Weapon,
+  predicates: WeaponPredicate[] | undefined,
+): boolean {
+  if (!predicates || predicates.length === 0) return true;
+  for (const predicate of predicates) {
+    if (!matchesOne(weapon, predicate)) return false;
+  }
+  return true;
+}
+
+function matchesOne(weapon: Weapon, predicate: WeaponPredicate): boolean {
+  switch (predicate.kind) {
+    case "any":
+      return true;
+    case "id":
+      return predicate.values.includes(weapon.id);
+    case "type":
+      return predicate.values.includes(weapon.type);
+    case "quality":
+      return predicate.values.some((q) => weapon.qualities.includes(q));
+    default:
+      assertNever(predicate);
+  }
+}
 
 // ── setBase phase ──────────────────────────────────────────────────
 // Returns the override map consumed by the formula phase; secondary
@@ -29,7 +62,9 @@ export function applySetBase(
       // Last write wins — phase ordering replaces priority (ADR-015 §4).
       overrides.set(effect.target.stat, effect.modifier.value);
     } else if (effect.target.kind === "combat") {
-      // TODO(phase6-chunk-E): per-slot setBase on attackAttribute.
+      // Per-slot setBase on `attackAttribute` is handled in
+      // `deriveCombatSlots`. Other combat fields reject setBase at parse
+      // time.
     }
   }
   return overrides;
@@ -59,7 +94,7 @@ export function applyAddFlat(
         break;
       }
       case "combat":
-        // TODO(phase6-chunk-E): per-slot baseDamage / bonusDamage addFlat.
+        // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -100,7 +135,7 @@ export function applyMultiply(
         break;
       }
       case "combat":
-        // TODO(phase6-chunk-E).
+        // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -113,7 +148,8 @@ export function applyMultiply(
 }
 
 // ── cap phase ──────────────────────────────────────────────────────
-// Caps are applied to non-combat targets only. Combat caps land in E.
+// Caps are applied to non-combat targets only. Combat caps are
+// per-slot — handled by `deriveCombatSlots`.
 
 export function applyCap(
   character: Character,
@@ -142,7 +178,7 @@ export function applyCap(
         break;
       }
       case "combat":
-        // TODO(phase6-chunk-E).
+        // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -155,8 +191,9 @@ export function applyCap(
 }
 
 // ── flag phase ─────────────────────────────────────────────────────
-// Mutates set membership: character.flags, armor qualities, weapon
-// qualities. `remove` modifier removes; everything else adds.
+// Mutates character-level set membership: `character.flags` and armor
+// qualities (body + plug). `weaponQuality` is per-slot and handled by
+// `deriveCombatSlots`, not here.
 
 export function applyFlag(
   character: Character,
@@ -171,7 +208,7 @@ export function applyFlag(
         applyArmorQuality(character, effect);
         break;
       case "weaponQuality":
-        applyWeaponQuality(character, effect);
+        // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "secondary":
       case "combat":
@@ -195,24 +232,17 @@ function applyFlagSet(character: Character, effect: ResolvedEffect): void {
 
 function applyArmorQuality(character: Character, effect: ResolvedEffect): void {
   if (effect.target.kind !== "armorQuality") return;
-  const body = character.equipment?.armor?.body;
-  if (!body) return;
-  const qualities = (body.qualities ?? []) as string[];
   const quality = effect.target.quality;
-  if (effect.modifier.type === "remove") {
-    body.qualities = qualities.filter((q) => q !== quality);
-  } else if (!qualities.includes(quality)) {
-    body.qualities = [...qualities, quality];
+  for (const slot of ["body", "plug"] as const) {
+    const piece = character.equipment?.armor?.[slot];
+    if (!piece) continue;
+    const qualities = piece.qualities ?? [];
+    if (effect.modifier.type === "remove") {
+      piece.qualities = qualities.filter((q) => q !== quality);
+    } else if (!qualities.includes(quality)) {
+      piece.qualities = [...qualities, quality];
+    }
   }
-}
-
-function applyWeaponQuality(
-  _character: Character,
-  _effect: ResolvedEffect,
-): void {
-  // TODO(phase6-chunk-E): walk derived combat slots and add/remove the
-  // quality on every slot whose weapon matches the effect's appliesTo
-  // predicate. Stubbed in Chunk C.
 }
 
 function assertNever(value: never): never {

@@ -206,7 +206,12 @@ describe("applyFlag", () => {
 
   it("adds armor quality when body armor present", () => {
     const char = asChar();
-    char.equipment.armor.body = { name: "Leather", qualities: [] };
+    char.equipment.armor.body = {
+      id: "leather",
+      name: "Leather",
+      armor: 1,
+      qualities: [],
+    };
     applyFlag(char, [
       {
         source: "test",
@@ -214,13 +219,15 @@ describe("applyFlag", () => {
         modifier: { type: "addFlat", value: 1 },
       },
     ]);
-    assert.deepEqual(char.equipment.armor.body.qualities, ["reinforced"]);
+    assert.deepEqual(char.equipment.armor.body!.qualities, ["reinforced"]);
   });
 
   it("removes armor quality", () => {
     const char = asChar();
     char.equipment.armor.body = {
+      id: "leather",
       name: "Leather",
+      armor: 1,
       qualities: ["reinforced", "padded"],
     };
     applyFlag(char, [
@@ -230,7 +237,7 @@ describe("applyFlag", () => {
         modifier: { type: "remove" },
       },
     ]);
-    assert.deepEqual(char.equipment.armor.body.qualities, ["padded"]);
+    assert.deepEqual(char.equipment.armor.body!.qualities, ["padded"]);
   });
 
   it("no-op when armor body is null", () => {

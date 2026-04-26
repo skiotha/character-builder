@@ -60,8 +60,6 @@ const KNOWN_COMBAT_FIELDS = new Set<string>([
   "attackAttribute",
   "baseDamage",
   "bonusDamage",
-  "qualities",
-  "flags",
 ]);
 
 const KNOWN_TARGET_KINDS = new Set<string>([
@@ -110,9 +108,10 @@ export function normalizeRawEffect(
   };
 
   if (raw.appliesTo !== undefined) {
-    if (target.kind !== "combat") {
+    if (target.kind !== "combat" && target.kind !== "weaponQuality") {
       console.warn(
-        `[effects] Stripping appliesTo from non-combat effect (target.kind=${target.kind}, source=${effectSource}).`,
+        `[effects] Stripping appliesTo from target kind ${target.kind} ` +
+          `(only combat / weaponQuality accept appliesTo, source=${effectSource}).`,
       );
     } else {
       const predicates = parseAppliesTo(raw.appliesTo, effectSource);
@@ -130,6 +129,12 @@ export function collectAllEffects(
     traits?: LearnedTrait[];
     talents?: unknown[];
     effects?: RawEffect[];
+    equipment?: {
+      armor?: {
+        body?: { effects?: ResolvedEffect[] } | null;
+        plug?: { effects?: ResolvedEffect[] } | null;
+      };
+    };
   },
   registry: Registry,
 ): ResolvedEffect[] {
@@ -156,7 +161,17 @@ export function collectAllEffects(
     collectFromRaw(raw, "character.effects", collected);
   }
 
-  // Equipment effects — TODO(phase6-chunk-E): per-slot combat fanout.
+  // Armor-mounted effects (typed pass-through; reference catalog feeds
+  // ResolvedEffect[] directly via the registry deserializer in Chunk G).
+  // Weapon effects are NOT collected here — they enter per-slot in
+  // `deriveCombatSlots` with implicit `appliesTo` = the carrying weapon.
+  const armor = character.equipment?.armor;
+  if (armor?.body && Array.isArray(armor.body.effects)) {
+    collected.push(...armor.body.effects);
+  }
+  if (armor?.plug && Array.isArray(armor.plug.effects)) {
+    collected.push(...armor.plug.effects);
+  }
 
   return collected;
 }
@@ -332,6 +347,12 @@ function parseModifier(
 
   switch (type) {
     case "setBase": {
+      if (target.kind === "combat" && target.field !== "attackAttribute") {
+        console.warn(
+          `[effects] Rejecting setBase on combat field ${target.field} (only attackAttribute accepts setBase, source=${source}).`,
+        );
+        return null;
+      }
       if (
         typeof modVal !== "string" ||
         !KNOWN_PRIMARY_ATTRIBUTES.has(modVal as PrimaryAttributeName)
@@ -346,6 +367,12 @@ function parseModifier(
     case "addFlat":
     case "multiply":
     case "cap": {
+      if (target.kind === "combat" && target.field === "attackAttribute") {
+        console.warn(
+          `[effects] Rejecting ${type} on combat.attackAttribute (only setBase accepted, source=${source}).`,
+        );
+        return null;
+      }
       if (typeof modVal !== "number" || !Number.isFinite(modVal)) {
         console.warn(
           `[effects] Rejecting ${type} with non-numeric value ${JSON.stringify(modVal)} (source=${source}).`,

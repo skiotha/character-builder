@@ -487,13 +487,15 @@ Step 0 / Step 5 outline.
 | Chunk | Focus                                                        | Status                |
 | ----- | ------------------------------------------------------------ | --------------------- |
 | A     | Decisions, vocabulary lock & armor refactor                  | ✅ Done (2026-04-22)  |
-| B     | Reference catalog relocation (`data/` → `reference/`)        | Not started           |
-| C     | Typed pipeline foundation (no combat fanout)                 | Not started           |
-| D     | Schema migration: `Combat` + `specialAttacks` / `reactions`  | Not started           |
-| E     | Combat phase per-slot fanout + weapon predicates             | Not started           |
+| B     | Reference catalog relocation (`data/` → `reference/`)        | ✅ Done (2026-04-23)  |
+| C     | Typed pipeline foundation (no combat fanout)                 | ✅ Done (2026-04-24)  |
+| D     | Schema migration: `Combat` + `specialAttacks` / `reactions`  | ✅ Done (2026-04-24)  |
+| E     | Combat phase per-slot fanout + weapon predicates             | ✅ Done (2026-04-25)  |
+| F.0   | Reference layout refactor (locale merge + quality registry)  | Not started (gate)    |
 | F     | Effect normalization (data, collaborative bulk edit)         | Not started           |
 | G     | Wire ability/spell registry into recalc + reference-lint     | Not started           |
-| H     | Validators, sibling docs, cleanup                            | Not started           |
+| H     | Validators, sibling docs, cleanup (incl. `natural_weapon` unification) | Not started |
+| I     | Catalog-driven client pickers (closes the usability gap)     | Not started           |
 
 ### Chunk A Deliverables (done)
 

@@ -27,7 +27,7 @@
 - **Impact:** Each recalc clones the incoming `Character` via `structuredClone`, so the **previous** run's `character.flags` (and armor/weapon `qualities` set membership written by the engine) is carried forward. `applyFlag` only adds names from currently-live effects and only removes names when an effect with `modifier.type === "remove"` is present. If a trait/spell/effect that used to add a flag is unlearned or removed between saves, the flag is **never cleaned up** — it sticks on the character forever until something explicitly issues a `remove`.
 - **Repro:** Save a character with trait A that adds `flag: darkvision` → `flags: ["darkvision"]`. Remove trait A. Save again. Expected: `flags: []`. Actual: `flags: ["darkvision"]`.
 - **Fix (planned):** `derived.mts#recalculate` should reset all engine-owned set members at the start of the pipeline — `result.flags = []`, and (once Chunk E lands) the equivalent for armor/weapon qualities that are engine-contributed vs. authored on the equipment record. Needs care: equipment `qualities` that are intrinsic to the weapon/armor must *not* be wiped — only the engine-added overlay. Options: (a) track engine-added qualities in a separate derived set, (b) rebuild equipment `qualities` from `catalog qualities ∪ engine-added`, or (c) snapshot-diff.
-- **Status:** ❌ Open — discovered during Chunk C follow-up (2026-04-24). Target fix: **Chunk E** when per-slot combat fanout touches the same mutators, or earlier if a regression surfaces. Tracks cleanly alongside the `combat.flags` reachability audit in Chunk H.
+- **Status:** ✅ **Mostly resolved** — Phase 6 Chunk E (2026-04-25). `recalculate()` now unconditionally resets `result.flags = []`, `result.specialAttacks = []`, `result.reactions = []` at the top of the pipeline (closes the top-level half). Per-slot `combat.carried[*].flags` and `qualities` are also rebuilt fresh from each weapon every recalc by `deriveCombatSlots`, so weapon-quality leakage is gone too. **Remaining caveat:** `applyArmorQuality` still mutates `equipment.armor.body / .plug` overlay qualities in-place across recalcs — split armor overlay state vs. authored qualities is deferred to **Chunks G/H** alongside catalog reconciliation. See TODO in `src/rules/derived.mts#recalculate`.
 
 ### 18. Crash on undefined effect target
 - **Where:** `src/rules/derived.mts` line ~57 — `applyEffect(result, effect.target!, effect.modifier)`
@@ -113,7 +113,7 @@
 - **Where:** `src/rules/derived.mts` — enforceConsistency() does: clamp toughness, reset negative XP, filter expired effects, ensure equipment defaults, AND derive combat
 - **Impact:** Conceptually distinct pipeline stages tangled in one function. Hard to test and debug individually.
 - **Fix:** Separate into distinct pipeline stages per ADR-010.
-- **Status:** ❌ Open — Phase 6 Chunk C
+- **Status:** ✅ Resolved — Phase 6 Chunks C + E. `recalculate()` now invokes `deriveCombatSlots(result, effects)` as its own pipeline stage (separate from `enforceConsistency`, which is reduced to XP + equipment defaults).
 
 ### 8. `deriveCombat()` only reads first weapon, no dual-wield
 - **Where:** `src/rules/derived.mts` — `const primaryIndex = weaponSlots[0]`
@@ -125,7 +125,7 @@
 - **Where:** `src/rules/derived.mts` — `combat.bonusDamage = combat.bonusDamage || []`
 - **Impact:** No ability-driven bonus damage or attack attribute override.
 - **Fix:** Per-slot fanout (Chunk D) populates these from each slot's weapon and from `{ kind: "combat", field: "bonusDamage" / "attackAttribute" }` effects (Chunk E wires the ability data).
-- **Status:** 📋 Phase 6 Chunk D (schema) ✅ + Chunk E (wiring) 🔴. Chunk D collapsed the scalar `combat` block to `{ carried }` and made per-slot inner fields recalc-derived. Chunk E will wire ability-driven bonus damage / attribute overrides via `{ kind: "combat", field: ... }` effects.
+- **Status:** ✅ Resolved — Phase 6 Chunks D + E. Per-slot `attackAttribute`/`baseDamage`/`bonusDamage` are derived from the slot's weapon and from typed `combat`-targeted effects with `WeaponPredicate` routing. `attackAttribute` accepts `setBase` only; `baseDamage`/`bonusDamage` accept `addFlat`/`multiply`/`cap` (parser-enforced).
 
 ### 10. `effects.mts` and `registry.mts` are empty files
 - **Where:** `src/rules/effects.mts`, `src/rules/registry.mts`

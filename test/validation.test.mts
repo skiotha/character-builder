@@ -748,6 +748,24 @@ describe("generateDefaultCharacter", () => {
     const d = generateDefaultCharacter("pid");
     assert.equal(d.player, "Unknown");
   });
+
+  // Invariant: schema's seed natural_weapon must match the snapshot below.
+  // If the reference catalog's `natural_weapon` entry drifts, this test
+  // does NOT auto-update — the goal is to catch silent drift between the
+  // schema default and the canonical record. Resolution path is logged
+  // in `.github/plans/phase6-plan.md` Chunk F audit (deferred).
+  it("schema default for equipment.weapons[0] is the natural_weapon seed", () => {
+    const d = generateDefaultCharacter("pid");
+    const equipment = d.equipment as Record<string, unknown>;
+    const weapons = equipment.weapons as Array<Record<string, unknown>>;
+    assert.deepEqual(weapons[0], {
+      id: "natural_weapon",
+      name: "natural_weapon",
+      type: "natural",
+      damage: 0,
+      qualities: ["own"],
+    });
+  });
 });
 
 // ── validateRPGRules ──────────────────────────────────────────────
