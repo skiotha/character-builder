@@ -4,6 +4,7 @@ export {
   handleGetRituals,
   handleGetWeapons,
   handleGetArmor,
+  handleGetQualities,
 } from "./handleGetReference.mts";
 export { handleGetCharacters } from "./handleGetCharacters.mts";
 export { handleUploadPortrait } from "./handleUploadPortrait.mts";

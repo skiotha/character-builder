@@ -897,6 +897,23 @@ describe("GET /api/v1/talents (merged boons+sins)", () => {
   });
 });
 
+describe("GET /api/v1/qualities", () => {
+  it("returns 200 with the seeded payload", async () => {
+    const res = await fetch(`${BASE}/api/v1/qualities?locale=en`);
+
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as unknown[];
+    assert.ok(Array.isArray(body));
+  });
+
+  it("rejects an unknown locale with 400", async () => {
+    const res = await fetch(`${BASE}/api/v1/qualities?locale=fr`);
+
+    assert.equal(res.status, 400);
+    await res.text();
+  });
+});
+
 describe("GET /api/v1/abilities", () => {
   it("returns 404 (endpoint removed)", async () => {
     const res = await fetch(`${BASE}/api/v1/abilities`);

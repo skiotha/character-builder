@@ -4,6 +4,7 @@
 
 import type {
   AbilityTier,
+  Quality,
   Reaction,
   ResolvedEffect,
   SpecialAttack,
@@ -25,13 +26,38 @@ export interface InMemoryRegistryConfig {
   traits?: Record<string, TraitFixture>;
   /** Keyed by `${id}:${level}`. */
   talents?: Record<string, { effects?: ResolvedEffect[] }>;
+  /**
+   * Keyed by quality id. Unmapped ids return `null` and the engine
+   * throws (mirrors production strictness, ADR-016 / F.0e).
+   *
+   * The test default fixture (`makeTypedCharacter`) seeds slot 2 with a
+   * weapon carrying the `own` quality; tests that touch combat MUST
+   * either spread `BASE_QUALITIES` or pass `own` explicitly. The
+   * convenience pattern is `{ qualities: { ...BASE_QUALITIES, foo: ... } }`.
+   */
+  qualities?: Record<string, Quality>;
 }
+
+/**
+ * Quality entries that every character fixture relies on. Spread into
+ * any test-scoped `createInMemoryRegistry({ qualities })` call so the
+ * default `natural_weapon` slot-2 anchor (which carries the `own`
+ * quality) doesn't trip the strict registry check.
+ *
+ * Keep this set MINIMAL — it only mirrors what `makeTypedCharacter`
+ * itself authors. Any other quality the test references must be
+ * registered explicitly.
+ */
+export const BASE_QUALITIES: Readonly<Record<string, Quality>> = Object.freeze({
+  own: { id: "own", effects: [] },
+});
 
 export function createInMemoryRegistry(
   config: InMemoryRegistryConfig = {},
 ): Registry {
   const traits = config.traits ?? {};
   const talents = config.talents ?? {};
+  const qualities = config.qualities ?? {};
 
   return {
     lookupTrait(id: string, tier: AbilityTier): TraitLookupResult | null {
@@ -49,10 +75,33 @@ export function createInMemoryRegistry(
       if (!entry) return null;
       return { effects: entry.effects ?? [] };
     },
+
+    /**
+     * Strict: unmapped ids return `null` and the engine throws,
+     * mirroring production. As a convenience, `BASE_QUALITIES`
+     * (currently `{ own }`) is always treated as a fallback so the
+     * default slot-2 anchor in `makeTypedCharacter` doesn't crash
+     * tests that didn't opt into combat at all. Tests that want to
+     * exercise the "`own` is missing from the registry" path should
+     * construct a `Registry` literal directly.
+     */
+    lookupQuality(id: string): Quality | null {
+      return qualities[id] ?? BASE_QUALITIES[id] ?? null;
+    },
   };
 }
 
+/**
+ * Minimal-strictness default registry for tests that don't care about
+ * trait/talent effects but do touch the recalc pipeline. Traits and
+ * talents return null (warn-and-skip in `effects.mts`); qualities
+ * resolve only for `BASE_QUALITIES` (currently just `own`). Any other
+ * quality id triggers the F.0e strict-throw — which is the *right*
+ * production behaviour. Use `createInMemoryRegistry({ qualities: ... })`
+ * when the test fixture carries additional quality ids.
+ */
 export const emptyRegistry: Registry = {
   lookupTrait: () => null,
   lookupTalent: () => null,
+  lookupQuality: (id) => BASE_QUALITIES[id] ?? null,
 };

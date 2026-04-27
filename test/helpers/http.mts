@@ -22,7 +22,38 @@ interface TestServer {
 async function startTestServer(tempDir: TempDir): Promise<TestServer> {
   // Seed reference catalog so /api/v1/traits and friends don't 500.
   // abilities + spells are merged into /traits; boons + sins into /talents;
-  // rituals/weapons/armor are single-source.
+  // rituals/weapons/armor/qualities are single-source.
+  // qualities: post-F.0e the engine throws on unknown weapon/armor
+  // qualities, so we seed the full id set used by the default fixture
+  // weapons (most importantly `own` for slot 2).
+  const qualityIds = [
+    "area",
+    "balanced",
+    "blessed",
+    "blunt",
+    "catastrophic",
+    "composite",
+    "concealed",
+    "cumbersome",
+    "deep_wounds",
+    "entangling",
+    "flaming",
+    "flexible",
+    "fortified",
+    "hampering",
+    "long",
+    "massive",
+    "own",
+    "precise",
+    "ranged",
+    "returning",
+    "short",
+    "special",
+    "unwieldy",
+    "vengeful",
+    "versatile",
+  ];
+  const qualitySeed = qualityIds.map((id) => ({ id, effects: [] }));
   const seedTopics: Array<[string, unknown]> = [
     ["abilities", [{ id: "test-ability", name: "Test Ability" }]],
     ["spells", [{ id: "test-spell", name: "Test Spell" }]],
@@ -31,6 +62,7 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
     ["rituals", [{ id: "test-ritual", name: "Test Ritual" }]],
     ["weapons", [{ id: "test-weapon", name: "Test Weapon" }]],
     ["armor", [{ id: "test-armor", name: "Test Armor" }]],
+    ["qualities", qualitySeed],
   ];
   for (const [topic, payload] of seedTopics) {
     for (const locale of ["en", "ru"]) {

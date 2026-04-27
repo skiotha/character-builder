@@ -102,7 +102,7 @@ export function recalculate(
   clampValues(result);
 
   // ── 8. deriveCombatSlots ─────────────────────────────────────────
-  deriveCombatSlots(result, effects);
+  deriveCombatSlots(result, effects, registry);
 
   // ── 9. enforceConsistency (trimmed) ──────────────────────────────
   enforceConsistency(result);
@@ -139,6 +139,7 @@ const NATURAL_WEAPON: Weapon = {
 function deriveCombatSlots(
   character: Character,
   globalEffects: ResolvedEffect[],
+  registry: Registry,
 ): void {
   const equipment = character.equipment;
   const weapons = (equipment?.weapons ?? []) as Weapon[];
@@ -160,9 +161,19 @@ function deriveCombatSlots(
   );
 
   const existing = character.combat?.carried;
-  const slot0 = buildSlot(weapons, existing?.[0]?.weaponIndex, combatEffects);
-  const slot1 = buildSlot(weapons, existing?.[1]?.weaponIndex, combatEffects);
-  const slot2 = buildSlot(weapons, ownIndex, combatEffects) ?? {
+  const slot0 = buildSlot(
+    weapons,
+    existing?.[0]?.weaponIndex,
+    combatEffects,
+    registry,
+  );
+  const slot1 = buildSlot(
+    weapons,
+    existing?.[1]?.weaponIndex,
+    combatEffects,
+    registry,
+  );
+  const slot2 = buildSlot(weapons, ownIndex, combatEffects, registry) ?? {
     weaponIndex: ownIndex,
     attackAttribute: "accurate",
     baseDamage: 0,
@@ -178,6 +189,7 @@ function buildSlot(
   weapons: Weapon[],
   weaponIndex: number | undefined,
   combatEffects: ResolvedEffect[],
+  registry: Registry,
 ): CombatSlot | null {
   if (typeof weaponIndex !== "number") return null;
   const weapon = weapons[weaponIndex];
@@ -202,6 +214,18 @@ function buildSlot(
   // Authored predicates (if any) still apply.
   for (const effect of weapon.effects ?? []) {
     if (matchesPredicates(weapon, effect.appliesTo)) local.push(effect);
+  }
+  // Registry-resolved quality effects (ADR-016): each id in
+  // `weapon.qualities` looks up a `Quality` entry and contributes its
+  // `effects[]` to this slot. Implicit `appliesTo = this weapon`.
+  // Unknown ids are a hard error — every weapon quality must be
+  // registered (F.0e flipped this from warn-and-skip).
+  for (const qualityId of weapon.qualities) {
+    const quality = registry.lookupQuality(qualityId);
+    if (!quality) {
+      throw unknownWeaponQualityError(qualityId, weapon.id, weaponIndex);
+    }
+    for (const effect of quality.effects) local.push(effect);
   }
 
   applySlotPhases(slot, local);
@@ -288,6 +312,26 @@ function applyNumericSlotField(
 // TODO(phase6-chunk-H?): reassess — much of this defaulting is also done
 // at the schema/storage boundary. Once Chunk H lands, we may remove
 // `enforceConsistency` entirely.
+
+// ── Quality registry strict lookup (ADR-016, F.0e) ─────────────────
+//
+// Unknown quality ids are a hard error. The registry is loaded from
+// `reference/qualities.<locale>.json`; every id appearing on a weapon
+// or armor piece must resolve. F.0c–F.0d ran in warn-and-skip mode;
+// F.0e flipped this to throw now that the registry is populated.
+
+function unknownWeaponQualityError(
+  id: string,
+  weaponId: string,
+  weaponIndex: number,
+): Error {
+  return new Error(
+    `[quality-registry] Unknown weapon quality '${id}' on weapon ` +
+      `'${weaponId}' (equipment.weapons[${weaponIndex}]). ` +
+      `Every quality id on a weapon or armor piece must have a matching ` +
+      `entry in reference/qualities.<locale>.json (ADR-016).`,
+  );
+}
 
 function enforceConsistency(character: Character): void {
   if (

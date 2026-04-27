@@ -61,6 +61,34 @@ describe("getTopic (single-source)", () => {
     const reloaded = await ref.getTopic("rituals", "en");
     assert.equal(reloaded[0]?.id, "ritual-b");
   });
+
+  it("qualities: throws on duplicate id within a single locale (ADR-016)", async () => {
+    await writeRef("qualities.en.json", [{ id: "padded" }, { id: "padded" }]);
+    const future = new Date(Date.now() + 15_000);
+    await fs.utimes(
+      path.join(tempDir.referenceDir, "qualities.en.json"),
+      future,
+      future,
+    );
+    await assert.rejects(
+      () => ref.getTopic("qualities", "en"),
+      /Duplicate quality id 'padded'.*qualities\.en\.json/,
+    );
+  });
+
+  it("qualities: throws when an entry is missing an id (ADR-016)", async () => {
+    await writeRef("qualities.ru.json", [{ name: "Nameless" }]);
+    const future = new Date(Date.now() + 20_000);
+    await fs.utimes(
+      path.join(tempDir.referenceDir, "qualities.ru.json"),
+      future,
+      future,
+    );
+    await assert.rejects(
+      () => ref.getTopic("qualities", "ru"),
+      /Quality entry without id.*qualities\.ru\.json/,
+    );
+  });
 });
 
 describe("getMerged (traits)", () => {

@@ -36,7 +36,7 @@ Key layers:
 - `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
 - `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
-- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor}` (locale-aware, mtime-cached). **Not** served as static files.
+- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ.
 - `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
 ## Key Design Decisions
@@ -58,6 +58,7 @@ in [`docs/decisions/README.md`](../docs/decisions/README.md). Key ones:
 - **ADR-013:** Domain layer as the mutation gate. `src/models/index.mts` is the single entry point for character mutations; storage is internal. Handlers and middleware import from `#models`, never `#models/storage` (carve-outs: `src/lib/backup.mts` and code inside `src/models/` itself).
 - **ADR-014:** Per-slot combat, special attacks & reactions. `combat.carried` is `[Slot|null, Slot|null, Slot]`; index 2 is required and must reference a weapon with the `own` quality (default `natural_weapon`). Combat phase fans out per slot. `SpecialAttack[]` / `Reaction[]` are derived collections distinguished by `trigger === "manual"`. Tier stacking is additive. **Slot naming convention** — use names, not numbers, in prose / UI / commit messages: index 0 = **main-hand**, index 1 = **off-hand**, index 2 = **own**. The numeric tuple is an implementation detail; "slot 2" is ambiguous so don't write it.
 - **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). 5-kind discriminated union (`secondary | combat | weaponQuality | armorQuality | flag`), `WeaponPredicate` (`any | type | quality | id`, AND-composed via `appliesTo`), per-phase `EffectModifier` shapes including `remove`, no `priority` field.
+- **ADR-016:** Quality registry. `reference/qualities.{en,ru}.json` is the engine-canonical source of effects for weapon/armor qualities (single namespace, parametric ids via `_N` suffix, EN authoritative, locale-drift lint enforces structural alignment). Engine throws on unknown ids; production registry is loaded once at startup via `loadQualityIndex()` in `src/app.mts`.
 
 ## Coding Guidelines
 

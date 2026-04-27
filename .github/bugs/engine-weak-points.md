@@ -157,5 +157,11 @@ _Items #15, #16, #17 moved to [`api-infra-bugs.md`](api-infra-bugs.md)._
 - **Where:** Planned in deferred-tasks §2
 - **Status:** 📋 Weapons + armor exist (armor refreshed in Chunk A); relocation to `reference/` in Chunk B; runes still pending.
 
+### 19. 📋 Slot-2 `own` quality has no registry-side check
+- **Where:** `src/models/character.mts` `validateCombatCarried` and the [quality registry](../decisions/016-quality-registry.md).
+- **Impact:** Schema validation asserts that `combat.carried[2]`'s weapon has `"own"` in its `qualities[]`, but nothing currently asserts the symmetric registry-side property: that `"own"` is a registered quality id in `reference/qualities.<locale>.json`. If `"own"` is dropped from the catalog by mistake, the engine throws on every recalc *after* a save lands — the failure surfaces late and looks like a recalc bug instead of a catalog bug.
+- **Fix:** Add to the Chunk G load-time `reference-lint.test.mts` validator (now drafted in [phase6-plan.md § Chunk G step 6](../plans/phase6-plan.md#chunk-g--wire-abilityspell-registry-into-recalc)). Optionally also assert this at engine startup in `loadQualityIndex()`.
+- **Status:** 📋 Phase 6 Chunk G
+
 
 _Items #24, #25, #26, #27, #28, #29 moved to [`api-infra-bugs.md`](api-infra-bugs.md)._

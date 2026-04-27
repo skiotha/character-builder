@@ -243,6 +243,26 @@ export interface ArmorPiece {
   effects?: ResolvedEffect[];
 }
 
+// ── Quality registry (ADR-016) ────────────────────────────────────
+//
+// Boilerplate-effect registry for weapon/armor qualities. A flat keyed
+// map (no weapon/armor split — single namespace). The engine looks up
+// each id mentioned in `Weapon.qualities` / `ArmorPiece.qualities` and
+// fans out the registry's `effects[]` with implicit `appliesTo`:
+//   * weapon-mounted qualities → scoped to the carrying weapon
+//   * armor-mounted qualities → applied globally
+//
+// Localized fields (`name`, `description`) are display-only; the engine
+// never reads them. `effects[]` is byte-identical across locale files
+// (the locale-drift lint enforces).
+
+export interface Quality {
+  id: string;
+  name?: string;
+  description?: string;
+  effects: ResolvedEffect[];
+}
+
 export interface Rune {
   name: string;
   description?: string;

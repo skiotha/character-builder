@@ -205,6 +205,7 @@ Sourced from the reference files in `data/`:
 | Weapon `id`     | `id` field of any entry in `reference/weapons.{locale}.json`.                                                                                                   |
 | Armor `quality` | See `reference/armor.{locale}.json` `qualities`. Includes `hampering` (single literal, no `_N` suffix — magnitude is implicit in the armor's `armor` value).    |
 | Armor `slot`    | `body` \| `plug`. **There is no `armor.type` field.**                                                                                                       |
+| Quality `id`    | See `reference/qualities.{locale}.json` (ADR-016). Single namespace shared by weapons and armor; parametric variants use `_N` suffix (e.g. `fortified_2`).      |
 
 The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. The transition fallback for `equipment.armor.body.defense` was removed in Chunk D; existing characters must be re-saved or wiped.
 
@@ -326,15 +327,34 @@ it to render all character-related forms from `(schema, data, role)`.
 > `/view/creation`, `/view/character/:id`). These will be removed once
 > the schema-driven rendering migration is complete (roadmap Phase 3).
 
-### 3.3 Other
+### 3.3 Reference Catalogs
+
+| Method | Path                | Auth | Source                                        |
+| ------ | ------------------- | ---- | --------------------------------------------- |
+| `GET`  | `/traits`           | none | merged `abilities` + `spells` (`source` stamped) |
+| `GET`  | `/talents`          | none | merged `boons` + `sins` (`source` stamped)    |
+| `GET`  | `/rituals`          | none | `reference/rituals.{locale}.json`             |
+| `GET`  | `/weapons`          | none | `reference/weapons.{locale}.json`             |
+| `GET`  | `/armor`            | none | `reference/armor.{locale}.json`               |
+| `GET`  | `/qualities`        | none | `reference/qualities.{locale}.json` (ADR-016) |
+
+All reference endpoints accept `?locale=` (`en`/`ru`); fall back to
+`Accept-Language`, then to `en`. Unknown locales return `400`. Files
+under `reference/` are **not** served as static files.
+
+A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps
+the `{en,ru}` pairs structurally aligned: same id set, same ordering,
+and only the allowlisted localized fields (`name`, `description`,
+`tags`) may differ. The engine never reads any of those fields.
+
+### 3.4 Other
 
 | Method | Path                        | Auth | Response                 |
 | ------ | --------------------------- | ---- | ------------------------ |
-| `GET`  | `/abilities`                | none | abilities array (JSON)   |
 | `POST` | `/validate-dm`              | DM   | validation result        |
 | `POST` | `/recover`                  | none | character (by name+code) |
 
-### 3.4 Planned Endpoints (not yet implemented)
+### 3.5 Planned Endpoints (not yet implemented)
 
 | Method | Path                                | Auth   | Purpose                               | Source             |
 | ------ | ----------------------------------- | ------ | ------------------------------------- | ------------------ |
@@ -342,7 +362,7 @@ it to render all character-related forms from `(schema, data, role)`.
 | `POST` | `/characters/:id/import/addon`      | owner/DM | Update character from addon export   | addon-integration §5 |
 | `POST` | `/characters/:id/sync`              | DM     | DM sync script upload                 | addon-integration §6 |
 
-### 3.5 Update Payload Format
+### 3.6 Update Payload Format
 
 The `PATCH` endpoint accepts an array of field-level updates:
 

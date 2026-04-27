@@ -14,6 +14,7 @@
 
 import type {
   AbilityTier,
+  Quality,
   Reaction,
   ResolvedEffect,
   SpecialAttack,
@@ -44,4 +45,16 @@ export interface Registry {
    * (see `TODO(phase6-post-G)` in `effects.mts`).
    */
   lookupTalent(id: string, level: number): TalentLookupResult | null;
+
+  /**
+   * Resolve a weapon or armor quality id to its registry entry. Returns
+   * `null` when the id is not registered. Per ADR-016, the engine fans
+   * out the entry's `effects[]` with implicit `appliesTo`:
+   *   * weapon qualities → scoped to the carrying weapon (`buildSlot`)
+   *   * armor qualities → applied globally (`collectAllEffects`)
+   *
+   * F.0c–F.0d: callers warn-once-per-id and skip on miss. F.0e flips
+   * this to throw once the registry is populated.
+   */
+  lookupQuality(id: string): Quality | null;
 }

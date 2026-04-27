@@ -11,7 +11,7 @@ interface ReferenceEntry {
   [key: string]: unknown;
 }
 
-const SINGLE_TOPICS = ["rituals", "weapons", "armor"] as const;
+const SINGLE_TOPICS = ["rituals", "weapons", "armor", "qualities"] as const;
 type SingleTopic = (typeof SINGLE_TOPICS)[number];
 
 const MERGED_TOPICS = ["traits", "talents"] as const;
@@ -60,8 +60,10 @@ async function loadFile(
 }
 
 /**
- * Read a single-source reference topic (rituals, weapons, armor).
- * Cached per (topic, locale) and invalidated by mtime.
+ * Read a single-source reference topic (rituals, weapons, armor, qualities).
+ * Cached per (topic, locale) and invalidated by mtime. The `qualities`
+ * topic additionally asserts id-uniqueness on load (ADR-016: single
+ * namespace, no weapon/armor split).
  */
 async function getTopic(
   topic: SingleTopic,
@@ -75,6 +77,22 @@ async function getTopic(
   }
 
   const loaded = await loadFile(topic, locale);
+  if (topic === "qualities") {
+    const seen = new Set<string>();
+    for (const entry of loaded.entries) {
+      if (!entry.id) {
+        throw new Error(
+          `[Reference] Quality entry without id in reference/qualities.${locale}.json`,
+        );
+      }
+      if (seen.has(entry.id)) {
+        throw new Error(
+          `[Reference] Duplicate quality id '${entry.id}' in reference/qualities.${locale}.json (single namespace, ADR-016)`,
+        );
+      }
+      seen.add(entry.id);
+    }
+  }
   singleCache.set(key, loaded);
   console.log(`[Reference] Cache updated: ${topic}.${locale}`);
   return loaded.entries;

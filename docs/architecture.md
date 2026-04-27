@@ -44,6 +44,7 @@ The Nagara Character Builder is a web application for creating and managing RPG 
 │   │   reference/spells.{en,ru}.json                           │      │
 │   │   reference/{boons,sins,rituals}.{en,ru}.json             │      │
 │   │   reference/{weapons,armor,runes}.{en,ru}.json            │      │
+│   │   reference/qualities.{en,ru}.json   (ADR-016)            │      │
 │   └───────────────────────────────────────────────────────────┘      │
 │                                                                      │
 │   ┌───────────────────────────────────────────────────────────┐      │
@@ -107,14 +108,19 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 | `handleGetRituals`      | `/api/v1/rituals`                 | GET    |
 | `handleGetWeapons`      | `/api/v1/weapons`                 | GET    |
 | `handleGetArmor`        | `/api/v1/armor`                   | GET    |
+| `handleGetQualities`    | `/api/v1/qualities`               | GET    |
 | `handleValidateDM`      | `/api/v1/validate-dm`             | POST   |
 | `handleGetSchema`       | `/api/v1/schema`                  | GET    |
 
 > Reference endpoints accept `?locale=` (`en`/`ru`); fall back to `Accept-Language`,
 > then to `en`. `/traits` merges `abilities` + `spells` and `/talents` merges
 > `boons` + `sins`, with each entry stamped `source: "ability" | "spell" | "boon" | "sin"`.
+> `/qualities` is a single-source endpoint backed by `reference/qualities.{en,ru}.json`
+> (the engine-canonical registry from [ADR-016](decisions/016-quality-registry.md)).
 > Reference JSON files live in `reference/` (not `data/`) and are **not** served as
-> static files — only via these API endpoints.
+> static files — only via these API endpoints. A locale-drift lint test
+> (`test/reference-locale-drift.test.mts`) keeps the `{en,ru}` pairs structurally
+> aligned (same id set + ordering; only `name`, `description`, `tags` may differ).
 
 > **Note:** View endpoints (`/api/v1/view/`) were removed in Phase 3.
 > The server is now a pure JSON API. Client renders all views from data

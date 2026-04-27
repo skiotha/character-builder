@@ -131,8 +131,16 @@ export function collectAllEffects(
     effects?: RawEffect[];
     equipment?: {
       armor?: {
-        body?: { effects?: ResolvedEffect[] } | null;
-        plug?: { effects?: ResolvedEffect[] } | null;
+        body?: {
+          id: string;
+          qualities?: string[];
+          effects?: ResolvedEffect[];
+        } | null;
+        plug?: {
+          id: string;
+          qualities?: string[];
+          effects?: ResolvedEffect[];
+        } | null;
       };
     };
   },
@@ -173,7 +181,50 @@ export function collectAllEffects(
     collected.push(...armor.plug.effects);
   }
 
+  // Registry-resolved armor quality effects (ADR-016): walk both armor
+  // pieces' `qualities[]` and append the registry's effects globally.
+  // Unknown ids throw with the offending piece + id (F.0e behaviour).
+  if (armor?.body && Array.isArray(armor.body.qualities)) {
+    appendArmorQualityEffects(
+      armor.body.qualities,
+      registry,
+      collected,
+      "body",
+      armor.body.id,
+    );
+  }
+  if (armor?.plug && Array.isArray(armor.plug.qualities)) {
+    appendArmorQualityEffects(
+      armor.plug.qualities,
+      registry,
+      collected,
+      "plug",
+      armor.plug.id,
+    );
+  }
+
   return collected;
+}
+
+function appendArmorQualityEffects(
+  qualities: string[],
+  registry: Registry,
+  out: ResolvedEffect[],
+  piece: "body" | "plug",
+  pieceId: string,
+): void {
+  for (const qualityId of qualities) {
+    const quality = registry.lookupQuality(qualityId);
+    if (!quality) {
+      throw new Error(
+        `[quality-registry] Unknown armor quality '${qualityId}' on ` +
+          `armor.${piece} '${pieceId}'. ` +
+          `Every quality id on a weapon or armor piece must have a matching ` +
+          `entry in reference/qualities.<locale>.json (ADR-016).`,
+      );
+    }
+    for (const effect of quality.effects) out.push(effect);
+  }
 }
 
 export function groupByPhase(

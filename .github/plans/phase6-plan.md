@@ -813,6 +813,18 @@ shape is firm. Until then the three copies are accepted as a known debt.
      each ability/spell id is unique within its file; `.en` and `.ru`
      structures match (same set of ids, same tier counts, same
      `effects.length` per tier).
+   - **Quality registry-resolution validator (deferred from F.0):** for
+     every weapon entry's `qualities[]` and every armor entry's
+     `qualities[]`, assert each id resolves in
+     `reference/qualities.<DEFAULT_LOCALE>.json`. For every effect
+     across abilities/spells/talents whose `target.kind` is
+     `weaponQuality` or `armorQuality`, assert `target.quality` resolves
+     in the registry too. Same for `appliesTo` predicate `kind: "quality"`
+     values. Closes the F.0e "runtime warn/throw only" gap.
+   - **Slot-2 `own` registry sanity:** assert `reference/qualities.*.json`
+     contains an `own` entry. The schema validator checks that slot-2
+     weapons carry `"own"` in their `qualities[]`; this asserts the
+     symmetric registry side. Tracks engine-weak-points.md #19.
    - Reports **all** anomalies in one run (don't bail on first failure).
 7. End-to-end test: character with Behemoth (master, slot 0 = heavy weapon),
    Polearm (novice, slot 0 = polearm — different character), Marksmanship

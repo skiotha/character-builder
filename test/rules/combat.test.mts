@@ -204,6 +204,12 @@ describe("deriveCombatSlots: predicate routing", () => {
     const char = withLoadout([sword, bow], [0, 1, 0]);
 
     const registry = createInMemoryRegistry({
+      qualities: {
+        // `ranged` is referenced by both the weapon (carried quality)
+        // and the ability's `appliesTo` predicate; register it as a
+        // no-op so the strict registry check is satisfied.
+        ranged: { id: "ranged", effects: [] },
+      },
       traits: {
         "marksmanship:adept": {
           effects: [
@@ -429,6 +435,11 @@ describe("deriveCombatSlots: weaponQuality add/remove", () => {
     const char = withLoadout([polearm], [0, null, 0]);
 
     const registry = createInMemoryRegistry({
+      qualities: {
+        // Test-only quality; register as a no-op so the strict
+        // registry check is satisfied.
+        clumsy: { id: "clumsy", effects: [] },
+      },
       traits: {
         "polish:adept": {
           effects: [
@@ -446,6 +457,34 @@ describe("deriveCombatSlots: weaponQuality add/remove", () => {
 
     const result = recalculate(char, registry);
     assert.equal(result.combat.carried[0]!.qualities.includes("clumsy"), false);
+  });
+
+  it("registry-resolved weapon quality (ADR-016): effects scope to the carrying weapon", () => {
+    // `fortified` quality registry entry adds +2 baseDamage. It is
+    // listed on the polearm only, so the sword in slot 0 is unaffected
+    // even though the same id could appear elsewhere.
+    const sword = weapon("longsword", "main", 4);
+    const polearm = weapon("halberd", "polearm", 6, ["fortified"]);
+    const char = withLoadout([sword, polearm], [0, 1, 0]);
+
+    const registry = createInMemoryRegistry({
+      qualities: {
+        fortified: {
+          id: "fortified",
+          effects: [
+            {
+              source: "fortified",
+              target: { kind: "combat", field: "baseDamage" },
+              modifier: { type: "addFlat", value: 2 },
+            },
+          ],
+        },
+      },
+    });
+
+    const result = recalculate(char, registry);
+    assert.equal(result.combat.carried[0]!.baseDamage, 4); // sword unchanged
+    assert.equal(result.combat.carried[1]!.baseDamage, 8); // polearm 6 + 2
   });
 });
 

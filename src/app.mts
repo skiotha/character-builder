@@ -5,6 +5,7 @@ import { URL } from "node:url";
 
 import { requireDmToken } from "#auth";
 import * as nagara from "#models";
+import * as ref from "#models/reference";
 import * as backup from "./lib/backup.mts";
 import { recalculate } from "#rules";
 import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
@@ -15,6 +16,7 @@ import {
   handleGetRituals,
   handleGetWeapons,
   handleGetArmor,
+  handleGetQualities,
   handleGetCharacters,
   handleUpdateCharacter,
   handleCreateCharacter,
@@ -33,10 +35,12 @@ import {
   DATA_DIR,
   API_ROUTE,
   LOCAL_ADDRESS,
+  DEFAULT_LOCALE,
 } from "#config";
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NagaraRequest, Character } from "#types";
+import type { Quality, ResolvedEffect } from "#rpg-types";
 import type { Registry } from "#rules";
 
 const getCharacterHandler = createCharacterRoute();
@@ -45,12 +49,39 @@ const portraitHandler = createPortraitRoute();
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
 // TODO(phase6-chunk-G): replace with createRegistry() loading from
-// REFERENCE_DIR. Chunk C ships an empty stub so character.traits[] always
-// resolves to no effects (the engine warns and skips on miss).
+// REFERENCE_DIR. Chunk C ships an empty stub for traits/talents so
+// `character.traits[]` resolves to no effects (warn-and-skip on miss).
+// F.0e wires the quality catalog: `lookupQuality` reads
+// `reference/qualities.<DEFAULT_LOCALE>.json` once at startup and serves
+// from an in-memory map. Unknown ids are a hard error per ADR-016.
+const qualityIndex = await loadQualityIndex();
+
 const emptyRegistry: Registry = {
   lookupTrait: () => null,
   lookupTalent: () => null,
+  lookupQuality: (id) => qualityIndex.get(id) ?? null,
 };
+
+async function loadQualityIndex(): Promise<Map<string, Quality>> {
+  const entries = await ref.getTopic("qualities", DEFAULT_LOCALE);
+  const map = new Map<string, Quality>();
+  for (const entry of entries) {
+    map.set(entry.id, {
+      id: entry.id,
+      ...(typeof entry.name === "string" ? { name: entry.name } : {}),
+      ...(typeof entry.description === "string"
+        ? { description: entry.description }
+        : {}),
+      effects: Array.isArray(entry.effects)
+        ? (entry.effects as ResolvedEffect[])
+        : [],
+    });
+  }
+  console.log(
+    `[quality-registry] Loaded ${map.size} qualities from reference/qualities.${DEFAULT_LOCALE}.json`,
+  );
+  return map;
+}
 
 // Wire the character service once at startup (ADR-013). Domain mutations
 // throw until this runs, so it must happen at module top-level — before
@@ -241,7 +272,7 @@ async function handleApi(
       return await handleGetCharacters(req, res, url);
     }
 
-    // GET /api/v1/traits | /talents | /rituals | /weapons | /armor
+    // GET /api/v1/traits | /talents | /rituals | /weapons | /armor | /qualities
     if (req.method === "GET" && pathParts[0] && !pathParts[1]) {
       switch (pathParts[0]) {
         case "traits":
@@ -254,6 +285,8 @@ async function handleApi(
           return await handleGetWeapons(req, res);
         case "armor":
           return await handleGetArmor(req, res);
+        case "qualities":
+          return await handleGetQualities(req, res);
       }
     }
 
