@@ -1,0 +1,102 @@
+[
+  {
+    "id": "area",
+    "effects": []
+  },
+  {
+    "id": "balanced",
+    "effects": []
+  },
+  {
+    "id": "blessed",
+    "effects": []
+  },
+  {
+    "id": "blunt",
+    "effects": []
+  },
+  {
+    "id": "catastrophic",
+    "effects": []
+  },
+  {
+    "id": "composite",
+    "effects": []
+  },
+  {
+    "id": "concealed",
+    "effects": []
+  },
+  {
+    "id": "cumbersome",
+    "effects": []
+  },
+  {
+    "id": "deep_wounds",
+    "effects": []
+  },
+  {
+    "id": "entangling",
+    "effects": []
+  },
+  {
+    "id": "flaming",
+    "effects": []
+  },
+  {
+    "id": "flexible",
+    "effects": []
+  },
+  {
+    "id": "fortified",
+    "effects": []
+  },
+  {
+    "id": "hampering",
+    "effects": []
+  },
+  {
+    "id": "long",
+    "effects": []
+  },
+  {
+    "id": "massive",
+    "effects": []
+  },
+  {
+    "id": "own",
+    "effects": []
+  },
+  {
+    "id": "precise",
+    "effects": []
+  },
+  {
+    "id": "ranged",
+    "effects": []
+  },
+  {
+    "id": "returning",
+    "effects": []
+  },
+  {
+    "id": "short",
+    "effects": []
+  },
+  {
+    "id": "special",
+    "effects": []
+  },
+  {
+    "id": "unwieldy",
+    "effects": []
+  },
+  {
+    "id": "vengeful",
+    "effects": []
+  },
+  {
+    "id": "versatile",
+    "effects": []
+  }
+]

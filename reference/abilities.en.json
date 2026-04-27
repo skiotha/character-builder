@@ -37,15 +37,6 @@
         "description": "Grants a quick reaction to being knocked prone and removes the unwieldy quality of combat heels.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction",
-              "scope": "statusRemoval.prone"
-            },
-            "description": "Quick check to instantly spring to your feet as a reaction after falling prone."
-          },
-          {
             "tier": "A",
             "target": {
               "kind": "weaponQuality",
@@ -55,20 +46,21 @@
             },
             "modifier": { "type": "remove" },
             "description": "The Adept may use combat heels as if they lacked the unwieldy quality."
+          },
+          {
+            "tier": "B",
+            "target": {
+              "kind": "flag",
+              "flag": "reaction",
+              "scope": "statusRemoval.prone"
+            },
+            "description": "Quick check to instantly spring to your feet as a reaction after falling prone."
           }
         ]
       },
       "master": {
         "description": "Allows using an enemy as cover, ending movement on them, and gaining advantage on the next attack.",
         "effects": [
-          {
-            "tier": "C",
-            "description": "Quick check to use an enemy as a shield against incoming attacks they can no longer dodge."
-          },
-          {
-            "tier": "C",
-            "description": "You may end your movement in a space occupied by an enemy if their position allows it."
-          },
           {
             "tier": "B",
             "target": {
@@ -77,6 +69,14 @@
               "scope": "attacks"
             },
             "description": "If you end your movement on an enemy, your next attack this turn is made with advantage."
+          },
+          {
+            "tier": "C",
+            "description": "Quick check to use an enemy as a shield against incoming attacks they can no longer dodge."
+          },
+          {
+            "tier": "C",
+            "description": "You may end your movement in a space occupied by an enemy if their position allows it."
           }
         ]
       }
@@ -160,7 +160,7 @@
     "id": "intrigues",
     "name": "Intrigues",
     "category": "ability",
-    "description": "A courtly combat technique exploiting enemy weaknesses, surprise, and backstabs.",
+    "description": "A tribely combat technique exploiting enemy weaknesses, surprise, and backstabs.",
     "tags": [
       "advantage",
       "damage",
@@ -413,8 +413,8 @@
     }
   },
   {
-    "id": "fast-reflexes",
-    "name": "Fast Reflexes",
+    "id": "quick-reflexes",
+    "name": "Quick Reflexes",
     "category": "ability",
     "description": "Extreme reaction speed and survivability that soften dangerous blows and constantly outpace opponents.",
     "tags": ["initiative", "reaction", "defense"],
@@ -2437,7 +2437,7 @@
             },
             "modifier": {
               "type": "addFlat",
-              "value": 2
+              "value": 1
             },
             "description": "Defense increases by two when armed with the staff."
           }
@@ -3306,16 +3306,16 @@
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
-        "description": "Removes permanent Corruption from novice spells and rituals of the court tradition.",
+        "description": "Removes permanent Corruption from novice spells and rituals of the tribe tradition.",
         "effects": [
           {
             "tier": "C",
-            "description": "Shaman gains no permanent Corruption when learning novice-tier spells and rituals of the court tradition."
+            "description": "Shaman gains no permanent Corruption when learning novice-tier spells and rituals of the tribe tradition."
           }
         ]
       },
       "adept": {
-        "description": "Caps temporary Corruption from court magic and removes the cost of learning adept spells.",
+        "description": "Caps temporary Corruption from tribe magic and removes the cost of learning adept spells.",
         "effects": [
           {
             "tier": "C",
@@ -3323,16 +3323,16 @@
           },
           {
             "tier": "C",
-            "description": "Shaman gains no permanent Corruption when learning adept-tier spells of the court tradition."
+            "description": "Shaman gains no permanent Corruption when learning adept-tier spells of the tribe tradition."
           }
         ]
       },
       "master": {
-        "description": "Removes the cost of learning master-tier court spells and improves elemental reliability.",
+        "description": "Removes the cost of learning master-tier tribe spells and improves elemental reliability.",
         "effects": [
           {
             "tier": "C",
-            "description": "Shaman gains no permanent Corruption when learning master-tier spells of the court tradition."
+            "description": "Shaman gains no permanent Corruption when learning master-tier spells of the tribe tradition."
           },
           {
             "tier": "C",
