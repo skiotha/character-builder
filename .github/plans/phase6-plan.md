@@ -709,25 +709,27 @@ Pure data work. User-owned bulk edit pass over all reference files,
 guided by an authoring spec produced by Copilot up-front. No per-batch
 back-and-forth.
 
+> **Authoring spec is live:**
+> [`docs/authoring-effects.md`](../../docs/authoring-effects.md). Lock-in
+> decisions captured in §1–§9; deferred items tracked in §10.
+>
+> **Deferred to a follow-up after Chunk F (do not lose):**
+>
+> - **`SpecialAttack` / `Reaction` wire shape on tier objects** —
+>   bulk pass leaves these as Tier C narrative `description` entries.
+>   Back-fill happens after Chunk G wires the registry-side collection.
+>   See [authoring-effects.md §10](../../docs/authoring-effects.md#L0).
+> - **`EffectFlag` cleanup pass** — authors extend the union as they
+>   go; consolidate near-duplicates after the bulk pass closes.
+
 **Workflow**
 
-1. **Authoring spec** (Copilot, written once before F starts; lives at
-   `docs/authoring-effects.md` or as a section of `data-contracts.md`):
-   - Canonical JSON shape for an ability/spell/boon/sin/ritual entry
-     (root, tiers, `effects[]`, `specialAttacks[]`, `reactions[]`).
-   - Every `EffectTarget` kind with a real example.
-   - Every `WeaponPredicate` kind with a real example.
-   - Every `EffectModifier` verb (`setBase`, `addFlat`, `multiply`, `cap`,
-     `remove`) with a real example.
-   - Tier-stacking convention (only new effects per tier).
-   - The trigger enum (current draft from Chunk A).
-   - Worked Tier-A examples for: flat secondary bonus, weapon-conditional
-     bonus, formula override, weapon-quality grant, armor-quality removal,
-     special-attack promotion, reaction promotion, spell tier with
-     `attackAttribute`/`damage`/`trigger`.
-   - Explicit "do not encode" list: character-state conditions (rage,
-     no-armor, low-health), per-encounter resource counts, action economy.
-     Those stay Tier C narrative; sibling apps handle them.
+1. **Authoring spec** — done. Live at
+   [`docs/authoring-effects.md`](../../docs/authoring-effects.md). Lock
+   decisions reflected: boons / sins / rituals stay flat (no per-rank
+   `effects[]` — non-combat, engine doesn't consume them); weapons and
+   armor get an optional `description`; no `tags` on weapons / armor /
+   qualities; special attacks and reactions deferred (see callout above).
 2. **Bulk edit** (user, over multiple sessions/days): apply the spec to all
    `reference/*.{en,ru}.json` files. Mirror `.en` and `.ru` structurally
    (translations differ, schema identical). No Copilot in the loop.
