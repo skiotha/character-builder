@@ -2,297 +2,386 @@
   {
     "id": "heavy_weapon",
     "name": "Heavy Weapon",
+    "description": "Heavy weapon is the type of weapon that requires two hands to be used effectively. And \"effectively\" means that the wielder has a good chance of finishing someone off with just one good hit, because heavy weapons have the highest base damage stats of any melee weapon type.",
     "type": "heavy",
     "damage": 10,
     "cost": 10,
-    "qualities": []
+    "qualities": [],
+    "effects": []
   },
   {
     "id": "two_handed_sword",
     "name": "Two-Handed Sword",
+    "description": "Two-handed swords are usually large and heavy but still balanced enough for one-handed use with a shield, a parrying dagger, or something alike.",
     "type": "heavy",
     "damage": 10,
     "cost": 50,
-    "qualities": ["precise", "versatile"]
+    "qualities": ["precise", "versatile"],
+    "effects": []
   },
   {
     "id": "heavy_flail",
     "name": "Heavy Flail",
+    "description": "Heavy flails are powerful, two-handed weapons designed to deliver devastating blows. The flail's chain allows the weight to bypass shields and parrying techniques, making it effective against well defended opponents.",
     "type": "heavy",
     "damage": 10,
     "cost": 50,
-    "qualities": ["composite"]
+    "qualities": ["composite"],
+    "effects": []
   },
   {
     "id": "two_handed_axe",
     "name": "Two-Handed Axe",
+    "description": "Two-handed axes are designed for powerful, sweeping strikes, and the sheer size and weight of a two-handed axe allow the wielder to generate more force behind each swing, making it quite a formidable weapon in combat.",
     "type": "heavy",
     "damage": 10,
     "cost": 50,
-    "qualities": ["deep_wounds"]
+    "qualities": ["deep_wounds"],
+    "effects": []
   },
   {
     "id": "polearm",
     "name": "Polearm",
+    "description": "A polearm, by the grace of its very length, allows its bearer to attack his enemy first--provided, of course, that the enemy is not armed with another polearm weapon themselves.",
     "type": "polearm",
     "damage": 8,
     "cost": 3,
-    "qualities": ["long"]
+    "qualities": ["long"],
+    "effects": []
   },
   {
     "id": "halberd",
     "name": "Halberd",
+    "description": "A halberd is a versatile polearm that combines features of an axe with a spear and allows the wielder to both slash and thrust effectively. Its long reach and sharp blade make it a formidable weapon in both offensive and defensive maneuvers.",
     "type": "polearm",
     "damage": 8,
     "cost": 15,
-    "qualities": ["long", "deep_wounds"]
+    "qualities": ["long", "deep_wounds"],
+    "effects": []
   },
   {
     "id": "pike",
     "name": "Pike",
+    "description": "A pike is a long polearm that is primarily used for thrusting attacks. Its length allows the wielder to strike from a distance, making it effective against mounted opponents and in formations.",
     "type": "polearm",
     "damage": 8,
     "cost": 15,
-    "qualities": ["long", "precise"]
+    "qualities": ["long", "precise"],
+    "effects": []
   },
   {
     "id": "staff",
     "name": "Staff",
+    "description": "A staff is a long, versatile weapon that can be used for both offensive and defensive maneuvers. Its length allows the wielder to maintain distance from opponents, and it can be used to block attacks or deliver powerful strikes. In hands of a skilled combatant, a staff can be an effective weapon for controlling the battlefield and keeping enemies at bay.",
     "type": "polearm",
-    "damage": 6,
+    "damage": 8,
     "cost": 0.1,
-    "qualities": ["long", "blunt"]
+    "qualities": ["long", "blunt"],
+    "effects": []
   },
   {
     "id": "composite_staff",
     "name": "Composite Staff",
+    "description": "A composite staff is a staff with short chains at the ends that can be used to entangle an opponent. The weapon became famous when elves started attaching weights and short blades to these chains, which made it truly lethal.",
     "type": "polearm",
     "damage": 8,
     "cost": 15,
-    "qualities": ["long", "composite"]
+    "qualities": ["long", "composite"],
+    "effects": []
   },
   {
     "id": "one_handed_weapon",
     "name": "One-handed Weapon",
+    "description": "One-handed weapons cover all types of weapons that, as the name suggests, are meant to be carried and used in one hand. Some two-handers and polearms can also be wielded single-handedly, which causes them to lose some of their advantages but gain new ones instead.",
     "type": "main",
     "damage": 8,
     "cost": 5,
-    "qualities": []
+    "qualities": [],
+    "effects": []
   },
   {
     "id": "longsword",
     "name": "Longsword",
+    "description": "Longswords are versatile one-handed weapons that can be used for both slashing and thrusting attacks. They are known for their balance and precision, making them effective in a variety of combat situations.",
     "type": "main",
     "damage": 8,
     "cost": 25,
-    "qualities": ["precise"]
+    "qualities": ["precise"],
+    "effects": []
   },
   {
     "id": "flail",
     "name": "Flail",
+    "description": "One-handed flails are a shorter and more lightweight variant of their heavy siblings that still consist of a handle connected to a striking head--by a chain or flexible material. This design allows the wielder to bypass shields and armor, delivering powerful, unpredictable strikes.",
     "type": "main",
     "damage": 8,
     "cost": 25,
-    "qualities": ["composite"]
+    "qualities": ["composite"],
+    "effects": []
   },
   {
     "id": "shield",
     "name": "Shield",
+    "description": "With a shield in their hands, the wearer is protected from all types of physical attacks: their Defense will be increased by 1. Some small shields--such as bucklers--are attached to the forearm, leaving both hands unoccupied, though they can not not benefit from the Shields ability.",
     "type": "shield",
     "damage": 4,
     "cost": 3,
-    "qualities": []
+    "qualities": [],
+    "effects": [
+      {
+        "target": { "kind": "secondary", "stat": "defense" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "buckler",
     "name": "Buckler",
+    "description": "A buckler is a small, lightweight shield that is typically strapped to the forearm. It provides basic protection while allowing the wielder to keep their hands relatively free for other actions.",
     "type": "shield",
     "damage": 4,
     "cost": 15,
-    "qualities": ["flexible"]
+    "qualities": ["flexible"],
+    "effects": [
+      {
+        "target": { "kind": "secondary", "stat": "defense" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "iron_shield",
     "name": "Iron Shield",
+    "description": "An iron shield is a sturdy and durable shield made of steel, providing excellent protection against physical attacks. Its weight and solid construction make it less maneuverable than lighter shields, but it offers superior defense.",
     "type": "shield",
     "damage": 4,
     "cost": 15,
-    "qualities": ["balanced"]
+    "qualities": ["balanced"],
+    "effects": [
+      {
+        "target": { "kind": "secondary", "stat": "defense" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "short_weapon",
     "name": "Short Weapon",
+    "description": "Short weapons are easy to draw and just as easy to hide. Some types of short weapons--such as the wide-guarded dueling dagger--have found use specifically for parrying attacks, and thus acquired some qualities of shields instead of qualities of a weapon.",
     "type": "light",
     "damage": 6,
     "cost": 1,
-    "qualities": ["short"]
+    "qualities": ["short"],
+    "effects": []
   },
   {
     "id": "parring_dagger",
     "name": "Parring Dagger",
+    "description": "Parrying daggers were designed for close combat and defense. They typically have a wide guard to protect the wielder's hand and are used to parry incoming attacks while delivering quick, swift retaliation strikes.",
     "type": "light",
     "damage": 6,
     "cost": 5,
-    "qualities": ["balanced", "short"]
+    "qualities": ["balanced", "short"],
+    "effects": []
   },
   {
     "id": "stiletto",
     "name": "Stiletto",
+    "description": "Stilettos are slender, pointed daggers designed for thrusting attacks. Their narrow blade allows the wielder to penetrate armor gaps and deliver precise, lethal strikes. They are favored by assassins and those who require a discreet, easily concealable weapon.",
     "type": "light",
     "damage": 6,
     "cost": 5,
-    "qualities": ["deep_wounds", "short"]
+    "qualities": ["deep_wounds", "short"],
+    "effects": []
   },
   {
     "id": "assassins_dagger",
     "name": "Assassin's Dagger",
+    "description": "Assassin's daggers have a feather-thin blade and a slender handle, which lets the weapon to be worn on the shin, wrist, neck, or anywhere else along the curve of the body, as well as tucked in clothing, which makes it especially difficult to detect without prior knowledge of how and where to look. None of these qualities affect the weapon's effectiveness.",
     "type": "light",
     "damage": 6,
     "cost": 5,
-    "qualities": ["short", "concealed"]
+    "qualities": ["short", "concealed"],
+    "effects": []
   },
   {
     "id": "natural_weapon",
     "name": "Natural Weapon",
+    "description": "In public perception, a natural weapon is a weapon of last resort--you use it when no other option is available. That impression cannot be more wrong when you encounter true masters of unarmed combat--or monsters armed with their own claws... The main advantage of a natural weapon is that it is always with you.",
     "type": "natural",
     "damage": 4,
     "cost": 0,
-    "qualities": ["own", "short"]
+    "qualities": ["own", "short"],
+    "effects": []
   },
   {
     "id": "war_claws",
     "name": "War Claws",
+    "description": "War claws are made of steel and can be worn on the hands. They allow the wielder to deliver powerful slashing attacks, often leading to terrible wounds.",
     "type": "natural",
     "damage": 4,
     "cost": 1,
-    "qualities": ["own", "short", "deep_wounds"]
+    "qualities": ["own", "short", "deep_wounds"],
+    "effects": []
   },
   {
     "id": "battle_fan",
     "name": "Battle Fan",
+    "description": "War Fans, or Battle Fans, are a traditional Pandaria weapon. Its sturdy metal frame allows it to be used not just offensively but in defence as well, serving as a makeshift shield.",
     "type": "exotic",
     "damage": 6,
     "cost": 15,
-    "qualities": ["special", "unwieldy", "short", "balanced"]
+    "qualities": ["special", "unwieldy", "short", "balanced"],
+    "effects": []
   },
   {
     "id": "heels",
     "name": "Battle Heels",
+    "description": "Combat Heels were weapons developed by Smoke Triad engineers. Early versions featured hidden metal edges that expose themselves when the wielder applies pressure to specific areas of their shoe. However, as the weapon gained popularity among assassins and spies, the expensive but fragile mechanics were ditched in favor of specialized alloys--still expensive, yet considerably more reliable. While the weapon can be taken off the foot and then wielded in hand, true professionals can use it with both hands free.",
     "type": "exotic",
     "damage": 4,
     "cost": 15,
-    "qualities": ["own", "special", "unwieldy", "short", "concealed"]
+    "qualities": ["own", "special", "unwieldy", "short", "concealed"],
+    "effects": []
   },
   {
     "id": "whip",
     "name": "Whip",
+    "description": "A whip, aka long whip, is a weapon-instrument of slavers and herders. One of its most common uses is, predictably, to restrain opponents, but it can also wound poorly armored targets.",
     "type": "exotic",
-    "damage": 4,
+    "damage": 6,
     "cost": 15,
-    "qualities": ["special", "unwieldy", "composite", "blunt", "entangling"]
+    "qualities": ["special", "unwieldy", "composite", "blunt", "entangling"],
+    "effects": []
   },
   {
     "id": "fire_tube",
     "name": "Fire Tube",
+    "description": "This weapon is an alchemy-powered device, capable of inflicting significant damage with a flaming area effect. There are two versions of this weapon: a smaller one that can be worn by an individual and a larger one that can't be moved without a specialized team. All attacks with that weapon, even missed, inflict at least half of the armor piercing damage to all targets in the area of effect.",
     "type": "exotic",
     "damage": 12,
     "cost": 10,
-    "qualities": ["special", "ranged", "flaming", "area"]
+    "qualities": ["special", "ranged", "flaming", "area", "catastrophic"],
+    "effects": []
   },
   {
     "id": "blowgun",
     "name": "Blowgun",
+    "description": "The primary purpose of a blowgun is to fire a poisoned dart. The dart itself does no damage, but a successful hit is determined by rolling a d8 against the target's Armor, and if successful, the target may become poisoned. If the user has the Marksman ability, they roll a d10 against the target's Armor.",
     "type": "exotic",
     "damage": 0,
     "cost": 2,
-    "qualities": ["special", "ranged"]
+    "qualities": ["special", "ranged"],
+    "effects": []
   },
   {
     "id": "firearm",
     "name": "Firearm",
+    "description": "Firearms are loud but deadly: a single shot can be enough to send an enemy to the Netherstorm. However, reloading a firearm requires full turn's Movement that is available to the shooter: you can either reload or move.",
     "type": "firearm",
     "damage": 8,
     "cost": 40,
-    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+    "qualities": ["ranged", "deep_wounds", "unwieldy"],
+    "effects": []
   },
   {
     "id": "ladies_revolver",
     "name": "Ladies' Revolver",
+    "description": "The Ladies' Revolver, despite its name, is popular among gangs and assassins on both continents because it's very simple to hide. While it can be fired one-handed, it still requires two hands to reload, and it has the same penetrating power as any other firearm.",
     "type": "firearm",
     "damage": 8,
     "cost": 50,
-    "qualities": ["ranged", "deep_wounds", "unwieldy", "concealed"]
+    "qualities": ["ranged", "deep_wounds", "unwieldy", "concealed"],
+    "effects": []
   },
   {
     "id": "rifle",
     "name": "Rifle",
+    "description": "Rifles are long-barreled firearms capable of inflicting significant damage at long range, making them ideal for sniping or engaging targets from a distance. However, their size and weight make them less maneuverable in close quarters.",
     "type": "firearm",
     "damage": 10,
     "cost": 60,
-    "qualities": ["ranged", "deep_wounds", "unwieldy"]
+    "qualities": ["ranged", "deep_wounds", "unwieldy"],
+    "effects": []
   },
   {
     "id": "bow",
     "name": "Bow",
+    "description": "Bows remain a popular ranged weapon due to the fact that they are easy to carry and maintain, are relatively quiet, offer a wide range of specialized ammunition, and their \"reload\" is a Free Action.",
     "type": "bows",
     "damage": 8,
     "cost": 5,
-    "qualities": ["ranged"]
+    "qualities": ["ranged"],
+    "effects": []
   },
   {
     "id": "long_bow",
     "name": "Long Bow",
+    "description": "Long bows are traditional bows known for their impressive range and accuracy. They require skill and strength to use effectively, but in the hands of a skilled archer, they can deliver devastating long-range attacks.",
     "type": "bows",
     "damage": 8,
     "cost": 25,
-    "qualities": ["ranged", "precise"]
+    "qualities": ["ranged", "precise"],
+    "effects": []
   },
   {
     "id": "composite_bow",
     "name": "Composite Bow",
+    "description": "Composite bows are crafted with several layers of horns and sinews attached to a wooden base. Composite bows are shorter and less accurate than longbows, but at the same time they are more powerful. Their size allows them to be used from tree branches, masts, or even from a saddle.",
     "type": "bows",
     "damage": 8,
     "cost": 25,
-    "qualities": ["ranged", "deep_wounds"]
+    "qualities": ["ranged", "deep_wounds"],
+    "effects": []
   },
   {
     "id": "thrown_weapon",
     "name": "Thrown Weapon",
+    "description": "Thrown weapons are a type of ranged weapons like bows and firearms, but they are wielded with only one hand, which allows them to be combined with shields or other one-handed or versatile two-handed weapons. They are often used early in combat for a short-term advantage.",
     "type": "thrown",
     "damage": 6,
     "cost": 2,
-    "qualities": ["ranged"]
+    "qualities": ["ranged"],
+    "effects": []
   },
   {
     "id": "alchemical_bomb",
     "name": "Alchemical Bomb",
+    "description": "Alchemical grenades are sturdy ceramic vessels filled with hot mixtures that can explode if set on fire or crushed. The grenade's size allows it to be thrown by hand or from a slingshot. When it explodes, it creates a burst of flames and shrapnel, dealing damage to anyone in the area. The explosion can also ignite flammable materials nearby, creating additional hazards. Alchemists, Pyrotechnicians, and Artillery Experts can bypass catastrophic effects caused by this weapon.",
     "type": "thrown",
     "damage": 10,
     "cost": 1,
-    "qualities": ["ranged", "area", "flaming", "special"]
+    "qualities": ["ranged", "area", "flaming", "special", "catastrophic"],
+    "effects": []
   },
   {
     "id": "bolas",
     "name": "Bolas",
+    "description": "Bolases are used when either a target needs to be captured alive or slowed before moving in for the kill. They consist of two or more weights tied together with rope and thrown toward the target's extremities. If the legs are hit, the target cannot move. If the arms are hit, the target requires two successful checks on all actions. Removing a bolas requires a full Action and a Quick check.",
     "type": "thrown",
     "damage": 6,
     "cost": 2,
-    "qualities": ["ranged", "entangling", "special"]
+    "qualities": ["ranged", "entangling", "special"],
+    "effects": []
   },
   {
     "id": "chakram",
     "name": "Chakram",
+    "description": "Chakrams are designed to return to the user's hand if they fail to hit an enemy. While it can be made of sturdy wood (when it is usually used for hunting), military versions are more known. Those are crafted from steel and feature sharp edges on all sides of the weapon.",
     "type": "thrown",
     "damage": 6,
     "cost": 10,
-    "qualities": ["ranged", "special", "returning", "concealed"]
+    "qualities": ["ranged", "special", "returning", "concealed"],
+    "effects": []
   },
   {
     "id": "javelin",
     "name": "Javelin",
+    "description": "Javelins are lightweight spears designed for throwing. They are especially effective at medium range and are often used by skirmishers and light infantry to harass enemies from a short distance before closing in for melee combat.",
     "type": "thrown",
     "damage": 6,
     "cost": 10,
-    "qualities": ["ranged", "deep_wounds"]
+    "qualities": ["ranged", "deep_wounds"],
+    "effects": []
   }
 ]

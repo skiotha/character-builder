@@ -119,6 +119,9 @@ Triggered actions ([ADR-014](014-per-slot-combat-special-attacks.md)) carry a `t
 ```ts
 type TriggerKind =
   | "manual"          // player-invoked → SpecialAttack
+  | "onHit"
+  | "onMiss"
+  | "onContact"
   | "onTurnStart"
   | "onTurnEnd"
   | "onAttacked"
@@ -127,9 +130,7 @@ type TriggerKind =
   | "onAllyDamaged"
   | "onSpellCast"
   | "onMovement"
-  | "onSightOf"
-  | "onRageStart"
-  | "onRageEnd";
+  | "onSightOf";
 ```
 
 The engine **validates only that a value is one of the known set**. It attaches no semantics to any value beyond `"manual"` (which routes the action into `SpecialAttack[]` rather than `Reaction[]`). All other behavior is a sibling-app concern.

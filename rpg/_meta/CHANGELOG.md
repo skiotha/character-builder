@@ -34,3 +34,8 @@ For notable changes.
 
 ### Fixed
 - Typo in 03/spells.
+
+## [1.0.4] - 2026-04-30
+
+### Fixed
+- Typo in 03/weapons.
