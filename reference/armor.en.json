@@ -2,161 +2,201 @@
   {
     "id": "light_armor",
     "name": "Light Armor",
+    "description": "Light armor provides basic protection while still allowing for considerable mobility. It has a hampering modifier of -2, which means it slightly limits the wearer's physical capabilities regarding stealth, Defense, or mystical powers.",
     "slot": "body",
     "armor": 4,
     "cost": 2,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "embroidered_silk",
     "name": "Embroidered Silk",
+    "description": "Embroidered silk.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "witchs_robe",
     "name": "Witch's Robe",
+    "description": "Witch's robe.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "spiked_leather",
     "name": "Spiked Leather",
+    "description": "Spiked leather.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "mages_cloak",
     "name": "Mage's Cloak",
+    "description": "Mage's cloak.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "skalds_cuirass",
     "name": "Skald's Cuirass",
+    "description": "Skald's cuirass.",
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"],
+    "effects": []
   },
   {
     "id": "wolfs_hide",
     "name": "Wolf's Hide",
+    "description": "Wolf's hide.",
     "slot": "body",
     "armor": 4,
     "cost": 1,
-    "qualities": ["hampering", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"],
+    "effects": []
   },
   {
     "id": "concealed_armor",
     "name": "Concealed Armor",
+    "description": "Concealed armor.",
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "concealed", "flexible"]
+    "qualities": ["hampering", "concealed", "flexible"],
+    "effects": []
   },
   {
     "id": "blessed_robe",
     "name": "Blessed Robe",
+    "description": "Blessed robe.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "medium_armor",
     "name": "Medium Armor",
+    "description": "Medium armor provides a good balance between protection and mobility. It has a hampering modifier of -3, which means it significantly limits the wearer's physical capabilities regarding stealth, Defense, or mystical powers.",
     "slot": "body",
     "armor": 6,
     "cost": 5,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "chainmail",
     "name": "Chainmail",
+    "description": "Chainmail.",
     "slot": "body",
     "armor": 6,
     "cost": 125,
-    "qualities": ["hampering", "fortified", "flexible"]
+    "qualities": ["hampering", "fortified", "flexible"],
+    "effects": []
   },
   {
     "id": "ravens_armor",
     "name": "Raven's Armor",
+    "description": "Raven's armor.",
     "slot": "body",
     "armor": 6,
     "cost": 2,
-    "qualities": ["hampering", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"],
+    "effects": []
   },
   {
     "id": "lacquered_silk_cuirass",
     "name": "Lacquered Silk Cuirass",
+    "description": "Lacquered silk cuirass.",
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "laminated_armor",
     "name": "Laminated Armor",
+    "description": "Laminated armor.",
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "heavy_armor",
     "name": "Heavy Armor",
+    "description": "Heavy armor provides excellent protection but significantly limits mobility. It has a hampering modifier of -4, which means it greatly restricts the wearer's physical capabilities regarding stealth, Defense, or mystical powers.",
     "slot": "body",
     "armor": 8,
     "cost": 10,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "field_armor",
     "name": "Field Armor",
+    "description": "Field armor.",
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "plate_armor",
     "name": "Plate Armor",
+    "description": "Plate armor.",
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "knights_plate_armor",
     "name": "Knight's Plate Armor",
+    "description": "Knight's plate armor.",
     "slot": "body",
     "armor": 8,
     "cost": 250,
-    "qualities": ["hampering", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"],
+    "effects": []
   },
   {
     "id": "templars_plate_armor",
     "name": "Templar's Plate Armor",
+    "description": "Templar's plate armor.",
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "blessed"]
+    "qualities": ["hampering", "blessed"],
+    "effects": []
   },
   {
     "id": "wrath_armor",
     "name": "Wrath Armor",
+    "description": "Wrath armor.",
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "vengeful"]
+    "qualities": ["hampering", "vengeful"],
+    "effects": []
   }
 ]

@@ -2,161 +2,201 @@
   {
     "id": "light_armor",
     "name": "Легкая броня",
+    "description": "Легкая броня обеспечивает базовую защиту, при этом позволяя сохранять значительную подвижность. Она имеет модификатор ограничения -2, что означает, что она слегка ограничивает физические возможности носителя в отношении скрытности, защиты или мистических способностей.",
     "slot": "body",
     "armor": 4,
     "cost": 2,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "embroidered_silk",
     "name": "Вышитый шелк",
+    "description": "Вышитый шелк.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "witchs_robe",
     "name": "Ведьмино одеяние",
+    "description": "Ведьмино одеяние.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "spiked_leather",
     "name": "Шипованная кожа",
+    "description": "Шипованная кожа.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "mages_cloak",
     "name": "Плащ мага",
+    "description": "Плащ мага.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "skalds_cuirass",
     "name": "Кираса скальда",
+    "description": "Кираса скальда.",
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"],
+    "effects": []
   },
   {
     "id": "wolfs_hide",
     "name": "Шкура волка",
+    "description": "Шкура волка.",
     "slot": "body",
     "armor": 4,
     "cost": 1,
-    "qualities": ["hampering", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"],
+    "effects": []
   },
   {
     "id": "concealed_armor",
     "name": "Скрытая броня",
+    "description": "Скрытая броня.",
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "concealed", "flexible"]
+    "qualities": ["hampering", "concealed", "flexible"],
+    "effects": []
   },
   {
     "id": "blessed_robe",
     "name": "Благословенное одеяние",
+    "description": "Благословенное одеяние.",
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "medium_armor",
     "name": "Средняя броня",
+    "description": "Средняя броня обеспечивает хороший баланс между защитой и подвижностью. Она имеет модификатор ограничения -3, что означает, что она значительно ограничивает физические возможности носителя в отношении скрытности, защиты или мистических способностей.",
     "slot": "body",
     "armor": 6,
     "cost": 5,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "chainmail",
     "name": "Кольчуга",
+    "description": "Кольчуга.",
     "slot": "body",
     "armor": 6,
     "cost": 125,
-    "qualities": ["hampering", "fortified", "flexible"]
+    "qualities": ["hampering", "fortified", "flexible"],
+    "effects": []
   },
   {
     "id": "ravens_armor",
     "name": "Броня ворона",
+    "description": "Броня ворона.",
     "slot": "body",
     "armor": 6,
     "cost": 2,
-    "qualities": ["hampering", "cumbersome"]
+    "qualities": ["hampering", "cumbersome"],
+    "effects": []
   },
   {
     "id": "lacquered_silk_cuirass",
     "name": "Лакированная шелковая кираса",
+    "description": "Лакированная шелковая кираса.",
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "laminated_armor",
     "name": "Ламинированная броня",
+    "description": "Ламинированная броня.",
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "heavy_armor",
     "name": "Тяжелая броня",
+    "description": "Тяжелая броня обеспечивает отличную защиту, но значительно ограничивает подвижность. Она имеет модификатор ограничения -4, что означает, что она сильно ограничивает физические возможности носителя в отношении скрытности, защиты или мистических способностей.",
     "slot": "body",
     "armor": 8,
     "cost": 10,
-    "qualities": ["hampering"]
+    "qualities": ["hampering"],
+    "effects": []
   },
   {
     "id": "field_armor",
     "name": "Полевой доспех",
+    "description": "Полевой доспех.",
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "fortified"]
+    "qualities": ["hampering", "fortified"],
+    "effects": []
   },
   {
     "id": "plate_armor",
     "name": "Латная броня",
+    "description": "Латная броня.",
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "flexible"]
+    "qualities": ["hampering", "flexible"],
+    "effects": []
   },
   {
     "id": "knights_plate_armor",
     "name": "Латная броня рыцаря",
+    "description": "Латная броня рыцаря.",
     "slot": "body",
     "armor": 8,
     "cost": 250,
-    "qualities": ["hampering", "flexible", "fortified"]
+    "qualities": ["hampering", "flexible", "fortified"],
+    "effects": []
   },
   {
     "id": "templars_plate_armor",
     "name": "Латная броня храмовника",
+    "description": "Латная броня храмовника.",
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "blessed"]
+    "qualities": ["hampering", "blessed"],
+    "effects": []
   },
   {
     "id": "wrath_armor",
     "name": "Броня Гнева",
+    "description": "Броня Гнева.",
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "vengeful"]
+    "qualities": ["hampering", "vengeful"],
+    "effects": []
   }
 ]
