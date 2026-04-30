@@ -1,102 +1,213 @@
 [
   {
     "id": "area",
+    "name": "Area Effect",
+    "description": "This weapon has an area effect, allowing it to strike multiple targets in a single attack, but can't be aimed precisely. Additionally, even missed attacks can still deal damage to nearby targets if those were within the area of effect.",
     "effects": []
   },
   {
     "id": "balanced",
+    "name": "Balanced",
+    "description": "This weapon or shield is so well-balanced, it grants a +1 bonus to Defense.",
+    "effects": [
+      {
+        "target": { "kind": "secondary", "stat": "defense" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
+  },
+  {
+    "id": "bleeding",
+    "name": "Bleeding",
+    "description": "This weapon causes bleeding, inflicting ongoing damage to Max Toughness over time. Each consecutive hit with this weapon increases the bleeding damage over time by 1.",
     "effects": []
   },
   {
     "id": "blessed",
+    "name": "Blessed",
+    "description": "An item with this quality has been consecrated in holy fire and now possesses special power against corrupt creatures. A creature wounded by a weapon with this quality must make a d20 check against its Corruption, or it will take +d4 additional damage. A creature that attacks the wearer of armor with this quality must make a d20 check against its Corruption, and if it fails, the armor will have +d4 Armor against that attack. Corrupt creatures always fail these checks.",
     "effects": []
   },
   {
     "id": "blunt",
-    "effects": []
+    "name": "Blunt",
+    "description": "This weapon is blunt, making it less effective compared to sharp weapons. It deals 2 less damage.",
+    "effects": [
+      {
+        "target": { "kind": "combat", "field": "bonusDamage" },
+        "modifier": { "type": "addFlat", "value": -2 }
+      }
+    ]
   },
   {
     "id": "catastrophic",
+    "name": "Catastrophic",
+    "description": "If the wielder of this weapon got a 1 on an attack roll, the weapon might explode in their hands, causing armor piercing damage to the wielder and anyone in melee range from them. Professionals, depending on the abilities learned, can be immune to this effect.",
     "effects": []
   },
   {
     "id": "composite",
-    "effects": []
+    "name": "Composite",
+    "description": "This weapon is made from multiple materials, and it can still inflict damage even after a miss.",
+    "effects": [],
+    "reactions": [
+      {
+        "name": "Composite Weapon Attack",
+        "trigger": "onMiss",
+        "damage": 6,
+        "attackAttribute": "accurate"
+      }
+    ]
   },
   {
     "id": "concealed",
+    "name": "Concealed",
+    "description": "This weapon is concealed, making it harder to detect. It can only be discovered with a failed Discreet check during an active body search and can not be found otherwise.",
     "effects": []
   },
   {
     "id": "cumbersome",
+    "name": "Cumbersome",
+    "description": "In cumbersome armor, it is especially difficult to move, which increases its hampering modifier by -1.",
     "effects": []
   },
   {
     "id": "deep_wounds",
+    "name": "Deep Wounds",
+    "description": "This weapon causes deeper impact and generally inflicts 1 more damage.",
+    "effects": [
+      {
+        "target": { "kind": "combat", "field": "attackAttribute" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
+  },
+  {
+    "id": "devastating",
+    "name": "Devastating",
+    "description": "This weapon is devastating, causing massive damage on impact, but it can't be aimed at a single enemy, only at an area. Successful hits can sink ships, crumble castles, destroy walls, gates, and bridges. If a person was near the impact, they will receive specified armor piercing damage that can't be avoided. If they were inside a destroyed building, they will lose all their Toughness points.",
     "effects": []
   },
   {
     "id": "entangling",
-    "effects": []
+    "name": "Entangling",
+    "description": "This weapon can entangle targets, restricting their movement and actions. Entangled targets can't move and need two successful checks on any Action beside related to freeing themselves. Additionally, entangled target can be thrown to the ground with a successfull Strong check, and they won't be able to get up until they remove entangled status.",
+    "effects": [],
+    "reactions": [
+      {
+        "name": "Entangling Weapon Attack",
+        "trigger": "onHit",
+        "damage": 0,
+        "attackAttribute": "accurate"
+      }
+    ]
   },
   {
     "id": "flaming",
+    "name": "Flaming",
+    "description": "This weapon glows and sparks even before it gets activated and ignites. The weapon deals normal damage, but it can set the target on fire, causing them to take d4 damage for d4 turns, starting from the turn the effect was applied. Fire can be extinguished if the burning creature spends the entire turn rolling on the ground and succeeds on a Speed check. Armor with this quality provides an additional check for anything related to fire and also offers +d4 Armor against all fire effects.",
     "effects": []
   },
   {
     "id": "flexible",
+    "name": "Flexible",
+    "description": "If an armor or a shield is flexible it means it is much easier to use than other representatives of their type. Flexible armor reduces the effect of the hampering modifier by +2 (light armor will not affect stealth, Defense, and mystical powers at all, medium armor will have a -1 hampering modifier, and heavy armor will have a -2), and flexible shields can be worn on the forearm, and they will not interfere with using that hand.",
     "effects": []
   },
   {
     "id": "fortified",
-    "effects": []
+    "name": "Fortified",
+    "description": "Fortified armor is thicker and more sturdy than other representatives of its type, providing a +1 modifier to all Armor checks.",
+    "effects": [
+      {
+        "target": { "kind": "secondary", "stat": "armor" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "hampering",
+    "name": "Hampering",
+    "description": "This is a negative armor modifier that limits the physical capabilities of the wearer: the armor may restrict movement, be too heavy, too cumbersome, or have other properties tied to discomfort. This modifier is added to all Defense, stealth, and mystical power checks.",
     "effects": []
   },
   {
     "id": "long",
-    "effects": []
+    "name": "Long",
+    "description": "This weapon has an extended reach, allowing it to strike earlier, providing a Free Attack once a turn against anyone who closes the distance.",
+    "effects": [],
+    "reactions": [
+      {
+        "name": "Reach Weapon Attack",
+        "trigger": "onContact",
+        "damage": 8,
+        "attackAttribute": "accurate"
+      }
+    ]
   },
   {
     "id": "massive",
+    "name": "Massive",
+    "description": "This weapon is massive, dealing significant damage. You can roll damage twice on each successful hit and take the higher result.",
     "effects": []
   },
   {
     "id": "own",
+    "name": "Natural",
+    "description": "This weapon is natural. It's either a part of the wielder's body or attached to it too closely to be disarmed or dropped.",
     "effects": []
   },
   {
     "id": "precise",
-    "effects": []
+    "name": "Precise",
+    "description": "This weapon is precise, granting a +1 bonus to attack rolls.",
+    "effects": [
+      {
+        "target": { "kind": "combat", "field": "bonusAttack" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "ranged",
+    "name": "Ranged",
+    "description": "This weapon is designed for attacks from a distance, allowing the wielder to strike targets without engaging in close combat. This weapon cannot be used in melee.",
     "effects": []
   },
   {
     "id": "returning",
+    "name": "Returning",
+    "description": "This weapon returns to the wielder after being thrown if it missed.",
     "effects": []
   },
   {
     "id": "short",
+    "name": "Short",
+    "description": "This weapon is short, making it easier to draw or swap. It costs Free Action to get armed with a short weapon.",
     "effects": []
   },
   {
     "id": "special",
+    "name": "Special",
+    "description": "This weapon has unique bespoke properties that set it apart from standard weapons.",
     "effects": []
   },
   {
     "id": "unwieldy",
+    "name": "Unwieldy",
+    "description": "This weapon is difficult to handle in combat: you can't make attacks and move on the same turn.",
     "effects": []
   },
   {
     "id": "vengeful",
+    "name": "Vengeful",
+    "description": "Armor with this quality glows with dark energies. For each hit on the wearer of this armor, the attacker must pass a Speed check or take d4 damage for d4 turns.",
     "effects": []
   },
   {
     "id": "versatile",
+    "name": "Versatile",
+    "description": "This weapon is versatile, allowing it to be used effectively in either one hand or two hands and thus fitting different combat styles.",
     "effects": []
   }
 ]
