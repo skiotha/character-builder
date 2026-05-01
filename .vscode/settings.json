@@ -1,0 +1,5 @@
+{
+  // UI Setting:
+  // TypeScript (Native Preview) > Use Tsgo
+  "js/ts.experimental.useTsgo": true
+}
