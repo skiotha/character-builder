@@ -40,7 +40,7 @@ const KNOWN_PRIMARY_ATTRIBUTES = new Set<PrimaryAttributeName>([
   "accurate",
   "cunning",
   "discreet",
-  "alluring",
+  "appealing",
   "quick",
   "resolute",
   "vigilant",

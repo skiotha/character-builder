@@ -268,7 +268,7 @@ describe("validateCharacterCreation", () => {
       accurate: 5,
       cunning: 5,
       discreet: 5,
-      alluring: 5,
+      appealing: 5,
       quick: 5,
       resolute: 5,
       vigilant: 5,

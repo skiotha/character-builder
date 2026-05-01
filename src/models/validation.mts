@@ -180,7 +180,7 @@ export function skipOnCreation(fieldPath: string, userRole: string): boolean {
       "attributes.primary.accurate",
       "attributes.primary.cunning",
       "attributes.primary.discreet",
-      "attributes.primary.alluring",
+      "attributes.primary.appealing",
       "attributes.primary.quick",
       "attributes.primary.strong",
       "attributes.primary.vigilant",

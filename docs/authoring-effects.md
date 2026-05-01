@@ -529,7 +529,7 @@ Modifier verbs: `addFlat` | `multiply` | `cap`. Not `setBase`, not `remove`.
 ```
 
 - `attackAttribute`: `setBase` only. Value is a `PrimaryAttributeName`
-  (`"accurate"`, `"cunning"`, `"discreet"`, `"alluring"`, `"quick"`,
+  (`"accurate"`, `"cunning"`, `"discreet"`, `"appealing"`, `"quick"`,
   `"resolute"`, `"vigilant"`, `"strong"`).
 - `baseDamage` / `bonusDamage`: `addFlat` | `multiply` | `cap`. Not `setBase`.
 

@@ -59,7 +59,7 @@ describe("attributes contract", () => {
       "accurate",
       "cunning",
       "discreet",
-      "alluring",
+      "appealing",
       "quick",
       "resolute",
       "vigilant",

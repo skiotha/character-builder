@@ -32,7 +32,7 @@ This is the **source of truth** — all other formats derive from it.
       "accurate":  5,                   // 5–15, integer, budget total = 80
       "cunning":   5,
       "discreet":  5,
-      "alluring":  5,
+      "appealing":  5,
       "quick":     5,
       "resolute":  5,
       "vigilant":  5,

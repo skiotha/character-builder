@@ -90,7 +90,7 @@ For clarity, the exported object should contain exactly:
   "corruption":      { "permanent", "temporary" },
 
   "attributes": {
-    "primary":   { "accurate", "cunning", "discreet", "alluring",
+    "primary":   { "accurate", "cunning", "discreet", "appealing",
                    "quick", "resolute", "vigilant", "strong" },
     "secondary": { "toughness": { "max", "current" },
                    "painThreshold", "corruptionThreshold", "defense",

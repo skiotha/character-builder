@@ -4,7 +4,7 @@ export interface PrimaryAttributes {
   accurate: number;
   cunning: number;
   discreet: number;
-  alluring: number;
+  appealing: number;
   quick: number;
   resolute: number;
   vigilant: number;
@@ -82,10 +82,16 @@ export type SecondaryAttributeName = keyof SecondaryAttributes;
 export type CombatSlotField = "attackAttribute" | "baseDamage" | "bonusDamage";
 
 export type EffectFlag =
-  | "poisonImmunity"
-  | "diseaseImmunity"
-  | "darkvision"
-  | "infravision"
+  | "poisonResistance"
+  | "fireResistance"
+  | "freeAttackImmunity"
+  | "attackImmunity"
+  | "advantage"
+  | "deathDenial"
+  | "blindvision"
+  | "initiativeExemption"
+  | "fastSwap"
+  | "poisonedWeapons"
   | "trueSight"
   | "flight"
   | "swim"

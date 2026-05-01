@@ -47,7 +47,7 @@ function makePrimaryAttributes(
     accurate: 10,
     cunning: 10,
     discreet: 10,
-    alluring: 10,
+    appealing: 10,
     quick: 10,
     resolute: 10,
     vigilant: 10,
