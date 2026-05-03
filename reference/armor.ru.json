@@ -6,7 +6,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 2,
-    "qualities": ["hampering"],
+    "qualities": ["hampering_2"],
     "effects": []
   },
   {
@@ -16,7 +16,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_2", "flexible"],
     "effects": []
   },
   {
@@ -26,7 +26,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_2", "flexible"],
     "effects": []
   },
   {
@@ -36,7 +36,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "fortified"],
+    "qualities": ["hampering_2", "fortified"],
     "effects": []
   },
   {
@@ -46,7 +46,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_2", "flexible"],
     "effects": []
   },
   {
@@ -56,7 +56,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "flexible", "fortified"],
+    "qualities": ["hampering_2", "flexible", "fortified"],
     "effects": []
   },
   {
@@ -66,7 +66,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 1,
-    "qualities": ["hampering", "cumbersome"],
+    "qualities": ["hampering_2", "cumbersome"],
     "effects": []
   },
   {
@@ -76,7 +76,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 50,
-    "qualities": ["hampering", "concealed", "flexible"],
+    "qualities": ["hampering_2", "concealed", "flexible"],
     "effects": []
   },
   {
@@ -86,7 +86,7 @@
     "slot": "body",
     "armor": 4,
     "cost": 10,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_2", "flexible"],
     "effects": []
   },
   {
@@ -96,7 +96,7 @@
     "slot": "body",
     "armor": 6,
     "cost": 5,
-    "qualities": ["hampering"],
+    "qualities": ["hampering_3"],
     "effects": []
   },
   {
@@ -106,7 +106,7 @@
     "slot": "body",
     "armor": 6,
     "cost": 125,
-    "qualities": ["hampering", "fortified", "flexible"],
+    "qualities": ["hampering_3", "fortified", "flexible"],
     "effects": []
   },
   {
@@ -116,7 +116,7 @@
     "slot": "body",
     "armor": 6,
     "cost": 2,
-    "qualities": ["hampering", "cumbersome"],
+    "qualities": ["hampering_3", "cumbersome"],
     "effects": []
   },
   {
@@ -126,7 +126,7 @@
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_3", "flexible"],
     "effects": []
   },
   {
@@ -136,7 +136,7 @@
     "slot": "body",
     "armor": 6,
     "cost": 25,
-    "qualities": ["hampering", "fortified"],
+    "qualities": ["hampering_3", "fortified"],
     "effects": []
   },
   {
@@ -146,7 +146,7 @@
     "slot": "body",
     "armor": 8,
     "cost": 10,
-    "qualities": ["hampering"],
+    "qualities": ["hampering_4"],
     "effects": []
   },
   {
@@ -156,7 +156,7 @@
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "fortified"],
+    "qualities": ["hampering_4", "fortified"],
     "effects": []
   },
   {
@@ -166,7 +166,7 @@
     "slot": "body",
     "armor": 8,
     "cost": 50,
-    "qualities": ["hampering", "flexible"],
+    "qualities": ["hampering_4", "flexible"],
     "effects": []
   },
   {
@@ -176,7 +176,7 @@
     "slot": "body",
     "armor": 8,
     "cost": 250,
-    "qualities": ["hampering", "flexible", "fortified"],
+    "qualities": ["hampering_4", "flexible", "fortified"],
     "effects": []
   },
   {
@@ -186,7 +186,7 @@
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "blessed"],
+    "qualities": ["hampering_4", "blessed"],
     "effects": []
   },
   {
@@ -196,7 +196,17 @@
     "slot": "body",
     "armor": 8,
     "cost": 100,
-    "qualities": ["hampering", "vengeful"],
+    "qualities": ["hampering_4", "vengeful"],
+    "effects": []
+  },
+  {
+    "id": "battle_oils",
+    "name": "Боевые масла",
+    "description": "Покрыт боевыми маслами.",
+    "slot": "body",
+    "armor": 0,
+    "cost": 100,
+    "qualities": ["oiled"],
     "effects": []
   }
 ]

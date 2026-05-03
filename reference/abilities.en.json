@@ -20,12 +20,12 @@
         "effects": [
           {
             "tier": "B",
+            "description": "Quick check to prevent an enemy's free attacks when moving away from, past, or toward them.",
             "target": {
               "kind": "flag",
-              "flag": "immunity",
-              "scope": "freeAttack.movement"
+              "name": "evasion"
             },
-            "description": "Quick check to prevent an enemy's free attacks when moving away from, past, or toward them."
+            "modifier": { "type": "addFlat", "value": 1 }
           },
           {
             "tier": "C",
@@ -38,23 +38,24 @@
         "effects": [
           {
             "tier": "A",
+            "description": "The Adept may use combat heels as if they lacked the unwieldy quality.",
             "target": {
               "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "unwieldy",
-              "weaponFilter": "heels"
+              "quality": "unwieldy"
             },
             "modifier": { "type": "remove" },
-            "description": "The Adept may use combat heels as if they lacked the unwieldy quality."
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction",
-              "scope": "statusRemoval.prone"
-            },
+            "tier": "C",
             "description": "Quick check to instantly spring to your feet as a reaction after falling prone."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Bounce Back",
+            "description": "Attempt to get up instantly.",
+            "trigger": "onProne"
           }
         ]
       },
@@ -63,12 +64,12 @@
         "effects": [
           {
             "tier": "B",
+            "description": "If you end your movement on an enemy, your next attack this turn is made with advantage.",
             "target": {
               "kind": "flag",
-              "flag": "advantage",
-              "scope": "attacks"
+              "name": "advantage"
             },
-            "description": "If you end your movement on an enemy, your next attack this turn is made with advantage."
+            "modifier": { "type": "addFlat", "value": 1 }
           },
           {
             "tier": "C",
@@ -77,6 +78,13 @@
           {
             "tier": "C",
             "description": "You may end your movement in a space occupied by an enemy if their position allows it."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Hide Behind Enemy",
+            "description": "Attempt to hide behind an enemy.",
+            "trigger": "onAttacked"
           }
         ]
       }
@@ -99,10 +107,11 @@
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
-        "description": "Shifts the hit calculation to Discreet and enhances attacks with short or precise weapons.",
+        "description": "Switches the hit calculation to Discreet and enhances attacks with short or precise weapons.",
         "effects": [
           {
             "tier": "A",
+            "description": "Use Discreet instead of Accurate to calculate hit chance with short or precise weapons.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -111,16 +120,30 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "description": "Use Discreet instead of Accurate to calculate hit chance with short or precise weapons."
+            "appliesTo": [
+              { "kind": "type", "values": ["short"] },
+              { "kind": "quality", "values": ["precise"] }
+            ]
           },
           {
             "tier": "B",
+            "description": "Any attack with short weapons is made with advantage.",
             "target": {
               "kind": "flag",
-              "flag": "advantage",
-              "scope": "weapons.short"
+              "name": "advantage"
             },
-            "description": "Any attack with such weapons is made with advantage."
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "type", "values": ["short"] }]
+          },
+          {
+            "tier": "B",
+            "description": "Any attack with precise weapons is made with advantage.",
+            "target": {
+              "kind": "flag",
+              "name": "advantage"
+            },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "quality", "values": ["precise"] }]
           }
         ]
       },
@@ -129,6 +152,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Discreet instead of Quick to calculate Defense.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -136,8 +160,7 @@
             "modifier": {
               "type": "setBase",
               "value": "discreet"
-            },
-            "description": "Use Discreet instead of Quick to calculate Defense."
+            }
           }
         ]
       },
@@ -145,12 +168,17 @@
         "description": "Grants a chance to make an extra free attack during your own turn.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
-            "description": "Discreet check to gain a chance at an extra free attack during your own turn."
+            "tier": "C",
+            "description": "Gain an extra free attack during your turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Feint",
+            "description": "Perform a Feint attack.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "discreet"
           }
         ]
       }
@@ -177,18 +205,7 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "combat",
-              "field": "bonusDamage"
-            },
-            "modifier": {
-              "type": "addFlat",
-              "value": 4
-            },
-            "description": "Once per turn, when you have advantage, you may deal a Backstab for +d4 damage."
-          },
-          {
-            "tier": "A",
+            "description": "You may use Discreet instead of Accurate to calculate hit chance.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -197,7 +214,27 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "description": "You may use Discreet instead of Accurate to calculate hit chance."
+            "appliesTo": []
+          },
+          {
+            "tier": "C",
+            "description": "Once per turn, when you have advantage, you may deal a Backstab for +d4 damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Intrigues",
+            "description": "If you have advantage during your turn, you can perform a Backstab attack.",
+            "trigger": "onAdvantage"
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Backstab",
+            "description": "A Backstab is a special attack that can be used once per turn. It deals +d4 damage on top of the normal damage.",
+            "trigger": "manual",
+            "damage": 10,
+            "attackAttribute": "discreet"
           }
         ]
       },
@@ -205,12 +242,7 @@
         "description": "Enhances Backstab with persistent bleeding.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "statusEffect",
-              "status": "bleeding",
-              "scope": "specialAttack"
-            },
+            "tier": "C",
             "description": "A Backstab causes bleeding that deals d4 additional damage each turn until the wound is treated."
           }
         ]
@@ -219,20 +251,21 @@
         "description": "Increases Backstab's direct damage and removes the per-turn limit on such strikes.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "combat",
-              "field": "bonusDamage"
-            },
-            "modifier": {
-              "type": "addFlat",
-              "value": 4
-            },
+            "tier": "C",
             "description": "The direct bonus damage of a Backstab is now +d8 instead of +d4."
           },
           {
             "tier": "C",
             "description": "The Master is no longer limited in the number of Backstabs per turn as long as advantage is maintained."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Backstab",
+            "description": "A Backstab is a special attack that can be used instead of any attack if you have the advantage. It deals +d8 damage on top of the normal damage.",
+            "trigger": "manual",
+            "damage": 14,
+            "attackAttribute": "discreet"
           }
         ]
       }
@@ -247,32 +280,24 @@
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
-        "description": "Unlocks a dirty hit that stuns the target and allows an immediate follow-up attack.",
+        "description": "Unlocks Cheap Shot attack that stuns the target and allows an immediate follow-up attack.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
-            "description": "A dirty hit deals d6 damage."
+            "tier": "C",
+            "description": "Cheap Shot deals d6 damage and stuns on hit."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "statusEffect",
-              "status": "stunned",
-              "scope": "specialAttack"
-            },
-            "description": "On a hit, the target is stunned."
-          },
-          {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "The stun allows you to immediately make one more normal attack."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Cheap Shot",
+            "description": "Cheap Shot can stun the target. If successful, you can perform one additional normal attack right after.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "quick"
           }
         ]
       },
@@ -280,12 +305,15 @@
         "description": "Allows converting any successful attack into a knockdown.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "statusEffect",
-              "status": "prone"
-            },
+            "tier": "C",
             "description": "Quick check to make any successful attack end with a trip or shove that knocks the enemy prone."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Knock Over",
+            "description": "After a successful melee atack, can attempt to knock the target prone.",
+            "trigger": "onHit"
           }
         ]
       },
@@ -293,12 +321,17 @@
         "description": "Grants a reactive counterattack against any melee attack made against you.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction"
-            },
+            "tier": "C",
             "description": "A counterattack as a reaction deals d6 armor-ignoring damage each time the Master is targeted by a melee attack."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Riposte",
+            "description": "When targeted by a melee attack, the Master can make a counterattack as a reaction.",
+            "trigger": "onAttacked",
+            "damage": 6,
+            "attackAttribute": "quick"
           }
         ]
       }
@@ -317,15 +350,16 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Quick instead of Accurate to calculate hit chance with short weapons.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
             },
             "modifier": {
               "type": "setBase",
-              "value": "discreet"
+              "value": "quick"
             },
-            "description": "Use Quick instead of Accurate to calculate hit chance with short weapons."
+            "appliesTo": [{ "kind": "quality", "values": ["short"] }]
           }
         ]
       },
@@ -333,34 +367,29 @@
         "description": "Grants an extra knife attack each turn.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "One extra knife attack per turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Stab",
+            "description": "Make an additional knife attack as a bonus action.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "quick"
           }
         ]
       },
       "master": {
-        "description": "Allows forcing close-quarters combat, restricting the enemy's weapon options, and worsening their defense.",
+        "description": "Allows forcing close-quarters combat, restrict the enemy's weapon options and worsen their defense.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "immunity",
-              "scope": "weapons.long"
-            },
+            "tier": "C",
             "description": "After a successful knife attack the enemy cannot use long weapons at all."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "advantage",
-              "scope": "weapons.melee"
-            },
+            "tier": "C",
             "description": "After a successful knife attack the enemy can no longer effectively use other melee weapons except knives."
           },
           {
@@ -424,8 +453,10 @@
         "description": "Caps especially dangerous damage and negates half-damage from missed hits of such abilities.",
         "effects": [
           {
-            "tier": "C",
-            "description": "If an attack could inflict more damage than your current Toughness, it inflicts only half damage on a hit or nothing at all on a miss."
+            "tier": "B",
+            "description": "If an attack could inflict more damage than your current Toughness, it inflicts only half damage on a hit or nothing at all on a miss.",
+            "target": { "kind": "flag", "name": "deathDenial" },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       },
@@ -434,11 +465,19 @@
         "effects": [
           {
             "tier": "B",
+            "description": "After an enemy misses, the Adept may react by swapping places with them and ending up behind their back, without provoking free attacks.",
             "target": {
               "kind": "flag",
-              "flag": "reaction"
+              "name": "evasion"
             },
-            "description": "After an enemy misses, the Adept may react by swapping places with them and ending up behind their back, without provoking free attacks."
+            "modifier": { "type": "addFlat", "value": 1 }
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Dodge and Swap",
+            "description": "After an enemy misses an attack against you, you can swap places with them as a reaction.",
+            "trigger": "onDodged"
           }
         ]
       },
@@ -446,8 +485,13 @@
         "description": "Guarantees initiative priority unless the opponent has the same mastery.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The Master always wins initiative and acts first, unless facing another master of the same ability."
+            "tier": "B",
+            "description": "The Master always wins initiative and acts first, unless facing another master of the same ability.",
+            "target": {
+              "kind": "flag",
+              "name": "initiativeExemption"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       }
@@ -465,12 +509,22 @@
         "description": "Allows beating the enemy on the first draw and reloading a revolver without losing movement.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Quick check to draw and make the first attack before the opponent."
+            "tier": "A",
+            "description": "A revolver can be reloaded on the move without losing Movement.",
+            "target": { "kind": "weaponQuality", "quality": "unwieldy" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [
+              { "kind": "id", "values": ["revolver", "ladies_revolver"] }
+            ]
           },
           {
-            "tier": "C",
-            "description": "A revolver can be reloaded on the move without losing Movement."
+            "tier": "B",
+            "description": "Quick check to draw and make the first attack before the opponent.",
+            "target": {
+              "kind": "flag",
+              "name": "initiativeExemption"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       },
@@ -478,12 +532,20 @@
         "description": "Allows swapping weapons on the move and reloading rifles just as freely.",
         "effects": [
           {
-            "tier": "C",
-            "description": "You can holster one weapon and draw another in a single motion without losing your attack."
+            "tier": "B",
+            "description": "You can holster one weapon and draw another in a single motion without losing your attack.",
+            "target": {
+              "kind": "flag",
+              "name": "fastSwap"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           },
           {
-            "tier": "C",
-            "description": "A rifle can be reloaded on the move without losing Movement."
+            "tier": "B",
+            "description": "A rifle can be reloaded on the move without losing Movement.",
+            "target": { "kind": "weaponQuality", "quality": "unwieldy" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "id", "values": ["rifle"] }]
           }
         ]
       },
@@ -491,19 +553,15 @@
         "description": "Removes the action cost from consumables and makes firearms more convenient to handle.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Elixirs, grenades, poisons, and traps can be used without spending an Action."
+            "tier": "A",
+            "description": "All firearms are treated as if they lack the unwieldy quality.",
+            "target": { "kind": "weaponQuality", "quality": "unwieldy" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "type", "values": ["firearm"] }]
           },
           {
-            "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "unwieldy",
-              "weaponFilter": "firearms"
-            },
-            "modifier": { "type": "remove" },
-            "description": "All firearms are treated as if they lack the unwieldy quality."
+            "tier": "C",
+            "description": "Elixirs, grenades, poisons, and traps can be used without spending an Action."
           }
         ]
       }
@@ -531,19 +589,21 @@
         "description": "Allows gathering ingredients for simple elixirs, working safely with grenades, and brewing combat oils.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Cunning check to gather ingredients for one dose of a simple elixir."
+            "tier": "A",
+            "description": "Alchemist no longer suffers catastrophes when using alchemical grenades.",
+            "target": { "kind": "weaponQuality", "quality": "catastrophic" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "id", "values": ["alchemical_bomb"] }]
           },
           {
-            "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "catastrophic",
-              "weaponFilter": "alchemy"
-            },
-            "modifier": { "type": "remove" },
-            "description": "The Novice no longer suffers catastrophes when using alchemical grenades."
+            "tier": "B",
+            "description": "Alchemy knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:alchemy" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
+            "tier": "C",
+            "description": "Cunning check to gather ingredients for one dose of a simple elixir."
           },
           {
             "tier": "C",
@@ -601,6 +661,12 @@
         "description": "Allows quickly coating a weapon with poison and activating it with a Cunning check.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Poisons knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:alchemy:poisons" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "The Novice can coat a weapon with poison at any time as a free action."
           },
@@ -618,13 +684,17 @@
             "description": "Poison applied to a weapon remains effective for the entire battle regardless of hit count."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "weapons.hidden"
-            },
+            "tier": "C",
             "description": "The Adept can use a hidden weapon in combat as a free action when they have advantage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Hidden Attack",
+            "description": "When you have advantage, you can make a hidden weapon attack as a free action.",
+            "trigger": "onAdvantage",
+            "damage": 4,
+            "attackAttribute": "cunning"
           }
         ]
       },
@@ -655,16 +725,21 @@
         "description": "Allows entering a choking grapple when you have advantage, dealing armor-ignoring damage and denying the target's actions.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "After a successful hit with advantage, you may enter a rear grapple, dealing d6 armor-ignoring damage and preventing the target from taking actions."
           },
           {
             "tier": "C",
             "description": "Cunning check to determine whether the choking grapple is maintained on the next turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Choking Grapple",
+            "description": "A Choking Grapple is a special attack that can be performed after a successful hit with advantage. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "cunning"
           }
         ]
       },
@@ -672,12 +747,17 @@
         "description": "Unlocks suffocating spores against one target for several turns.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "A successful throw of suffocating spores deals d4 armor-ignoring damage per turn for d4 turns; the target can still move and act."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Spores Dust",
+            "description": "A targeted melee distance attack with a special poisonous dust. On contact, it deals d4 armor-ignoring damage per turn for d4 turns; the target can still move and act after being hit.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "cunning"
           }
         ]
       },
@@ -685,12 +765,17 @@
         "description": "Turns the suffocating spores into a grenade that covers an entire room or small area.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "A spore bomb deals d4 armor-ignoring damage per turn for d4 turns to all enemies in a room, corridor, or small open space."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Spores Grenade",
+            "description": "A thrown attack with an alchemical grenade. On explosion, it deals d4 armor-ignoring damage per turn for d4 turns. Affected targets can only attempt to move out.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "cunning"
           }
         ]
       }
@@ -708,8 +793,11 @@
         "description": "Grants natural armor if the character applied a combat oil beforehand and wears no other armor.",
         "effects": [
           {
-            "tier": "C",
-            "description": "If you applied a combat oil beforehand and wear no other armor, you gain d4 natural Armor."
+            "tier": "A",
+            "description": "If you applied a combat oil beforehand and wear no other armor, you gain d4 natural Armor.",
+            "target": { "kind": "secondary", "stat": "armor" },
+            "modifier": { "type": "addFlat", "value": 4 },
+            "appliesTo": [{ "kind": "quality", "values": ["oiled"] }]
           }
         ]
       },
@@ -717,12 +805,18 @@
         "description": "Allows applying oil during the current turn and extends protection to elements and some mystical damage.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Combat oils also protect against elements like clothing.",
+            "target": { "kind": "flag", "name": "elementsProtection" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "Cunning check to apply oil to yourself during the current turn."
           },
           {
             "tier": "C",
-            "description": "Combat oils also protect against elements like clothing and prevent d4 damage from physical mystical effects such as fire, ice, acid, and electricity."
+            "description": "Combat oils prevent d4 damage from physical mystical effects such as fire, ice, acid, and electricity."
           }
         ]
       },
@@ -735,7 +829,7 @@
           },
           {
             "tier": "C",
-            "description": "The Master can have two body oils active simultaneously."
+            "description": "The Master can have two body oils effects active simultaneously."
           }
         ]
       }
@@ -802,6 +896,12 @@
         "description": "Allows identifying weaknesses and traits of living creatures at a glance.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Beasts knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:world:nature" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "Cunning check to understand the special abilities, traits, and physical weaknesses of a person or animal at a glance."
           }
@@ -812,6 +912,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Choose a creature category; every hit against its members deals +d4 more damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -820,7 +921,7 @@
               "type": "addFlat",
               "value": 4
             },
-            "description": "Choose a creature category; every hit against its members deals +d4 more damage."
+            "appliesTo": []
           },
           {
             "tier": "C",
@@ -833,6 +934,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "The additional damage against the chosen creature category is now +d6.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -841,7 +943,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "The additional damage against the chosen creature category is now +d6."
+            "appliesTo": []
           }
         ]
       }
@@ -859,6 +961,12 @@
         "description": "Shifts initiative to Cunning.",
         "effects": [
           {
+            "tier": "B",
+            "description": "War education.",
+            "target": { "kind": "flag", "name": "knowledge:world:warfare" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "Use Cunning instead of Quick to determine initiative."
           }
@@ -869,6 +977,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Cunning instead of Quick to determine your Defense.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -876,8 +985,7 @@
             "modifier": {
               "type": "setBase",
               "value": "cunning"
-            },
-            "description": "Use Cunning instead of Quick to determine your Defense."
+            }
           }
         ]
       },
@@ -886,6 +994,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Cunning instead of Accurate to calculate hit chance with any weapon except heavy ones.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -894,7 +1003,21 @@
               "type": "setBase",
               "value": "cunning"
             },
-            "description": "Use Cunning instead of Accurate to calculate hit chance with any weapon except heavy ones."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "main",
+                  "polearm",
+                  "light",
+                  "natural",
+                  "exotic",
+                  "firearm",
+                  "bows",
+                  "thrown"
+                ]
+              }
+            ]
           }
         ]
       }
@@ -912,6 +1035,12 @@
         "description": "Provides basic healing without supplies and improves it with medicine.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Poisons knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:alchemy:poisons" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "Cunning check to heal a patient for d4 Toughness with surgery alone, or d6 with remedies."
           }
@@ -921,11 +1050,8 @@
         "description": "Raises healing caps and adds damage from anatomical knowledge.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Healing without supplies is capped at d6, and with remedies at d8."
-          },
-          {
             "tier": "A",
+            "description": "Knowledge of the human body permanently increases damage with any weapon by +d2.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -934,7 +1060,11 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Knowledge of the human body permanently increases damage with any weapon by +d2."
+            "appliesTo": []
+          },
+          {
+            "tier": "C",
+            "description": "Healing without supplies is capped at d6, and with remedies at d8."
           }
         ]
       },
@@ -964,6 +1094,12 @@
       "novice": {
         "description": "Allows identifying artifacts and reading old human languages.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Academic education.",
+            "target": { "kind": "flag", "name": "knowledge:world" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "Cunning check to identify an artifact's quality and hidden qualities without testing it on yourself."
@@ -1014,19 +1150,21 @@
         "description": "Unlocks work with light artillery and field fortifications.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The Novice can use swivel guns, broadside artillery, and construct defensive structures and barricades."
+            "tier": "A",
+            "description": "The character no longer suffers catastrophes when using alchemical grenades.",
+            "target": { "kind": "weaponQuality", "quality": "catastrophic" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "id", "values": ["alchemical_bomb"] }]
           },
           {
-            "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "catastrophic",
-              "weaponFilter": "alchemy"
-            },
-            "modifier": { "type": "remove" },
-            "description": "The character no longer suffers catastrophes when using alchemical grenades."
+            "tier": "B",
+            "description": "Warfare knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:world:warfare" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
+            "tier": "C",
+            "description": "The Novice can use swivel guns, broadside artillery, and construct defensive structures and barricades."
           }
         ]
       },
@@ -1034,12 +1172,15 @@
         "description": "Unlocks heavy guns, siege engines, and special ammunition.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The Adept can use and organize the construction of cannons, mortars, and catapults, and identify weak points in forts and ships."
+            "tier": "A",
+            "description": "Unlocks the use of smoke screens, breach rounds, fire tubes, portable bombards, and culverins without catastrophe risk.",
+            "target": { "kind": "weaponQuality", "quality": "catastrophic" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "id", "values": ["fire_tube"] }]
           },
           {
             "tier": "C",
-            "description": "Unlocks the use of smoke screens, breach rounds, fire tubes, portable bombards, and culverins without catastrophe risk."
+            "description": "The Adept can use and organize the construction of cannons, mortars, and catapults, and identify weak points in forts and ships."
           }
         ]
       },
@@ -1048,14 +1189,10 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "add",
-              "quality": "massive",
-              "weaponFilter": "alchemy"
-            },
-            "modifier": { "type": "add" },
-            "description": "All siege weapons used by the Master gain the massive quality if they lacked it."
+            "description": "All siege weapons used by the Master gain the massive quality if they lacked it.",
+            "target": { "kind": "weaponQuality", "quality": "massive" },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "type", "values": ["siege"] }]
           }
         ]
       }
@@ -1072,6 +1209,12 @@
       "novice": {
         "description": "Allows making simple weapons and ammunition, and fitting or repairing armor.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Entrepreneurship.",
+            "target": { "kind": "flag", "name": "knowledge:world:commerce" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "Cunning check to craft simple ammunition, polearms, short weapons, and other simple weapons without special modifiers."
@@ -1119,6 +1262,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Quick may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "quick"
@@ -1126,8 +1270,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Quick may be raised by one point."
+            }
           }
         ]
       },
@@ -1136,6 +1279,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Quick may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "quick"
@@ -1143,8 +1287,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Quick may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1153,6 +1296,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Quick may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "quick"
@@ -1160,8 +1304,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Quick may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1180,6 +1323,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Vigilant may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "vigilant"
@@ -1187,8 +1331,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Vigilant may be raised by one point."
+            }
           }
         ]
       },
@@ -1197,6 +1340,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Vigilant may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "vigilant"
@@ -1204,8 +1348,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Vigilant may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1214,6 +1357,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Vigilant may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "vigilant"
@@ -1221,8 +1365,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Vigilant may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1241,6 +1384,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Strong may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "strong"
@@ -1248,8 +1392,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Strong may be raised by one point."
+            }
           }
         ]
       },
@@ -1258,6 +1401,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Strong may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "strong"
@@ -1265,8 +1409,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Strong may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1275,6 +1418,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Strong may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "strong"
@@ -1282,8 +1426,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Strong may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1302,6 +1445,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Accurate may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "accurate"
@@ -1309,8 +1453,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Accurate may be raised by one point."
+            }
           }
         ]
       },
@@ -1319,6 +1462,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Accurate may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "accurate"
@@ -1326,8 +1470,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Accurate may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1336,6 +1479,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Accurate may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "accurate"
@@ -1343,8 +1487,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Accurate may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1363,6 +1506,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Resolute may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "resolute"
@@ -1370,8 +1514,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Resolute may be raised by one point."
+            }
           }
         ]
       },
@@ -1380,6 +1523,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Resolute may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "resolute"
@@ -1387,8 +1531,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Resolute may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1397,6 +1540,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Resolute may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "resolute"
@@ -1404,8 +1548,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Resolute may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1424,6 +1567,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Appealing may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "appealing"
@@ -1431,8 +1575,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Appealing may be raised by one point."
+            }
           }
         ]
       },
@@ -1441,6 +1584,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Appealing may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "appealing"
@@ -1448,8 +1592,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Appealing may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1458,6 +1601,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Appealing may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "appealing"
@@ -1465,8 +1609,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Appealing may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1485,6 +1628,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Cunning may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "cunning"
@@ -1492,8 +1636,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Cunning may be raised by one point."
+            }
           }
         ]
       },
@@ -1502,6 +1645,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Cunning may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "cunning"
@@ -1509,8 +1653,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Cunning may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1519,6 +1662,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Cunning may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "cunning"
@@ -1526,8 +1670,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Cunning may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1546,6 +1689,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Discreet may be raised by one point.",
             "target": {
               "kind": "primary",
               "stat": "discreet"
@@ -1553,8 +1697,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Discreet may be raised by one point."
+            }
           }
         ]
       },
@@ -1563,6 +1706,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Discreet may be raised by a total of two points.",
             "target": {
               "kind": "primary",
               "stat": "discreet"
@@ -1570,8 +1714,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Discreet may be raised by a total of two points."
+            }
           }
         ]
       },
@@ -1580,6 +1723,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Discreet may be raised by a total of three points.",
             "target": {
               "kind": "primary",
               "stat": "discreet"
@@ -1587,8 +1731,7 @@
             "modifier": {
               "type": "addFlat",
               "value": 1
-            },
-            "description": "Discreet may be raised by a total of three points."
+            }
           }
         ]
       }
@@ -1607,6 +1750,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Vigilant instead of Accurate to calculate ranged weapon hit chance.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -1615,7 +1759,12 @@
               "type": "setBase",
               "value": "vigilant"
             },
-            "description": "Use Vigilant instead of Accurate to calculate ranged weapon hit chance."
+            "appliesTo": [
+              {
+                "kind": "quality",
+                "values": ["ranged"]
+              }
+            ]
           }
         ]
       },
@@ -1624,6 +1773,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Vigilant instead of Quick to calculate Defense.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -1631,8 +1781,11 @@
             "modifier": {
               "type": "setBase",
               "value": "vigilant"
-            },
-            "description": "Use Vigilant instead of Quick to calculate initiative and Defense."
+            }
+          },
+          {
+            "tier": "C",
+            "description": "The Adept can use Vigilant instead of Quick to calculate initiative."
           }
         ]
       },
@@ -1640,8 +1793,13 @@
         "description": "Allows maintaining full effectiveness in darkness and while blinded.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Darkness or blindness does not affect the Master's abilities."
+            "tier": "B",
+            "description": "Darkness or blindness does not affect the Master's abilities.",
+            "target": {
+              "kind": "flag",
+              "name": "darkvision"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       }
@@ -1659,8 +1817,13 @@
         "description": "Allows seeing the dominant aspect of a target's true nature at the cost of one temporary Corruption.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Vigilant check to see the dominant aspect of the true nature of an object, place, or creature, at the cost of one temporary Corruption."
+            "tier": "B",
+            "description": "Vigilant check to see the dominant aspect of the true nature of an object, place, or creature, at the cost of one temporary Corruption.",
+            "target": {
+              "kind": "flag",
+              "name": "trueSight"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       },
@@ -1697,6 +1860,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Revolver damage increases to d8, bows and revolvers to d10, and rifles to d12.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -1705,7 +1869,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Revolver damage increases to d8, bows and revolvers to d10, and rifles to d12."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -1716,6 +1885,15 @@
             "tier": "C",
             "description": "Accurate check to have a shot pin the enemy to the spot and hold them there until the marksman fails a check."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Crippling Shot",
+            "description": "A precise shot that can pin the target in place.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
+          }
         ]
       },
       "master": {
@@ -1723,7 +1901,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The Master's shots ignore armor."
+            "description": "The Master's shots always ignore armor."
           }
         ]
       }
@@ -1741,12 +1919,17 @@
         "description": "Allows marking one target and rerolling failed ranged attacks against them.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "Mark up to one target; all failed ranged attack checks against them may be rerolled until the fight ends or the target dies."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Hunter's Mark",
+            "description": "Reroll failed ranged attacks against marked target.",
+            "trigger": "onMiss",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1755,6 +1938,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "All attacks against the chosen target deal +d4 more damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -1763,7 +1947,7 @@
               "type": "addFlat",
               "value": 4
             },
-            "description": "All attacks against the chosen target deal +d4 more damage."
+            "appliesTo": [{ "kind": "quality", "values": ["ranged"] }]
           }
         ]
       },
@@ -1771,12 +1955,17 @@
         "description": "Punishes any movement by the marked target with free ranged attacks.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction"
-            },
+            "tier": "C",
             "description": "Any attempt by the target to move triggers a free ranged attack; an escape attempt triggers two."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Hunter's Wrath",
+            "description": "Free ranged attack against the marked target when they attempt to move.",
+            "trigger": "onEnemyMovement",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -1794,12 +1983,17 @@
         "description": "Allows responding to a melee hit with a jab from an arrow, bayonet, or barrel.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "You can respond to a melee attack against you with a strike from an arrow, bayonet, or revolver barrel for d6 damage, including ammunition effects."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Arrow Jab",
+            "description": "Strike with an arrow, bayonet, or barrel in response to a melee attack against you.",
+            "trigger": "onAttacked",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1810,18 +2004,32 @@
             "tier": "C",
             "description": "Ranged weapon damage in melee increases to d8."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Arrow Jab",
+            "description": "Strike with an arrow, bayonet, or barrel in response to a melee attack against you.",
+            "trigger": "onAttacked",
+            "damage": 8,
+            "attackAttribute": "accurate"
+          }
         ]
       },
       "master": {
         "description": "After a successful ranged strike, allows immediately following up with a second free shot.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "After a successful arrow attack, the Master may immediately make one more free shot at the enemy in the same reaction."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Close Quarters Shot",
+            "description": "After a successful jab, the Master may immediately free shot with their ranged weapon at the enemy even if the enemy is in melee.",
+            "trigger": "onHit",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -1839,16 +2047,21 @@
         "description": "Allows sacrificing the attack and movement for a precision shot with a powerful secondary effect.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "You may sacrifice your attack and Movement to perform a precision shot: disarm, blind, pin, or similar effect."
           },
           {
             "tier": "C",
             "description": "A normal attack alongside such a shot causes the target to lose their next action on hit while they deal with the new problem."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Maiming Shot",
+            "description": "A precise shot that applies a status effect on hit. Costs Full Action to perform.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1868,6 +2081,13 @@
             "tier": "C",
             "description": "Accurate check to parry with a ranged weapon against a melee attack targeting an ally, or a ranged attack against yourself or an ally; a successful parry negates the damage."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Parry Shot",
+            "description": "Parry with a ranged weapon against a melee attack targeting an ally, or a ranged attack against yourself or an ally.",
+            "trigger": "onAllyAttacked"
+          }
         ]
       }
     }
@@ -1884,16 +2104,24 @@
         "description": "Allows trading movement for a second shot and quickly reloading firearms.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
-            "description": "By sacrificing movement, you may fire two arrows instead of one -- at the same target or different ones."
+            "tier": "A",
+            "description": "Firearms can be reloaded as a free action.",
+            "target": { "kind": "weaponQuality", "quality": "unwieldy" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "type", "values": ["firearm"] }]
           },
           {
             "tier": "C",
-            "description": "Firearms can be reloaded as a free action."
+            "description": "By sacrificing movement, you may fire two arrows instead of one -- at the same target or different ones."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Volley",
+            "description": "Fire additional shot by spending Movement.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1901,12 +2129,17 @@
         "description": "Removes the movement cost from the second arrow and transfers it to the second firearm shot.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "The Adept can fire two bow shots without sacrificing movement, or two firearm shots at the cost of movement."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Volley",
+            "description": "Fire additional shot.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1914,12 +2147,17 @@
         "description": "Brings the volley of arrows or shots up to three per turn.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "The Master can fire three bow shots without spending movement, or three firearm shots at the cost of movement."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Storm of Arrows",
+            "description": "Fire one additional shot.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -1938,6 +2176,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Thrown weapon damage increased to d8.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -1946,7 +2185,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Thrown weapon damage increased to d8."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["thrown"]
+              }
+            ]
           }
         ]
       },
@@ -1954,16 +2198,21 @@
         "description": "Allows throwing twice in one attack and effectively throwing standard melee weapons.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "Any thrown weapon attack allows two throws at the same or different targets."
           },
           {
             "tier": "C",
             "description": "The Adept can also effectively throw any melee weapon."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Fan of Knives",
+            "description": "Throw a weapon an additional time.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -1971,12 +2220,17 @@
         "description": "Turns a single thrown weapon attack into a triple volley.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "Any thrown weapon attack allows three consecutive throws at the same or different targets."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Hail of Iron",
+            "description": "Throw a weapon an additional time.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -1995,6 +2249,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Even a simple piece of cloth in the off-hand raises Defense by one.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2003,7 +2258,12 @@
               "type": "addFlat",
               "value": 1
             },
-            "description": "A simple piece of cloth in the off-hand raises Defense by one."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main"]
+              }
+            ]
           }
         ]
       },
@@ -2011,20 +2271,30 @@
         "description": "Allows blinding an enemy with the cloth and immediately continuing the attack.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "The Adept may attempt to blind an adjacent enemy with the cloth; on success, the target is blinded until the start of the next turn."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "A successful blind grants an immediate second free attack."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Flourish",
+            "description": "Attempt to blind an adjacent enemy with the cloth; on success, the target is blinded until the start of the next turn.",
+            "trigger": "manual",
+            "damage": 0,
+            "attackAttribute": "accurate"
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Pounce",
+            "description": "Make one free attack against any blinded target.",
+            "trigger": "onHit",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2033,14 +2303,10 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "add",
-              "quality": "entangling",
-              "weaponFilter": "melee"
-            },
-            "modifier": { "type": "add" },
-            "description": "The cloth in the Master's hand gains the entangling weapon quality."
+            "description": "The cloth in the Master's hand gains the entangling weapon quality.",
+            "target": { "kind": "weaponQuality", "quality": "entangling" },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "type", "values": ["main"] }]
           }
         ]
       }
@@ -2059,6 +2325,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Main-hand weapon damage increases to d10.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2067,7 +2334,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Main-hand weapon damage increases to d10."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main"]
+              }
+            ]
           }
         ]
       },
@@ -2075,13 +2347,17 @@
         "description": "Allows responding with one free attack per turn after a successful Defense.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "reaction"
-            },
+            "tier": "C",
             "description": "After a successful Defense check, the Adept may make one free attack as a reaction."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Counterattack",
+            "description": "Enables a free retaliation after a successful Defense check.",
+            "trigger": "onDodged",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2090,6 +2366,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Main-hand weapon damage increases to d12.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2098,15 +2375,15 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Main-hand weapon damage increases to d12."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main"]
+              }
+            ]
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "reaction"
-            },
+            "tier": "C",
             "description": "The Master can make unlimited counterattacks after each successful Defense check."
           }
         ]
@@ -2126,6 +2403,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Battle heels deal +d2 more damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2134,18 +2412,14 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Battle heels deal +d2 more damage."
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           },
           {
             "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "unwieldy",
-              "weaponFilter": "heels"
-            },
+            "description": "Battle heels lose the unwieldy quality.",
+            "target": { "kind": "weaponQuality", "quality": "unwieldy" },
             "modifier": { "type": "remove" },
-            "description": "Battle heels lose the unwieldy quality."
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           }
         ]
       },
@@ -2153,13 +2427,17 @@
         "description": "Allows adding a free heel kick to other weapon attacks once per turn.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "reaction"
-            },
+            "tier": "C",
             "description": "Once per turn you may make a free combat heel attack, provided no normal heel attack was made this turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Heel Kick",
+            "description": "A free combat heel attack that can be used once per turn.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2168,14 +2446,10 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "add",
-              "quality": "long",
-              "weaponFilter": "heels"
-            },
-            "modifier": { "type": "add" },
-            "description": "The Master's combat heels gain the long quality in addition to their existing qualities."
+            "description": "The Master's combat heels gain the long quality in addition to their existing qualities.",
+            "target": { "kind": "weaponQuality", "quality": "long" },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           }
         ]
       }
@@ -2211,12 +2485,17 @@
         "description": "Turns every successful entangling weapon hit into a choking throat strike.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Every successful entangling weapon attack gains a suffocating effect and deals d6 armor-ignoring damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Choking Tie",
+            "description": "After a successful attack with an entangling weapon, you can perform a Choking Tie special attack. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
+            "trigger": "onHit",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -2235,14 +2514,10 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "add",
-              "quality": "entangling",
-              "weaponFilter": "compound"
-            },
-            "modifier": { "type": "add" },
-            "description": "All composite weapons gain the entangling quality in addition to their existing qualities."
+            "description": "All composite weapons gain the entangling quality in addition to their existing qualities.",
+            "target": { "kind": "weaponQuality", "quality": "entangling" },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "quality", "values": ["composite"] }]
           }
         ]
       },
@@ -2251,6 +2526,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Secondary damage from composite weapon hits increases to d8.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2259,7 +2535,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Secondary damage from composite weapon hits increases to d8."
+            "appliesTo": [{ "kind": "quality", "values": ["composite"] }]
           }
         ]
       },
@@ -2267,13 +2543,17 @@
         "description": "Allows striking all adjacent enemies with a sweeping blow.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "statusEffect.surrounded"
-            },
+            "tier": "C",
             "description": "The Master can attack all surrounding enemies each turn: one attack per enemy."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Sweeping Strike",
+            "description": "Attack all surrounding enemies with a sweeping blow.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -2291,12 +2571,17 @@
         "description": "Unlocks a combo attack: a blunt side strike followed by a normal attack.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "The Novice can first hit with the blunt side of the axe for d6 to shock and stun, then immediately follow up with a normal attack on success."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Shock Strike",
+            "description": "Hit with the blunt side of the axe to shock and stun the enemy for d6 damage; on success, follow up with a normal attack.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2304,15 +2589,8 @@
         "description": "Allows making two attacks per turn at the cost of reduced damage.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
-            "description": "The Adept can make two attacks per turn."
-          },
-          {
             "tier": "A",
+            "description": "Axe attack damage is reduced by -d2.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2321,7 +2599,25 @@
               "type": "addFlat",
               "value": -2
             },
-            "description": "Axe attack damage is reduced by -d2."
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
+          },
+          {
+            "tier": "C",
+            "description": "The Adept can make two attacks per turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Axe Flurry",
+            "description": "Make an additional attack with your axe.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2329,16 +2625,17 @@
         "description": "Enhances every single strike per action.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "combat",
-              "field": "bonusDamage"
-            },
-            "modifier": {
-              "type": "addFlat",
-              "value": 4
-            },
+            "tier": "C",
             "description": "Any single attack per action deals +d4 more damage."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Ravaging Blow",
+            "description": "A powerful axe strike that deals significant damage.",
+            "trigger": "manual",
+            "damage": 10,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -2365,6 +2662,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Spears and halberds deal d10, staffs d8, and all long weapons gain +d2 damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2373,21 +2671,28 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Spears and halberds deal d10, staffs d8, and all long weapons gain +d2 damage."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["long"]
+              }
+            ]
           }
         ]
       },
       "adept": {
-        "description": "Allows greeting any approach or retreat with a free attack against enemies without long weapons.",
+        "description": "Allows striking any approaching or retreating enemy with a free attack, as long as they are not armed with a long weapon.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction",
-              "scope": "statusEffect.surrounded"
-            },
+            "tier": "C",
             "description": "The Adept can make a free attack against anyone who approaches or retreats, as long as they are not also armed with a long weapon."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Reach Strike",
+            "description": "Make a free attack against an enemy who comes into melee range, as long as they are not armed with a long weapon.",
+            "trigger": "onContact"
           }
         ]
       },
@@ -2419,6 +2724,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Defense increases by one when armed with long weapons.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2427,10 +2733,16 @@
               "type": "addFlat",
               "value": 1
             },
-            "description": "Defense increases by one when armed with long weapons."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["long"]
+              }
+            ]
           },
           {
             "tier": "A",
+            "description": "Defense increases by two when armed with the staff.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2439,7 +2751,12 @@
               "type": "addFlat",
               "value": 1
             },
-            "description": "Defense increases by two when armed with the staff."
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["staff", "composite_staff"]
+              }
+            ]
           }
         ]
       },
@@ -2447,20 +2764,28 @@
         "description": "Allows responding with the staff's other end after a blocked attack, and counterattacking after a successful Defense.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "If the first attack was blocked, the Adept may make a free attack with the other end of the long weapon for up to d6 damage."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction"
-            },
+            "tier": "C",
             "description": "After a successful Defense check, the Adept may make a reactive free attack with the staff for d6 damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Second End of the Stick",
+            "description": "Make a free attack with the staff after a missed attack.",
+            "trigger": "onMiss",
+            "damage": 6,
+            "attackAttribute": "accurate"
+          },
+          {
+            "name": "Return Strike",
+            "description": "Make a free attack with the staff after a successful Defense check.",
+            "trigger": "onDodged",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2468,12 +2793,17 @@
         "description": "Allows knocking the enemy down after a hit and immediately following up with an advantage attack.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "Accurate check to knock the enemy prone after a successful attack and immediately make a free follow-up attack for d6 with advantage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Knockdown",
+            "description": "Attempt to knock the enemy prone after a successful attack; on success, make a free follow-up attack for d6 with advantage.",
+            "trigger": "onHit",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -2491,15 +2821,8 @@
         "description": "Unlocks the basic dual-wield scheme and a Defense bonus from the off-hand.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
-            "description": "You can use any melee weapon in the main hand and a short weapon in the off-hand, making two attacks per turn against one target: d8 and d6."
-          },
-          {
             "tier": "A",
+            "description": "If you hold a weapon in the off-hand, Defense increases by one.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2508,16 +2831,47 @@
               "type": "addFlat",
               "value": 1
             },
-            "description": "If you hold a weapon in the off-hand, Defense increases by one."
+            "appliesTo": [
+              {
+                "kind": "quality",
+                "values": ["short"]
+              },
+              {
+                "kind": "type",
+                "values": ["light"]
+              }
+            ]
+          },
+          {
+            "tier": "C",
+            "description": "You can use any melee weapon in the main hand and a short weapon in the off-hand, making two attacks per turn against one target: d8 and d6."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Off-Hand Strike",
+            "description": "Make an attack with a short or light off-hand weapon.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
       "adept": {
-        "description": "Removes the short weapon restriction from the off-hand.",
+        "description": "Removes the short weapon requirement from the off-hand.",
         "effects": [
           {
             "tier": "C",
-            "description": "The Adept can use two melee weapons, even if they are not short, each dealing up to d8 damage."
+            "description": "The Adept can use any one-handed melee weapon in the second hand, even if they are not short."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Off-Hand Strike",
+            "description": "Make an attack with any one-handed melee weapon in the off-hand.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2526,6 +2880,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "The main-hand weapon can deal up to d10 damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2534,7 +2889,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "The main-hand weapon can deal up to d10 damage."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main"]
+              }
+            ]
           }
         ]
       }
@@ -2553,6 +2913,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Strong instead of Accurate to calculate melee weapon hit chance.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -2561,7 +2922,19 @@
               "type": "setBase",
               "value": "strong"
             },
-            "description": "Use Strong instead of Accurate to calculate melee weapon hit chance."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "heavy",
+                  "polearm",
+                  "main",
+                  "shield",
+                  "light",
+                  "natural"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -2570,6 +2943,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "All melee weapon attacks deal d4 more damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2578,7 +2952,19 @@
               "type": "addFlat",
               "value": 4
             },
-            "description": "All melee weapon attacks deal d4 more damage."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "heavy",
+                  "polearm",
+                  "main",
+                  "shield",
+                  "light",
+                  "natural"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -2586,16 +2972,17 @@
         "description": "Allows replacing the normal bonus with an exceptionally powerful strike once per turn.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "combat",
-              "field": "bonusDamage"
-            },
-            "modifier": {
-              "type": "addFlat",
-              "value": 4
-            },
+            "tier": "C",
             "description": "Once per turn the Master can deal +d8 damage instead of the usual +d4."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Mighty Blow",
+            "description": "Once per turn, deal an exceptionally powerful strike that adds d12 damage instead of the normal bonus.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "strong"
           }
         ]
       }
@@ -2614,6 +3001,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Heavy two-handed weapons can deal up to d12 damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2622,7 +3010,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Heavy two-handed weapons can deal up to d12 damage."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["heavy", "polearm"]
+              }
+            ]
           }
         ]
       },
@@ -2630,12 +3023,17 @@
         "description": "Allows using the reverse momentum of a miss to still hit the target.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "If an attack missed, the Adept can use the returning momentum of the swing to still hit the target for up to d8 damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Momentum",
+            "description": "After a missed attack with a two-handed weapon, you can make a follow-up attack using the returning momentum for up to d8 damage.",
+            "trigger": "onMiss",
+            "damage": 8,
+            "attackAttribute": "strong"
           }
         ]
       },
@@ -2663,6 +3061,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "One-handed swords in the main hand deal up to d10, short one-handed weapons up to d8.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2671,10 +3070,16 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "One-handed swords in the main hand deal up to d10, short one-handed weapons up to d8."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main"]
+              }
+            ]
           },
           {
             "tier": "A",
+            "description": "Shields raise Defense by two.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2683,7 +3088,12 @@
               "type": "addFlat",
               "value": 1
             },
-            "description": "Shields raise Defense by two."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["shield"]
+              }
+            ]
           }
         ]
       },
@@ -2691,25 +3101,39 @@
         "description": "Allows following up every successful hit with a shield strike that may knock the enemy prone.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
-            "description": "Every successful main-hand weapon attack can be followed by a shield strike that deals d4 damage on success."
+            "tier": "C",
+            "description": "Every successful main-hand weapon attack can be followed by a shield bash that deals up to d4 damage."
           },
           {
             "tier": "C",
-            "description": "Strong check to determine whether the shield strike also knocks the enemy prone."
+            "description": "Strong check to determine whether the shield bash also knocks the enemy prone."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Shield Bash",
+            "description": "A shield bash attack that deals d4 damage and may knock the enemy prone.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "strong"
           }
         ]
       },
       "master": {
-        "description": "Raises shield strike damage to a full offensive value.",
+        "description": "Raises shield bash damage to a full offensive value.",
         "effects": [
           {
             "tier": "C",
-            "description": "A shield strike deals up to d8 damage."
+            "description": "A shield bash deals up to d8 damage."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Shield Bash",
+            "description": "A shield bash attack that deals d8 damage and may knock the enemy prone.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "strong"
           }
         ]
       }
@@ -2728,6 +3152,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Unarmed attacks deal d6 damage.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2736,19 +3161,12 @@
               "type": "addFlat",
               "value": 2
             },
-            "description": "Unarmed attacks deal d6 damage."
-          },
-          {
-            "tier": "A",
-            "target": {
-              "kind": "combat",
-              "field": "bonusDamage"
-            },
-            "modifier": {
-              "type": "addFlat",
-              "value": 2
-            },
-            "description": "If the body already has a natural weapon, its effectiveness increases by +d2."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["natural"]
+              }
+            ]
           }
         ]
       },
@@ -2756,12 +3174,17 @@
         "description": "Allows making two unarmed attacks instead of one.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "The Adept of Unarmed Combat can make two attacks instead of one."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Elbow Strike",
+            "description": "Make a second unarmed attack.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -2769,12 +3192,17 @@
         "description": "Adds painful strikes targeting the most vulnerable spots.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Every Master attack deals an additional d6 damage by targeting the least protected areas of the body."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Vital Strike",
+            "description": "Every successful unarmed attack may deal up to d6 additional damage.",
+            "trigger": "onHit",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -2800,12 +3228,22 @@
         "description": "After any successful attack, unlocks a grapple with a choice between throwing and holding.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Any successful attack unlocks a grapple: Strong check to throw the enemy for d4 armor-ignoring damage and knock them prone, or hold them without damage, preventing movement and actions."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Throw",
+            "description": "After a successful attack, you can attempt to grapple the enemy and throw them on the ground for d4 armor-ignoring damage.",
+            "trigger": "onHit",
+            "damage": 4,
+            "attackAttribute": "strong"
+          },
+          {
+            "name": "Hold",
+            "description": "After a successful attack, you can attempt to grapple the enemy and hold them without dealing damage, preventing their movement and actions.",
+            "trigger": "onHit"
           }
         ]
       },
@@ -2813,12 +3251,17 @@
         "description": "Allows counter-grappling after a successful Defense and Quick check.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction"
-            },
+            "tier": "C",
             "description": "On successful Defense and Quick checks, the Adept may react by counter-grappling, throwing the enemy prone, dealing d4 damage, and interrupting their turn."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Grapple",
+            "description": "Attempt a Quick check to grapple the enemy, throwing them prone, dealing d4 damage, and interrupting their turn.",
+            "trigger": "onDodged",
+            "damage": 4,
+            "attackAttribute": "quick"
           }
         ]
       },
@@ -2826,24 +3269,21 @@
         "description": "Allows preempting an attack with a grapple via a Quick check and immediately following up on the fallen target.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "secondary",
-              "stat": "defense"
-            },
-            "modifier": {
-              "type": "setBase",
-              "value": "quick"
-            },
+            "tier": "C",
             "description": "The Master may replace a Defense check with a Quick check; success automatically throws the enemy prone, deals d6 damage, and interrupts their turn."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack"
-            },
+            "tier": "C",
             "description": "After a successful preemptive throw, the Master may make a free attack against the fallen enemy."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Preemptive Grapple",
+            "description": "Caught the enemy in their attack with a Quick check; on success, throw them prone, deal d6 damage, and interrupt their turn. Then make a free attack against them.",
+            "trigger": "onAttacked",
+            "damage": 6,
+            "attackAttribute": "quick"
           }
         ]
       }
@@ -2862,6 +3302,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Berserk deals +d6 more damage with all melee weapons.",
             "target": {
               "kind": "combat",
               "field": "bonusDamage"
@@ -2870,10 +3311,23 @@
               "type": "addFlat",
               "value": 6
             },
-            "description": "Rage allows dealing +d6 more damage in melee."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "heavy",
+                  "polearm",
+                  "main",
+                  "shield",
+                  "light",
+                  "natural"
+                ]
+              }
+            ]
           },
           {
             "tier": "A",
+            "description": "Berserk's Defense can't be higher than 5.",
             "target": {
               "kind": "secondary",
               "stat": "defense"
@@ -2881,8 +3335,7 @@
             "modifier": {
               "type": "cap",
               "value": 5
-            },
-            "description": "While this effect is active, Defense drops to 5."
+            }
           }
         ]
       },
@@ -2890,8 +3343,11 @@
         "description": "Turns rage into a layer of armor and reduces all incoming damage.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The Adept takes d4 less damage from all attacks."
+            "tier": "A",
+            "description": "The Adept takes d4 less damage from all attacks.",
+            "target": { "kind": "secondary", "stat": "armor" },
+            "modifier": { "type": "addFlat", "value": 4 },
+            "appliesTo": []
           }
         ]
       },
@@ -2899,8 +3355,16 @@
         "description": "Removes the Defense penalty while keeping all other rage bonuses.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Rage no longer affects the Defense score while preserving the ability's other bonuses."
+            "tier": "A",
+            "description": "Removes Berserk's Defense penalty.",
+            "target": {
+              "kind": "secondary",
+              "stat": "defense"
+            },
+            "modifier": {
+              "type": "cap",
+              "value": 20
+            }
           }
         ]
       }
@@ -2943,6 +3407,13 @@
             "tier": "C",
             "description": "This recovery can be triggered as a reaction to damage just received."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Instant Recovery",
+            "description": "Trigger your recovery as a reaction to damage just received for up to d8 Toughness.",
+            "trigger": "onDamaged"
+          }
         ]
       }
     }
@@ -2960,6 +3431,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "The Novice's Toughness is calculated as Strong + 5, but the pain threshold does not increase.",
             "target": {
               "kind": "secondary",
               "stat": "toughness.max"
@@ -2967,26 +3439,25 @@
             "modifier": {
               "type": "addFlat",
               "value": 5
-            },
-            "description": "The Novice's Toughness is calculated as Strong + 5, but the pain threshold does not increase."
+            }
           }
         ]
       },
       "adept": {
-        "description": "When at half Toughness, allows rerolling all failed Strong checks.",
+        "description": "If Toughness is reduced to at least half, allows rerolling all failed Strong checks.",
         "effects": [
           {
             "tier": "C",
-            "description": "When Toughness is reduced to half, you may reroll all failed Strong checks, including Strong-based attacks."
+            "description": "If Toughness is reduced to at least half, you may reroll all failed Strong checks, including Strong-based attacks."
           }
         ]
       },
       "master": {
-        "description": "When at half Toughness, adds bonus melee damage.",
+        "description": "If Toughness is reduced to at least half, adds bonus melee damage.",
         "effects": [
           {
             "tier": "C",
-            "description": "When the Master's Toughness is reduced to half, all melee weapon attacks deal +d4 more damage."
+            "description": "If the Master's Toughness is reduced to at least half, all melee weapon attacks deal +d4 more damage."
           }
         ]
       }
@@ -3007,6 +3478,13 @@
             "tier": "C",
             "description": "Resolute check to intercept an attack against an ally that they cannot defend against."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Interception",
+            "description": "Make a Resolute check to intercept an attack against an ally that they cannot defend against.",
+            "trigger": "onAllyAttacked"
+          }
         ]
       },
       "adept": {
@@ -3022,12 +3500,17 @@
         "description": "Turns any attack on an ally into an opportunity for a free attack.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "reaction"
-            },
+            "tier": "C",
             "description": "Any attack on an ally triggers a free attack against the attacker from the Master Bodyguard."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Punish",
+            "description": "Any attack on an ally triggers a free attack against the attacker.",
+            "trigger": "onAllyAttacked",
+            "damage": 6,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -3045,8 +3528,11 @@
         "description": "Enhances any worn armor by one protection step.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Any armor protects +d2 better: light grants d6 instead of d4, medium d8 instead of d6, heavy d10 instead of d8."
+            "tier": "A",
+            "description": "Any armor protects +d2 better: light grants d6 instead of d4, medium d8 instead of d6, heavy d10 instead of d8.",
+            "target": { "kind": "secondary", "stat": "armor" },
+            "modifier": { "type": "addFlat", "value": 2 },
+            "appliesTo": []
           }
         ]
       },
@@ -3055,13 +3541,21 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "armorQuality",
-              "action": "remove",
-              "quality": "hampering"
-            },
-            "modifier": { "type": "remove" },
-            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it."
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_2" },
+            "modifier": { "type": "remove" }
+          },
+          {
+            "tier": "A",
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_3" },
+            "modifier": { "type": "remove" }
+          },
+          {
+            "tier": "A",
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_4" },
+            "modifier": { "type": "remove" }
           }
         ]
       },
@@ -3075,6 +3569,13 @@
           {
             "tier": "C",
             "description": "Mystical powers are no longer hindered by any worn armor, even the bulkiest."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Iron Hide",
+            "description": "Make a Quick check to counter any armor-bypassing or armor-piercing effects.",
+            "trigger": "onAttacked"
           }
         ]
       }
@@ -3110,13 +3611,17 @@
         "description": "Punishes failed mental attacks with a blast of force.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack",
-              "scope": "reaction"
-            },
+            "tier": "C",
             "description": "Any failed mental attack against the Master triggers a d6 armor-ignoring damage reaction against the attacker."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Mental Backlash",
+            "description": "Any failed mental attack against you triggers a d6 armor-ignoring damage reaction against the attacker.",
+            "trigger": "onResisted",
+            "damage": 6,
+            "attackAttribute": "strong"
           }
         ]
       }
@@ -3171,6 +3676,12 @@
         "description": "Removes permanent Corruption from novice spells and rituals of the academic tradition.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:magic:arcane" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "The Order Initiate gains no permanent Corruption when learning Novice-tier spells and rituals of the academic tradition."
           }
@@ -3215,6 +3726,12 @@
       "novice": {
         "description": "Removes permanent Corruption from novice spells and rituals of the witch tradition.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:magic:nature" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "The Witch Apprentice gains no permanent Corruption when learning Novice-tier spells and rituals of the wild tradition."
@@ -3264,6 +3781,12 @@
         "description": "Removes permanent Corruption from novice church spells and rituals.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": { "kind": "flag", "name": "knowledge:magic:light" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "The Apoleata Cleric gains no permanent Corruption when learning novice-tier spells and rituals of the church tradition."
           }
@@ -3308,6 +3831,15 @@
       "novice": {
         "description": "Removes permanent Corruption from novice spells and rituals of the tribe tradition.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic:elementalism"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "Shaman gains no permanent Corruption when learning novice-tier spells and rituals of the tribe tradition."
@@ -3354,6 +3886,15 @@
         "description": "Allows minimizing new Corruption to one point through Resolute.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic:fel"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "Resolute check to minimize new Corruption to one point."
           }
@@ -3390,6 +3931,15 @@
       "novice": {
         "description": "Removes permanent Corruption from novice powers and grants a reroll on a single-target mind effect.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic:shadow"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "Learning Novice-tier mystical powers adds no permanent Corruption."
@@ -3440,6 +3990,15 @@
         "description": "Requires physically drawing symbols slowly and allows only one to be prepared.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic:enchantment"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "A rune must have a physical form; its creation takes one hour, only one symbol may be stored at a time, and activation requires a full turn."
           }
@@ -3480,6 +4039,15 @@
       "novice": {
         "description": "Allows learning one ritual of any tradition.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "The Novice Ritualist may learn up to one ritual if they find a teacher or other source of knowledge."
@@ -3528,6 +4096,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "The Special Gift Adept doubles their Corruption Threshold.",
             "target": {
               "kind": "secondary",
               "stat": "corruptionThreshold"
@@ -3535,11 +4104,11 @@
             "modifier": {
               "type": "multiply",
               "value": 2
-            },
-            "description": "The Special Gift Adept doubles their Corruption Threshold."
+            }
           },
           {
             "tier": "A",
+            "description": "The Special Gift Adept doubles their Corruption Limit.",
             "target": {
               "kind": "secondary",
               "stat": "corruptionMax"
@@ -3547,8 +4116,7 @@
             "modifier": {
               "type": "multiply",
               "value": 2
-            },
-            "description": "The Special Gift Adept doubles their Corruption Limit."
+            }
           }
         ]
       },
@@ -3582,6 +4150,13 @@
             "tier": "C",
             "description": "The Novice can redirect onto themselves any temporary Corruption that was about to affect someone nearby."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Absorb Corruption",
+            "description": "Redirect onto yourself any temporary Corruption that was about to affect someone nearby.",
+            "trigger": "onSpellCast"
+          }
         ]
       },
       "adept": {
@@ -3600,6 +4175,13 @@
             "tier": "C",
             "description": "Resolute check to redirect incoming Corruption to a visible target; on failure the Master takes half and the rest dissipates."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Redirect Corruption",
+            "description": "Redirect onto enemy any temporary Corruption that was about to affect someone nearby.",
+            "trigger": "onSpellCast"
+          }
         ]
       }
     }
@@ -3617,14 +4199,10 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "armorQuality",
-              "action": "add",
-              "quality": "flexible",
-              "armorFilter": "plug"
-            },
-            "modifier": { "type": "add" },
-            "description": "All of the Novice's demiurge hands gain the flexible quality."
+            "description": "All of the Novice's demiurge hands gain the flexible quality.",
+            "target": { "kind": "armorQuality", "quality": "flexible" },
+            "modifier": { "type": "addFlat", "value": 1 },
+            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
           }
         ]
       },
@@ -3639,6 +4217,13 @@
             "tier": "C",
             "description": "Once per battle the Adept can redirect into a demiurge hand an amount of received temporary Corruption equal to its difficulty modifier."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Ground Corruption",
+            "description": "Redirect into the plug any temporary Corruption that was about to affect the wielder.",
+            "trigger": "onSpellCast"
+          }
         ]
       },
       "master": {
@@ -3646,14 +4231,24 @@
         "effects": [
           {
             "tier": "A",
-            "target": {
-              "kind": "armorQuality",
-              "action": "remove",
-              "quality": "hampering",
-              "armorFilter": "plug"
-            },
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_2" },
             "modifier": { "type": "remove" },
-            "description": "The hampering difficulty modifier no longer applies to the Master."
+            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+          },
+          {
+            "tier": "A",
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_3" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+          },
+          {
+            "tier": "A",
+            "description": "Physical armor restrictions that reduce Quick no longer hamper the Adept, who moves in armor as effectively as without it.",
+            "target": { "kind": "armorQuality", "quality": "hampering_4" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
           },
           {
             "tier": "C",
@@ -3662,6 +4257,13 @@
           {
             "tier": "C",
             "description": "At the start of the day the Master may make a Resolute check to maintain the effect of any one demiurge hand for the entire day, regardless of further hand swaps."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Attune to Plug",
+            "description": "Redirect into the plug any temporary Corruption that was about to affect the wielder.",
+            "trigger": "onNewDay"
           }
         ]
       }
@@ -3730,7 +4332,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The Adept can choose and announce one enemy; all ally attacks against them deal +d4 more damage."
+            "description": "The Adept can choose and announce one enemy; all allies do +d4 more damage against that enemy."
           }
         ]
       },
@@ -3739,7 +4341,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "If the Master had the opportunity to give a speech before the battle, all who heard it may use the Master's Appealing instead of their own Resolute for spell defense."
+            "description": "If the Master had the opportunity to give a speech before the battle, all who heard the speech may use the Master's Appealing instead of their own Resolute for spell defense."
           }
         ]
       }
@@ -3758,6 +4360,7 @@
         "effects": [
           {
             "tier": "A",
+            "description": "Use Appealing instead of Accurate to calculate melee weapon hit chance.",
             "target": {
               "kind": "combat",
               "field": "attackAttribute"
@@ -3766,7 +4369,12 @@
               "type": "setBase",
               "value": "appealing"
             },
-            "description": "Use Appealing instead of Accurate to calculate melee weapon hit chance."
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["heavy", "polearm", "main", "light", "natural"]
+              }
+            ]
           }
         ]
       },
@@ -3774,11 +4382,7 @@
         "description": "Allows forcing an enemy not to attack the Adept on their next turn.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Appealing check to make an enemy hesitate on their next turn; they will not attack the Adept but may still strike allies."
           }
         ]
@@ -3787,11 +4391,7 @@
         "description": "Allows breaking the will to continue fighting in an already wounded side.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Appealing check to end combat with an enemy: they may surrender, flee, or agree to negotiate; in an ongoing fight this is possible if someone on their side has been wounded."
           }
         ]
@@ -3827,8 +4427,13 @@
         "description": "Removes the limit on weapon swaps per turn.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The Adept can swap weapons as many times per turn as desired, instantly switching from swords to a revolver and back."
+            "tier": "B",
+            "description": "The Adept can swap weapons as many times per turn as desired, instantly switching from swords to a revolver and back.",
+            "target": {
+              "kind": "flag",
+              "name": "fastSwap"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
           }
         ]
       },
@@ -3840,13 +4445,15 @@
             "description": "The Master may reroll all failed Defense checks against incoming Free Attacks triggered by disengaging."
           },
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "freeAttack",
-              "scope": "reaction"
-            },
+            "tier": "C",
             "description": "Whenever the Master is targeted by such a free attack, they may make a free attack against the opponent using any available weapon."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Retaliate",
+            "description": "When targeted by a free attack triggered by disengaging, make a free attack against the opponent using any available weapon.",
+            "trigger": "onAttacked"
           }
         ]
       }
@@ -3864,19 +4471,24 @@
         "description": "Unlocks blinding powder and safe use of grenades and mines.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Accurate check to use blinding powder in melee; on success the target takes d4 armor-ignoring damage and is blinded for d4 rounds."
+            "tier": "A",
+            "description": "Using alchemical mines or grenades can no longer result in a catastrophic outcome.",
+            "target": { "kind": "weaponQuality", "quality": "catastrophic" },
+            "modifier": { "type": "remove" },
+            "appliesTo": [{ "kind": "id", "values": ["alchemical_bomb"] }]
           },
           {
-            "tier": "A",
-            "target": {
-              "kind": "weaponQuality",
-              "action": "remove",
-              "quality": "catastrophic",
-              "weaponFilter": "alchemy"
-            },
-            "modifier": { "type": "remove" },
-            "description": "Using alchemical mines or grenades can no longer result in a catastrophic outcome."
+            "tier": "C",
+            "description": "Accurate check to use blinding powder in melee; on success the target takes d4 armor-ignoring damage and is blinded for d4 rounds."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Blinding Powder",
+            "description": "Throw blinding powder to deal d4 armor-ignoring damage and blind the target for d4 rounds on a successful Accurate check.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -3884,12 +4496,17 @@
         "description": "Unlocks a smoke canister that damages and blinds an area.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Accurate check to correctly deploy a smoke canister; all who do not leave the affected area take d4 armor-ignoring damage and cannot see."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Smoke Canister",
+            "description": "Deploy a smoke canister that fills an area with blinding smoke; on a successful Accurate check, all who do not leave the area take d4 armor-ignoring damage and cannot see.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "accurate"
           }
         ]
       },
@@ -3897,12 +4514,17 @@
         "description": "Grants a thunder ball with high armor-ignoring damage and blinding.",
         "effects": [
           {
-            "tier": "B",
-            "target": {
-              "kind": "flag",
-              "flag": "specialAttack"
-            },
+            "tier": "C",
             "description": "Accurate check to use a thunder ball that deals up to d12 armor-ignoring damage on success or d6 on failure, and blinds for d4 rounds."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Thunder Ball",
+            "description": "Use a thunder ball that deals up to d12 armor-ignoring damage on a successful Accurate check, or d6 on failure, and blinds the target for d4 rounds.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "accurate"
           }
         ]
       }
@@ -3919,6 +4541,15 @@
       "novice": {
         "description": "Allows creating simple artifacts.",
         "effects": [
+          {
+            "tier": "B",
+            "description": "Magic knowledge.",
+            "target": {
+              "kind": "flag",
+              "name": "knowledge:magic"
+            },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
           {
             "tier": "C",
             "description": "Cunning check to create a simple artifact."
@@ -3957,14 +4588,7 @@
         "description": "Removes medium armor interference with mystical powers.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "armorQuality",
-              "action": "remove",
-              "quality": "hampering",
-              "armorFilter": "medium"
-            },
-            "modifier": { "type": "remove" },
+            "tier": "C",
             "description": "Medium armor has no effect on the effectiveness of mystical powers."
           }
         ]
@@ -3973,14 +4597,7 @@
         "description": "Extends the same comfort to heavy armor.",
         "effects": [
           {
-            "tier": "A",
-            "target": {
-              "kind": "armorQuality",
-              "action": "remove",
-              "quality": "hampering",
-              "armorFilter": "heavy"
-            },
-            "modifier": { "type": "remove" },
+            "tier": "C",
             "description": "Heavy armor has no effect on the effectiveness of mystical powers."
           }
         ]
@@ -3989,8 +4606,10 @@
         "description": "Mystically enhances the armor itself by one additional protection step.",
         "effects": [
           {
-            "tier": "C",
-            "description": "The armor's effectiveness is enhanced by mystical energies, providing +d4 more protection."
+            "tier": "A",
+            "description": "The armor's effectiveness is enhanced by mystical energies, providing +d4 more protection.",
+            "target": { "kind": "secondary", "stat": "armor" },
+            "modifier": { "type": "addFlat", "value": 4 }
           }
         ]
       }
@@ -4046,7 +4665,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The Novice Volkhv can imbue their soul into a chosen runic object; all permanent Corruption from novice-level spells is redirected into that object."
+            "description": "The Novice Magus can imbue their soul into a chosen runic object; all permanent Corruption from novice-level spells is redirected into that object."
           },
           {
             "tier": "C",
@@ -4076,7 +4695,7 @@
           },
           {
             "tier": "C",
-            "description": "The Master Volkhv gains no temporary Corruption when using their tradition's powers."
+            "description": "The Master Magus gains no temporary Corruption when using their tradition's powers."
           }
         ]
       }

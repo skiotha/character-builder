@@ -82,22 +82,28 @@ export type SecondaryAttributeName = keyof SecondaryAttributes;
 export type CombatSlotField = "attackAttribute" | "baseDamage" | "bonusDamage";
 
 export type EffectFlag =
-  | "poisonResistance"
-  | "fireResistance"
-  | "freeAttackImmunity"
-  | "attackImmunity"
+  | "evasion"
   | "advantage"
   | "deathDenial"
-  | "blindvision"
+  | "darkvision"
   | "initiativeExemption"
   | "fastSwap"
-  | "poisonedWeapons"
-  | "trueSight"
-  | "flight"
-  | "swim"
-  | "climb"
-  | "undead"
-  | "abomination";
+  | "elementsProtection"
+  | "knowledge:alchemy"
+  | "knowledge:alchemy:poisons"
+  | "knowledge:world"
+  | "knowledge:world:nature"
+  | "knowledge:world:warfare"
+  | "knowledge:world:commerce"
+  | "knowledge:magic"
+  | "knowledge:magic:arcane"
+  | "knowledge:magic:nature"
+  | "knowledge:magic:light"
+  | "knowledge:magic:elementalism"
+  | "knowledge:magic:fel"
+  | "knowledge:magic:shadow"
+  | "knowledge:magic:enchantment"
+  | "trueSight";
 // NOTE: This is a placeholder starting set. The authoring pass in Chunk F
 // will surface the real vocabulary; this enum is expected to expand.
 
