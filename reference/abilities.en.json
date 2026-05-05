@@ -3434,7 +3434,7 @@
             "description": "The Novice's Toughness is calculated as Strong + 5, but the pain threshold does not increase.",
             "target": {
               "kind": "secondary",
-              "stat": "toughness.max"
+              "stat": "toughness"
             },
             "modifier": {
               "type": "addFlat",

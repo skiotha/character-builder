@@ -3480,7 +3480,7 @@
             "description": "Выживаемость неофита рассчитывается через Силу + 5, но болевой порог не увеличивается.",
             "target": {
               "kind": "secondary",
-              "stat": "toughness.max"
+              "stat": "toughness"
             },
             "modifier": {
               "type": "addFlat",
