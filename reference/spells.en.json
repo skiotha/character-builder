@@ -51,6 +51,13 @@
             "tier": "C",
             "description": "As a reaction, the mystic may reroll one failed Defense check once per turn."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Illusory Correction: Survive",
+            "description": "Reroll Defense check.",
+            "trigger": "onAttacked"
+          }
         ]
       },
       "adept": {
@@ -60,6 +67,13 @@
             "tier": "C",
             "description": "As a reaction, the mystic may reroll any failed check related to them once per turn."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Illusory Correction: Destiny",
+            "description": "Reroll any failed check involving the mystic.",
+            "trigger": "onCheck"
+          }
         ]
       },
       "master": {
@@ -68,6 +82,13 @@
           {
             "tier": "C",
             "description": "As a reaction, the mystic may force a reroll of any nearby check once per turn, even if it belonged to someone else."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Illusory Correction: World",
+            "description": "Force reroll any check around the mystic.",
+            "trigger": "onCheck"
           }
         ]
       }
@@ -141,6 +162,22 @@
             "tier": "C",
             "description": "Resolute lets the mystic lift and throw an object for up to d8 damage, or as a reaction lift one to block a physical or mental attack aimed at them."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Telekinesis: Defense",
+            "description": "Resolute to protect yourself against any physical or mental attack with telekinesis.",
+            "trigger": "onAttacked"
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Telekinesis: Attack",
+            "description": "Lift and throw an object at a target for damage.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -150,6 +187,15 @@
             "tier": "C",
             "description": "Resolute lifts an enemy into the air, hurls them away for up to d8 damage, and knocks them prone on their back."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Telekinesis: Control",
+            "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
@@ -158,6 +204,15 @@
           {
             "tier": "C",
             "description": "The mystic may lift and hurl a group of enemies away, making a separate check for each one until the first failure."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Telekinesis: Control",
+            "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
           }
         ]
       }
@@ -297,6 +352,13 @@
             "tier": "C",
             "description": "The mystic forms a psychic copy of their melee weapon and may reroll the hit check if the original melee attack misses."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Psychic Strike: Certainty",
+            "description": "Reroll Attack check.",
+            "trigger": "onMiss"
+          }
         ]
       },
       "adept": {
@@ -306,6 +368,13 @@
             "tier": "C",
             "description": "Resolute makes the psychic strike paralyze the target, and the physical attack becomes an automatic hit."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Psychic Strike: Control",
+            "description": "Resolute to stun an enemy on successful weapon attack.",
+            "trigger": "onHit"
+          }
         ]
       },
       "master": {
@@ -314,6 +383,14 @@
           {
             "tier": "C",
             "description": "The psychic strike deals d4 extra damage on top of the physical attack, and that bonus damage ignores armor."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Psychic Strike: Power",
+            "description": "Any successful physical attack inflicts additional non-avoidable psychic damage.",
+            "trigger": "onHit",
+            "damage": 4
           }
         ]
       }
@@ -371,6 +448,14 @@
             "tier": "C",
             "description": "A consecrated weapon deals +d4 damage, or +d6 against corrupt creatures and monsters."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Witch Hammer: Smash",
+            "description": "Any successful physical attack inflicts additional damage.",
+            "trigger": "onHit",
+            "damage": 4
+          }
         ]
       },
       "adept": {
@@ -380,6 +465,14 @@
             "tier": "C",
             "description": "The mystic's weapon deals +d8 damage."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Witch Hammer: Smash",
+            "description": "Any successful physical attack inflicts additional damage.",
+            "trigger": "onHit",
+            "damage": 8
+          }
         ]
       },
       "master": {
@@ -388,6 +481,14 @@
           {
             "tier": "C",
             "description": "The mystic's weapon deals +d10 damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Witch Hammer: Smash",
+            "description": "Any successful physical attack inflicts additional damage.",
+            "trigger": "onHit",
+            "damage": 10
           }
         ]
       }
@@ -452,7 +553,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The aura's damage rises to d8, and all living creatures within it recover d4 Survival each turn."
+            "description": "The aura's damage rises to d8, and all living creatures within it recover d4 Toughness each turn."
           }
         ]
       },
@@ -461,7 +562,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The aura's damage rises to d10, and the healing it grants to living creatures rises to d6 Survival each turn."
+            "description": "The aura's damage rises to d10, and the healing it grants to living creatures rises to d6 Toughness each turn."
           }
         ]
       }
@@ -482,6 +583,22 @@
             "tier": "C",
             "description": "Resolute concentrates the light of the mystic's soul into a burning ray that deals d6 damage to a target, or d8 if the target is a monster."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Burning Glass: Ray",
+            "description": "A ray of light that burns monsters harder than anything else.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          },
+          {
+            "name": "Burning Glass: Ray (Monster)",
+            "description": "The ray of light deals extra damage to monsters.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -491,6 +608,22 @@
             "tier": "C",
             "description": "Resolute deals d8 damage to all targets at once, or d12 if they are monsters."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Burning Glass: Explosion",
+            "description": "An explosion of light that burns monsters harder than anything else.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          },
+          {
+            "name": "Burning Glass: Explosion (Monster)",
+            "description": "The explosion of light deals extra damage to monsters.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
@@ -499,6 +632,15 @@
           {
             "tier": "C",
             "description": "On a successful effect, the mystic may also stun all affected monsters for one turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Burning Glass: Explosion (Monster)",
+            "description": "The explosion of light deals damage to monsters and can stun them.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "Resolute"
           }
         ]
       }
@@ -565,11 +707,20 @@
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
-        "description": "Compares d20 to the target's Corruption, paralyzing them and scorching monsters.",
+        "description": "Compare d20 to the target monster's Corruption. Paralyze them and scorch on a successful roll.",
         "effects": [
           {
             "tier": "C",
             "description": "If a d20 roll is less than or equal to the target's Corruption, the target is paralyzed for a turn, and monsters also suffer d6 armor-ignoring damage."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Purgatory: Ray",
+            "description": "The ray of radiance deals armor-piercing damage to a monster and can paralyze them.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
           }
         ]
       },
@@ -580,6 +731,15 @@
             "tier": "C",
             "description": "The d20 result is compared to the Corruption of all visible targets at the same time."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Purgatory: Blast",
+            "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
@@ -588,6 +748,14 @@
           {
             "tier": "C",
             "description": "As a reaction, the effect automatically strikes any target that gains or uses Corruption: each point of Corruption becomes one point of armor-ignoring damage, though allies may be exempted."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Purgatory: Eye for an Eye",
+            "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
+            "trigger": "onSpellCast",
+            "attackAttribute": "Resolute"
           }
         ]
       }
@@ -602,11 +770,11 @@
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
-        "description": "Heals d6 Survival through touch.",
+        "description": "Heals d6 Toughness through touch.",
         "effects": [
           {
             "tier": "C",
-            "description": "Resolute heals a touched target for d6 Survival."
+            "description": "Resolute heals a touched target for d6 Toughness."
           }
         ]
       },
@@ -615,7 +783,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "Touch now heals d8 Survival and removes all poison and bleeding effects from the target."
+            "description": "Touch now heals d8 Toughness and removes all poison and bleeding effects from the target."
           }
         ]
       },
@@ -624,7 +792,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "Resolute heals d12 Survival by touch, or d8 at range with nothing but a look."
+            "description": "Resolute heals d12 Toughness by touch, or d8 at range with nothing but a look."
           }
         ]
       }
@@ -651,7 +819,14 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The mystic may draw harm from another creature onto themselves: the target heals d6 Survival, while the mystic takes the same amount of damage."
+            "description": "The mystic may draw harm from another creature onto themselves: the target heals d6 Toughness, while the mystic takes the same amount of damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Inherit Wound: Suffer",
+            "description": "Can transfer ally's received damage onto yourself.",
+            "trigger": "onAllyAttacked"
           }
         ]
       },
@@ -662,6 +837,13 @@
             "tier": "C",
             "description": "The healing increases to d8, the mystic takes only half that amount as damage, and they may also take all poison and bleeding effects onto themselves."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Inherit Wound: Suffer",
+            "description": "Can transfer ally's received damage and physical status ailments onto yourself. Half of the damage dissipates.",
+            "trigger": "onAllyAttacked"
+          }
         ]
       },
       "master": {
@@ -670,6 +852,13 @@
           {
             "tier": "C",
             "description": "The mystic may transfer the remaining half of the damage to any other visible creature; that damage cannot be defended against and ignores armor."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Inherit Wound: Punish",
+            "description": "Can transfer ally's received damage to another creature, even to an unwilling one.",
+            "trigger": "onAllyAttacked"
           }
         ]
       }
@@ -928,6 +1117,15 @@
             "tier": "C",
             "description": "Resolute enchants up to five arrows to hover beside the mystic and launch as a free action, always hitting for d6 damage and carrying any effects already placed on the ammunition."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Storm Arrow: Discharge",
+            "description": "Launch up an enchanted arrow at the enemy as a Free Action.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -937,6 +1135,15 @@
             "tier": "C",
             "description": "The arrows deal up to d8 damage, and the mystic may launch two at the same time."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Storm Arrow: Volley",
+            "description": "Launch up to two enchanted arrows at the enemy as a Free Action.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
@@ -945,6 +1152,15 @@
           {
             "tier": "C",
             "description": "The mystic may launch three arrows at the same time."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Storm Arrow: Volley",
+            "description": "Launch up to three enchanted arrows at the enemy as a Free Action.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
           }
         ]
       }
@@ -1047,6 +1263,15 @@
             "tier": "C",
             "description": "The mystic places larvae inside the enemy: the target takes d4 armor-ignoring damage each turn, cannot maintain concentration, and Resolute may carry the effect into the next turn."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Larval Pustule: Infest",
+            "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
+            "trigger": "manual",
+            "damage": 4,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -1056,6 +1281,15 @@
             "tier": "C",
             "description": "The larvae deal d6 damage each turn."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Larval Pustule: Infest",
+            "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
@@ -1064,6 +1298,15 @@
           {
             "tier": "C",
             "description": "The larvae deal d8 damage each turn."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Larval Pustule: Infest",
+            "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
           }
         ]
       }
@@ -1121,6 +1364,14 @@
             "tier": "C",
             "description": "The witch kindles an ominous flame around their melee weapon, and it deals +d4 damage."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Ghost Strike: Ravage",
+            "description": "Any successful physical attack inflicts additional damage.",
+            "trigger": "onHit",
+            "damage": 4
+          }
         ]
       },
       "adept": {
@@ -1130,6 +1381,14 @@
             "tier": "C",
             "description": "Any living creature killed by the mystic's weapon immediately rises again as undead and obeys the witch until the end of the battle."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Ghost Strike: Ravage",
+            "description": "Any successful physical attack inflicts additional damage and may raise the target as undead.",
+            "trigger": "onHit",
+            "damage": 4
+          }
         ]
       },
       "master": {
@@ -1138,6 +1397,14 @@
           {
             "tier": "C",
             "description": "The extra damage from Ghost Strike increases to +d8."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Ghost Strike: Ravage",
+            "description": "Any successful physical attack inflicts additional damage and may raise the target as undead.",
+            "trigger": "onHit",
+            "damage": 8
           }
         ]
       }
@@ -1174,7 +1441,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The aura deals up to d8 damage and also heals monsters and summoned creatures for d8 Survival."
+            "description": "The aura deals up to d8 damage and also heals monsters and summoned creatures for d8 Toughness."
           }
         ]
       }
@@ -1203,6 +1470,15 @@
             "tier": "C",
             "description": "Resolute fires a Black Arrow: on a hit it deals d6 armor-ignoring damage and prevents the target from acting until concentration is broken or the target wins with Resolute; only one such effect may be maintained at a time."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Black Arrow: Shoot",
+            "description": "Fire a Black Arrow that deals damage and can restrain the target.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -1211,6 +1487,15 @@
           {
             "tier": "C",
             "description": "The effect may spread to several targets until the first miss, but if one target breaks free, the entire group is released."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Black Arrow: Shoot",
+            "description": "Fire a Black Arrow that deals damage and can restrain all targets.",
+            "trigger": "manual",
+            "damage": 6,
+            "attackAttribute": "Resolute"
           }
         ]
       },
@@ -1290,8 +1575,24 @@
         "description": "Lets the mystic enter spirit form as a reaction to a physical attack.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Resolute replaces Defense and lets the mystic become a spirit as a reaction to a physical attack, then return to normal immediately afterward."
+            "tier": "A",
+            "description": "Resolute replaces Defense and lets the mystic become a spirit as a reaction to a physical attack, then return to normal immediately afterward.",
+            "target": {
+              "kind": "secondary",
+              "stat": "defense"
+            },
+            "modifier": {
+              "type": "addFlat",
+              "value": 1
+            },
+            "appliesTo": []
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Spirit Path: Evasion",
+            "description": "Become a spirit as a reaction to a physical attack, then return to normal immediately afterward.",
+            "trigger": "onAttacked"
           }
         ]
       },
@@ -1419,6 +1720,13 @@
             "tier": "C",
             "description": "As a reaction, the mystic may forge a deadly link to one attacker so that all damage the mystic receives, from any source, is mirrored onto that target."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Retribution: Link",
+            "description": "As a reaction to being attacked, forge a link to the attacker that mirrors all damage the mystic receives from that target back onto it.",
+            "trigger": "onAttacked"
+          }
         ]
       },
       "master": {
@@ -1427,6 +1735,13 @@
           {
             "tier": "C",
             "description": "The mystic may create a new deadly link with each new attacker without ending the old ones, duplicating incoming damage onto all linked enemies."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Retribution: Chain",
+            "description": "As a reaction to being attacked, forge a link to the attacker that mirrors all damage the mystic receives from any target back onto all linked enemies.",
+            "trigger": "onAttacked"
           }
         ]
       }
@@ -1447,6 +1762,15 @@
             "tier": "C",
             "description": "Resolute lashes an enemy with a cascade of fire for d12 damage, or d6 if the check fails."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Sulfur Cascade: Scorch",
+            "description": "Strike an enemy with a cascade of fire that can deal damage even on a miss.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -1455,6 +1779,15 @@
           {
             "tier": "C",
             "description": "After the first successful hit, the mystic may strike the next enemy, and then the next, continuing until the first failed check."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Sulfur Cascade: Pyroclasm",
+            "description": "Strike all enemies with cascades of fire that can deal damage even on a miss.",
+            "trigger": "manual",
+            "damage": 12,
+            "attackAttribute": "Resolute"
           }
         ]
       },
@@ -1521,6 +1854,15 @@
             "tier": "C",
             "description": "As a reaction, the mystic deals d6 fire damage to anyone who attacks them and gains +d6 Armor when defending against fire."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Fire Soul: Blazing Shield",
+            "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
+            "trigger": "onAttacked",
+            "damage": 6,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -1530,14 +1872,36 @@
             "tier": "C",
             "description": "The returned melee damage rises to d10, and the Armor bonus against fire rises to +d10."
           }
+        ],
+        "reactions": [
+          {
+            "name": "Fire Soul: Blazing Shield",
+            "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
+            "trigger": "onAttacked",
+            "damage": 10,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "master": {
         "description": "Makes the mystic immune to fire and turns flame into healing.",
         "effects": [
           {
+            "tier": "B",
+            "description": "Fire resistance.",
+            "target": { "kind": "flag", "name": "fireResistance" },
+            "modifier": { "type": "addFlat", "value": 1 }
+          },
+          {
             "tier": "C",
             "description": "The mystic no longer takes fire damage, half of any potential fire damage becomes healing instead, and any non-mental attack against them may trigger d10 returned damage."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Fire Soul: Pyromancy",
+            "description": "Heal half of any fire damage received.",
+            "trigger": "onDamaged"
           }
         ]
       }
@@ -1583,7 +1947,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The hymn also heals d6 Survival once per battle."
+            "description": "The hymn also heals d6 Toughness once per battle."
           }
         ]
       }
@@ -1629,6 +1993,13 @@
           {
             "tier": "C",
             "description": "The elegy also prevents d4 temporary Corruption once per battle."
+          }
+        ],
+        "reactions": [
+          {
+            "name": "Elegy: Mental Fortitude",
+            "description": "Prevent temporary Corruption.",
+            "trigger": "onSpellCast"
           }
         ]
       }
@@ -1710,6 +2081,31 @@
         "description": "Makes the enchantment permanent and removes the action cost to set it in motion.",
         "effects": [
           {
+            "tier": "A",
+            "description": "Resolute to determine weapon attack checks results.",
+            "target": {
+              "kind": "combat",
+              "field": "attackAttribute"
+            },
+            "modifier": {
+              "type": "setBase",
+              "value": "resolute"
+            },
+            "appliesTo": []
+          },
+          {
+            "tier": "A",
+            "description": "Resolute to determine defense checks results.",
+            "target": {
+              "kind": "secondary",
+              "stat": "defense"
+            },
+            "modifier": {
+              "type": "setBase",
+              "value": "resolute"
+            }
+          },
+          {
             "tier": "C",
             "description": "The mystic's weapon is always enchanted and needs no action to activate: while it holds its position, the mystic is free to do anything else."
           }
@@ -1785,7 +2181,7 @@
         "effects": [
           {
             "tier": "C",
-            "description": "The life force taken by the glyph is redirected into allies, restoring d4 Survival to them each turn."
+            "description": "The life force taken by the glyph is redirected into allies, restoring d4 Toughness to them each turn."
           }
         ]
       }
@@ -1917,6 +2313,15 @@
             "tier": "C",
             "description": "Resolute replaces Accurate to hurl a staff for d8 damage, and any enchantments already placed on the weapon may trigger on the hit."
           }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Staff Projectile: Throw",
+            "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
+            "trigger": "manual",
+            "damage": 8,
+            "attackAttribute": "Resolute"
+          }
         ]
       },
       "adept": {
@@ -1925,6 +2330,15 @@
           {
             "tier": "C",
             "description": "The staff may pass around walls and enemies as long as the mystic can see some part of the target, and the damage rises to d10."
+          }
+        ],
+        "specialAttacks": [
+          {
+            "name": "Staff Projectile: Throw",
+            "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
+            "trigger": "manual",
+            "damage": 10,
+            "attackAttribute": "Resolute"
           }
         ]
       },
