@@ -721,6 +721,10 @@ back-and-forth.
 >   See [authoring-effects.md §10](../../docs/authoring-effects.md#L0).
 > - **`EffectFlag` cleanup pass** — authors extend the union as they
 >   go; consolidate near-duplicates after the bulk pass closes.
+> - **Schema/engine amendments surfaced mid-authoring** — special-attack
+>   inherit-by-default, `magicAttribute` derived field, armor-side
+>   `appliesTo`, `initiativeAttribute` derived field. Captured in
+>   [`phase6-chunkF-postpass-amendment.md`](./phase6-chunkF-postpass-amendment.md).
 
 **Workflow**
 
@@ -976,6 +980,147 @@ weapon-ref validity, trait-ref validity).
 
 ---
 
+## Chunk J — Real-Data Engine Test Suite
+
+> **Precondition.** Reference data must be stable. After Chunk F closes
+> (and the Chunk F-postpass amendments land), the catalog stops moving
+> and the RPG pipeline is expected to behave deterministically end-to-end.
+> Until that point, real-data tests would rot daily.
+>
+> **Sequence.** Sits after Chunk I. Layer 1 (per-entry spot tests) may
+> ride alongside Chunk G's reference-lint if convenient — they share the
+> registry-loading scaffold. Layers 2 and 3 wait for Chunk I so that
+> end-to-end fixtures can be authored against the final, UI-reachable
+> shape.
+>
+> **Why now and not in E.** Chunk E's `combat.test.mts` covers the
+> *engine mechanics* (predicate composition, modifier verbs, per-slot
+> independence) using synthetic fixtures. Chunk J covers *the catalog*:
+> "does Polearm Mastery actually grant `reach` to the polearm in slot 0
+> the way the rulebook says?" That question only becomes answerable —
+> and worth locking — once the catalog is canonical.
+
+**The "what passes mean" policy**
+
+Authored data is fuzzy. The author (the user, who designed Nagara) is
+the ground truth for "what this number should be." We translate that
+authority into tests as follows:
+
+- **Layer 1 — per-entry spot tests** carry the expected derived value
+  inline as a hand-computed literal, sourced from the user. The test
+  body and the literal are both in the same file (no off-the-shelf
+  rules engine to "double-check" against — the engine *is* the rules,
+  and the literal is the spec). When the author says "Polearm Mastery
+  gives a polearm `reach`", the test asserts `slot.qualities.includes("reach")`
+  with that exact id and no others added.
+- **Layer 2 — multi-source interaction tests** carry an English-prose
+  preamble describing the scenario ("Behemoth-master + Polearm-novice +
+  iron polearm in slot 0") immediately followed by the expected derived
+  state as a literal. Reviewers check the preamble against the literal;
+  the engine just has to match.
+- **Layer 3 — canonical character snapshots** use real `Character` JSON
+  fixtures (built via `test/helpers/fixtures.mts` factories, not raw
+  JSON, to combat fixture rot when schema fields shift). The expected
+  recalc output is checked in as a sibling JSON. When intentional
+  changes happen, the workflow is: run with `--update-snapshots` (or
+  equivalent), eyeball the diff, get author sign-off, commit. The
+  snapshot file is the spec; the engine matches it.
+
+This shifts the burden cleanly: the engine asserts "I produce X"; the
+fixture+literal asserts "X is what the rulebook says"; the author owns
+the literal. If the engine changes and a literal needs updating, that
+change must land in the same commit as a sentence explaining why — no
+silent snapshot bumps.
+
+**Steps**
+
+1. **Test scaffold** (`test/rules/real-data/`):
+   - Helper that loads the production registry once per file
+     (`loadQualityIndex`, `loadAbilityIndex`, etc.) and exposes a
+     `recalc(character)` that wires the same pipeline `recalculate`
+     uses in production.
+   - Factories in `test/helpers/fixtures.mts` extended with
+     `withTrait(id, tier)`, `withSpell(id, tier)`, `withTalent(id, rank)`,
+     `withRitual(id, level)`, `equip(slot, weaponId)`, `wear(slot, armorId)`
+     to keep fixture authoring terse.
+
+2. **Layer 1 — per-entry spot tests** (`test/rules/real-data/abilities.test.mts`,
+   `spells.test.mts`, `talents.test.mts`, `qualities.test.mts`):
+   - One `describe` block per catalog entry that has typed effects.
+   - For each tier (or rank) that introduces effects, one `it` per
+     observable change, asserting against a hand-computed literal.
+   - **Coverage target**: every catalog entry whose `effects[]` has at
+     least one Tier-A or Tier-B entry. Tier-C entries are skipped
+     (engine doesn't consume them; nothing to assert).
+   - Skip-list mechanism for entries whose semantics are still under
+     discussion — annotated with a TODO and a tracker reference.
+
+3. **Layer 2 — multi-source interaction tests**
+   (`test/rules/real-data/interactions.test.mts`):
+   - 30–50 hand-authored scenarios chosen by the author for cases
+     where multiple effects compose in non-obvious ways:
+     stacking, conflict resolution (highest-attribute-wins for
+     `setBase` per Item 5), `addFlat` accumulation, `cap`
+     interaction with `addFlat`, predicate AND/OR composition with
+     real qualities, armor body+plug composition, Tier-stacking
+     (novice + adept + master same ability).
+   - Format: `describe("scenario name") { it("derived state") { /* literal */ } }`.
+
+4. **Layer 3 — canonical character snapshots**
+   (`test/rules/real-data/canon/`):
+   - 5–10 archetypal characters chosen by the author (e.g. "Bare-handed
+     monk", "Heavy-armored polearm soldier", "Witch with Leader",
+     "Marksman with Quick Reflexes Master", "Ritualist"). Each is a
+     factory-built `Character` checked in as a `.fixture.mts`.
+   - Each fixture has a sibling `.expected.json` with the full
+     `recalculate()` output (or a curated subset — derived combat
+     slots, secondary attributes, special attacks, reactions, flags).
+   - A snapshot updater script (`scripts/update-canon-snapshots.mts`)
+     regenerates expected JSONs from current fixtures; commits
+     require manual review of the diff.
+   - Each fixture carries a markdown sibling (`<name>.md`) describing
+     the build in prose — what abilities, what equipment, what the
+     character is "supposed" to be good at. This is the human-readable
+     spec for reviewers.
+
+5. **CI integration**: real-data tests run as part of `npm test`. They
+   are **not** opt-in — drift in the catalog or engine that breaks them
+   is a release blocker. Failure messages should include the catalog
+   id(s) involved so triage starts at the right entry.
+
+**Verification**
+
+1. `npm test` green; real-data tests cover ≥95% of Tier-A/B catalog entries.
+2. A deliberate edit to `reference/abilities.en.json` (e.g. changing
+   Polearm Mastery's `addFlat` value) triggers exactly the expected
+   spot test failure(s) — no others.
+3. A deliberate engine change (e.g. flipping conflict resolution policy)
+   triggers a clearly-attributed wave of failures across Layer 2 and 3,
+   not just Layer 1.
+4. Author can review a snapshot diff and decide "yes that's correct,
+   bump the literal" without re-deriving from first principles —
+   the markdown sibling and the literal together carry the intent.
+
+**Expectations (effort & risk)**
+
+- Comparable scope to Chunk E. Heaviest cost is Layer 1's breadth
+  (one assertion per Tier-A/B entry — likely several hundred `it`
+  blocks once the catalog is fully authored), but each one is
+  mechanical: pick a fixture, apply the entry, assert one literal.
+- Layer 2 is the high-judgement layer and the smallest. Author picks
+  the scenarios that matter; reviewer judges coverage by reading the
+  preamble list, not the asserts.
+- Layer 3 is the most fragile (any schema field rename can ripple
+  through every snapshot). Mitigated by factory-built fixtures and
+  the update script; risk only materializes on intentional schema
+  churn, at which point a snapshot regeneration is the right answer.
+- Hardest non-mechanical part: keeping Layer 1 literals from rotting
+  silently when the author iterates a number in the catalog. Mitigation:
+  the catalog change and the literal change land in the same commit;
+  CI failure makes this enforceable rather than aspirational.
+
+---
+
 ## Cross-Cutting Notes
 
 - **Character-state conditions stay out of the engine**: "when raging",
@@ -1038,6 +1183,16 @@ as the matching schema field is stable — `equipment-list` in particular
 can ship right after E since `equipment.weapons[]` is already final.
 
 Suggested execution: A → B → C → D → E → F.0 → G (registry + tests landing
-first; lint-over-real-data turned on once F finishes) → H → I. F runs
+first; lint-over-real-data turned on once F finishes) → H → I → J. F runs
 independently in user time after A and F.0 ship. Chunk I closes Phase 6
-with a manually usable app.
+with a manually usable app; Chunk J locks the catalog↔engine contract
+once both have stabilized. J's Layer 1 (per-entry spot tests) may ride
+alongside G's reference-lint if convenient — they share the registry
+scaffold; Layers 2 and 3 wait for I.
+
+The post-F amendment plan
+([phase6-chunkF-postpass-amendment.md](phase6-chunkF-postpass-amendment.md))
+sequences between F and G — its 11 implementation steps add the engine
+features the bulk authoring pass surfaced (`magicAttribute`,
+`initiativeAttribute`, primary-attribute target, `setBase` conflict
+policy, etc.). Treat it as Chunk F+ rather than a separate chunk number.
