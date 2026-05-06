@@ -77,7 +77,7 @@
     "description": "Оружие с качеством глубокой раны наносит на единицу больше урона, потому что оно или лучше преодолевает броню, чем аналогичные, или просто настолько увесистое.",
     "effects": [
       {
-        "target": { "kind": "combat", "field": "attackAttribute" },
+        "target": { "kind": "combat", "field": "bonusDamage" },
         "modifier": { "type": "addFlat", "value": 1 }
       }
     ]
@@ -207,9 +207,15 @@
     "id": "precise",
     "name": "Точное",
     "description": "С точным оружием легче управляться: оно дает +1 положительный модификатор на все проверки попадания.",
+    "effects": []
+  },
+  {
+    "id": "protective",
+    "name": "Защитное",
+    "description": "Этот предмет обеспечивает дополнительную защиту, предоставляя +1 к проверкам Защиты.",
     "effects": [
       {
-        "target": { "kind": "combat", "field": "bonusAttack" },
+        "target": { "kind": "secondary", "stat": "defense" },
         "modifier": { "type": "addFlat", "value": 1 }
       }
     ]

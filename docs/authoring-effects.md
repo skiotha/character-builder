@@ -566,6 +566,36 @@ member of the `EffectFlag` union in
 [`src/rpg-types.mts`](../src/rpg-types.mts) — extend the union if you add
 a new one.
 
+`appliesTo: WeaponPredicate[]` is **allowed** on flag targets but the
+engine treats it as documentary metadata for sibling apps — see
+[§8.5 Roll-time modifier passthrough](#85-roll-time-modifier-passthrough).
+The engine still adds the flag name to the global character set
+unconditionally; sibling apps consume the predicate to decide when the
+roll-time bonus actually fires.
+
+---
+
+## 8.5 Roll-time modifier passthrough
+
+The engine derives **static character state** (attributes, secondary stats,
+per-slot combat values, the set of active flags and weapon/armor qualities).
+It does **not** roll dice and it does **not** model "+N to a roll result"
+modifiers — those are sibling concerns (Discord bot, WoW addon).
+
+Two recurring catalog patterns belong on the sibling side:
+
+| Pattern | Where it lives | What siblings do |
+| --- | --- | --- |
+| `precise` weapon quality (+1 to attack roll **result**, not die size) | Quality registry entry has empty `effects[]`; the id appears in `weapon.qualities[]`. | Add +1 to the attack roll result when the carried weapon has the `precise` quality. |
+| `advantage` flag (+2 to attack roll result; sometimes weapon-scoped) | Effect with `target.kind: "flag"`, `name: "advantage"`, optional `appliesTo` predicate. Engine adds `"advantage"` to the flag set; `appliesTo` is preserved verbatim. | Add +2 to the attack roll result when `"advantage"` is in the flag set. If the originating effect carried an `appliesTo` predicate, narrow that bonus to matching weapons only. |
+
+**Rule of thumb:** if the modifier changes a *die roll's result* (not the
+die size, base damage, bonus damage, or attack attribute), encode it as
+either an empty-effects quality (for weapon-bound modifiers) or as a
+`flag` target with optional `appliesTo` (for character-bound, possibly
+weapon-scoped modifiers). Document the magnitude in the entry's
+`description` so siblings can read it without consulting this spec.
+
 ---
 
 ## 9. `WeaponPredicate` — quick reference
@@ -592,6 +622,12 @@ Four kinds:
 There is **no** `subtype` predicate (ADR-015 §3a).
 
 If `appliesTo` is omitted or `[]`, the effect applies to every slot.
+
+`appliesTo` is engine-evaluated for `combat` and `weaponQuality` targets
+(per-slot fanout), and preserved as documentary metadata for `flag`
+targets (siblings consume it — see [§8.5](#85-roll-time-modifier-passthrough)).
+The parser strips it with a warn for `secondary`, `armorQuality`, and any
+future kinds.
 
 ---
 

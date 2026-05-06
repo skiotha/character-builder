@@ -126,13 +126,8 @@
     "type": "shield",
     "damage": 4,
     "cost": 3,
-    "qualities": [],
-    "effects": [
-      {
-        "target": { "kind": "secondary", "stat": "defense" },
-        "modifier": { "type": "addFlat", "value": 1 }
-      }
-    ]
+    "qualities": ["protective"],
+    "effects": []
   },
   {
     "id": "buckler",
@@ -141,13 +136,8 @@
     "type": "shield",
     "damage": 4,
     "cost": 15,
-    "qualities": ["flexible"],
-    "effects": [
-      {
-        "target": { "kind": "secondary", "stat": "defense" },
-        "modifier": { "type": "addFlat", "value": 1 }
-      }
-    ]
+    "qualities": ["flexible", "protective"],
+    "effects": []
   },
   {
     "id": "iron_shield",
@@ -156,13 +146,8 @@
     "type": "shield",
     "damage": 4,
     "cost": 15,
-    "qualities": ["balanced"],
-    "effects": [
-      {
-        "target": { "kind": "secondary", "stat": "defense" },
-        "modifier": { "type": "addFlat", "value": 1 }
-      }
-    ]
+    "qualities": ["balanced", "protective"],
+    "effects": []
   },
   {
     "id": "short_weapon",

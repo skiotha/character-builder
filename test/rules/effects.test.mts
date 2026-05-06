@@ -127,6 +127,32 @@ describe("normalizeRawEffect", () => {
     assert.ok(resolved);
     assert.deepEqual(resolved.appliesTo, [{ kind: "type", values: ["sword"] }]);
   });
+
+  it("preserves appliesTo on flag targets as documentary metadata (Item 13)", () => {
+    // The engine adds the flag to the global set regardless of `appliesTo`;
+    // siblings consume the predicate to scope roll-time modifiers (e.g. advantage
+    // only when attacking with short weapons).
+    const warnMock = mock.method(console, "warn", () => {});
+    try {
+      const raw: RawEffect = {
+        target: { kind: "flag", name: "advantage" },
+        modifier: { type: "addFlat", value: 1 },
+        appliesTo: [{ kind: "type", values: ["short"] }],
+      };
+      const resolved = normalizeRawEffect(raw, "test");
+      assert.ok(resolved);
+      assert.deepEqual(resolved.appliesTo, [
+        { kind: "type", values: ["short"] },
+      ]);
+      assert.equal(
+        warnMock.mock.callCount(),
+        0,
+        "flag + appliesTo should not warn",
+      );
+    } finally {
+      warnMock.mock.restore();
+    }
+  });
 });
 
 // ── collectAllEffects ───────────────────────────────────────────

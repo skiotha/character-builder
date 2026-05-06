@@ -811,6 +811,12 @@ shape is firm. Until then the three copies are accepted as a known debt.
    - Lookup known abilities; assert effect shapes and tier stacking.
    - Bad target shape → throws at load time.
 6. Add `test/rules/reference-lint.test.mts` (the F validation pass):
+   - **Precursor:** `scripts/audit-reference.mts` (added during the Chunk F
+     authoring pass) is the informal version of this lint and was used to
+     audit the catalog before amendments. Promote its checks into this
+     test (most of the categorization translates 1:1 — tier markers,
+     parser rejections, predicate hygiene, quality resolution, flag-name
+     vocabulary). Delete the standalone script once the test absorbs it.
    - Iterates **every** ability/spell/boon/sin/ritual entry across all
      locales.
    - Asserts: each effect parses; each predicate parses; each modifier verb

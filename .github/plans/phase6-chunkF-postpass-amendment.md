@@ -1147,3 +1147,75 @@ Suggested order, smallest blast radius first:
 
 Each item should land as its own chunk in `phase6-plan.md` with its own PR and
 test coverage. Do not bundle.
+
+---
+
+## Item 13 — Roll-time modifier passthrough (`flag` + `appliesTo`; `precise` quality)
+
+### Problem
+
+The engine derives static character state — attributes, secondary stats,
+per-slot combat values, the set of active flags and weapon/armor qualities.
+It does **not** roll dice and has no representation for "+N to a roll
+result." Two recurring patterns surfaced during Chunk F authoring need a
+home that doesn't pretend to live in the engine:
+
+1. **`precise` weapon quality** — RPG rules: "+1 to attack roll result"
+   (the result, not the die size). Original authoring tried
+   `target: { kind: "combat", field: "bonusAttack" }` — `bonusAttack` is
+   not a field in `CombatSlotField` and the parser rejected it.
+2. **`advantage` flag with weapon scoping** — e.g. Smoke and Mirrors
+   novice tier-B grants advantage but only when attacking with short or
+   precise weapons. Authored as `target: { kind: "flag", name: "advantage" },
+   appliesTo: [...]`. The pre-Item-13 parser silently stripped
+   `appliesTo` from non-combat/non-weaponQuality targets.
+
+Both modify *roll results*, which is sibling territory.
+
+### Resolution
+
+Carve the engine/sibling boundary explicitly and surface enough metadata
+in the catalog for siblings to act on it without re-parsing English prose.
+
+**(a) Parser change:** `parseAppliesTo` in `src/rules/effects.mts` accepts
+`flag` in addition to `combat`/`weaponQuality`. The engine still adds the
+flag name to the global character set unconditionally; `appliesTo` is
+preserved verbatim on the resolved effect so siblings can read it.
+`secondary` and `armorQuality` continue to strip-with-warn.
+
+**(b) Catalog change:** drop the bespoke `effects[]` from
+`reference/qualities.{en,ru}.json` `precise` entry. The id appears in
+`weapon.qualities[]`; siblings detect it and add +1 to the attack roll
+result.
+
+**(c) Spec change:** new §8.5 "Roll-time modifier passthrough" in
+`docs/authoring-effects.md` documents the boundary and the two known
+patterns (`precise`, `advantage`). §8 `flag` and §9 `WeaponPredicate`
+sections cross-reference it.
+
+### Status
+
+✅ Implemented 2026-05-06 alongside this entry. Item 13 ships *outside*
+the locked Item 10 → 1 → 12 ordering because it is a one-clause parser
+change that unblocks a documentary pattern — no character data shape
+churn, no engine math change.
+
+### Affected code & docs
+
+- `src/rules/effects.mts` — `parseAppliesTo` accept-list extended with `flag`.
+- `test/rules/effects.test.mts` — added "preserves appliesTo on flag
+  targets (documentary metadata)" case.
+- `scripts/audit-reference.mts` — `predicateHygiene` no longer flags
+  `flag + appliesTo`.
+- `docs/authoring-effects.md` — new §8.5 and §8/§9 cross-references.
+- `reference/qualities.{en,ru}.json` — `precise.effects` cleared.
+
+### Non-goals
+
+- The engine still does not roll dice or evaluate `appliesTo` against a
+  hypothetical attack context — siblings own that. If a future pattern
+  needs the engine to *gate* something on the predicate (vs. just emit it),
+  that's a separate amendment.
+- `armorQuality + appliesTo` is **not** unblocked by Item 13 — that case
+  belongs to Item 3 (deferred). The asymmetry is intentional: armor scope
+  is the slot, not the weapon.

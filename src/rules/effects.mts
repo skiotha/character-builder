@@ -108,10 +108,19 @@ export function normalizeRawEffect(
   };
 
   if (raw.appliesTo !== undefined) {
-    if (target.kind !== "combat" && target.kind !== "weaponQuality") {
+    // `combat` and `weaponQuality`: appliesTo is engine-evaluated (per-slot fanout).
+    // `flag`: appliesTo is preserved as documentary metadata for siblings (roll-time
+    //   modifiers like `advantage` are sibling-side; the engine still adds the flag
+    //   name to the global set regardless of `appliesTo`). See ADR-015 + Item 13.
+    // All other target kinds: silently stripped with a warn (per ADR-015 §3a).
+    if (
+      target.kind !== "combat" &&
+      target.kind !== "weaponQuality" &&
+      target.kind !== "flag"
+    ) {
       console.warn(
         `[effects] Stripping appliesTo from target kind ${target.kind} ` +
-          `(only combat / weaponQuality accept appliesTo, source=${effectSource}).`,
+          `(only combat / weaponQuality / flag accept appliesTo, source=${effectSource}).`,
       );
     } else {
       const predicates = parseAppliesTo(raw.appliesTo, effectSource);
