@@ -66,7 +66,7 @@ The Nagara Character Builder is a web application for creating and managing RPG 
 
 | Layer     | Technology                         | Notes                                    |
 | --------- | ---------------------------------- | ---------------------------------------- |
-| Runtime   | Node.js 24+                        | Native TypeScript via strip-types        |
+| Runtime   | Node.js 26+                        | Native TypeScript via strip-types        |
 | Server    | Raw `node:http` / `node:https`     | Zero external dependencies (see ADR-001) |
 | Client    | Vanilla JavaScript ES modules      | No build step, import maps               |
 | Storage   | File-based JSON on disk            | In-memory index, file-per-character      |

@@ -9,7 +9,7 @@ two sibling projects:
 
 ## Stack
 
-- **Runtime:** Node.js 24+ (native TypeScript via strip-types — no build step)
+- **Runtime:** Node.js 26+ (native TypeScript via strip-types — no build step)
 - **Server:** Raw `node:http` / `node:https`, zero npm runtime dependencies
 - **Client:** Vanilla JavaScript SPA, native ES modules, schema-driven rendering
 - **Storage:** File-based JSON (`data/characters/*.json` + `data/index.json`)

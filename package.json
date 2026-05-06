@@ -20,7 +20,7 @@
     "email": "skiotha.bl@gmail.com"
   },
   "engines": {
-    "node": ">=25.0.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "start": "node --env-file-if-exists=config/nagara.production.env src/server.mts",
@@ -43,6 +43,6 @@
     "#sse": "./src/sse/broadcast.mts"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0"
+    "@types/node": "^25.6.0"
   }
 }

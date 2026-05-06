@@ -10,7 +10,7 @@ The codebase is currently plain JavaScript (`.mjs` files) with no type annotatio
 
 - `.mts` file extension
 - `tsconfig.json` with `noEmit: true`, `strict: true`, `verbatimModuleSyntax`
-- Node.js 24+ `--experimental-strip-types` for direct execution (no tsc build)
+- Node.js 26+ `--experimental-strip-types` for direct execution (no tsc build)
 - `@types/node` as the sole devDependency
 - `tsc -p tsconfig.json` for type-checking only (no compilation step)
 

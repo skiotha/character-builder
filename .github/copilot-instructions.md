@@ -11,7 +11,7 @@ All three share the same character data model. The website is the source of trut
 
 ## Stack & Conventions
 
-- **Runtime:** Node.js 25+ (native TypeScript strip-types, no flag needed)
+- **Runtime:** Node.js 26+ (native TypeScript strip-types, no flag needed)
 - **Language:** TypeScript (`.mts` files, `noEmit`, `strict`, `verbatimModuleSyntax`)
 - **Server:** Raw `node:http` / `node:https` — zero npm runtime dependencies
 - **Client:** Vanilla JavaScript SPA with native ES modules (no build step)
