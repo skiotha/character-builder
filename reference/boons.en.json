@@ -2,6 +2,7 @@
   {
     "id": "blood-bond",
     "name": "Blood Bond",
+    "category": "boon",
     "tags": ["boon", "corruption", "transformation", "support"],
     "levels": 1,
     "description": "Lets the character spend experience to develop one exotic natural ability belonging to a chosen exotic race or species."
@@ -9,6 +10,7 @@
   {
     "id": "cartographer",
     "name": "Cartographer",
+    "category": "boon",
     "tags": ["boon", "profession", "knowledge", "support"],
     "levels": 3,
     "description": "Lets the character join expeditions and ship crews without paying passage, and also work as a navigator or guide. Grants a +1 bonus on all checks related to navigation at sea, on land, and in dungeons."
@@ -16,6 +18,7 @@
   {
     "id": "enterprise",
     "name": "Enterprise",
+    "category": "boon",
     "tags": ["boon", "profession", "support", "cunning", "appealing"],
     "levels": 1,
     "description": "Once per adventure, the character can make a Cunning or Appealing check, depending on the business, and earn 10+5d10 gold coins beyond already paid expenses."
@@ -23,6 +26,7 @@
   {
     "id": "prostitution",
     "name": "Prostitution",
+    "category": "boon",
     "tags": ["boon", "appealing", "profession", "corruption"],
     "levels": 1,
     "description": "Whenever the character removes Corruption with a member of civilization, they can test their Appealing to demand payment: 1+d40 silver coins from a commoner, 1+d40 copper coins from a soldier or merchant, or 1+d4 gold coins from an aristocrat. It also lets the character enter closed social gatherings without an invitation, but one runic tattoo slot is permanently occupied by a professional tattoo."
@@ -30,6 +34,7 @@
   {
     "id": "language-of-beasts",
     "name": "Language of Beasts",
+    "category": "boon",
     "tags": ["boon", "knowledge", "support"],
     "levels": 1,
     "description": "Lets the character speak with animals. They can answer questions about beings in their area, who passed by, and roughly how many there were, but they do not perform services."
@@ -37,6 +42,7 @@
   {
     "id": "powerful-voice",
     "name": "Powerful Voice",
+    "category": "boon",
     "tags": ["boon", "appealing", "corruption", "support"],
     "levels": 3,
     "description": "The character’s direct commands to allies are heard in any commotion. Grants a +1 bonus on all Appealing checks related to such commands, and lets the character remove temporary Corruption through the throat instead of the usual areas of mystical concentration."
@@ -44,6 +50,7 @@
   {
     "id": "escape-artist",
     "name": "Escape Artist",
+    "category": "boon",
     "tags": ["boon", "mobility", "support", "quick", "strong", "resolute"],
     "levels": 1,
     "description": "Lets the character slip free from grapples and traps, including snares and nets, and squeeze through narrow openings. In all escape situations, the character gets a second attempt regardless of attribute."
@@ -51,6 +58,7 @@
   {
     "id": "elven-tongue",
     "name": "Elven Tongue",
+    "category": "boon",
     "tags": ["boon", "knowledge"],
     "levels": 1,
     "description": "Allows the character to use a special language and to teach it to others."
@@ -58,6 +66,7 @@
   {
     "id": "light-footed",
     "name": "Light-Footed",
+    "category": "boon",
     "tags": ["boon", "mobility", "quick", "support"],
     "levels": 1,
     "description": "Grants a +3 bonus to Quick in situations involving escape or pursuit."
@@ -65,6 +74,7 @@
   {
     "id": "deceiver",
     "name": "Deceiver",
+    "category": "boon",
     "tags": ["boon", "appealing", "vigilant", "knowledge"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Appealing and Vigilant checks related to lies, including spotting someone else’s lies."
@@ -72,6 +82,7 @@
   {
     "id": "manipulator",
     "name": "Manipulator",
+    "category": "boon",
     "tags": ["boon", "appealing", "status", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus to Appealing on checks based on flattery, threats, and other methods that are not lies, as long as the character had enough time to persuade the victim. Beliefs accepted this way remain with the victim even after they part ways with the character."
@@ -79,6 +90,7 @@
   {
     "id": "flirt",
     "name": "Flirt",
+    "category": "boon",
     "tags": ["boon", "appealing", "status"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Appealing checks related to persuasion, interrogation, and goading. If the character gets what they want from a victim and gives nothing in return, the victim remembers it."
@@ -86,6 +98,7 @@
   {
     "id": "dark-blood",
     "name": "Dark Blood",
+    "category": "boon",
     "tags": ["boon", "corruption", "transformation", "magic"],
     "levels": 1,
     "description": "The character gains a stigma from the Beastly sin and can acquire and develop the exotic natural traits Natural Weapon, Armored, Mighty, Regeneration, and Wings."
@@ -93,6 +106,7 @@
   {
     "id": "cleansing",
     "name": "Cleansing",
+    "category": "boon",
     "tags": ["boon", "corruption", "healing", "defense"],
     "levels": 1,
     "description": "Each time the character removes temporary Corruption, they restore the same amount of Toughness. If Toughness was already full, then on the next cleansing check they may gain the same amount as temporary Toughness above the limit once, lasting until the next rest."
@@ -100,6 +114,7 @@
   {
     "id": "false-identity",
     "name": "False Identity",
+    "category": "boon",
     "tags": ["boon", "mobility", "transformation", "support"],
     "levels": 1,
     "description": "The character has a second identity with its own clothing, gear, and documents. No one except the character and the person who helped prepare it can uncover that identity."
@@ -107,6 +122,7 @@
   {
     "id": "contacts",
     "name": "Contacts",
+    "category": "boon",
     "tags": ["boon", "appealing", "support"],
     "levels": 1,
     "description": "With a successful Appealing check, the character can recall an acquaintance able to help with a specific problem or pull them out of a difficult situation. If the character can get a message to them, that contact comes to help even from afar."
@@ -114,6 +130,7 @@
   {
     "id": "secret-knowledge",
     "name": "Secret Knowledge",
+    "category": "boon",
     "tags": ["boon", "alchemy", "crafting", "knowledge", "cunning"],
     "levels": 1,
     "description": "The character knows all formulas for alchemical remedies and all secrets of artifact creation available at their current Alchemist and Artifact Creation ranks, including forbidden and formerly secret recipes and designs."
@@ -121,6 +138,7 @@
   {
     "id": "lockpicker",
     "name": "Lockpicker",
+    "category": "boon",
     "tags": ["boon", "quick", "discreet", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Discreet or Quick checks related to entering locked places and hiding the fact that the character was inside them."
@@ -128,6 +146,7 @@
   {
     "id": "nimble-fingers",
     "name": "Nimble Fingers",
+    "category": "boon",
     "tags": ["boon", "discreet", "concealed", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Discreet checks related to theft and hiding items on the character’s person."
@@ -135,6 +154,7 @@
   {
     "id": "mirage",
     "name": "Mirage",
+    "category": "boon",
     "tags": ["boon", "appealing", "profession", "support"],
     "levels": 1,
     "description": "Lets the character create temporary illusions and overlay a false appearance onto small objects. With a successful Appealing check, they can convince a victim to sell goods worth up to 100 illusory gold coins at a time; the images quickly fall apart once the character leaves the area where they were created."
@@ -142,6 +162,7 @@
   {
     "id": "poison-resistance",
     "name": "Poison Resistance",
+    "category": "boon",
     "tags": ["boon", "poison", "defense"],
     "levels": 1,
     "description": "Any poison used against the character counts as one rank lower, and weak poison cannot deal more than 1 damage per turn. Against toxins with other harmful effects, the character gets a second chance to resist; the poison’s duration does not change."
@@ -149,6 +170,7 @@
   {
     "id": "natural-healing",
     "name": "Natural Healing",
+    "category": "boon",
     "tags": ["boon", "healing", "support", "magic"],
     "levels": 1,
     "description": "The character’s saliva and milk can restore d4 Toughness to others once per day. This healing counts as mystical for effects that can only be removed by mystical healing."
@@ -156,6 +178,7 @@
   {
     "id": "forged-in-flame",
     "name": "Forged in Flame",
+    "category": "boon",
     "tags": ["boon", "magic", "defense"],
     "levels": 1,
     "description": "Grants mystical +1 protection against fire effects and a +1 bonus on all checks related to using fire or resisting it."
@@ -163,6 +186,7 @@
   {
     "id": "inheritance",
     "name": "Inheritance",
+    "category": "boon",
     "tags": ["boon", "weapons", "armor"],
     "levels": 1,
     "description": "The character receives a family heirloom in the form of any weapon or armor, except an artifact."
@@ -170,6 +194,7 @@
   {
     "id": "privileges",
     "name": "Privileges",
+    "category": "boon",
     "tags": ["boon", "support", "appealing"],
     "levels": 1,
     "description": "Within their own society, the character may repeat any failed social check and does not have to roll at all unless the request is especially demanding or impossible. They also start with 50 gold coins."
@@ -177,6 +202,7 @@
   {
     "id": "safehouses",
     "name": "Safehouses",
+    "category": "boon",
     "tags": ["boon", "mobility", "support"],
     "levels": 1,
     "description": "The character knows the locations of one organization’s safehouses, where they can hide, wait things out, and replace or retrieve vital weapons, armor, and gear. With a successful Cunning check, they remember a convenient nearby safehouse and find either up to 10 gold coins in cash or items worth the same amount there."
@@ -184,6 +210,7 @@
   {
     "id": "water-off-a-duck",
     "name": "Water off a Duck's Back",
+    "category": "boon",
     "tags": ["boon", "corruption", "defense"],
     "levels": 1,
     "description": "All effects of removing temporary Corruption are increased by +d2. While the character is already in the process of removing Corruption, they cannot gain either temporary or permanent Corruption."
@@ -191,6 +218,7 @@
   {
     "id": "bloodhound",
     "name": "Bloodhound",
+    "category": "boon",
     "tags": ["boon", "cunning", "vigilant", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Vigilant and Cunning checks related to finding tracks or determining a person’s location."
@@ -198,6 +226,7 @@
   {
     "id": "pet",
     "name": "Pet",
+    "category": "boon",
     "tags": ["boon", "summoning", "support"],
     "levels": 1,
     "description": "The character has a tamed animal companion no larger than a wolfhound. It can help in combat, but it gains no experience and cannot learn new abilities."
@@ -205,6 +234,7 @@
   {
     "id": "servant",
     "name": "Servant",
+    "category": "boon",
     "tags": ["boon", "support", "summoning", "corruption"],
     "levels": 1,
     "description": "The character has a personal servant who can be used to fight temporary Corruption. The servant can handle simple duties such as standing watch at night or delivering messages, but is useless in combat and provides no help in dangerous situations."
@@ -212,6 +242,7 @@
   {
     "id": "reliable-companion",
     "name": "Reliable Companion",
+    "category": "boon",
     "tags": ["boon", "summoning", "corruption", "support"],
     "levels": 1,
     "description": "The character has an old friend or lover with whom they can exchange simple messages or emotions telepathically. Both roughly know where the other is and notice when the other is in trouble; intimacy with that companion grants up to d4 extra protection from temporary Corruption per day if the character had no temporary Corruption at the time."
@@ -219,6 +250,7 @@
   {
     "id": "shadow-creation",
     "name": "Shadow Creation",
+    "category": "boon",
     "tags": ["boon", "mobility", "discreet", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Discreet checks related to hiding oneself."
@@ -226,6 +258,7 @@
   {
     "id": "medium",
     "name": "Medium",
+    "category": "boon",
     "tags": [
       "boon",
       "vigilant",
@@ -240,6 +273,7 @@
   {
     "id": "forager",
     "name": "Forager",
+    "category": "boon",
     "tags": ["boon", "vigilant", "profession", "support"],
     "levels": 1,
     "description": "With a successful Vigilant test, the character can find enough food and water for themselves while traveling through the wilderness. If they gather for a small group as well, that group cannot move while the foraging happens."
@@ -247,6 +281,7 @@
   {
     "id": "fortification",
     "name": "Fortification",
+    "category": "boon",
     "tags": ["boon", "corruption", "armor", "defense"],
     "levels": 1,
     "description": "Whenever the character removes temporary Corruption, their Armor increases by the same amount until the end of the day or until the first successful attack that pierces that Armor."
@@ -254,6 +289,7 @@
   {
     "id": "gambler",
     "name": "Gambler",
+    "category": "boon",
     "tags": ["boon", "knowledge", "cunning", "profession", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Cunning checks in gambling and tactical games, and a +1 bonus on all Vigilant checks made to catch a cheat."
@@ -261,6 +297,7 @@
   {
     "id": "cardsharp",
     "name": "Cardsharp",
+    "category": "boon",
     "tags": ["boon", "cunning", "knowledge", "discreet"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Discreet and Cunning checks related to cheating in games, plus an extra chance on a Discreet check when the character tries to keep the cheating unnoticed."
@@ -268,6 +305,7 @@
   {
     "id": "wild-soul",
     "name": "Wild Soul",
+    "category": "boon",
     "tags": ["boon", "alchemy", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all checks related to the challenges of nature, including finding food and shelter, moving through dense growth, and spotting or avoiding natural traps. The same bonus also applies to all checks to use the Alchemist ability."
@@ -275,6 +313,7 @@
   {
     "id": "perfect-body",
     "name": "Perfect Body",
+    "category": "boon",
     "tags": ["boon", "corruption"],
     "levels": 3,
     "description": "Increases by 1 the number of attempts the character can make each day to remove temporary Corruption."
@@ -282,6 +321,7 @@
   {
     "id": "perfect-memory",
     "name": "Perfect Memory",
+    "category": "boon",
     "tags": ["boon", "knowledge", "support", "profession"],
     "levels": 1,
     "description": "Work involving reconnaissance, reports, bookkeeping, and similar tasks pays the character one and a half times as much. They may make two checks for any test related to memorizing something new and can recall any relevant episode from past adventures."
@@ -289,6 +329,7 @@
   {
     "id": "perfect-soul",
     "name": "Perfect Soul",
+    "category": "boon",
     "tags": ["boon", "corruption", "defense", "support"],
     "levels": 1,
     "description": "Lets the character remove temporary Corruption even with the most corrupted beings: cursed sorcerers, undead, demons, creatures of the Night, and the like."
@@ -296,6 +337,7 @@
   {
     "id": "archivist",
     "name": "Archivist",
+    "category": "boon",
     "tags": ["boon", "knowledge", "support", "cunning", "profession"],
     "levels": 3,
     "description": "Grants a +1 bonus on all checks related to libraries, archives, and repositories."
@@ -303,6 +345,7 @@
   {
     "id": "augur",
     "name": "Augur",
+    "category": "boon",
     "tags": ["boon", "ritual", "knowledge", "magic", "profession"],
     "levels": 3,
     "description": "Grants a +1 bonus on checks related to the rituals Foresight, Divination, and White Smoke, the mystical power Hexcraft, and similar effects."
@@ -310,6 +353,7 @@
   {
     "id": "long-march",
     "name": "Long March",
+    "category": "boon",
     "tags": ["boon", "healing", "strong", "support", "mobility"],
     "levels": 1,
     "description": "Lets the character recover health even during fast travel. They can share this knowledge with others, allowing them to recover health during difficult marches if they pass a Strong check."
@@ -317,6 +361,7 @@
   {
     "id": "actor",
     "name": "Actor",
+    "category": "boon",
     "tags": ["boon", "profession", "discreet", "transformation"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Discreet checks when the character impersonates someone, and a second chance to succeed when imitating a recognizable archetype rather than a specific person. When trying to impersonate someone of another race, every check must be repeated."
@@ -324,6 +369,7 @@
   {
     "id": "musician",
     "name": "Musician",
+    "category": "boon",
     "tags": ["boon", "profession", "appealing"],
     "levels": 3,
     "description": "Grants a bonus on all Appealing checks related to persuasion and lets the character calm an enraged animal with music, provided nothing is threatening it, by succeeding on a Appealing check to prevent its attack."
@@ -331,6 +377,7 @@
   {
     "id": "pathfinder",
     "name": "Pathfinder",
+    "category": "boon",
     "tags": ["boon", "vigilant", "profession"],
     "levels": 1,
     "description": "Lets the character repeat any failed Vigilant check related to finding tracks, following them, finding a way to a place, or finding the road back."
@@ -338,6 +385,7 @@
   {
     "id": "packhorse",
     "name": "Packhorse",
+    "category": "boon",
     "tags": ["boon", "strong", "mobility", "support"],
     "levels": 1,
     "description": "Lets the character carry one and a half times as many items as an ordinary person."
@@ -345,6 +393,7 @@
   {
     "id": "storyteller",
     "name": "Storyteller",
+    "category": "boon",
     "tags": ["boon", "appealing", "profession", "support"],
     "levels": 3,
     "description": "Grants a +1 bonus on all Appealing checks when the character needs to tell a more or less convincing tale and lets them earn money with that art."
@@ -352,6 +401,7 @@
   {
     "id": "gossip",
     "name": "Gossip",
+    "category": "boon",
     "tags": ["boon", "appealing", "knowledge"],
     "levels": 3,
     "description": "Grants a +1 bonus on all checks related to gathering, spreading, and judging the truth of rumors."
@@ -359,6 +409,7 @@
   {
     "id": "hardy",
     "name": "Hardy",
+    "category": "boon",
     "tags": ["boon", "defense"],
     "levels": 1,
     "description": "In any situation that could destroy the character, they may make two checks instead of one and choose the better result."

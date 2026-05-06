@@ -122,15 +122,17 @@ type TriggerKind =
   | "onHit"
   | "onMiss"
   | "onContact"
-  | "onTurnStart"
-  | "onTurnEnd"
+  | "onProne"
   | "onAttacked"
-  | "onDamaged"
-  | "onCrit"
-  | "onAllyDamaged"
+  | "onCheck"
+  | "onDodged"
+  | "onAdvantage"
+  | "onEnemyMovement"
+  | "onAllyAttacked"
+  | "onResisted"
   | "onSpellCast"
-  | "onMovement"
-  | "onSightOf";
+  | "onNewDay"
+  | "onDamaged";
 ```
 
 The engine **validates only that a value is one of the known set**. It attaches no semantics to any value beyond `"manual"` (which routes the action into `SpecialAttack[]` rather than `Reaction[]`). All other behavior is a sibling-app concern.

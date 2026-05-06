@@ -89,6 +89,7 @@ export type EffectFlag =
   | "initiativeExemption"
   | "fastSwap"
   | "elementsProtection"
+  | "fireResistance"
   | "knowledge:alchemy"
   | "knowledge:alchemy:poisons"
   | "knowledge:world"
