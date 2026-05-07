@@ -279,6 +279,26 @@ export const CHARACTER_SCHEMA: Record<
       strong: createAttributeField("strong"),
     },
 
+    // Recalc-output snapshot of `primary` after `kind: "primary"` effects
+    // (addFlat, cap) are applied. Server-controlled — clients receive it for
+    // display but cannot write it. May exceed the 5–15 base range.
+    primaryEffective: {
+      type: "object",
+      required: true,
+      derived: true,
+      serverControlled: true,
+      permissions: perm_attr,
+
+      accurate: createEffectiveAttributeField("accurate"),
+      cunning: createEffectiveAttributeField("cunning"),
+      discreet: createEffectiveAttributeField("discreet"),
+      appealing: createEffectiveAttributeField("appealing"),
+      quick: createEffectiveAttributeField("quick"),
+      resolute: createEffectiveAttributeField("resolute"),
+      vigilant: createEffectiveAttributeField("vigilant"),
+      strong: createEffectiveAttributeField("strong"),
+    },
+
     secondary: {
       type: "object",
       required: true,
@@ -919,6 +939,23 @@ function createAttributeField(name: string): SchemaField {
       placeholder: "5",
       order: getAttributeOrder(name),
       displayAs: "number",
+    },
+  };
+}
+
+function createEffectiveAttributeField(name: string): SchemaField {
+  return {
+    type: "number",
+    integer: true,
+    derived: true,
+    serverControlled: true,
+    default: 5,
+    permissions: perm_attr,
+    ui: {
+      section: "attributes.primary",
+      label: `${capitalize(name)} (effective)`,
+      order: getAttributeOrder(name) + 100,
+      displayAs: "readonly",
     },
   };
 }

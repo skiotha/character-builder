@@ -166,11 +166,18 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
   // Layer on derived collections that recalc would normally produce.
   const carried = (stored as { combat: { carried: unknown[] } }).combat.carried;
   const slot2 = carried[2] as { weaponIndex: number };
+  const storedAttrs = (
+    stored as { attributes: { primary: Record<string, number> } }
+  ).attributes;
   const enriched: Record<string, unknown> = {
     ...stored,
     flags: [],
     specialAttacks: [],
     reactions: [],
+    attributes: {
+      ...storedAttrs,
+      primaryEffective: { ...storedAttrs.primary },
+    },
     combat: {
       carried: [
         carried[0],

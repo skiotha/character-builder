@@ -29,6 +29,7 @@ import type {
   Character,
   CombatSlot,
   PrimaryAttributeName,
+  PrimaryAttributes,
   ResolvedEffect,
   Weapon,
 } from "#rpg-types";
@@ -64,6 +65,12 @@ export function recalculate(
 
   const effects = collectAllEffects(result, registry);
   const phases = groupByPhase(effects);
+
+  // ── 0. primary ───────────────────────────────────────────────────
+  // Snapshot effective primary attributes BEFORE setBase/formula so all
+  // downstream stages (formula, override resolution, combat slots) read
+  // post-effect values via `readPrimary`. Item 10.
+  derivePrimaryAttributes(result, phases.get("primary") ?? []);
 
   // ── 1. setBase ───────────────────────────────────────────────────
   const overrides = applySetBase(phases.get("setBase") ?? []);
@@ -135,6 +142,61 @@ const NATURAL_WEAPON: Weapon = {
   damage: 0,
   qualities: ["own"],
 };
+
+// ── Primary attribute pre-pipeline ─────────────────────────────
+//
+// Snapshots the effective primary attributes by copying
+// `character.attributes.primary` into `character.attributes.primaryEffective`,
+// then applying `addFlat` and `cap` modifiers on the snapshot.
+// `setBase`, `multiply`, and `remove` on primary targets are parser-rejected
+// (ADR-015 §3e). All downstream pipeline stages (formula, override
+// resolution, combat slots) read primary attributes via `readPrimary`,
+// which pulls from `primaryEffective`, so writing the snapshot is enough
+// to propagate effective values through the entire pipeline.
+//
+// `attributes.primary` is the player-authored 5–15 base and is never
+// mutated by the engine; this preserves the round-trip invariant
+// (save → load → recalc must not drift) and lets the UI display
+// "base + bonus = effective".
+function derivePrimaryAttributes(
+  character: Character,
+  effects: ResolvedEffect[],
+): void {
+  if (!character.attributes?.primary) return;
+  const base = character.attributes.primary as unknown as Record<
+    PrimaryAttributeName,
+    number
+  >;
+
+  // Always reset: rebuild the effective snapshot from the base on every
+  // recalc. This closes the same class of accumulation bug as Bug #31
+  // (top-level flags / specialAttacks / reactions).
+  const effective: Record<PrimaryAttributeName, number> = { ...base };
+  character.attributes.primaryEffective =
+    effective as unknown as PrimaryAttributes;
+
+  // 1. addFlat accumulation.
+  for (const effect of effects) {
+    if (effect.target.kind !== "primary") continue;
+    if (effect.modifier.type !== "addFlat") continue;
+    const stat = effect.target.stat;
+    effective[stat] = (effective[stat] ?? 0) + effect.modifier.value;
+  }
+
+  // 2. cap clamping (smallest cap wins per stat).
+  const caps = new Map<PrimaryAttributeName, number>();
+  for (const effect of effects) {
+    if (effect.target.kind !== "primary") continue;
+    if (effect.modifier.type !== "cap") continue;
+    const stat = effect.target.stat;
+    const next = effect.modifier.value;
+    const prev = caps.get(stat);
+    if (prev === undefined || next < prev) caps.set(stat, next);
+  }
+  for (const [stat, cap] of caps) {
+    if (effective[stat] > cap) effective[stat] = cap;
+  }
+}
 
 function deriveCombatSlots(
   character: Character,

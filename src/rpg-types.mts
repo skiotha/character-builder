@@ -28,7 +28,21 @@ export interface SecondaryAttributes {
 }
 
 export interface CharacterAttributes {
+  /**
+   * Player-authored base values. Validated to [5, 15] per stat. Never
+   * mutated by the engine — recalc reads these as the starting point
+   * for `primaryEffective`.
+   */
   primary: PrimaryAttributes;
+  /**
+   * Recalc-output snapshot: `primary` + all `kind: "primary"` effect
+   * modifiers (addFlat, cap). May exceed 15. Server-controlled — clients
+   * receive it for display but cannot write it. All downstream engine
+   * stages (secondary formulas, setBase override resolution, future
+   * combat/magic derivations) read primaries via `readPrimary`, which
+   * pulls from this field.
+   */
+  primaryEffective: PrimaryAttributes;
   secondary: SecondaryAttributes;
 }
 
@@ -109,6 +123,7 @@ export type EffectFlag =
 // will surface the real vocabulary; this enum is expected to expand.
 
 export type EffectTarget =
+  | { kind: "primary"; stat: PrimaryAttributeName }
   | { kind: "secondary"; stat: SecondaryAttributeName }
   | { kind: "combat"; field: CombatSlotField }
   | { kind: "weaponQuality"; quality: string }
@@ -129,6 +144,7 @@ export type EffectModifier =
   | { type: "remove" };
 
 export type EffectPhase =
+  | "primary"
   | "setBase"
   | "formula"
   | "addFlat"

@@ -63,6 +63,7 @@ const KNOWN_COMBAT_FIELDS = new Set<string>([
 ]);
 
 const KNOWN_TARGET_KINDS = new Set<string>([
+  "primary",
   "secondary",
   "combat",
   "weaponQuality",
@@ -269,6 +270,12 @@ function collectFromRaw(
 }
 
 function phaseOf(effect: ResolvedEffect): EffectPhase {
+  // `primary` runs in its own pre-pipeline phase — primary
+  // attributes are snapshotted into `result.attributes.primary` BEFORE
+  // setBase/formula so all downstream phases see the effective values.
+  if (effect.target.kind === "primary") {
+    return "primary";
+  }
   // `flag` / `weaponQuality` / `armorQuality` always run in the `flag`
   // phase regardless of modifier type. They mutate set membership rather
   // than participating in numeric ordering.
@@ -317,6 +324,19 @@ function parseTarget(value: unknown, source: string): EffectTarget | null {
     return null;
   }
   switch (kind) {
+    case "primary": {
+      const stat = (value as { stat?: unknown }).stat;
+      if (
+        typeof stat !== "string" ||
+        !KNOWN_PRIMARY_ATTRIBUTES.has(stat as PrimaryAttributeName)
+      ) {
+        console.warn(
+          `[effects] Rejecting primary effect with unknown stat ${JSON.stringify(stat)} (source=${source}).`,
+        );
+        return null;
+      }
+      return { kind: "primary", stat: stat as PrimaryAttributeName };
+    }
     case "secondary": {
       const stat = (value as { stat?: unknown }).stat;
       if (typeof stat !== "string" || !KNOWN_SECONDARY_STATS.has(stat)) {
@@ -407,6 +427,12 @@ function parseModifier(
 
   switch (type) {
     case "setBase": {
+      if (target.kind === "primary") {
+        console.warn(
+          `[effects] Rejecting setBase on primary attribute (only addFlat/cap accepted, source=${source}).`,
+        );
+        return null;
+      }
       if (target.kind === "combat" && target.field !== "attackAttribute") {
         console.warn(
           `[effects] Rejecting setBase on combat field ${target.field} (only attackAttribute accepts setBase, source=${source}).`,
@@ -427,6 +453,12 @@ function parseModifier(
     case "addFlat":
     case "multiply":
     case "cap": {
+      if (target.kind === "primary" && type === "multiply") {
+        console.warn(
+          `[effects] Rejecting multiply on primary attribute (only addFlat/cap accepted, source=${source}).`,
+        );
+        return null;
+      }
       if (target.kind === "combat" && target.field === "attackAttribute") {
         console.warn(
           `[effects] Rejecting ${type} on combat.attackAttribute (only setBase accepted, source=${source}).`,

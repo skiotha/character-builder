@@ -38,6 +38,7 @@ const KNOWN_COMBAT_FIELDS = new Set([
   "bonusDamage",
 ]);
 const KNOWN_TARGET_KINDS = new Set([
+  "primary",
   "secondary",
   "combat",
   "weaponQuality",
@@ -54,11 +55,7 @@ const KNOWN_MODIFIER_TYPES = new Set([
 ]);
 
 // Amendment-only kinds (don't exist yet, but flag if authored ahead of schedule).
-const AMENDMENT_KINDS = new Set([
-  "primary",
-  "magicAttribute",
-  "initiativeAttribute",
-]);
+const AMENDMENT_KINDS = new Set(["magicAttribute", "initiativeAttribute"]);
 
 // ── Findings buckets ──
 
@@ -148,7 +145,7 @@ function inspectEffect(
         file,
         entryId,
         tier,
-        detail: `${context}: target.kind="${kind}" — requires amendment Item ${kind === "primary" ? "10" : kind === "magicAttribute" ? "2" : "4"}`,
+        detail: `${context}: target.kind="${kind}" — requires amendment Item ${kind === "magicAttribute" ? "2" : "4"}`,
       });
     } else if (!KNOWN_TARGET_KINDS.has(kind)) {
       addFinding("parserRejections", {
@@ -160,6 +157,25 @@ function inspectEffect(
     } else {
       // Per-kind validation.
       switch (kind) {
+        case "primary": {
+          const stat = target.stat;
+          if (typeof stat !== "string") {
+            addFinding("parserRejections", {
+              file,
+              entryId,
+              tier,
+              detail: `${context}: primary.stat missing/non-string`,
+            });
+          } else if (!KNOWN_PRIMARY.has(stat)) {
+            addFinding("parserRejections", {
+              file,
+              entryId,
+              tier,
+              detail: `${context}: primary.stat="${stat}" not in known set`,
+            });
+          }
+          break;
+        }
         case "secondary": {
           const stat = target.stat;
           if (typeof stat !== "string") {
@@ -248,6 +264,14 @@ function inspectEffect(
     } else {
       // Cross-validate target+modifier compatibility (mirrors parseModifier).
       if (type === "setBase") {
+        if (targetKind === "primary") {
+          addFinding("parserRejections", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: setBase on primary (rejected — only addFlat/cap accepted)`,
+          });
+        }
         if (targetKind === "combat" && target.field !== "attackAttribute") {
           addFinding("parserRejections", {
             file,
@@ -285,6 +309,14 @@ function inspectEffect(
           });
         }
       } else if (type === "addFlat" || type === "multiply" || type === "cap") {
+        if (targetKind === "primary" && type === "multiply") {
+          addFinding("parserRejections", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: multiply on primary (rejected — only addFlat/cap accepted)`,
+          });
+        }
         if (targetKind === "combat" && target.field === "attackAttribute") {
           addFinding("parserRejections", {
             file,

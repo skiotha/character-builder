@@ -1,13 +1,20 @@
 # Phase 6 — Post-Chunk-F Amendment Plan
 
-> **Status:** Open. Planning notes only — DO NOT implement until the Chunk F bulk
-> authoring pass (qualities/weapons/armor/abilities/spells/boons/sins/rituals) is
-> complete and merged. Items here were surfaced *during* authoring; the
-> resolution is locked, the implementation is deferred so authoring isn't
-> disrupted by churning types/schema/engine.
+> **Status:** Partially implemented. Items here were surfaced *during* Chunk F
+> authoring; the resolution is locked, the implementation was deferred so
+> authoring wasn't disrupted by churning types/schema/engine.
 >
-> When ready, copy the relevant items into `phase6-plan.md` as concrete chunks
-> (likely chunk G or a dedicated F+1).
+> Each item carries its own `### Status` section. As of 2026-05-07, shipped:
+> Item 13 (2026-05-06), Item 10 (2026-05-06; primaryEffective follow-up
+> 2026-05-07), Item 11 (2026-05-06). All other items remain deferred.
+>
+> **Connection to `phase6-plan.md`.** This file is the staging ground for
+> what will become Chunk G's amendment work. Items are pulled into the main
+> plan as they ship — see `phase6-plan.md` Chunk F for the rolling progress
+> log and Chunk G for the scheduled implementation order.
+
+When ready, copy the relevant items into `phase6-plan.md` as concrete chunks
+(likely chunk G or a dedicated F+1).
 
 Cross-references:
 
@@ -1001,6 +1008,49 @@ Replaces direct reads of `character.attributes.primary` in the engine.
 - Tests: cover Quick novice/adept/master stacking, interaction with cap
   effects, propagation into Item 5 setBase resolution.
 
+### Status
+
+✅ Implemented 2026-05-06 (G1.A). Six-kind `EffectTarget` union; parser
+accepts `addFlat`/`cap`, rejects `setBase`/`multiply`/`remove` with warn;
+strips `appliesTo` with warn. New `derivePrimaryAttributes` pre-pipeline
+stage runs ahead of `setBase`. Applicator gained no-op exhaustiveness arms.
+15-test suite (`test/rules/primary-attributes.test.mts`) covers stacking,
+cap precedence, propagation into secondary toughness, parser rejection.
+ADR-015 §3e and authoring-effects §8 published; audit script's
+`KNOWN_TARGET_KINDS` extended.
+
+#### Follow-up fix — `attributes.primaryEffective` sibling field (2026-05-07)
+
+The original implementation wrote the post-effect snapshot back into
+`character.attributes.primary`. Storage then persisted those values, which
+(a) violated the schema's `min: 5, max: 15` validation on next load,
+(b) accumulated drift on every recalc (`15 → 18 → 21 → …`), and
+(c) made the natural UI display "base + bonus = effective" impossible.
+
+Resolution (Option A, no schema-version bump):
+
+- `CharacterAttributes` gains sibling field `primaryEffective: PrimaryAttributes`.
+- Schema marks it `derived: true` + `serverControlled: true`, permissions
+  `perm_attr`, `displayAs: "readonly"`, no `min`/`max`. Auto-stripped from
+  POST/PATCH bodies via existing `filterServerControlledFields`. Auto-skipped
+  by `generateDefaultCharacter`.
+- `derivePrimaryAttributes` resets `result.attributes.primaryEffective =
+  { ...result.attributes.primary }` on every recalc (Bug #31 reset pattern),
+  then applies `addFlat`/`cap` onto the snapshot. `attributes.primary`
+  remains the player-authored 5–15 base and is never mutated by the engine.
+- `readPrimary` reads `primaryEffective` with fallback to `primary` for
+  partial fixtures.
+- Tests: 8 existing pipeline assertions rewritten to `primaryEffective`
+  with explicit base-preservation checks; new idempotency-across-recalcs
+  test; new JSON serialize/deserialize round-trip test; mutation test
+  checks both fields. Stripping test in `test/utils.test.mts`,
+  generation-exclusion test in `test/validation.test.mts`. `+3 tests`
+  (561 → 564). Pre-existing on-disk characters wiped via `hard-delete --all`.
+- Docs: `docs/data-contracts.md` JSONC mockup gains `primaryEffective`
+  block; ADR-015 §3e amended with the writes-to-primaryEffective rule
+  and the `serverControlled` callout; `docs/authoring-effects.md` §8
+  `primary` entry gains a "Display semantics" callout.
+
 ---
 
 ## Item 11 — `secondary.toughness` writeable as a single value
@@ -1055,6 +1105,16 @@ One writable target per `SecondaryAttributeName`. Done.
   → `"toughness"`.
 - Test: `addFlat` on `secondary.toughness` writes to `.max`, leaves `.current`
   alone.
+
+### Status
+
+✅ Implemented 2026-05-06 (G1.B). Engine already wrote to `.max` across
+`addFlat`/`multiply`/`cap`/formula phases; G1.B added 3 explicit
+regression tests (`addFlat` / `multiply` / `cap` on `secondary.toughness`
+writes to `.max`, leaves `.current` untouched) in
+`test/rules/applicator.test.mts`. Reference sweep confirmed clean
+(`grep "toughness.max" reference/` → 0 matches). Authoring spec §8
+`secondary` entry now carries the writes-to-`.max` note.
 
 ---
 

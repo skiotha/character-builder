@@ -23,7 +23,14 @@ interface SecondaryFormulaRule {
 }
 
 function readPrimary(character: Character, stat: PrimaryAttributeName): number {
-  return character.attributes.primary[stat] ?? 0;
+  // Prefer the post-effect snapshot written by `derivePrimaryAttributes`.
+  // Fall back to the player-authored base for partial fixtures and for
+  // pre-Phase-6.G1 characters loaded before recalc has run once.
+  return (
+    character.attributes.primaryEffective?.[stat] ??
+    character.attributes.primary[stat] ??
+    0
+  );
 }
 
 export const SECONDARY_FORMULAS: Record<

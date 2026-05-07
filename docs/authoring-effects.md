@@ -139,7 +139,7 @@ add a real `target`/`modifier`. Descriptions are for humans only.
 }
 ```
 
-The five `EffectTarget` kinds and worked examples are in §7.
+The six `EffectTarget` kinds and worked examples are in §8.
 
 ### Tier-A worked example — flat secondary bonus
 
@@ -512,6 +512,42 @@ Two entries; the magnitude is part of the id.
 Each kind with the minimum required shape and a real-data example. See
 [`src/rpg-types.mts`](../src/rpg-types.mts) for the canonical TypeScript.
 
+### `primary`
+
+```jsonc
+{ "kind": "primary", "stat": "strong" }
+// stat ∈ { "accurate", "cunning", "discreet", "appealing", "quick", "resolute", "vigilant", "strong" }
+```
+
+Modifier verbs: `addFlat` | `cap`. Not `setBase`, not `multiply`, not
+`remove`. Runs in a pre-pipeline phase ahead of `setBase`/formula, so all
+downstream stages (secondary formulas, override resolution, per-slot
+combat) automatically see the post-effect values.
+
+> **Display semantics.** The post-effect snapshot is written to
+> `character.attributes.primaryEffective`, **not** to
+> `character.attributes.primary`. The latter remains the player-authored
+> 5–15 base and is never mutated by the engine. Read effective values
+> from `primaryEffective`; show the difference (`effective − base`) as
+> the bonus from effects. `primaryEffective` is server-controlled —
+> clients receive it for display but cannot write it.
+
+Worked example — *Exceptional Attribute (strong) +1*:
+
+```jsonc
+{
+  "id": "exceptional_attribute_strong",
+  "tiers": {
+    "novice":  { "tier": "A", "target": { "kind": "primary", "stat": "strong" }, "modifier": { "type": "addFlat", "value": 1 } },
+    "adept":   { "tier": "A", "target": { "kind": "primary", "stat": "strong" }, "modifier": { "type": "addFlat", "value": 1 } },
+    "master":  { "tier": "A", "target": { "kind": "primary", "stat": "strong" }, "modifier": { "type": "addFlat", "value": 1 } }
+  }
+}
+```
+
+`appliesTo` is silently stripped with a warn — primary attributes are
+character-level, not slot-level.
+
 ### `secondary`
 
 ```jsonc
@@ -520,6 +556,14 @@ Each kind with the minimum required shape and a real-data example. See
 ```
 
 Modifier verbs: `addFlat` | `multiply` | `cap`. Not `setBase`, not `remove`.
+
+> **Toughness writes to `.max`.** `secondary.toughness` is the only
+> secondary stat with a `{ max, current }` shape. `addFlat` / `multiply`
+> / `cap` modifiers on it write to `.max` and leave `.current` untouched.
+> A subsequent `clampValues` pass at the end of `recalculate` clamps
+> `current` into `[0, max]`. Author `secondary.stat: "toughness"` (NOT
+> `"toughness.max"`) — the audit script flags `"toughness.max"` as a
+> parser-rejected legacy form.
 
 ### `combat`
 

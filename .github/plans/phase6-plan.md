@@ -746,6 +746,24 @@ back-and-forth.
 1. All reference JSON files parse as valid JSON.
 2. (See Chunk G for semantic validation.)
 
+### Progress log (post-pass amendment items)
+
+> Living index of items from
+> [`phase6-chunkF-postpass-amendment.md`](./phase6-chunkF-postpass-amendment.md)
+> (the staging file for Chunk-F-surfaced amendments) that have actually
+> shipped. Each entry points back at the per-item `### Status` block in
+> the staging file for the canonical record. Chunks G.1/G.2/… below pull
+> from the same staging list as they're scheduled.
+
+| Item | What                                                   | Shipped     | Notes |
+| ---- | ------------------------------------------------------ | ----------- | ----- |
+| 13   | Roll-time modifier passthrough (`flag` + `appliesTo`)  | 2026-05-06  | One-clause parser change; unblocks `precise` / `advantage` documentary pattern. |
+| 10   | `EffectTarget.kind = "primary"` + `derivePrimaryAttributes` stage | 2026-05-06  | G1.A. Six-kind union, addFlat/cap accepted, others rejected. |
+| 10*  | Follow-up: `attributes.primaryEffective` sibling field | 2026-05-07  | Engine writes effective snapshot to a server-controlled sibling field; base stays validated 5–15 and never mutates. Closes accumulating-drift / schema-violation regression. No schema-version bump. |
+| 11   | `secondary.toughness` writes-to-`.max` regression tests | 2026-05-06  | G1.B. Engine behaviour was already correct; added 3 explicit tests + authoring-spec note. |
+
+Items still on deck (in staging, not yet scheduled): 1, 2, 3, 4, 5, 6, 7, 8, 9, 12.
+
 ### F-side audit: schema defaults that hard-code reference data
 
 > Marked during Chunk D wrap-up. Do not address until F+G land.

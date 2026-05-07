@@ -28,7 +28,7 @@ This is the **source of truth** — all other formats derive from it.
 
   // ── Attributes ──
   "attributes": {
-    "primary": {
+    "primary": {                        // player-authored base; validated 5–15
       "accurate":  5,                   // 5–15, integer, budget total = 80
       "cunning":   5,
       "discreet":  5,
@@ -38,7 +38,17 @@ This is the **source of truth** — all other formats derive from it.
       "vigilant":  5,
       "strong":    5
     },
-    "secondary": {                      // all derived from primaries + effects
+    "primaryEffective": {               // server-controlled; derived = primary + `kind: "primary"` effects (addFlat, cap)
+      "accurate":  5,                   //   may exceed 15; never sent in POST/PATCH bodies (stripped server-side)
+      "cunning":   5,                   //   all downstream engine stages (formulas, combat) read from here
+      "discreet":  5,
+      "appealing":  5,
+      "quick":     5,
+      "resolute":  5,
+      "vigilant":  5,
+      "strong":    5
+    },
+    "secondary": {                      // all derived from primaryEffective + effects
       "toughness": {
         "max":     10,                  // max(strong, 10)
         "current": 10                   // 0 ≤ current ≤ max

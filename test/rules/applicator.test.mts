@@ -89,6 +89,21 @@ describe("applyAddFlat", () => {
     assert.equal(char.attributes.secondary.toughness.max, 15);
   });
 
+  it("addFlat on toughness leaves `.current` untouched (Item 11)", () => {
+    const char = asChar();
+    char.attributes.secondary.toughness.max = 10;
+    char.attributes.secondary.toughness.current = 7;
+    applyAddFlat(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "addFlat", value: 5 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.toughness.max, 15);
+    assert.equal(char.attributes.secondary.toughness.current, 7);
+  });
+
   it("ignores non-addFlat modifiers", () => {
     const char = asChar();
     char.attributes.secondary.defense = 10;
@@ -131,6 +146,21 @@ describe("applyMultiply", () => {
     ]);
     assert.equal(char.attributes.secondary.toughness.max, 20);
   });
+
+  it("multiply on toughness leaves `.current` untouched (Item 11)", () => {
+    const char = asChar();
+    char.attributes.secondary.toughness.max = 10;
+    char.attributes.secondary.toughness.current = 4;
+    applyMultiply(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "multiply", value: 2 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.toughness.max, 20);
+    assert.equal(char.attributes.secondary.toughness.current, 4);
+  });
 });
 
 // ── applyCap ─────────────────────────────────────────────────────
@@ -160,6 +190,21 @@ describe("applyCap", () => {
       },
     ]);
     assert.equal(char.attributes.secondary.defense, 5);
+  });
+
+  it("caps toughness.max and leaves `.current` untouched (Item 11)", () => {
+    const char = asChar();
+    char.attributes.secondary.toughness.max = 100;
+    char.attributes.secondary.toughness.current = 60;
+    applyCap(char, [
+      {
+        source: "test",
+        target: { kind: "secondary", stat: "toughness" },
+        modifier: { type: "cap", value: 50 },
+      },
+    ]);
+    assert.equal(char.attributes.secondary.toughness.max, 50);
+    assert.equal(char.attributes.secondary.toughness.current, 60);
   });
 });
 

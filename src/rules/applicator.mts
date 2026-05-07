@@ -96,6 +96,10 @@ export function applyAddFlat(
       case "combat":
         // Per-slot — handled by `deriveCombatSlots`.
         break;
+      case "primary":
+        // Bucketed into `primary` phase by groupByPhase, applied by
+        // `derivePrimaryAttributes` in derived.mts (Item 10).
+        break;
       case "weaponQuality":
       case "armorQuality":
       case "flag":
@@ -136,6 +140,10 @@ export function applyMultiply(
       }
       case "combat":
         // Per-slot — handled by `deriveCombatSlots`.
+        break;
+      case "primary":
+        // Bucketed into `primary` phase (Item 10); also `multiply` is
+        // parser-rejected for primary targets so this is doubly unreachable.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -180,6 +188,9 @@ export function applyCap(
       case "combat":
         // Per-slot — handled by `deriveCombatSlots`.
         break;
+      case "primary":
+        // Bucketed into `primary` phase (Item 10).
+        break;
       case "weaponQuality":
       case "armorQuality":
       case "flag":
@@ -210,9 +221,11 @@ export function applyFlag(
       case "weaponQuality":
         // Per-slot — handled by `deriveCombatSlots`.
         break;
+      case "primary":
       case "secondary":
       case "combat":
         // Numeric targets bucketed into flag only via `remove`; no-op.
+        // (`primary` is also bucketed into its own `primary` phase.)
         break;
       default:
         assertNever(effect.target);

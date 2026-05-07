@@ -118,6 +118,22 @@ describe("filterServerControlledFields", () => {
     assert.deepStrictEqual(portrait.crop, { x: 0 });
   });
 
+  it("strips attributes.primaryEffective (server-controlled engine output)", () => {
+    const input = {
+      characterName: "Hero",
+      attributes: {
+        primary: { strong: 10 },
+        primaryEffective: { strong: 18 },
+        secondary: { defense: 12 },
+      },
+    };
+    const result = filterServerControlledFields(input);
+    const attrs = result.attributes as Record<string, unknown>;
+    assert.equal(attrs.primaryEffective, undefined);
+    assert.deepStrictEqual(attrs.primary, { strong: 10 });
+    assert.deepStrictEqual(attrs.secondary, { defense: 12 });
+  });
+
   it("preserves user fields", () => {
     const input = {
       id: "abc",

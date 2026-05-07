@@ -20,10 +20,11 @@ The Phase 6 engine rework needs the vocabulary fixed before any code lands.
 
 ## Decision
 
-### 1. `EffectTarget` is a five-kind discriminated union
+### 1. `EffectTarget` is a six-kind discriminated union
 
 ```ts
 type EffectTarget =
+  | { kind: "primary";       stat: PrimaryAttributeName }
   | { kind: "secondary";     stat: SecondaryAttributeName }
   | { kind: "combat";        field: CombatSlotField }
   | { kind: "weaponQuality"; quality: string }
@@ -101,6 +102,34 @@ This convention keeps the `EffectModifier` union narrow (no separate `add` verb)
 The combat target field `attackAttribute` is non-numeric — it names a primary attribute the slot rolls against (e.g. `"accurate"`, `"strong"`). Only the `setBase` modifier is meaningful for it. The registry deserializer (Chunk G) and the runtime parser (`src/rules/effects.mts`) reject `addFlat`, `multiply`, `cap`, and `remove` on `combat.attackAttribute`.
 
 Per-slot default is `"accurate"` (set in `deriveCombatSlots`); a `setBase` effect overrides it.
+
+### 3e. `primary` accepts `addFlat` and `cap` only
+
+The `primary` target kind addresses the eight base primary attributes (`accurate`, `cunning`, `discreet`, `appealing`, `quick`, `resolute`, `vigilant`, `strong`) and runs in its own pre-pipeline phase ahead of `setBase`. The engine writes the post-effect snapshot to `result.attributes.primaryEffective` (a sibling field of `primary`); all downstream stages — secondary formulas, override resolution, per-slot combat — read primaries via `readPrimary`, which pulls from `primaryEffective`.
+
+`attributes.primary` is the player-authored 5–15 base and is **never** mutated by the engine. This preserves the round-trip invariant (save → load → recalc must not drift), keeps schema validation honest (the base stays in range), and lets the UI render "base + bonus = effective". `attributes.primaryEffective` is `serverControlled: true` — clients receive it for display but cannot write it; POST/PATCH bodies that include it are stripped before validation.
+
+Accepted modifiers:
+
+- `addFlat` — accumulates additively per stat.
+- `cap`     — smallest cap wins per stat.
+
+Rejected modifiers (parser returns `null` with a warn):
+
+- `setBase`  — primary attributes have no meta-attribute to override.
+- `multiply` — no authoring case in the catalog; would be a foot-gun.
+- `remove`   — not a set-membership target.
+
+Worked example — *Exceptional Attribute (strong) +1*:
+
+```jsonc
+{
+  "target":   { "kind": "primary", "stat": "strong" },
+  "modifier": { "type": "addFlat", "value": 1 }
+}
+```
+
+`appliesTo` is silently stripped with a warn — primary attributes are character-level, not slot-level.
 
 ### 4. No `priority` field
 

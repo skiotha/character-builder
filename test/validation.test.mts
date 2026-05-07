@@ -737,6 +737,11 @@ describe("generateDefaultCharacter", () => {
     assert.equal(defaults.schemaVersion, undefined);
   });
 
+  it("excludes serverControlled attributes.primaryEffective block", () => {
+    const attrs = defaults.attributes as Record<string, unknown>;
+    assert.equal(attrs.primaryEffective, undefined);
+  });
+
   it("includes non-serverControlled fields with defaults", () => {
     const attrs = defaults.attributes as Record<string, unknown>;
     const primary = attrs.primary as Record<string, number>;
