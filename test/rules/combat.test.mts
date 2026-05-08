@@ -354,6 +354,11 @@ describe("deriveCombatSlots: modifier semantics", () => {
   it("attackAttribute setBase overrides default", () => {
     const sword = weapon("longsword", "main", 4);
     const char = withLoadout([sword], [0, null, 0]);
+    // resolveSetBase picks max-by-primary with the default (accurate)
+    // included; ties go to the default. Bump strong above accurate so
+    // the override wins.
+    char.attributes.primary.strong = 13;
+    char.attributes.primaryEffective = { ...char.attributes.primary };
 
     const registry = createInMemoryRegistry({
       traits: {

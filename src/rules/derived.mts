@@ -45,6 +45,7 @@ import {
 } from "./applicator.mts";
 import { SECONDARY_FORMULAS, clampValues } from "./attributes.mts";
 import { collectAllEffects, groupByPhase } from "./effects.mts";
+import { resolveSetBase } from "./setbase.mts";
 
 export function recalculate(
   character: Character,
@@ -69,11 +70,26 @@ export function recalculate(
   // ── 0. primary ───────────────────────────────────────────────────
   // Snapshot effective primary attributes BEFORE setBase/formula so all
   // downstream stages (formula, override resolution, combat slots) read
-  // post-effect values via `readPrimary`. Item 10.
+  // post-effect values via `readPrimary`.
   derivePrimaryAttributes(result, phases.get("primary") ?? []);
 
   // ── 1. setBase ───────────────────────────────────────────────────
-  const overrides = applySetBase(phases.get("setBase") ?? []);
+  // Collect raw setBase candidates per stat; resolution (default-
+  // inclusive max-by-primary) happens in the formula phase below so we
+  // can read the post-effect primary snapshot.
+  const setBaseEffects = phases.get("setBase") ?? [];
+  const setBaseCandidates = applySetBase(setBaseEffects);
+  const primaryEffective =
+    result.attributes.primaryEffective ?? result.attributes.primary;
+
+  // ── 1a. magicAttribute / initiativeAttribute ───────────────────────
+  // Both are server-derived `PrimaryAttributeName` pointers consumed by
+  // sibling apps at roll time. They route through the `setBase` phase
+  // (only modifier type accepted) and resolve via `resolveSetBase`
+  // against the post-effect primary snapshot, with the field's default
+  // included in the comparison.
+  deriveMagicAttribute(result, setBaseEffects, primaryEffective);
+  deriveInitiativeAttribute(result, setBaseEffects, primaryEffective);
 
   // ── 2. formula ───────────────────────────────────────────────────
   if (result.attributes?.secondary) {
@@ -82,7 +98,10 @@ export function recalculate(
       unknown
     >;
     for (const [stat, rule] of Object.entries(SECONDARY_FORMULAS)) {
-      const override = overrides.get(stat as never);
+      const list = setBaseCandidates.get(stat as never);
+      const override = list
+        ? resolveSetBase(rule.defaultPrimary, list, primaryEffective)
+        : undefined;
       const baseValue = rule.base(result, override);
       const calculated = rule.formula(baseValue);
 
@@ -109,7 +128,7 @@ export function recalculate(
   clampValues(result);
 
   // ── 8. deriveCombatSlots ─────────────────────────────────────────
-  deriveCombatSlots(result, effects, registry);
+  deriveCombatSlots(result, effects, registry, primaryEffective);
 
   // ── 9. enforceConsistency (trimmed) ──────────────────────────────
   enforceConsistency(result);
@@ -198,10 +217,59 @@ function derivePrimaryAttributes(
   }
 }
 
+// ── magicAttribute / initiativeAttribute (G2.B / G2.C) ─────────────
+//
+// Both are reset-on-recalc to their schema default, then resolved via
+// `resolveSetBase` against any `kind: "magicAttribute"` /
+// `kind: "initiativeAttribute"` setBase candidates (parser enforces
+// setBase-only for these target kinds). The default is included in the
+// max-by-primary comparison so an unfavourable override can never lower
+// the chosen attribute below the default.
+
+const MAGIC_ATTRIBUTE_DEFAULT: PrimaryAttributeName = "resolute";
+const INITIATIVE_ATTRIBUTE_DEFAULT: PrimaryAttributeName = "quick";
+
+function deriveMagicAttribute(
+  character: Character,
+  setBaseEffects: ResolvedEffect[],
+  primary: PrimaryAttributes,
+): void {
+  character.magicAttribute = MAGIC_ATTRIBUTE_DEFAULT;
+  const candidates: PrimaryAttributeName[] = [];
+  for (const effect of setBaseEffects) {
+    if (effect.target.kind !== "magicAttribute") continue;
+    if (effect.modifier.type !== "setBase") continue;
+    candidates.push(effect.modifier.value);
+  }
+  const chosen = resolveSetBase(MAGIC_ATTRIBUTE_DEFAULT, candidates, primary);
+  if (chosen) character.magicAttribute = chosen;
+}
+
+function deriveInitiativeAttribute(
+  character: Character,
+  setBaseEffects: ResolvedEffect[],
+  primary: PrimaryAttributes,
+): void {
+  character.initiativeAttribute = INITIATIVE_ATTRIBUTE_DEFAULT;
+  const candidates: PrimaryAttributeName[] = [];
+  for (const effect of setBaseEffects) {
+    if (effect.target.kind !== "initiativeAttribute") continue;
+    if (effect.modifier.type !== "setBase") continue;
+    candidates.push(effect.modifier.value);
+  }
+  const chosen = resolveSetBase(
+    INITIATIVE_ATTRIBUTE_DEFAULT,
+    candidates,
+    primary,
+  );
+  if (chosen) character.initiativeAttribute = chosen;
+}
+
 function deriveCombatSlots(
   character: Character,
   globalEffects: ResolvedEffect[],
   registry: Registry,
+  primary: PrimaryAttributes,
 ): void {
   const equipment = character.equipment;
   const weapons = (equipment?.weapons ?? []) as Weapon[];
@@ -228,14 +296,22 @@ function deriveCombatSlots(
     existing?.[0]?.weaponIndex,
     combatEffects,
     registry,
+    primary,
   );
   const slot1 = buildSlot(
     weapons,
     existing?.[1]?.weaponIndex,
     combatEffects,
     registry,
+    primary,
   );
-  const slot2 = buildSlot(weapons, ownIndex, combatEffects, registry) ?? {
+  const slot2 = buildSlot(
+    weapons,
+    ownIndex,
+    combatEffects,
+    registry,
+    primary,
+  ) ?? {
     weaponIndex: ownIndex,
     attackAttribute: "accurate",
     baseDamage: 0,
@@ -252,6 +328,7 @@ function buildSlot(
   weaponIndex: number | undefined,
   combatEffects: ResolvedEffect[],
   registry: Registry,
+  primary: PrimaryAttributes,
 ): CombatSlot | null {
   if (typeof weaponIndex !== "number") return null;
   const weapon = weapons[weaponIndex];
@@ -290,18 +367,32 @@ function buildSlot(
     for (const effect of quality.effects) local.push(effect);
   }
 
-  applySlotPhases(slot, local);
+  applySlotPhases(slot, local, primary);
   return slot;
 }
 
-function applySlotPhases(slot: CombatSlot, effects: ResolvedEffect[]): void {
-  // setBase: only `combat.attackAttribute` (parser enforces).
+function applySlotPhases(
+  slot: CombatSlot,
+  effects: ResolvedEffect[],
+  primary: PrimaryAttributes,
+): void {
+  // setBase: only `combat.attackAttribute` (parser enforces). Resolved
+  // by `resolveSetBase`: slot's intrinsic `attackAttribute`
+  // (currently always "accurate") is included as the default; the
+  // candidate with the highest post-effect primary value wins.
+  const setBaseCandidates: PrimaryAttributeName[] = [];
   for (const effect of effects) {
     if (effect.modifier.type !== "setBase") continue;
     if (effect.target.kind !== "combat") continue;
     if (effect.target.field !== "attackAttribute") continue;
-    slot.attackAttribute = effect.modifier.value as PrimaryAttributeName;
+    setBaseCandidates.push(effect.modifier.value as PrimaryAttributeName);
   }
+  const chosen = resolveSetBase(
+    slot.attackAttribute,
+    setBaseCandidates,
+    primary,
+  );
+  if (chosen) slot.attackAttribute = chosen;
 
   // addFlat: numeric combat fields.
   for (const effect of effects) {

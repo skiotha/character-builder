@@ -20,16 +20,18 @@ The Phase 6 engine rework needs the vocabulary fixed before any code lands.
 
 ## Decision
 
-### 1. `EffectTarget` is a six-kind discriminated union
+### 1. `EffectTarget` is an eight-kind discriminated union
 
 ```ts
 type EffectTarget =
-  | { kind: "primary";       stat: PrimaryAttributeName }
-  | { kind: "secondary";     stat: SecondaryAttributeName }
-  | { kind: "combat";        field: CombatSlotField }
-  | { kind: "weaponQuality"; quality: string }
-  | { kind: "armorQuality";  quality: string }
-  | { kind: "flag";          name: EffectFlag };
+  | { kind: "primary";             stat: PrimaryAttributeName }
+  | { kind: "secondary";           stat: SecondaryAttributeName }
+  | { kind: "combat";              field: CombatSlotField }
+  | { kind: "weaponQuality";       quality: string }
+  | { kind: "armorQuality";        quality: string }
+  | { kind: "flag";                name: EffectFlag }
+  | { kind: "magicAttribute" }
+  | { kind: "initiativeAttribute" };
 ```
 
 `CheckTarget` is **dropped** — no ability in the catalog needs it.
@@ -42,6 +44,8 @@ type EffectTarget =
   "modifier": { "type": "remove" }
 }
 ```
+
+`magicAttribute` and `initiativeAttribute` are server-derived `PrimaryAttributeName` pointers used by sibling apps at roll time (§3c, §3d).
 
 ### 2. `WeaponPredicate` for combat-effect filtering
 
@@ -101,7 +105,46 @@ This convention keeps the `EffectModifier` union narrow (no separate `add` verb)
 
 The combat target field `attackAttribute` is non-numeric — it names a primary attribute the slot rolls against (e.g. `"accurate"`, `"strong"`). Only the `setBase` modifier is meaningful for it. The registry deserializer (Chunk G) and the runtime parser (`src/rules/effects.mts`) reject `addFlat`, `multiply`, `cap`, and `remove` on `combat.attackAttribute`.
 
-Per-slot default is `"accurate"` (set in `deriveCombatSlots`); a `setBase` effect overrides it.
+Per-slot default is `"accurate"` (set in `deriveCombatSlots`); a `setBase` effect overrides it. When multiple `setBase` effects compete on the same slot, resolution follows the universal max-by-primary rule documented in §4a.
+
+### 3c. `magicAttribute` accepts `setBase` only
+
+`magicAttribute` is a character-level server-derived `PrimaryAttributeName` consumed by sibling apps (Discord bot, addon) at roll time — it names the primary attribute spell power rolls against. The schema default is `"resolute"`; an authored `setBase` effect (e.g. *Leader-novice* shifting spell power to `appealing`) joins the candidate pool and resolution follows the universal max-by-primary rule (§4a) with the default included.
+
+Accepted modifiers:
+
+- `setBase` — value is a `PrimaryAttributeName`.
+
+Rejected modifiers (parser returns `null` with a warn):
+
+- `addFlat`, `multiply`, `cap` — the field is non-numeric.
+- `remove` — not a set-membership target.
+
+`appliesTo` is silently stripped with a warn — `magicAttribute` is character-level, not slot-level.
+
+Worked example — *Leader-novice*:
+
+```jsonc
+{
+  "target":   { "kind": "magicAttribute" },
+  "modifier": { "type": "setBase", "value": "appealing" }
+}
+```
+
+### 3d. `initiativeAttribute` accepts `setBase` only
+
+`initiativeAttribute` mirrors `magicAttribute` for initiative rolls. The schema default is `"quick"`; an authored `setBase` effect (e.g. *Tactics-novice* shifting initiative to `cunning`) joins the candidate pool and resolution follows the universal max-by-primary rule (§4a) with the default included.
+
+Accepted and rejected modifiers, and the `appliesTo` strip-with-warn behaviour, are identical to §3c.
+
+Worked example — *Tactics-novice*:
+
+```jsonc
+{
+  "target":   { "kind": "initiativeAttribute" },
+  "modifier": { "type": "setBase", "value": "cunning" }
+}
+```
 
 ### 3e. `primary` accepts `addFlat` and `cap` only
 
@@ -140,6 +183,18 @@ setBase → formula → addFlat → multiply → cap → flag/remove
 ```
 
 Reference data may not carry a `priority` field; if present in legacy data, the engine ignores it. Closes weak-point bug #2.
+
+### 4a. Universal `setBase` resolution (max-by-primary, default-inclusive)
+
+Every `setBase` target kind — `secondary`, `combat.attackAttribute`, `magicAttribute`, `initiativeAttribute` — resolves competing candidates with one shared algorithm, implemented in `resolveSetBase(defaultName, candidates, primary)`:
+
+1. The field's schema default is **prepended** to the candidate pool (when non-null).
+2. The pool is reduced by max-by-primary against the post-effect primary snapshot (`attributes.primaryEffective`).
+3. The comparison is strict `>`, so the default wins ties — an unfavourable override can never lower the chosen attribute below the default-driven value. Among non-default candidates, the first wins ties (stable).
+
+`applySetBase` no longer picks a winner; it merely collects candidates by stat. Resolution happens after the primary phase so the post-effect primary snapshot is available, then again per-slot inside `deriveCombatSlots` for `combat.attackAttribute`, and once per derived attribute pointer in `deriveMagicAttribute` / `deriveInitiativeAttribute`.
+
+The consequence for authoring: an ability that shifts a derived value to an alternate primary takes effect only when that alternate's effective value is *strictly greater* than the field's current best candidate. Three abilities are affected behaviourally vs the pre-G2 "last setBase wins" semantics: *Smoke and Mirrors-novice*, *Tactics-adept*, and *Sixth Sense-adept* all author `setBase` on `secondary.defense` and now coexist correctly on the same character.
 
 ### 5. `TriggerKind` enum (engine treats as opaque)
 

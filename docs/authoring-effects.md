@@ -139,7 +139,7 @@ add a real `target`/`modifier`. Descriptions are for humans only.
 }
 ```
 
-The six `EffectTarget` kinds and worked examples are in §8.
+The eight `EffectTarget` kinds and worked examples are in §8.
 
 ### Tier-A worked example — flat secondary bonus
 
@@ -616,6 +616,48 @@ engine treats it as documentary metadata for sibling apps — see
 The engine still adds the flag name to the global character set
 unconditionally; sibling apps consume the predicate to decide when the
 roll-time bonus actually fires.
+
+### `magicAttribute`
+
+```jsonc
+{ "kind": "magicAttribute" }
+```
+
+Modifier: `setBase` only — value is a `PrimaryAttributeName`. The default
+is `"resolute"`. Resolution is universal max-by-primary with the default
+included (ADR-015 §4a), so an override only takes effect when the chosen
+attribute's effective value is *strictly greater* than the current best
+candidate.
+
+Worked example — *Leader-novice* (shifts spell power to Appealing):
+
+```jsonc
+{
+  "target":   { "kind": "magicAttribute" },
+  "modifier": { "type": "setBase", "value": "appealing" }
+}
+```
+
+`appliesTo` is silently stripped with a warn — the field is
+character-level, not slot-level.
+
+### `initiativeAttribute`
+
+```jsonc
+{ "kind": "initiativeAttribute" }
+```
+
+Modifier: `setBase` only. Default is `"quick"`. Resolution is identical
+to `magicAttribute` (ADR-015 §4a).
+
+Worked example — *Tactics-novice* (shifts initiative to Cunning):
+
+```jsonc
+{
+  "target":   { "kind": "initiativeAttribute" },
+  "modifier": { "type": "setBase", "value": "cunning" }
+}
+```
 
 ---
 

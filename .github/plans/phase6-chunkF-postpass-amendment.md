@@ -131,6 +131,8 @@ Resolution order at runtime:
 
 ## Item 2 — `magicAttribute` derived character field
 
+**Status:** ✅ Implemented (G2.B — 2026-05-08). `magicAttribute: PrimaryAttributeName` on `Character`, schema entry with `ui.hidden: true`, `EffectTarget` extended with `{ kind: "magicAttribute" }` (parser accepts `setBase` only, rejects all numeric verbs and `remove`, strips `appliesTo` with warn). `deriveMagicAttribute` runs after primary phase and before secondary formulas; resolution uses the universal `resolveSetBase` helper (Item 5). *Leader-novice* re-authored to typed `setBase` in `reference/abilities.{en,ru}.json`. Default `"resolute"` is reset on every recalc (Bug #31 pattern).
+
 ### Problem
 
 Spell entries currently carry `attackAttribute` per spell, locked to `resolute`
@@ -260,6 +262,8 @@ Two parts, both deferred:
 
 ## Item 4 — `initiativeAttribute` derived character field
 
+**Status:** ✅ Implemented (G2.C — 2026-05-08). Mirrors Item 2: `initiativeAttribute: PrimaryAttributeName` field, `{ kind: "initiativeAttribute" }` target, `deriveInitiativeAttribute` stage, default `"quick"` reset on every recalc. *Tactics-novice* re-authored to typed `setBase` (Tier C → Tier A) in `reference/abilities.{en,ru}.json`. *Quick Reflexes Master* keeps its `flag: initiativeExemption` — unchanged, as flagged in the original problem statement.
+
 ### Problem
 
 Initiative defaults to the `Quick` attribute. Some abilities change it:
@@ -340,6 +344,8 @@ Same shape as Item 2:
 ---
 
 ## Item 5 — Universal conflict resolution for `setBase`
+
+**Status:** ✅ Implemented (G2.A — 2026-05-08). Extracted as `resolveSetBase(defaultName, candidates, primary)` in [src/rules/setbase.mts](../../src/rules/setbase.mts). Default-inclusive max-by-primary, strict `>` comparison so the field default wins ties. `applySetBase` is now a candidate-collector — resolution runs after the primary phase against the post-effect snapshot (`primaryEffective`) and is reused per-slot in `deriveCombatSlots` for `combat.attackAttribute`, plus once each in `deriveMagicAttribute` / `deriveInitiativeAttribute`. ADR-015 §4a documents the rule. **Behavioural note:** three secondary-defense `setBase` authors (*Smoke and Mirrors-novice*, *Tactics-adept*, *Sixth Sense-adept*) now coexist correctly on the same character vs the pre-G2 "last wins" semantics.
 
 ### Why this is universal
 

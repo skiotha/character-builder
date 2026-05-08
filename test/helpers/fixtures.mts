@@ -132,6 +132,8 @@ function makeCharacter(
     combat: {
       carried: [null, null, { weaponIndex: 0 }],
     },
+    magicAttribute: "resolute",
+    initiativeAttribute: "quick",
     traits: [],
     rituals: [],
     talents: [],
@@ -174,6 +176,8 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
     flags: [],
     specialAttacks: [],
     reactions: [],
+    magicAttribute: "resolute",
+    initiativeAttribute: "quick",
     attributes: {
       ...storedAttrs,
       primaryEffective: { ...storedAttrs.primary },

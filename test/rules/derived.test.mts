@@ -390,19 +390,21 @@ describe("recalculate", () => {
         attributes: {
           primary: makePrimaryAttributes({
             strong: 15,
-            quick: 12,
-            discreet: 10,
+            quick: 10,
+            discreet: 12,
             resolute: 14,
           }),
           secondary: { toughness: { max: 99, current: 20 } },
         },
         effects: [
-          // setBase: defense uses discreet (10) instead of quick (12).
+          // setBase: defense uses discreet (12) instead of quick (10).
+          // resolveSetBase picks max-by-primary with the default
+          // included, so discreet must outscore quick to win.
           {
             target: { kind: "secondary", stat: "defense" },
             modifier: { type: "setBase", value: "discreet" },
           },
-          // addFlat after formula → 10 + 2 = 12
+          // addFlat after formula → 12 + 2 = 14
           {
             target: { kind: "secondary", stat: "defense" },
             modifier: { type: "addFlat", value: 2 },
@@ -425,8 +427,8 @@ describe("recalculate", () => {
       // toughness: max(strong=15, 10) = 15, current clamped from 20 → 15
       assert.equal(s.toughness.max, 15);
       assert.equal(s.toughness.current, 15);
-      // defense: discreet=10 + 2 = 12
-      assert.equal(s.defense, 12);
+      // defense: discreet=12 + 2 = 14
+      assert.equal(s.defense, 14);
       // armor: body.armor=3
       assert.equal(s.armor, 3);
       // painThreshold: ceil(15/2) = 8

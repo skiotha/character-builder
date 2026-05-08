@@ -175,8 +175,7 @@
             "name": "Telekinesis: Attack",
             "description": "Lift and throw an object at a target for damage.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -193,8 +192,7 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -211,8 +209,7 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -589,15 +586,13 @@
             "name": "Burning Glass: Ray",
             "description": "A ray of light that burns monsters harder than anything else.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           },
           {
             "name": "Burning Glass: Ray (Monster)",
             "description": "The ray of light deals extra damage to monsters.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -614,15 +609,13 @@
             "name": "Burning Glass: Explosion",
             "description": "An explosion of light that burns monsters harder than anything else.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           },
           {
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals extra damage to monsters.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -639,8 +632,7 @@
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals damage to monsters and can stun them.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       }
@@ -719,8 +711,7 @@
             "name": "Purgatory: Ray",
             "description": "The ray of radiance deals armor-piercing damage to a monster and can paralyze them.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -737,8 +728,7 @@
             "name": "Purgatory: Blast",
             "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -754,8 +744,7 @@
           {
             "name": "Purgatory: Eye for an Eye",
             "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
-            "trigger": "onSpellCast",
-            "attackAttribute": "Resolute"
+            "trigger": "onSpellCast"
           }
         ]
       }
@@ -1123,8 +1112,7 @@
             "name": "Storm Arrow: Discharge",
             "description": "Launch up an enchanted arrow at the enemy as a Free Action.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1141,8 +1129,7 @@
             "name": "Storm Arrow: Volley",
             "description": "Launch up to two enchanted arrows at the enemy as a Free Action.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -1159,8 +1146,7 @@
             "name": "Storm Arrow: Volley",
             "description": "Launch up to three enchanted arrows at the enemy as a Free Action.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -1269,8 +1255,7 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 4,
-            "attackAttribute": "Resolute"
+            "damage": 4
           }
         ]
       },
@@ -1287,8 +1272,7 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1305,8 +1289,7 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -1476,8 +1459,7 @@
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain the target.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1494,8 +1476,7 @@
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain all targets.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1768,8 +1749,7 @@
             "name": "Sulfur Cascade: Scorch",
             "description": "Strike an enemy with a cascade of fire that can deal damage even on a miss.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -1786,8 +1766,7 @@
             "name": "Sulfur Cascade: Pyroclasm",
             "description": "Strike all enemies with cascades of fire that can deal damage even on a miss.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -1860,8 +1839,7 @@
             "name": "Fire Soul: Blazing Shield",
             "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
             "trigger": "onAttacked",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1878,8 +1856,7 @@
             "name": "Fire Soul: Blazing Shield",
             "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
             "trigger": "onAttacked",
-            "damage": 10,
-            "attackAttribute": "Resolute"
+            "damage": 10
           }
         ]
       },
@@ -2319,8 +2296,7 @@
             "name": "Staff Projectile: Throw",
             "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -2337,8 +2313,7 @@
             "name": "Staff Projectile: Throw",
             "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "Resolute"
+            "damage": 10
           }
         ]
       },

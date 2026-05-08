@@ -49,25 +49,28 @@ function matchesOne(weapon: Weapon, predicate: WeaponPredicate): boolean {
 }
 
 // ── setBase phase ──────────────────────────────────────────────────
-// Returns the override map consumed by the formula phase; secondary
-// attributes are computed from the override before addFlat/multiply/cap.
+// Returns a candidate map consumed by the formula phase. The formula
+// phase resolves the winning candidate per stat via `resolveSetBase`
+// (ADR-015 §4): default-inclusive max-by-primary. We collect
+// raw candidates here so the resolution policy stays in one place
+// (`src/rules/setbase.mts`) and the phase boundary stays pure.
 
 export function applySetBase(
   effects: ResolvedEffect[],
-): Map<SecondaryAttributeName, PrimaryAttributeName> {
-  const overrides = new Map<SecondaryAttributeName, PrimaryAttributeName>();
+): Map<SecondaryAttributeName, PrimaryAttributeName[]> {
+  const candidates = new Map<SecondaryAttributeName, PrimaryAttributeName[]>();
   for (const effect of effects) {
     if (effect.modifier.type !== "setBase") continue;
     if (effect.target.kind === "secondary") {
-      // Last write wins — phase ordering replaces priority (ADR-015 §4).
-      overrides.set(effect.target.stat, effect.modifier.value);
-    } else if (effect.target.kind === "combat") {
-      // Per-slot setBase on `attackAttribute` is handled in
-      // `deriveCombatSlots`. Other combat fields reject setBase at parse
-      // time.
+      const list = candidates.get(effect.target.stat);
+      if (list) list.push(effect.modifier.value);
+      else candidates.set(effect.target.stat, [effect.modifier.value]);
     }
+    // combat: per-slot setBase on `attackAttribute` is resolved by
+    // `applySlotPhases` (also via `resolveSetBase`). Other combat
+    // fields reject setBase at parse time.
   }
-  return overrides;
+  return candidates;
 }
 
 // ── addFlat phase ──────────────────────────────────────────────────
@@ -99,6 +102,10 @@ export function applyAddFlat(
       case "primary":
         // Bucketed into `primary` phase by groupByPhase, applied by
         // `derivePrimaryAttributes` in derived.mts (Item 10).
+        break;
+      case "magicAttribute":
+      case "initiativeAttribute":
+        // Setbase-only; addFlat is parser-rejected. Unreachable.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -144,6 +151,10 @@ export function applyMultiply(
       case "primary":
         // Bucketed into `primary` phase (Item 10); also `multiply` is
         // parser-rejected for primary targets so this is doubly unreachable.
+        break;
+      case "magicAttribute":
+      case "initiativeAttribute":
+        // setBase-only; multiply is parser-rejected. Unreachable.
         break;
       case "weaponQuality":
       case "armorQuality":
@@ -191,6 +202,10 @@ export function applyCap(
       case "primary":
         // Bucketed into `primary` phase (Item 10).
         break;
+      case "magicAttribute":
+      case "initiativeAttribute":
+        // setBase-only; cap is parser-rejected. Unreachable.
+        break;
       case "weaponQuality":
       case "armorQuality":
       case "flag":
@@ -224,8 +239,12 @@ export function applyFlag(
       case "primary":
       case "secondary":
       case "combat":
+      case "magicAttribute":
+      case "initiativeAttribute":
         // Numeric targets bucketed into flag only via `remove`; no-op.
-        // (`primary` is also bucketed into its own `primary` phase.)
+        // (`primary` is also bucketed into its own `primary` phase;
+        // `magicAttribute` / `initiativeAttribute` are setBase-only and
+        // route to the `setBase` phase, consumed in derived.mts.)
         break;
       default:
         assertNever(effect.target);

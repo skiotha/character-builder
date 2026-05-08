@@ -450,6 +450,30 @@ export const CHARACTER_SCHEMA: Record<
     },
   },
 
+  // ── Server-derived attribute pointers ──────────────────────
+  //
+  // Recalc output: which `PrimaryAttributeName` to use when rolling
+  // magic and initiative. Resolved via `resolveSetBase` against
+  // `kind: "magicAttribute"` / `kind: "initiativeAttribute"` effects
+  // (setBase only). Server-controlled — engine-only writes; DM extends
+  // via custom effects, never by editing the field directly.
+  magicAttribute: {
+    type: "string",
+    derived: true,
+    serverControlled: true,
+    default: "resolute",
+    permissions: perm_attr,
+    ui: { hidden: true },
+  },
+  initiativeAttribute: {
+    type: "string",
+    derived: true,
+    serverControlled: true,
+    default: "quick",
+    permissions: perm_attr,
+    ui: { hidden: true },
+  },
+
   // ── Progression ─────────────────────────────────────────────
 
   experience: {

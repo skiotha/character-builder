@@ -128,7 +128,9 @@ export type EffectTarget =
   | { kind: "combat"; field: CombatSlotField }
   | { kind: "weaponQuality"; quality: string }
   | { kind: "armorQuality"; quality: string }
-  | { kind: "flag"; name: EffectFlag };
+  | { kind: "flag"; name: EffectFlag }
+  | { kind: "magicAttribute" }
+  | { kind: "initiativeAttribute" };
 
 export type WeaponPredicate =
   | { kind: "any" }
@@ -390,6 +392,20 @@ export interface Character {
   lastModified: string;
   attributes: CharacterAttributes;
   combat: Combat;
+  /**
+   * Server-derived primary attribute used when rolling magic-bearing
+   * abilities (spells, rituals, scrolls). Default `"resolute"`. Engine
+   * resolves via `resolveSetBase` against `kind: "magicAttribute"`
+   * effects (setBase only). Read by sibling apps at roll time.
+   */
+  magicAttribute: PrimaryAttributeName;
+  /**
+   * Server-derived primary attribute used when rolling initiative.
+   * Default `"quick"`. Engine resolves via `resolveSetBase` against
+   * `kind: "initiativeAttribute"` effects (setBase only). Read by
+   * sibling apps at combat start.
+   */
+  initiativeAttribute: PrimaryAttributeName;
   experience: {
     total: number;
     unspent: number;

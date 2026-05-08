@@ -69,6 +69,8 @@ const KNOWN_TARGET_KINDS = new Set<string>([
   "weaponQuality",
   "armorQuality",
   "flag",
+  "magicAttribute",
+  "initiativeAttribute",
 ]);
 
 const KNOWN_PREDICATE_KINDS = new Set<string>(["any", "type", "quality", "id"]);
@@ -387,6 +389,10 @@ function parseTarget(value: unknown, source: string): EffectTarget | null {
       }
       return { kind: "flag", name: name as never };
     }
+    case "magicAttribute":
+      return { kind: "magicAttribute" };
+    case "initiativeAttribute":
+      return { kind: "initiativeAttribute" };
   }
   return null;
 }
@@ -462,6 +468,15 @@ function parseModifier(
       if (target.kind === "combat" && target.field === "attackAttribute") {
         console.warn(
           `[effects] Rejecting ${type} on combat.attackAttribute (only setBase accepted, source=${source}).`,
+        );
+        return null;
+      }
+      if (
+        target.kind === "magicAttribute" ||
+        target.kind === "initiativeAttribute"
+      ) {
+        console.warn(
+          `[effects] Rejecting ${type} on ${target.kind} (only setBase accepted, source=${source}).`,
         );
         return null;
       }

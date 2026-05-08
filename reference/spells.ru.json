@@ -167,8 +167,7 @@
             "name": "Телекинез: Атака",
             "description": "Поднять и бросить объект в цель для нанесения урона.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -185,8 +184,7 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -203,8 +201,7 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -589,15 +586,13 @@
             "name": "Горящее Стекло: Луч",
             "description": "Луч света, который особенно сильно обжигает монстров.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           },
           {
             "name": "Горящее Стекло: Луч (Монстр)",
             "description": "Луч света наносит дополнительный урон монстрам.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -614,15 +609,13 @@
             "name": "Горящее Стекло: Взрыв",
             "description": "Взрыв света, который особенно сильно обжигает монстров.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           },
           {
             "name": "Горящее Стекло: Взрыв (Монстр)",
             "description": "Взрыв света наносит дополнительный урон монстрам.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -639,8 +632,7 @@
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals damage to monsters and can stun them.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       }
@@ -720,8 +712,7 @@
             "name": "Чистилище: Луч",
             "description": "Луч света наносит урон, игнорирующий броню, и может парализовать цель.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -738,8 +729,7 @@
             "name": "Purgatory: Blast",
             "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -755,8 +745,7 @@
           {
             "name": "Purgatory: Eye for an Eye",
             "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
-            "trigger": "onSpellCast",
-            "attackAttribute": "Resolute"
+            "trigger": "onSpellCast"
           }
         ]
       }
@@ -1124,8 +1113,7 @@
             "name": "Штормовая Стрела: Выстрел",
             "description": "Запуск зачарованной стрелы во врага как свободное действие.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1142,8 +1130,7 @@
             "name": "Штормовая Стрела: Залп",
             "description": "Запуск до двух зачарованных стрел во врага как свободное действие.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -1160,8 +1147,7 @@
             "name": "Штормовая Стрела: Залп",
             "description": "Запуск до трех зачарованных стрел во врага как свободное действие.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -1270,8 +1256,7 @@
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
-            "damage": 4,
-            "attackAttribute": "Resolute"
+            "damage": 4
           }
         ]
       },
@@ -1288,8 +1273,7 @@
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1306,8 +1290,7 @@
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       }
@@ -1477,8 +1460,7 @@
             "name": "Черная Стрела: Выстрел",
             "description": "Запускает Черную Стрелу, которая наносит урон и может удерживать цель.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1495,8 +1477,7 @@
             "name": "Черная Стрела: Выстрел",
             "description": "Запускает Черную Стрелу, которая наносит урон и может удерживать все цели.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1776,8 +1757,7 @@
             "name": "Каскад Серы: Обжиг",
             "description": "Ударьте врага каскадом огня, который может нанести урон даже при промахе.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -1794,8 +1774,7 @@
             "name": "Каскад Серы: Пироклазм",
             "description": "Ударьте всех врагов каскадами огня, которые могут нанести урон даже при промахе.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "Resolute"
+            "damage": 12
           }
         ]
       },
@@ -1868,8 +1847,7 @@
             "name": "Огненная Душа: Пылающий Щит",
             "description": "Как реакция на атаку, нанесите огненный урон нападающему и получите временную Броню против огня.",
             "trigger": "onAttacked",
-            "damage": 6,
-            "attackAttribute": "Resolute"
+            "damage": 6
           }
         ]
       },
@@ -1886,8 +1864,7 @@
             "name": "Огненная Душа: Пылающий Щит",
             "description": "Как реакция на атаку, нанесите огненный урон нападающему и получите временную Броню против огня.",
             "trigger": "onAttacked",
-            "damage": 10,
-            "attackAttribute": "Resolute"
+            "damage": 10
           }
         ]
       },
@@ -2326,8 +2303,7 @@
             "name": "Снаряд-Посох: Бросок",
             "description": "Бросок посоха с использованием Воли вместо Аккуратности и передача через него всех существующих чар.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "Resolute"
+            "damage": 8
           }
         ]
       },
@@ -2344,8 +2320,7 @@
             "name": "Снаряд-Посох: Бросок",
             "description": "Бросок посоха с использованием Воли вместо Аккуратности и передача через него всех существующих чар.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "Resolute"
+            "damage": 10
           }
         ]
       },

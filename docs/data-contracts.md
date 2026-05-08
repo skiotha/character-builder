@@ -96,6 +96,15 @@ This is the **source of truth** — all other formats derive from it.
     ]
   },
 
+  // ── Server-derived attribute pointers (ADR-015 §3c, §3d) ──
+  // Names of the primary attributes used by sibling apps for spell-power
+  // and initiative rolls. Defaults: "resolute" / "quick". Mutable only
+  // via setBase effects on `magicAttribute` / `initiativeAttribute`
+  // targets; resolution is max-by-primary with the default included.
+  // serverControlled — present in API responses, NOT in PATCH payloads.
+  "magicAttribute":      "resolute",
+  "initiativeAttribute": "quick",
+
   // ── Equipment ──
   "equipment": {
     "money":      0,                    // non-negative number

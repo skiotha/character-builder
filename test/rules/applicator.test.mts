@@ -18,7 +18,7 @@ function asChar(): Character {
 // ── applySetBase ─────────────────────────────────────────────────
 
 describe("applySetBase", () => {
-  it("returns override map keyed by secondary stat", () => {
+  it("returns candidate map keyed by secondary stat", () => {
     const effects: ResolvedEffect[] = [
       {
         source: "test",
@@ -26,8 +26,8 @@ describe("applySetBase", () => {
         modifier: { type: "setBase", value: "vigilant" },
       },
     ];
-    const overrides = applySetBase(effects);
-    assert.equal(overrides.get("toughness"), "vigilant");
+    const candidates = applySetBase(effects);
+    assert.deepEqual(candidates.get("toughness"), ["vigilant"]);
   });
 
   it("ignores non-setBase modifiers", () => {
@@ -38,11 +38,14 @@ describe("applySetBase", () => {
         modifier: { type: "addFlat", value: 5 },
       },
     ];
-    const overrides = applySetBase(effects);
-    assert.equal(overrides.size, 0);
+    const candidates = applySetBase(effects);
+    assert.equal(candidates.size, 0);
   });
 
-  it("last write wins", () => {
+  it("collects every candidate per stat for resolveSetBase to pick from", () => {
+    // G2.A: applySetBase no longer picks a winner. The formula phase
+    // calls resolveSetBase against the post-effect primary snapshot to
+    // resolve max-by-primary with the default included.
     const effects: ResolvedEffect[] = [
       {
         source: "a",
@@ -55,8 +58,8 @@ describe("applySetBase", () => {
         modifier: { type: "setBase", value: "vigilant" },
       },
     ];
-    const overrides = applySetBase(effects);
-    assert.equal(overrides.get("defense"), "vigilant");
+    const candidates = applySetBase(effects);
+    assert.deepEqual(candidates.get("defense"), ["quick", "vigilant"]);
   });
 });
 

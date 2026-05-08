@@ -44,7 +44,10 @@ const KNOWN_TARGET_KINDS = new Set([
   "weaponQuality",
   "armorQuality",
   "flag",
+  "magicAttribute",
+  "initiativeAttribute",
 ]);
+const SETBASE_ONLY_KINDS = new Set(["magicAttribute", "initiativeAttribute"]);
 const KNOWN_PREDICATE_KINDS = new Set(["any", "type", "quality", "id"]);
 const KNOWN_MODIFIER_TYPES = new Set([
   "setBase",
@@ -53,9 +56,6 @@ const KNOWN_MODIFIER_TYPES = new Set([
   "cap",
   "remove",
 ]);
-
-// Amendment-only kinds (don't exist yet, but flag if authored ahead of schedule).
-const AMENDMENT_KINDS = new Set(["magicAttribute", "initiativeAttribute"]);
 
 // ── Findings buckets ──
 
@@ -139,13 +139,6 @@ function inspectEffect(
         entryId,
         tier,
         detail: `${context}: target.kind is not a string`,
-      });
-    } else if (AMENDMENT_KINDS.has(kind)) {
-      addFinding("amendmentBlockers", {
-        file,
-        entryId,
-        tier,
-        detail: `${context}: target.kind="${kind}" — requires amendment Item ${kind === "magicAttribute" ? "2" : "4"}`,
       });
     } else if (!KNOWN_TARGET_KINDS.has(kind)) {
       addFinding("parserRejections", {
@@ -244,6 +237,11 @@ function inspectEffect(
           }
           break;
         }
+        case "magicAttribute":
+        case "initiativeAttribute":
+          // No additional target fields — setBase-only enforcement happens
+          // in the modifier validation below.
+          break;
       }
     }
   }
@@ -309,6 +307,17 @@ function inspectEffect(
           });
         }
       } else if (type === "addFlat" || type === "multiply" || type === "cap") {
+        if (
+          typeof targetKind === "string" &&
+          SETBASE_ONLY_KINDS.has(targetKind)
+        ) {
+          addFinding("parserRejections", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: ${type} on ${targetKind} (only setBase accepted)`,
+          });
+        }
         if (targetKind === "primary" && type === "multiply") {
           addFinding("parserRejections", {
             file,

@@ -761,8 +761,12 @@ back-and-forth.
 | 10   | `EffectTarget.kind = "primary"` + `derivePrimaryAttributes` stage | 2026-05-06  | G1.A. Six-kind union, addFlat/cap accepted, others rejected. |
 | 10*  | Follow-up: `attributes.primaryEffective` sibling field | 2026-05-07  | Engine writes effective snapshot to a server-controlled sibling field; base stays validated 5–15 and never mutates. Closes accumulating-drift / schema-violation regression. No schema-version bump. |
 | 11   | `secondary.toughness` writes-to-`.max` regression tests | 2026-05-06  | G1.B. Engine behaviour was already correct; added 3 explicit tests + authoring-spec note. |
+| 5    | Universal `setBase` resolution (`resolveSetBase` helper) | 2026-05-08  | G2.A. `applySetBase` becomes a candidate-collector; resolution runs after primary phase against `primaryEffective`. Default-inclusive, strict `>`, default wins ties. Reused per-slot for `combat.attackAttribute` and by Items 2/4. ADR-015 §4a. **Behavioural change:** Smoke and Mirrors-novice / Tactics-adept / Sixth Sense-adept now coexist correctly on the same character. |
+| 2    | `magicAttribute` derived character field                | 2026-05-08  | G2.B. New 8th `EffectTarget` kind, `setBase`-only, default `"resolute"`, hidden in UI. *Leader-novice* re-authored as typed Tier A. ADR-015 §3c. |
+| 4    | `initiativeAttribute` derived character field           | 2026-05-08  | G2.C. Mirrors Item 2; default `"quick"`. *Tactics-novice* re-authored Tier C → Tier A. *Quick Reflexes Master* keeps `flag: initiativeExemption` (out of scope). ADR-015 §3d. |
+| —    | Strip per-spell `attackAttribute` from spells.json      | 2026-05-08  | G2.D companion. Removed 25 hard-coded attribute strings from `specialAttacks[]` / `reactions[]` in `reference/spells.{en,ru}.json`. Sibling apps now read `character.magicAttribute`. |
 
-Items still on deck (in staging, not yet scheduled): 1, 2, 3, 4, 5, 6, 7, 8, 9, 12.
+Items still on deck (in staging, not yet scheduled): 1, 3, 6, 7, 8, 9, 12.
 
 ### F-side audit: schema defaults that hard-code reference data
 

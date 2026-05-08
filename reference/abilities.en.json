@@ -967,8 +967,10 @@
             "modifier": { "type": "addFlat", "value": 1 }
           },
           {
-            "tier": "C",
-            "description": "Use Cunning instead of Quick to determine initiative."
+            "tier": "A",
+            "description": "Use Cunning instead of Quick to determine initiative.",
+            "target": { "kind": "initiativeAttribute" },
+            "modifier": { "type": "setBase", "value": "cunning" }
           }
         ]
       },
@@ -4322,8 +4324,10 @@
         "description": "Shifts spell power to Appealing.",
         "effects": [
           {
-            "tier": "C",
-            "description": "Use Appealing instead of Resolute to determine spell power, though the Corruption Threshold is still calculated from Resolute."
+            "tier": "A",
+            "description": "Use Appealing instead of Resolute to determine spell power.",
+            "target": { "kind": "magicAttribute" },
+            "modifier": { "type": "setBase", "value": "appealing" }
           }
         ]
       },
