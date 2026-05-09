@@ -113,6 +113,13 @@ This is the **source of truth** — all other formats derive from it.
     "armor": {
       "body": null,                     // ArmorPiece object or null
       "plug": null                      // ArmorPiece object or null
+      // ArmorPiece shape:
+      //   { id, name, armor, qualities: string[], cost?, effects?,
+      //     qualitiesEffective?: string[] }
+      //   `qualitiesEffective` is the engine-resolved overlay produced
+      //   by armorQuality add/remove effects (ADR-015 §3f). It is
+      //   serverControlled — reset from `qualities` at the top of every
+      //   recalc; consumers should fall back to `qualities` when absent.
     },
     "runes":      [],                   // array of Rune objects (max 3)
     "assassin":   [],                   // specialist equipment (formerly professional.assassin)

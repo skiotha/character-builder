@@ -138,6 +138,25 @@ export type WeaponPredicate =
   | { kind: "quality"; values: string[] }
   | { kind: "id"; values: string[] };
 
+// `ArmorCondition` is the character-level gate for an effect (ADR-015 §3f).
+// Distinct from `WeaponPredicate`/`appliesTo`, which narrows per-slot
+// fanout in the combat phase. AND-list semantics across the array;
+// OR-within-`values[]`. Only valid on `kind: "secondary"` and
+// `kind: "armorQuality"` targets — parser strips elsewhere with a warn.
+//
+//   armorQuality — at least one equipped armor piece carries the quality
+//                  in its `qualitiesEffective`
+//   armorId      — at least one equipped armor piece has matching `id`
+//   armorSlot    — listed slot(s) currently carry a non-null armor piece;
+//                  also used as the implicit gate for registry-synthesized
+//                  `armorQuality` effects so they don't bleed across slots
+//   noArmor      — both `body` and `plug` slots are empty
+export type ArmorCondition =
+  | { kind: "armorQuality"; values: string[] }
+  | { kind: "armorId"; values: string[] }
+  | { kind: "armorSlot"; values: ("body" | "plug")[] }
+  | { kind: "noArmor" };
+
 export type EffectModifier =
   | { type: "setBase"; value: PrimaryAttributeName }
   | { type: "addFlat"; value: number }
@@ -159,6 +178,13 @@ export interface ResolvedEffect {
   target: EffectTarget;
   modifier: EffectModifier;
   appliesTo?: WeaponPredicate[];
+  /**
+   * Character-level gate (ADR-015 §3f). Independent of `appliesTo`.
+   * AND-list across entries; OR-within `values[]`. Only meaningful on
+   * `target.kind ∈ {"secondary", "armorQuality"}`; parser strips with a
+   * warn when present on other target kinds.
+   */
+  condition?: ArmorCondition[];
 }
 
 // ── Triggered Actions (ADR-014) ──────────────────────────────────
@@ -268,6 +294,19 @@ export interface ArmorPiece {
   name: string;
   armor: number;
   qualities: string[];
+  /**
+   * Recalc-output snapshot of the piece's qualities after registry
+   * fan-out and `armorQuality`-targeted effects have applied. Server-
+   * controlled — clients receive it for display but cannot write it.
+   * Engine consumers (other effect phases, sibling-app readers) should
+   * read qualities through this field; `qualities` is the authored set
+   * and is never mutated by the engine. Mirrors
+   * `primary` / `primaryEffective`. Optional in the type so existing
+   * on-disk fixtures load cleanly; engine populates it on every recalc
+   * (when `recalculate()` runs, the field is reset from `qualities`
+   * before any `armorQuality` effect applies — Bug #31 reset pattern).
+   */
+  qualitiesEffective?: string[];
   cost?: number | string;
   /** Effects intrinsic to this armor piece. Applied globally during
    *  recalc (collected by `collectAllEffects`). */

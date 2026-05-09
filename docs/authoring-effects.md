@@ -717,6 +717,83 @@ future kinds.
 
 ---
 
+## 9.5 `condition` — character-level effect gating
+
+`appliesTo` (§9) gates **per-slot combat** effects. For everything else —
+`secondary` stats and armor-side `armorQuality` add/remove — use the
+optional `condition` field instead. ADR-015 §3f.
+
+`condition` is an **AND-composed** array of `ArmorCondition` entries.
+Within an entry, `values[]` is **OR-composed**.
+
+```jsonc
+"condition": [
+  { "kind": "armorQuality", "values": ["oiled"] },     // any equipped piece carries `oiled`
+  { "kind": "armorSlot",    "values": ["plug"] }       // AND the plug slot is non-empty
+]
+```
+
+Four kinds:
+
+| `kind`         | Semantics                                                                         |
+| -------------- | --------------------------------------------------------------------------------- |
+| `armorQuality` | Any equipped armor piece carries any of `values[]` (read through `qualitiesEffective`). |
+| `armorId`      | Any equipped piece's `id` is in `values[]`.                                       |
+| `armorSlot`    | The named slot (`body` and/or `plug`) is non-empty.                               |
+| `noArmor`      | Both armor slots are empty.                                                       |
+
+Accepted on these target kinds **only**:
+
+- `secondary` — character-level read against equipped armor.
+- `armorQuality` — per-piece read; each condition is evaluated against
+  the current `body`/`plug` piece. `armorSlot` matches only when the
+  piece's slot is in `values`. `noArmor` always returns false (a piece
+  exists — use `secondary` if you want a "no armor at all" rule).
+
+The parser strips `condition` with a warn from any other target kind.
+
+If `condition` is omitted or `[]`, the effect always fires.
+
+### Worked example — *Combat Oils Novice*
+
+> Adds +4 armor, but only when at least one equipped piece is oiled.
+
+```jsonc
+{
+  "target":    { "kind": "secondary", "stat": "armor" },
+  "modifier":  { "type": "addFlat", "value": 4 },
+  "condition": [{ "kind": "armorQuality", "values": ["oiled"] }]
+}
+```
+
+### Worked example — *Demiurge Hands Master*
+
+> Removes `hampering_2`, but only from the plug, and only if the plug
+> actually has it.
+
+```jsonc
+{
+  "target":    { "kind": "armorQuality", "quality": "hampering_2" },
+  "modifier":  { "type": "remove" },
+  "condition": [
+    { "kind": "armorSlot",    "values": ["plug"] },
+    { "kind": "armorQuality", "values": ["hampering_2"] }
+  ]
+}
+```
+
+### Authoring rule (lint-enforced)
+
+Any `armorQuality` effect outside `qualities.{en,ru}.json` **must**
+carry a `condition`. The audit lint flags missing conditions because
+without one the effect is a silent foot-gun (it would fire on every
+equipped piece regardless of intent). Registry quality effects are
+exempt — the engine auto-stamps them with an implicit
+`condition: [{ kind: "armorSlot", values: [<piece>] }]` so a body
+piece's quality never bleeds onto the plug.
+
+---
+
 ## 10. Deferred — picked up after the bulk pass
 
 > Tracked in [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md)

@@ -206,6 +206,8 @@ in the same pass.
 
 ## Item 3 — Armor `appliesTo` is currently ignored
 
+**Status:** ✅ Implemented (Chunk F post-pass — 2026-05-04). New optional `condition?: ArmorCondition[]` field on `ResolvedEffect` (ADR-015 §3f), accepted on `secondary` (character-level read) and `armorQuality` (per-piece read). Four kinds: `armorQuality | armorId | armorSlot | noArmor`. Combat Oils Novice now correctly fires only when an oiled piece is equipped; Soldier Adept's `hampering_N` removal is gated on the piece carrying that quality; Demiurge Hands Novice/Master are properly scoped to the plug. Bonus: `applyArmorQuality` now writes to `ArmorPiece.qualitiesEffective` (an engine overlay reset every recalc) instead of mutating authored `qualities`, closing the remaining caveat on weak-point Bug #31. Audit lint requires `condition` on every non-registry `armorQuality` effect. Tests in `test/rules/armor-condition.test.mts` + `test/rules/armor-overlay-leak.test.mts` (19 cases). Tracker entries: weak-point #32 (new) + #31 (caveat resolved).
+
 ### The question
 
 > [`reference/abilities.en.json`](../../reference/abilities.en.json) lines 794–802 — Combat Oils Novice:

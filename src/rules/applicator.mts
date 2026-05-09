@@ -8,6 +8,8 @@
 // `derived.mts`, not here. The global handlers below skip them.
 
 import type {
+  ArmorCondition,
+  ArmorPiece,
   Character,
   PrimaryAttributeName,
   ResolvedEffect,
@@ -15,6 +17,88 @@ import type {
   Weapon,
   WeaponPredicate,
 } from "#rpg-types";
+
+// ── Armor condition matcher ────────────────────────────────────────
+//
+// Character-level effect gate (ADR-015 §3f). Independent of
+// `appliesTo`, which narrows per-slot weapon fanout. AND-list across
+// `conditions[]`; OR-within `values[]`.
+//
+// Two evaluation modes:
+//   * Character-level (no `slot` arg): used for `secondary`-targeted
+//     effects. armorSlot/armorQuality/armorId pass if ANY equipped
+//     piece satisfies; noArmor passes when both slots are empty.
+//   * Per-piece (`slot` provided): used inside `applyArmorQuality` so
+//     the effect mutates only the matching piece. armorSlot checks the
+//     piece's slot, armorQuality/armorId check that piece's data,
+//     noArmor is always false (you can't apply an armor quality to
+//     no armor).
+
+export function matchesArmorConditions(
+  character: Character,
+  conditions: ArmorCondition[] | undefined,
+  slot?: "body" | "plug",
+): boolean {
+  if (!conditions || conditions.length === 0) return true;
+  for (const condition of conditions) {
+    if (!matchesOneCondition(character, condition, slot)) return false;
+  }
+  return true;
+}
+
+function matchesOneCondition(
+  character: Character,
+  condition: ArmorCondition,
+  slot?: "body" | "plug",
+): boolean {
+  const armor = character.equipment?.armor;
+  const body = armor?.body ?? null;
+  const plug = armor?.plug ?? null;
+  switch (condition.kind) {
+    case "noArmor":
+      // Per-piece evaluation: a piece exists, so noArmor is false.
+      if (slot) return false;
+      return body === null && plug === null;
+    case "armorSlot":
+      if (slot) return condition.values.includes(slot);
+      // Character-level: at least one listed slot is non-empty.
+      return condition.values.some((s) =>
+        s === "body" ? body !== null : plug !== null,
+      );
+    case "armorQuality":
+      if (slot) {
+        const piece = slot === "body" ? body : plug;
+        return pieceHasAnyQuality(piece, condition.values);
+      }
+      return (
+        pieceHasAnyQuality(body, condition.values) ||
+        pieceHasAnyQuality(plug, condition.values)
+      );
+    case "armorId":
+      if (slot) {
+        const piece = slot === "body" ? body : plug;
+        return piece !== null && condition.values.includes(piece.id);
+      }
+      return (
+        (body !== null && condition.values.includes(body.id)) ||
+        (plug !== null && condition.values.includes(plug.id))
+      );
+    default:
+      assertNever(condition);
+  }
+}
+
+function pieceHasAnyQuality(
+  piece: ArmorPiece | null,
+  values: string[],
+): boolean {
+  if (!piece) return false;
+  // Read through `qualitiesEffective` (post-recalc snapshot), falling
+  // back to authored `qualities` for pre-recalc fixtures. Mirrors
+  // `readPrimary` (effective with base fallback).
+  const qualities = piece.qualitiesEffective ?? piece.qualities ?? [];
+  return values.some((v) => qualities.includes(v));
+}
 
 // ── Weapon predicate matcher ───────────────────────────────────────
 //
@@ -83,6 +167,7 @@ export function applyAddFlat(
     if (effect.modifier.type !== "addFlat") continue;
     switch (effect.target.kind) {
       case "secondary": {
+        if (!matchesArmorConditions(character, effect.condition)) break;
         const stat = effect.target.stat;
         const secondary = character.attributes.secondary as Record<
           SecondaryAttributeName,
@@ -128,6 +213,7 @@ export function applyMultiply(
     if (effect.modifier.type !== "multiply") continue;
     switch (effect.target.kind) {
       case "secondary": {
+        if (!matchesArmorConditions(character, effect.condition)) break;
         const stat = effect.target.stat;
         const secondary = character.attributes.secondary as Record<
           SecondaryAttributeName,
@@ -178,6 +264,7 @@ export function applyCap(
     if (effect.modifier.type !== "cap") continue;
     switch (effect.target.kind) {
       case "secondary": {
+        if (!matchesArmorConditions(character, effect.condition)) break;
         const stat = effect.target.stat;
         const secondary = character.attributes.secondary as Record<
           SecondaryAttributeName,
@@ -268,11 +355,23 @@ function applyArmorQuality(character: Character, effect: ResolvedEffect): void {
   for (const slot of ["body", "plug"] as const) {
     const piece = character.equipment?.armor?.[slot];
     if (!piece) continue;
-    const qualities = piece.qualities ?? [];
+    // Per-piece gate: condition must match against this slot. For
+    // registry-synthesized effects this carries the implicit
+    // `armorSlot` stamp (effect only fires on the carrying piece). For
+    // authored effects (e.g. Soldier) without a slot condition, every
+    // matching piece is mutated, which is the authoring intent.
+    if (!matchesArmorConditions(character, effect.condition, slot)) continue;
+    // Engine writes the overlay to `qualitiesEffective`, never to the
+    // authored `qualities` array. `recalculate()` resets
+    // `qualitiesEffective` from `qualities` at the top of each pass
+    // (Bug #31), so removals/additions don't accumulate across recalcs.
+    const current = piece.qualitiesEffective ?? piece.qualities ?? [];
     if (effect.modifier.type === "remove") {
-      piece.qualities = qualities.filter((q) => q !== quality);
-    } else if (!qualities.includes(quality)) {
-      piece.qualities = [...qualities, quality];
+      piece.qualitiesEffective = current.filter((q) => q !== quality);
+    } else if (!current.includes(quality)) {
+      piece.qualitiesEffective = [...current, quality];
+    } else {
+      piece.qualitiesEffective = current;
     }
   }
 }

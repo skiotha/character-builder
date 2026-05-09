@@ -765,8 +765,9 @@ back-and-forth.
 | 2    | `magicAttribute` derived character field                | 2026-05-08  | G2.B. New 8th `EffectTarget` kind, `setBase`-only, default `"resolute"`, hidden in UI. *Leader-novice* re-authored as typed Tier A. ADR-015 §3c. |
 | 4    | `initiativeAttribute` derived character field           | 2026-05-08  | G2.C. Mirrors Item 2; default `"quick"`. *Tactics-novice* re-authored Tier C → Tier A. *Quick Reflexes Master* keeps `flag: initiativeExemption` (out of scope). ADR-015 §3d. |
 | —    | Strip per-spell `attackAttribute` from spells.json      | 2026-05-08  | G2.D companion. Removed 25 hard-coded attribute strings from `specialAttacks[]` / `reactions[]` in `reference/spells.{en,ru}.json`. Sibling apps now read `character.magicAttribute`. |
+| 3    | Armor-side `appliesTo` / character-level effect gating  | 2026-05-04  | New optional `condition?: ArmorCondition[]` on `ResolvedEffect` (kinds: `armorQuality`, `armorId`, `armorSlot`, `noArmor`), accepted on `secondary` (character-level) and `armorQuality` (per-piece). Bonus: armor overlay split — engine writes to `ArmorPiece.qualitiesEffective` (reset every recalc), authored `qualities` no longer mutated. Closes weak-point Bug #31's remaining caveat. ADR-015 §3f. Authoring sweep: Soldier Adept, Demiurge Hands Novice/Master across `abilities.{en,ru}.json`. Tracker entry: weak-point #32. |
 
-Items still on deck (in staging, not yet scheduled): 1, 3, 6, 7, 8, 9, 12.
+Items still on deck (in staging, not yet scheduled): 1, 6, 7, 8, 9, 12.
 
 ### F-side audit: schema defaults that hard-code reference data
 

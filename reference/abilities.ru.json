@@ -3591,19 +3591,22 @@
             "tier": "A",
             "description": "Физические ограничения брони, влияющие на Защиту через снижение Скорости, больше не мешают, и адепт двигается в броне так же эффективно, как без нее.",
             "target": { "kind": "armorQuality", "quality": "hampering_2" },
-            "modifier": { "type": "remove" }
+            "modifier": { "type": "remove" },
+            "condition": [{ "kind": "armorQuality", "values": ["hampering_2"] }]
           },
           {
             "tier": "A",
             "description": "Физические ограничения брони, влияющие на Защиту через снижение Скорости, больше не мешают, и адепт двигается в броне так же эффективно, как без нее.",
             "target": { "kind": "armorQuality", "quality": "hampering_3" },
-            "modifier": { "type": "remove" }
+            "modifier": { "type": "remove" },
+            "condition": [{ "kind": "armorQuality", "values": ["hampering_3"] }]
           },
           {
             "tier": "A",
             "description": "Физические ограничения брони, влияющие на Защиту через снижение Скорости, больше не мешают, и адепт двигается в броне так же эффективно, как без нее.",
             "target": { "kind": "armorQuality", "quality": "hampering_4" },
-            "modifier": { "type": "remove" }
+            "modifier": { "type": "remove" },
+            "condition": [{ "kind": "armorQuality", "values": ["hampering_4"] }]
           }
         ]
       },
@@ -4243,7 +4246,7 @@
             "description": "Все ладони демиурга неофита получают качество гибкого.",
             "target": { "kind": "armorQuality", "quality": "flexible" },
             "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+            "condition": [{ "kind": "armorSlot", "values": ["plug"] }]
           }
         ]
       },
@@ -4275,21 +4278,30 @@
             "description": "Сковывающий модификатор затруднения больше не действует на мастера.",
             "target": { "kind": "armorQuality", "quality": "hampering_2" },
             "modifier": { "type": "remove" },
-            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+            "condition": [
+              { "kind": "armorSlot", "values": ["plug"] },
+              { "kind": "armorQuality", "values": ["hampering_2"] }
+            ]
           },
           {
             "tier": "A",
             "description": "Сковывающий модификатор затруднения больше не действует на мастера.",
             "target": { "kind": "armorQuality", "quality": "hampering_3" },
             "modifier": { "type": "remove" },
-            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+            "condition": [
+              { "kind": "armorSlot", "values": ["plug"] },
+              { "kind": "armorQuality", "values": ["hampering_3"] }
+            ]
           },
           {
             "tier": "A",
             "description": "Сковывающий модификатор затруднения больше не действует на мастера.",
             "target": { "kind": "armorQuality", "quality": "hampering_4" },
             "modifier": { "type": "remove" },
-            "appliesTo": [{ "kind": "type", "values": ["plug"] }]
+            "condition": [
+              { "kind": "armorSlot", "values": ["plug"] },
+              { "kind": "armorQuality", "values": ["hampering_4"] }
+            ]
           },
           {
             "tier": "C",

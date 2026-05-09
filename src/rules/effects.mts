@@ -25,6 +25,7 @@
 
 import type {
   AbilityTier,
+  ArmorCondition,
   EffectModifier,
   EffectPhase,
   EffectTarget,
@@ -74,6 +75,15 @@ const KNOWN_TARGET_KINDS = new Set<string>([
 ]);
 
 const KNOWN_PREDICATE_KINDS = new Set<string>(["any", "type", "quality", "id"]);
+
+const KNOWN_CONDITION_KINDS = new Set<string>([
+  "armorQuality",
+  "armorId",
+  "armorSlot",
+  "noArmor",
+]);
+
+const KNOWN_ARMOR_SLOTS = new Set<string>(["body", "plug"]);
 
 const KNOWN_MODIFIER_TYPES = new Set<string>([
   "setBase",
@@ -129,6 +139,27 @@ export function normalizeRawEffect(
       const predicates = parseAppliesTo(raw.appliesTo, effectSource);
       if (predicates && predicates.length > 0) {
         result.appliesTo = predicates;
+      }
+    }
+  }
+
+  const rawCondition = (raw as { condition?: unknown }).condition;
+  if (rawCondition !== undefined) {
+    // `condition` is the character-level gate (ADR-015 §3f). Only valid
+    // on `secondary` and `armorQuality` targets — every other target is
+    // either character-global (flag, magicAttribute, initiativeAttribute),
+    // per-slot (combat, weaponQuality), pre-pipeline (primary), or set-
+    // membership without a meaningful gate use case (armorQuality is the
+    // only set-membership target where character-level gating matters).
+    if (target.kind !== "secondary" && target.kind !== "armorQuality") {
+      console.warn(
+        `[effects] Stripping condition from target kind ${target.kind} ` +
+          `(only secondary / armorQuality accept condition, source=${effectSource}).`,
+      );
+    } else {
+      const conditions = parseCondition(rawCondition, effectSource);
+      if (conditions && conditions.length > 0) {
+        result.condition = conditions;
       }
     }
   }
@@ -235,8 +266,37 @@ function appendArmorQualityEffects(
           `entry in reference/qualities.<locale>.json (ADR-016).`,
       );
     }
-    for (const effect of quality.effects) out.push(effect);
+    for (const effect of quality.effects) {
+      // Registry synthesis (ADR-015 §3f): for `armorQuality`-targeted
+      // effects contributed by a registry quality entry, stamp an
+      // implicit `armorSlot` condition so the effect only fires on the
+      // carrying piece. Mirrors how weapon-mounted `Weapon.effects[]`
+      // get an implicit `appliesTo` = "this weapon" in deriveCombatSlots.
+      // Closes a real cross-slot leak (e.g. body-piece `Flexible` quality
+      // removing `hampering_N` from the plug too).
+      if (effect.target.kind === "armorQuality") {
+        const stamped: ResolvedEffect = {
+          ...effect,
+          condition: stampArmorSlotCondition(effect.condition, piece),
+        };
+        out.push(stamped);
+      } else {
+        out.push(effect);
+      }
+    }
   }
+}
+
+function stampArmorSlotCondition(
+  existing: ArmorCondition[] | undefined,
+  piece: "body" | "plug",
+): ArmorCondition[] {
+  const slotCondition: ArmorCondition = {
+    kind: "armorSlot",
+    values: [piece],
+  };
+  if (!existing || existing.length === 0) return [slotCondition];
+  return [...existing, slotCondition];
 }
 
 export function groupByPhase(
@@ -503,6 +563,58 @@ function parseModifier(
     }
   }
   return null;
+}
+
+function parseCondition(
+  value: unknown,
+  source: string,
+): ArmorCondition[] | null {
+  if (!Array.isArray(value)) {
+    console.warn(`[effects] Rejecting non-array condition (source=${source}).`);
+    return null;
+  }
+  const out: ArmorCondition[] = [];
+  for (const entry of value) {
+    if (!isPlainObject(entry)) {
+      console.warn(
+        `[effects] Skipping non-object condition entry (source=${source}).`,
+      );
+      continue;
+    }
+    const kind = (entry as { kind?: unknown }).kind;
+    if (typeof kind !== "string" || !KNOWN_CONDITION_KINDS.has(kind)) {
+      console.warn(
+        `[effects] Skipping condition entry with unknown kind ${JSON.stringify(kind)} (source=${source}).`,
+      );
+      continue;
+    }
+    if (kind === "noArmor") {
+      out.push({ kind: "noArmor" });
+      continue;
+    }
+    const values = (entry as { values?: unknown }).values;
+    if (!Array.isArray(values) || !values.every((v) => typeof v === "string")) {
+      console.warn(
+        `[effects] Skipping condition entry without string values[] (source=${source}).`,
+      );
+      continue;
+    }
+    if (kind === "armorSlot") {
+      const slots = values.filter((v): v is "body" | "plug" =>
+        KNOWN_ARMOR_SLOTS.has(v),
+      );
+      if (slots.length === 0) {
+        console.warn(
+          `[effects] Skipping armorSlot condition without valid slots (source=${source}).`,
+        );
+        continue;
+      }
+      out.push({ kind: "armorSlot", values: slots });
+      continue;
+    }
+    out.push({ kind: kind as "armorQuality" | "armorId", values });
+  }
+  return out;
 }
 
 function parseAppliesTo(

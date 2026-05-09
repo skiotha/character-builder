@@ -58,11 +58,16 @@ export function recalculate(
   result.flags = [];
   result.specialAttacks = [];
   result.reactions = [];
-  // TODO(phase6-chunk-G/H): also reset armor.body / armor.plug overlay
-  // qualities written by the previous recalc. Currently armorQuality
-  // effects mutate the persisted object, which can compound across
-  // recalcs. Catalog reconciliation lands in F+G; engine overlay split
-  // is the cleaner fix.
+  // Reset the per-piece `qualitiesEffective` overlay from the authored
+  // `qualities` set. The applicator writes to `qualitiesEffective` only;
+  // `qualities` is the player-authored base and is never mutated by the
+  // engine. Mirrors the `primary` / `primaryEffective` reset pattern in
+  // `derivePrimaryAttributes`. Closes the second half of Bug #31.
+  const armor = result.equipment?.armor;
+  if (armor?.body)
+    armor.body.qualitiesEffective = [...(armor.body.qualities ?? [])];
+  if (armor?.plug)
+    armor.plug.qualitiesEffective = [...(armor.plug.qualities ?? [])];
 
   const effects = collectAllEffects(result, registry);
   const phases = groupByPhase(effects);

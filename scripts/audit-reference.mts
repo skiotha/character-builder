@@ -49,6 +49,14 @@ const KNOWN_TARGET_KINDS = new Set([
 ]);
 const SETBASE_ONLY_KINDS = new Set(["magicAttribute", "initiativeAttribute"]);
 const KNOWN_PREDICATE_KINDS = new Set(["any", "type", "quality", "id"]);
+const KNOWN_CONDITION_KINDS = new Set([
+  "armorQuality",
+  "armorId",
+  "armorSlot",
+  "noArmor",
+]);
+const KNOWN_ARMOR_SLOTS = new Set(["body", "plug"]);
+const CONDITION_ACCEPTING_TARGETS = new Set(["secondary", "armorQuality"]);
 const KNOWN_MODIFIER_TYPES = new Set([
   "setBase",
   "addFlat",
@@ -413,6 +421,101 @@ function inspectEffect(
         }
       }
     }
+  }
+
+  // condition hygiene (ADR-015 §3f, character-level gate).
+  const targetKind = target?.kind;
+  const condition = effect.condition;
+  if (condition !== undefined) {
+    if (
+      typeof targetKind === "string" &&
+      !CONDITION_ACCEPTING_TARGETS.has(targetKind)
+    ) {
+      addFinding("predicateHygiene", {
+        file,
+        entryId,
+        tier,
+        detail: `${context}: condition on target kind "${targetKind}" — only "secondary" / "armorQuality" accept condition (parser strips with warn)`,
+      });
+    }
+    if (!Array.isArray(condition)) {
+      addFinding("predicateHygiene", {
+        file,
+        entryId,
+        tier,
+        detail: `${context}: condition must be an array`,
+      });
+    } else {
+      for (let i = 0; i < condition.length; i++) {
+        const c = condition[i];
+        if (!c || typeof c !== "object") {
+          addFinding("predicateHygiene", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: condition[${i}] not an object`,
+          });
+          continue;
+        }
+        const ck = c.kind;
+        if (typeof ck !== "string" || !KNOWN_CONDITION_KINDS.has(ck)) {
+          addFinding("predicateHygiene", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: condition[${i}].kind="${ck}" invalid`,
+          });
+          continue;
+        }
+        if (ck === "noArmor") continue;
+        if (!Array.isArray(c.values) || c.values.length === 0) {
+          addFinding("predicateHygiene", {
+            file,
+            entryId,
+            tier,
+            detail: `${context}: condition[${i}] (${ck}) missing/empty values[]`,
+          });
+          continue;
+        }
+        if (ck === "armorSlot") {
+          for (const v of c.values) {
+            if (typeof v !== "string" || !KNOWN_ARMOR_SLOTS.has(v)) {
+              addFinding("predicateHygiene", {
+                file,
+                entryId,
+                tier,
+                detail: `${context}: condition[${i}].values contains invalid slot "${v}" (must be "body" or "plug")`,
+              });
+            }
+          }
+        } else if (ck === "armorQuality") {
+          for (const v of c.values) {
+            if (typeof v === "string")
+              noteQualityRef(v, file, entryId, "condition");
+          }
+        }
+      }
+    }
+  }
+
+  // Strict authoring rule: every authored `armorQuality`-target effect
+  // requires a non-empty `condition`. Without it, the effect would mutate
+  // every equipped armor piece — which is virtually never the authoring
+  // intent. Registry-synthesized effects (in `reference/qualities.*.json`)
+  // get a slot condition stamped at load time and are exempt; this lint
+  // walks ability/spell/talent/ritual files which don't go through that
+  // synthesis path.
+  if (
+    targetKind === "armorQuality" &&
+    !file.includes("qualities.") &&
+    (!Array.isArray(condition) || condition.length === 0)
+  ) {
+    addFinding("predicateHygiene", {
+      file,
+      entryId,
+      tier,
+      detail: `${context}: armorQuality target requires a non-empty condition (would otherwise apply to every equipped piece)`,
+    });
   }
 }
 

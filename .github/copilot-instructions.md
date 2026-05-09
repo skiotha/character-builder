@@ -57,7 +57,7 @@ in [`docs/decisions/README.md`](../docs/decisions/README.md). Key ones:
 - **ADR-012:** Standards-first HTML, CSS & Web Platform conventions. Semantic markup, `@layer`/`@scope`/native nesting, native widgets over custom JS, modern CSS and Web APIs preferred.
 - **ADR-013:** Domain layer as the mutation gate. `src/models/index.mts` is the single entry point for character mutations; storage is internal. Handlers and middleware import from `#models`, never `#models/storage` (carve-outs: `src/lib/backup.mts` and code inside `src/models/` itself).
 - **ADR-014:** Per-slot combat, special attacks & reactions. `combat.carried` is `[Slot|null, Slot|null, Slot]`; index 2 is required and must reference a weapon with the `own` quality (default `natural_weapon`). Combat phase fans out per slot. `SpecialAttack[]` / `Reaction[]` are derived collections distinguished by `trigger === "manual"`. Tier stacking is additive. **Slot naming convention** — use names, not numbers, in prose / UI / commit messages: index 0 = **main-hand**, index 1 = **off-hand**, index 2 = **own**. The numeric tuple is an implementation detail; "slot 2" is ambiguous so don't write it.
-- **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). 5-kind discriminated union (`secondary | combat | weaponQuality | armorQuality | flag`), `WeaponPredicate` (`any | type | quality | id`, AND-composed via `appliesTo`), per-phase `EffectModifier` shapes including `remove`, no `priority` field.
+- **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). 8-kind discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | primary | magicAttribute | initiativeAttribute`), `WeaponPredicate` (`any | type | quality | id`, AND-composed via `appliesTo` for per-slot weapon narrowing), `ArmorCondition` (`armorQuality | armorId | armorSlot | noArmor`, AND-composed via `condition` for character-level / per-armor-piece gating on `secondary` and `armorQuality` targets, §3f), per-phase `EffectModifier` shapes including `remove`, no `priority` field.
 - **ADR-016:** Quality registry. `reference/qualities.{en,ru}.json` is the engine-canonical source of effects for weapon/armor qualities (single namespace, parametric ids via `_N` suffix, EN authoritative, locale-drift lint enforces structural alignment). Engine throws on unknown ids; production registry is loaded once at startup via `loadQualityIndex()` in `src/app.mts`.
 
 ## Coding Guidelines
@@ -73,6 +73,18 @@ Imports are ordered by category, separated by blank lines:
 
 If an import line contains both functions and constants, order it by the
 highest-priority item (functions > constants).
+
+### Code Documentation
+
+Written code carries explanatory comments at three scales. Pick the right one for the change you're making:
+
+- **Top-of-file module header** — use for any non-trivial `.mts` module (rules engine, models, multi-step routes). Document the module's purpose, where it sits in the larger flow, and any cross-cutting invariants. The header in [`src/rules/derived.mts`](../src/rules/derived.mts) (numbered pipeline overview) is the reference shape. Keep it current when the pipeline changes.
+- **Function-level JSDoc block** — use above any exported function whose contract isn't obvious from the signature, and above any non-exported function with non-trivial semantics. In `.mts` write a `/** ... */` block describing **what the function guarantees** (not what it does line-by-line) and any preconditions / phase ordering it relies on. In **client `.mjs` files use JSDoc descriptions consistently** — they're the only type signal and the existing client code (e.g. [`public/api.mjs`](../public/api.mjs)) is fully annotated; new client functions should match.
+- **Inline `//` comments** — use for non-obvious branches, phase markers (`// ── N. addFlat ─────`), and for citing the ADR / Bug / weak-points entry that explains *why* the code does what it does. Prefer `// Bug #31.` or `// ADR-015 §3f` over restating the rule.
+
+Don't comment trivial mechanics (variable names speak for themselves). Do comment: invariants the engine depends on, non-obvious resets / orderings, gotchas that already burned someone (the mock-before-import gotcha below is the model).
+
+When you change a behaviour the comments describe, update the comments in the same edit. Stale doc-comments are worse than missing ones.
 
 ### Commands
 
@@ -104,7 +116,7 @@ The server maps URLs to the filesystem as follows:
 | `/uploads/portraits/**` | `data/uploads/portraits/` | Character portrait images. |
 | `/**` (everything else) | `public/` | SPA client files (`.html`, `.mjs`, `.css`). Falls back to `index.html` for client-side routing. |
 
-> Note: `reference/` is **not** served as static files. Its contents are exposed only through `/api/v1/{traits,talents,rituals,weapons,armor}` (which apply locale resolution and merging).
+> Note: `reference/` is **not** served as static files. Its contents are exposed only through `/api/v1/{traits,talents,rituals,weapons,armor,qualities}` (which apply locale resolution and merging).
 
 When rewriting or moving static file references, update both the HTML/CSS/JS `href`/`src` attributes **and** ensure the files exist at the corresponding filesystem path.
 
@@ -123,7 +135,7 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Character schema is defined in `src/models/character.mts`
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
-- Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`
+- Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`, `remove` (the last is set-membership only — `weaponQuality` / `armorQuality` / `flag` targets, ADR-015 §3a)
 - Canonical RPG rules reference (attributes, formulas, effect tiers, combat) is kept as a Copilot repo memory (`nagara-rpg-rules.md`). Surface it explicitly when working on Phase 6 / engine code.
 
 ### Bug Trackers
@@ -183,11 +195,11 @@ See `docs/roadmap.md` for the full phased work plan. Quick reference:
 | 3     | Schema-driven rendering          | ✅ Done     |
 | 4     | Testing                          | ✅ Done\*   |
 | 5     | Bug fixes & hardening            | ✅ Done     |
-| 6     | RPG Engine                       | Not started |
+| 6     | RPG Engine                       | In progress |
 | 7     | Sibling project integration      | Not started |
 | 8     | Polish & beyond MVP              | Not started |
 
-\* _Server-side tests complete (444). Engine + client-side test suites run alongside Phases 6 and 8 respectively._
+\* _Server-side tests complete (607 as of 2026-05-09). Engine + client-side test suites run alongside Phases 6 and 8 respectively. Phase 6 is mid-flight: Chunks A–F shipped (per-slot combat, typed effects, quality registry, bulk reference normalization); a Chunk-F post-pass amendment is closing remaining engine items — see [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md) and [`.github/plans/phase6-chunkF-postpass-amendment.md`](../.github/plans/phase6-chunkF-postpass-amendment.md)._
 
 ## Sibling Projects
 

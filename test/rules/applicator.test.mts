@@ -267,7 +267,10 @@ describe("applyFlag", () => {
         modifier: { type: "addFlat", value: 1 },
       },
     ]);
-    assert.deepEqual(char.equipment.armor.body!.qualities, ["reinforced"]);
+    assert.deepEqual(char.equipment.armor.body!.qualitiesEffective, [
+      "reinforced",
+    ]);
+    assert.deepEqual(char.equipment.armor.body!.qualities, []);
   });
 
   it("removes armor quality", () => {
@@ -285,7 +288,11 @@ describe("applyFlag", () => {
         modifier: { type: "remove" },
       },
     ]);
-    assert.deepEqual(char.equipment.armor.body!.qualities, ["padded"]);
+    assert.deepEqual(char.equipment.armor.body!.qualitiesEffective, ["padded"]);
+    assert.deepEqual(char.equipment.armor.body!.qualities, [
+      "reinforced",
+      "padded",
+    ]);
   });
 
   it("no-op when armor body is null", () => {

@@ -174,6 +174,47 @@ Worked example — *Exceptional Attribute (strong) +1*:
 
 `appliesTo` is silently stripped with a warn — primary attributes are character-level, not slot-level.
 
+### 3f. Character-level effect gating via `condition`
+
+`appliesTo` (§2) narrows **per-slot** combat effects to a subset of weapons. It does **not** apply to character-level targets like `secondary` or to armor-side `armorQuality` effects, which run once against the character / once per armor piece. To gate those, `ResolvedEffect` carries an optional `condition?: ArmorCondition[]` field whose entries AND-compose:
+
+```ts
+type ArmorCondition =
+  | { kind: "armorQuality"; values: string[] }   // any equipped piece carries any of these
+  | { kind: "armorId";      values: string[] }   // any equipped piece has one of these ids
+  | { kind: "armorSlot";    values: ("body" | "plug")[] } // listed slot is non-empty
+  | { kind: "noArmor" };                          // both slots empty
+```
+
+Accepted target kinds: `secondary` (character-level read), `armorQuality` (per-piece read; see below). The parser strips `condition` with a warn from any other target kind. Within a single condition's `values[]`, membership is OR-composed; across conditions, AND-composed.
+
+Per-piece semantics for `armorQuality` targets: when `applyArmorQuality` iterates `body` / `plug`, each condition is evaluated against the current piece — `armorSlot` matches only when that piece's slot is in `values`, `armorQuality` reads only that piece's qualities, and `noArmor` always returns false (a piece exists). This keeps add/remove operations scoped exactly to the piece the authoring intent describes.
+
+Worked example — *Combat Oils Novice* (`secondary.armor +4`, only when an oiled piece is equipped):
+
+```jsonc
+{
+  "target":    { "kind": "secondary", "stat": "armor" },
+  "modifier":  { "type": "addFlat", "value": 4 },
+  "condition": [{ "kind": "armorQuality", "values": ["oiled"] }]
+}
+```
+
+Worked example — *Demiurge Hands Master* (remove `hampering_2`, but only from the plug, and only if it actually carries it):
+
+```jsonc
+{
+  "target":    { "kind": "armorQuality", "quality": "hampering_2" },
+  "modifier":  { "type": "remove" },
+  "condition": [
+    { "kind": "armorSlot",    "values": ["plug"] },
+    { "kind": "armorQuality", "values": ["hampering_2"] }
+  ]
+}
+```
+
+Implementation note — armor overlay: the engine writes per-piece add/remove results to `ArmorPiece.qualitiesEffective` (an optional, server-controlled overlay) and resets it from `qualities` at the top of every recalc. Authored `qualities` is never mutated. Quality-registry synthesis (§3a) for a piece's own qualities is auto-stamped with `condition: [{ kind: "armorSlot", values: [<piece>] }]` so a body piece's quality can never bleed onto the plug. Closes weak-point bug #31's remaining caveat (armor overlay) and the "armor-side `appliesTo` ignored" gap.
+
 ### 4. No `priority` field
 
 Effect ordering is determined by the phase the modifier belongs to, in the fixed order defined by [ADR-010](010-effect-resolution-pipeline.md):

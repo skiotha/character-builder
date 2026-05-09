@@ -522,8 +522,15 @@ describe("armorQuality: body and plug", () => {
     char.traits = [{ id: "reinforcement", tier: "novice", source: "ability" }];
 
     const result = recalculate(char, registry);
-    assert.deepEqual(result.equipment.armor.body!.qualities, ["reinforced"]);
-    assert.deepEqual(result.equipment.armor.plug!.qualities, ["reinforced"]);
+    assert.deepEqual(result.equipment.armor.body!.qualitiesEffective, [
+      "reinforced",
+    ]);
+    assert.deepEqual(result.equipment.armor.plug!.qualitiesEffective, [
+      "reinforced",
+    ]);
+    // Authored qualities never mutated (Bug #31).
+    assert.deepEqual(result.equipment.armor.body!.qualities, []);
+    assert.deepEqual(result.equipment.armor.plug!.qualities, []);
   });
 });
 
