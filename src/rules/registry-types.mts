@@ -22,7 +22,19 @@ import type {
 
 export interface TraitLookupResult {
   effects: ResolvedEffect[];
+  /**
+   * Special attacks granted by this trait at the queried tier.
+   *
+   * **Ordering contract (ADR-014, Item 9):** entries MUST appear in
+   * tier-ascending order — `novice` first, then `adept`, then `master`.
+   * The engine collection step (`collectActions` in `derived.mts`)
+   * relies on this order for last-write-wins dedupe by `Action.id`,
+   * so a master-tier rewrite of a same-id entry replaces the lower
+   * tier's version. The reference loader (Chunk G) and the in-memory
+   * test stub both produce arrays in this order; do not re-sort.
+   */
   specialAttacks: SpecialAttack[];
+  /** Reactions granted at the queried tier. Same ordering contract as `specialAttacks`. */
   reactions: Reaction[];
 }
 

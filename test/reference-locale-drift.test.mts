@@ -160,4 +160,46 @@ describe("reference locale drift", () => {
       });
     });
   }
+
+  // Explicit pin: nested `id` strings on specialAttacks / reactions
+  // must agree across en and ru. The deep-equals pass above already
+  // enforces this transitively, but this sub-test makes the contract
+  // unmistakeable so a future addition of nested locale-allowlist
+  // fields cannot silently relax it (ADR-014, Item 9).
+  describe("nested action id parity (abilities + spells)", () => {
+    for (const topic of ["abilities", "spells"] as const) {
+      it(`${topic}: nested specialAttack/reaction ids agree between en and ru`, async () => {
+        const [en, ru] = await Promise.all([
+          loadTopic(topic, "en"),
+          loadTopic(topic, "ru"),
+        ]);
+        for (let i = 0; i < en.length; i += 1) {
+          const enEntry = en[i] as Record<string, unknown>;
+          const ruEntry = ru[i] as Record<string, unknown>;
+          const enTiers = (enEntry.tiers ?? {}) as Record<string, unknown>;
+          const ruTiers = (ruEntry.tiers ?? {}) as Record<string, unknown>;
+          for (const tierKey of Object.keys(enTiers)) {
+            const enTier = (enTiers[tierKey] ?? {}) as Record<string, unknown>;
+            const ruTier = (ruTiers[tierKey] ?? {}) as Record<string, unknown>;
+            for (const field of ["specialAttacks", "reactions"] as const) {
+              const enList = (enTier[field] ?? []) as Array<{ id?: unknown }>;
+              const ruList = (ruTier[field] ?? []) as Array<{ id?: unknown }>;
+              assert.equal(
+                enList.length,
+                ruList.length,
+                `${topic}[${i}].tiers.${tierKey}.${field}: length differs`,
+              );
+              for (let j = 0; j < enList.length; j += 1) {
+                assert.equal(
+                  enList[j]?.id,
+                  ruList[j]?.id,
+                  `${topic}[${i}].tiers.${tierKey}.${field}[${j}].id: en='${String(enList[j]?.id)}', ru='${String(ruList[j]?.id)}'`,
+                );
+              }
+            }
+          }
+        }
+      });
+    }
+  });
 });

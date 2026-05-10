@@ -4,9 +4,11 @@
 > authoring; the resolution is locked, the implementation was deferred so
 > authoring wasn't disrupted by churning types/schema/engine.
 >
-> Each item carries its own `### Status` section. As of 2026-05-07, shipped:
-> Item 13 (2026-05-06), Item 10 (2026-05-06; primaryEffective follow-up
-> 2026-05-07), Item 11 (2026-05-06). All other items remain deferred.
+> Each item carries its own `### Status` section. As of 2026-05-10, shipped:
+> Item 3 (2026-05-04), Item 13 (2026-05-06), Item 10 (2026-05-06;
+> primaryEffective follow-up 2026-05-07), Item 11 (2026-05-06),
+> Items 5/2/4 (2026-05-08, G2.A/B/C), Item 9 (2026-05-10).
+> Deferred: Items 1, 6, 7, 8, 12.
 >
 > **Connection to `phase6-plan.md`.** This file is the staging ground for
 > what will become Chunk G's amendment work. Items are pulled into the main
@@ -797,6 +799,32 @@ and add a derived `combat.freeAttacks: number` per-slot field. Don't pre-build i
 ---
 
 ## Item 9 — Special-attack rewrite by id (rank supersedes lower rank)
+
+### Status
+
+✅ Implemented 2026-05-10. Engine collection step lives in
+`src/rules/derived.mts` (`collectActions`); dedupes via `Map.set`-based
+last-write-wins keyed by `Action.id`, relying on the registry's
+tier-ascending ordering contract documented on `TraitLookupResult` in
+`src/rules/registry-types.mts`. **Diverged from the original sketch:**
+rank stamping was dropped — the in-place `Map`/ordered-iteration trick
+produces identical semantics with no rank field on the wire and no
+change to `TraitLookupResult`. The legacy `Action.source` field
+(structured `{kind, id, tier}`) was unused by the engine and was
+**removed** rather than retained alongside the new `id`. Talents and
+equipment still do not contribute actions (artifact authoring is YAGNI).
+
+7-test suite (`test/rules/special-attacks-rewrite.test.mts`) covers
+same-id rewrite (specialAttacks + reactions), different-id coexistence,
+adept never receives master entries, empty traits, unknown-trait
+warn-and-skip, and Bug #31 reset on repeat recalc. Audit script gained
+an "Action ids" lint section (missing/empty `id`, dup-within-tier,
+cross-parent collision); current catalog reports zero findings.
+Locale-drift test gained an explicit nested-action-id parity pin for
+abilities + spells. ADR-014 amended (§9 "Action rewrite by id" + history
+note on `source` removal); `docs/data-contracts.md` and
+`docs/authoring-effects.md` §10 updated with the rewrite convention
+and worked examples (Intrigues/Backstab, Sulfur Cascade).
 
 ### Problem
 

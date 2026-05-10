@@ -75,6 +75,7 @@ const findings: Record<string, Finding[]> = {
   qualityResolution: [],
   amendmentBlockers: [],
   rogueFields: [],
+  actionIds: [],
 };
 const flagNames = new Set<string>();
 const flagOccurrences: Record<string, number> = {};
@@ -82,6 +83,18 @@ const qualityIds = new Set<string>();
 const qualityRefs = new Map<
   string,
   { file: string; entryId: string; via: string }[]
+>();
+
+// Cross-parent action-id accumulator (ADR-014, Item 9). Same-id entries
+// belonging to the SAME parent (ability/spell) are the documented
+// rewrite-by-id pattern; same-id across DIFFERENT parents is undefined
+// behaviour (engine ordering would decide which one wins, last-trait-
+// processed) and almost certainly an authoring slip. Reported via the
+// `actionIds` bucket. Walked across both abilities.* and spells.* in
+// both locales.
+const actionIdOwners = new Map<
+  string, // `${actionId}|${field}`  (field = "specialAttack" | "reaction")
+  { file: string; parentId: string }
 >();
 
 function addFinding(bucket: keyof typeof findings, f: Finding): void {
@@ -521,6 +534,70 @@ function inspectEffect(
 
 // ── File-type walkers ──
 
+/**
+ * Lints for nested action ids on specialAttacks / reactions
+ * (ADR-014, Item 9):
+ *
+ *   1. Each entry must carry a non-empty string `id`.
+ *   2. Within a single tier's array, ids must be unique. The engine's
+ *      collection step is `Map.set` which would silently drop dups
+ *      anyway, but at the same tier this is always an authoring slip.
+ *   3. Across different parent abilities/spells (and across both
+ *      en/ru locales — the lint accumulator is global), ids must be
+ *      unique. Cross-parent collisions produce non-deterministic-
+ *      looking last-trait-processed-wins behaviour at recalc time.
+ *
+ *   Note: same-id ACROSS TIERS of the same parent is intentional —
+ *   that's the rewrite-by-id pattern (master replaces adept replaces
+ *   novice). It is not flagged here.
+ */
+function inspectActionIds(
+  file: string,
+  parentId: string,
+  tier: string,
+  field: "specialAttack" | "reaction",
+  list: any[],
+): void {
+  const seenInTier = new Set<string>();
+  list.forEach((entry, i) => {
+    if (!entry || typeof entry !== "object") return;
+    const path = `${parentId}.tiers.${tier}.${field}s[${i}]`;
+    const id = entry.id;
+    if (typeof id !== "string" || id.length === 0) {
+      addFinding("actionIds", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: missing or empty 'id' (required since ADR-014 Item 9)`,
+      });
+      return;
+    }
+    if (seenInTier.has(id)) {
+      addFinding("actionIds", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: duplicate id '${id}' within the same tier (engine would silently dedupe)`,
+      });
+      return;
+    }
+    seenInTier.add(id);
+
+    const ownerKey = `${id}|${field}`;
+    const owner = actionIdOwners.get(ownerKey);
+    if (owner && owner.parentId !== parentId) {
+      addFinding("actionIds", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: id '${id}' also defined by '${owner.parentId}' in ${owner.file} — cross-parent collisions produce undefined recalc order`,
+      });
+    } else if (!owner) {
+      actionIdOwners.set(ownerKey, { file, parentId });
+    }
+  });
+}
+
 function walkAbilitiesOrSpells(file: string, data: any[]): void {
   for (const entry of data) {
     if (!entry || typeof entry !== "object") continue;
@@ -537,6 +614,7 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
       // Check for hardcoded special-attack/reaction shapes (Item 1).
       const specialAttacks = (tierVal as any).specialAttacks;
       if (Array.isArray(specialAttacks)) {
+        inspectActionIds(file, id, tierKey, "specialAttack", specialAttacks);
         specialAttacks.forEach((sa, i) => {
           if (
             sa &&
@@ -554,6 +632,7 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
       }
       const reactions = (tierVal as any).reactions;
       if (Array.isArray(reactions)) {
+        inspectActionIds(file, id, tierKey, "reaction", reactions);
         reactions.forEach((r, i) => {
           if (
             r &&
@@ -780,5 +859,10 @@ header("7. Rogue / unexpected fields");
 const rogueFindings = dedupe(findings.rogueFields!);
 if (rogueFindings.length === 0) console.log("  (none)");
 else rogueFindings.forEach((f) => console.log(`  [${f.file}] ${f.detail}`));
+
+header("8. Action ids (specialAttacks / reactions, ADR-014 Item 9)");
+const actionIdFindings = dedupe(findings.actionIds!);
+if (actionIdFindings.length === 0) console.log("  (none)");
+else actionIdFindings.forEach((f) => console.log(`  ${f.detail}`));
 
 console.log("\n--- end of audit ---");

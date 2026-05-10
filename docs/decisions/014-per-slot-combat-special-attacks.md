@@ -63,7 +63,12 @@ Two new derived collections on `Character`, populated by the engine and read-onl
 
 ```ts
 interface Action {
-  source: { kind: "ability" | "spell"; id: string; tier: TierName };
+  /**
+   * REQUIRED stable identifier (see Item 9 below). Locale-independent.
+   * Used as the rewrite key: same id at a higher tier replaces the
+   * lower; different ids coexist.
+   */
+  id: string;
   name: string;
   trigger: TriggerKind;
   attackAttribute?: PrimaryName;
@@ -74,6 +79,12 @@ interface Action {
 type SpecialAttack = Action & { trigger: "manual" };
 type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 ```
+
+> **History note:** the original ADR draft included a structured
+> `source: { kind, id, tier }` field on `Action`. It was never read
+> by the engine and was dropped in Item 9 (2026-05) in favour of the
+> required `id` as the dedupe key. Sibling apps that need provenance
+> can recover it from the trait list itself.
 
 **Distinction is purely semantic** — same shape, two collections:
 
@@ -123,6 +134,37 @@ The validator enforces:
 - `combat.carried[2].weaponIndex` references a weapon whose `qualities[]` contains `"own"`.
 
 Three weapons currently carry the `"own"` quality: [`natural_weapon`](../../data/weapons.en.json), `war_claws`, `heels`.
+
+### 9. Action rewrite by id
+
+`Action.id` is a required string and is the **rewrite key** during the
+engine's collection step (`collectActions` in
+[`src/rules/derived.mts`](../../src/rules/derived.mts)):
+
+- The registry's `lookupTrait(id, tier)` returns
+  `specialAttacks[]` and `reactions[]` in tier-ascending order
+  (novice → adept → master). The contract is documented on
+  `TraitLookupResult` in [`src/rules/registry-types.mts`](../../src/rules/registry-types.mts).
+- The engine iterates that order and writes into a `Map<id, Action>`.
+  `Map.set` is last-write-wins, so a higher-tier entry with a shared
+  `id` naturally replaces the lower-tier version. Different ids
+  coexist.
+
+Result: same-id at higher tier is the documented "rewrite this
+action" pattern (e.g. *Intrigues*'s `intrigues-backstab` going
+`damage: 10 → 12 → 14` across novice/adept/master). Same-id across
+**different** parent abilities/spells is undefined behaviour
+(last-trait-processed wins) and is flagged by the
+`scripts/audit-reference.mts` lint as an authoring error.
+
+**Engine declares; siblings consume.** Sibling projects (Discord
+bot, WoW addon) read `character.specialAttacks` / `character.reactions`
+verbatim — they do not run their own dedupe. Anyone changing the
+collection step must preserve the rewrite-by-id semantic.
+
+**Talents and equipment do not contribute actions today.** The hook is
+deliberately limited to `character.traits[]`. Artifact actions are
+YAGNI until a concrete authoring need lands.
 
 ## Consequences
 

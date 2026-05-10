@@ -204,7 +204,18 @@ export type TriggerKind =
   | "onRageEnd";
 
 export interface Action {
-  source: string;
+  /**
+   * REQUIRED stable identifier. Locale-independent. Used for
+   * rewrite-group dedupe in the engine: when two actions share the
+   * same `id`, the one granted at the higher ability rank
+   * (master > adept > novice) replaces the lower (ADR-014, Item 9).
+   *
+   * Authoring convention: prefix with the parent ability/spell id,
+   * e.g. `intrigues-backstab`, `sulfur-cascade-scorch`. The lint in
+   * `scripts/audit-reference.mts` enforces presence and per-tier /
+   * cross-parent uniqueness.
+   */
+  id: string;
   name: string;
   trigger: TriggerKind;
   attackAttribute?: PrimaryAttributeName;

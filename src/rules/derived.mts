@@ -23,14 +23,21 @@
 //                           `bonusDamage`, weaponQuality add/remove,
 //                           plus weapon.effects[] with implicit
 //                           appliesTo = the carrying weapon.
+//   10a. collectActions   — repopulate `specialAttacks` / `reactions`
+//                           from the registry, deduped by `Action.id`
+//                           with last-write-wins (master rewrites
+//                           adept rewrites novice; ADR-014, Item 9).
 //   11. enforceConsistency (XP guard + equipment defaulting only).
 
 import type {
   Character,
   CombatSlot,
+  LearnedTrait,
   PrimaryAttributeName,
   PrimaryAttributes,
+  Reaction,
   ResolvedEffect,
+  SpecialAttack,
   Weapon,
 } from "#rpg-types";
 import type { Registry } from "./registry-types.mts";
@@ -135,10 +142,59 @@ export function recalculate(
   // ── 8. deriveCombatSlots ─────────────────────────────────────────
   deriveCombatSlots(result, effects, registry, primaryEffective);
 
+  // ── 8a. collectActions (ADR-014, Item 9) ─────────────────────────
+  // Repopulate the engine-owned `specialAttacks` / `reactions`
+  // arrays from the registry. Same-id entries from a higher tier
+  // (master > adept > novice) replace lower-tier versions. Talents
+  // and equipment intentionally do NOT contribute actions today
+  // (artifact authoring is YAGNI; revisit alongside Chunk G+).
+  collectActions(result, registry);
+
   // ── 9. enforceConsistency (trimmed) ──────────────────────────────
   enforceConsistency(result);
 
   return result;
+}
+
+/**
+ * Walk `character.traits[]` and populate `result.specialAttacks` /
+ * `result.reactions` from the registry.
+ *
+ * Dedupe by `Action.id` with last-write-wins semantics: the registry's
+ * `TraitLookupResult` returns actions in tier-ascending order
+ * (novice → adept → master, see `registry-types.mts`), so iterating in
+ * order and writing into a `Map` keyed by id naturally lets a
+ * master-tier rewrite replace its lower-tier counterpart while
+ * different-id entries from any tier coexist (ADR-014, Item 9).
+ *
+ * Unknown trait ids are warned-and-skipped, mirroring
+ * `collectAllEffects`. The Bug #31 reset at the top of `recalculate`
+ * already guarantees the destination arrays are empty before we run.
+ */
+function collectActions(
+  character: {
+    traits?: LearnedTrait[];
+    specialAttacks: SpecialAttack[];
+    reactions: Reaction[];
+  },
+  registry: Registry,
+): void {
+  const saMap = new Map<string, SpecialAttack>();
+  const reactMap = new Map<string, Reaction>();
+
+  for (const trait of character.traits ?? []) {
+    const result = registry.lookupTrait(trait.id, trait.tier);
+    if (!result) {
+      // Already warned in `collectAllEffects` for the same trait;
+      // stay silent here to avoid double-logging the same miss.
+      continue;
+    }
+    for (const sa of result.specialAttacks) saMap.set(sa.id, sa);
+    for (const r of result.reactions) reactMap.set(r.id, r);
+  }
+
+  character.specialAttacks = [...saMap.values()];
+  character.reactions = [...reactMap.values()];
 }
 
 // ── Per-slot combat fanout (ADR-014) ───────────────────────────────

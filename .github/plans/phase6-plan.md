@@ -766,8 +766,9 @@ back-and-forth.
 | 4    | `initiativeAttribute` derived character field           | 2026-05-08  | G2.C. Mirrors Item 2; default `"quick"`. *Tactics-novice* re-authored Tier C → Tier A. *Quick Reflexes Master* keeps `flag: initiativeExemption` (out of scope). ADR-015 §3d. |
 | —    | Strip per-spell `attackAttribute` from spells.json      | 2026-05-08  | G2.D companion. Removed 25 hard-coded attribute strings from `specialAttacks[]` / `reactions[]` in `reference/spells.{en,ru}.json`. Sibling apps now read `character.magicAttribute`. |
 | 3    | Armor-side `appliesTo` / character-level effect gating  | 2026-05-04  | New optional `condition?: ArmorCondition[]` on `ResolvedEffect` (kinds: `armorQuality`, `armorId`, `armorSlot`, `noArmor`), accepted on `secondary` (character-level) and `armorQuality` (per-piece). Bonus: armor overlay split — engine writes to `ArmorPiece.qualitiesEffective` (reset every recalc), authored `qualities` no longer mutated. Closes weak-point Bug #31's remaining caveat. ADR-015 §3f. Authoring sweep: Soldier Adept, Demiurge Hands Novice/Master across `abilities.{en,ru}.json`. Tracker entry: weak-point #32. |
+| 9    | Special-attack rewrite by id (rank supersedes lower)    | 2026-05-10  | New `collectActions` step in `derived.mts`: walks `traits[]`, dedupes by required `Action.id` via `Map.set` last-write-wins; relies on registry's documented tier-ascending order (`TraitLookupResult` JSDoc) instead of a rank field. **Diverged:** dropped rank-stamping (free with ordered iteration) and **removed** the unused `Action.source` field rather than retaining it. Talents/equipment intentionally don't contribute (YAGNI). 7-test suite + nested-id locale-drift pin + audit lint Section 8 (missing/dup/cross-parent). ADR-014 §9; `data-contracts.md` + `authoring-effects.md` §10 updated. |
 
-Items still on deck (in staging, not yet scheduled): 1, 6, 7, 8, 9, 12.
+Items still on deck (in staging, not yet scheduled): 1, 6, 7, 8, 12.
 
 ### F-side audit: schema defaults that hard-code reference data
 

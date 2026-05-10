@@ -802,8 +802,7 @@ piece's quality never bleeds onto the plug.
 ### `SpecialAttack` / `Reaction` wire shape on tier objects
 
 ADR-014 says these are derived collections distinguished by
-`trigger === "manual"`. The intended landing shape is alongside
-`effects[]` on a tier:
+`trigger === "manual"`. The wire shape on tier objects is:
 
 ```jsonc
 {
@@ -812,20 +811,83 @@ ADR-014 says these are derived collections distinguished by
       "description": "...",
       "effects": [],
       "specialAttacks": [
-        { "name": "Whirlwind", "trigger": "manual", "damage": 4, "attackAttribute": "strong" }
+        {
+          "id": "whirlwind-spin",            // REQUIRED, locale-independent
+          "name": "Whirlwind",
+          "trigger": "manual",
+          "damage": 4,
+          "attackAttribute": "strong"
+        }
       ],
       "reactions": [
-        { "name": "Riposte", "trigger": "onAttacked", "damage": 2 }
+        {
+          "id": "riposte-counter",
+          "name": "Riposte",
+          "trigger": "onAttacked",
+          "damage": 2
+        }
       ]
     }
   }
 }
 ```
 
-The registry-side collection lands in Chunk G. **For the bulk pass:**
-leave special attacks and reactions as Tier C narrative
-`description`-only entries. Back-filled in a dedicated follow-up once
-the shape is firm.
+**`id` is required and is the rewrite key (ADR-014, Item 9):** when the
+same `id` appears at two tiers of the same parent ability/spell, the
+higher tier replaces the lower. Different ids coexist. So to "upgrade"
+a novice special attack at the master tier, repeat the same `id` and
+edit the other fields:
+
+```jsonc
+{
+  "tiers": {
+    "novice": {
+      "specialAttacks": [
+        { "id": "intrigues-backstab", "name": "Backstab", "trigger": "manual", "damage": 10 }
+      ]
+    },
+    "master": {
+      "specialAttacks": [
+        { "id": "intrigues-backstab", "name": "Backstab", "trigger": "manual", "damage": 14 }
+      ]
+    }
+  }
+}
+```
+
+A character with `intrigues@master` ends up with **one** Backstab in
+`character.specialAttacks` (the master version). A character at adept
+gets the novice version (the registry never serves them the master
+entry). To add a brand-new entry at a higher tier, give it a new id:
+
+```jsonc
+{
+  "tiers": {
+    "novice": {
+      "specialAttacks": [
+        { "id": "sulfur-cascade-scorch", "name": "Scorch", "trigger": "manual", "damage": 6 }
+      ]
+    },
+    "adept": {
+      "specialAttacks": [
+        { "id": "sulfur-cascade-pyroclasm", "name": "Pyroclasm", "trigger": "manual", "damage": 10 }
+      ]
+    }
+  }
+}
+```
+
+**Authoring conventions:**
+
+- Prefix the id with the parent ability/spell id (kebab-case) so
+  cross-parent collisions are nearly impossible: `intrigues-backstab`,
+  `sulfur-cascade-scorch`. The `scripts/audit-reference.mts` lint
+  flags missing ids, dups within a tier, and cross-parent collisions.
+- `id` is locale-independent — the en/ru locale-drift lint asserts
+  parallel entries carry identical ids.
+- The registry collection step is in `src/rules/derived.mts`
+  (`collectActions`); talents and equipment do **not** contribute
+  actions today (artifact authoring is YAGNI).
 
 ### `EffectFlag` cleanup
 

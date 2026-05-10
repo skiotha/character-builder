@@ -259,6 +259,28 @@ The combat phase fans out per slot; `SpecialAttack[]` and `Reaction[]`
 are distinguished by `trigger === "manual"`. Tier stacking is additive.
 Full shape documented in ADR-014.
 
+Each entry in `specialAttacks` / `reactions` carries a required
+`id: string` that the engine uses as a rewrite key — same id at a
+higher tier of the same parent ability/spell replaces the lower
+(ADR-014 §9). Sibling apps consume these arrays verbatim and do not
+re-dedupe. The `Action` shape is:
+
+```jsonc
+{
+  "id": "string",                            // required, locale-independent
+  "name": "string",
+  "trigger": "manual" | "onAttacked" | ...,
+  "attackAttribute": "strong" | ...,         // optional
+  "damage": 4,                               // optional, number or dice
+  "effects": [ /* ResolvedEffect[] */ ]       // optional
+}
+```
+
+> The pre-Item-9 drafts of ADR-014 included a structured `source`
+> field on `Action`. It was never read by the engine and was dropped;
+> sibling code that previously read it should switch to ignoring its
+> absence (no replacement is needed).
+
 ### 1.2 Learned Trait / Talent / Ritual
 
 Traits (abilities and spells) use a tier model with a source discriminator:
