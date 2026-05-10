@@ -53,7 +53,7 @@
         ],
         "reactions": [
           {
-            "id": "bounce-back",
+            "id": "acrobatics-bounce-back",
             "name": "Снова на Ногах",
             "description": "Попытка мгновенно подняться на ноги.",
             "trigger": "onProne"
@@ -83,7 +83,7 @@
         ],
         "reactions": [
           {
-            "id": "hide-behind-enemy",
+            "id": "acrobatics-hide-behind-enemy",
             "name": "Подставить Чужую Спину",
             "description": "Попытка спрятаться за противником.",
             "trigger": "onAttacked"
@@ -176,7 +176,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "feint",
+            "id": "smoke-and-mirrors-feint",
             "name": "Финт",
             "description": "Выполнить Финт.",
             "trigger": "manual",
@@ -225,7 +225,7 @@
         ],
         "reactions": [
           {
-            "id": "intrigues",
+            "id": "intrigues-strike-from-shadows",
             "name": "Интриги",
             "description": "Выполнить Удар в Спину, когда есть Преимущество.",
             "trigger": "onAdvantage"
@@ -233,7 +233,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "backstab",
+            "id": "intrigues-backstab",
             "name": "Удар в Спину",
             "description": "Удар в Спину -- специальная атака, которую можно использовать один раз за ход и только, когда есть Преимущество. Она наносит +d4 урона сверх обычного урона.",
             "trigger": "manual",
@@ -265,7 +265,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "backstab",
+            "id": "intrigues-backstab",
             "name": "Удар в Спину",
             "description": "Удар в Спину -- специальная атака, которую можно использовать вместо любой атаки, когда есть Преимущество. Она наносит +d8 урона сверх обычного урона.",
             "trigger": "manual",
@@ -298,7 +298,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "cheap-shot",
+            "id": "street-fighting-cheap-shot",
             "name": "Подлый Удар",
             "description": "Подлый Удар может оглушить цель. Если успешен, можно совершить комбо атаку сразу после.",
             "trigger": "manual",
@@ -317,7 +317,7 @@
         ],
         "reactions": [
           {
-            "id": "knock-over",
+            "id": "street-fighting-knock-over",
             "name": "Подножка",
             "description": "После любой успешной атаки в ближнем бою можно попытаться опрокинуть цель на землю.",
             "trigger": "onHit"
@@ -334,7 +334,7 @@
         ],
         "reactions": [
           {
-            "id": "riposte",
+            "id": "street-fighting-riposte",
             "name": "Ответка",
             "description": "Когда мастер становится целью атаки в ближнем бою, он может совершить контратаку.",
             "trigger": "onAttacked",
@@ -381,7 +381,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "stab",
+            "id": "knife-mastery-stab",
             "name": "Тычок",
             "description": "Совершить дополнительную атаку ножом.",
             "trigger": "manual",
@@ -484,7 +484,7 @@
         ],
         "reactions": [
           {
-            "id": "dodge-and-swap",
+            "id": "quick-reflexes-dodge-and-swap",
             "name": "Пируэт",
             "description": "После чужого промаха адепт поменяться с противником местами и оказаться у него за спиной.",
             "trigger": "onDodged"
@@ -707,7 +707,7 @@
         ],
         "reactions": [
           {
-            "id": "hidden-attack",
+            "id": "poisoner-hidden-attack",
             "name": "Скрытая Атака",
             "description": "Если у вас есть преимущество, вы можете совершить Скрытую Атаку как Свободное Действие.",
             "trigger": "onAdvantage",
@@ -760,7 +760,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "choking-grapple",
+            "id": "strangling-choking-grapple",
             "name": "Душащий Захват",
             "description": "Душащий Захват — это специальная атака, которую можно выполнить после успешного удара с преимуществом. Она наносит d6 игнорирующего броню урона и не позволяет цели совершать действия, пока захват не будет разорван.",
             "trigger": "manual",
@@ -779,7 +779,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "spores-dust",
+            "id": "strangling-spores-dust",
             "name": "Удушающие Споры",
             "description": "Целевая атака на ближнем расстоянии с использованием специальной ядовитой пыли. При контакте наносит d4 игнорирующего броню урона за ход в течение d4 ходов; цель может двигаться и действовать после попадания.",
             "trigger": "manual",
@@ -798,7 +798,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "spores-grenade",
+            "id": "strangling-spores-grenade",
             "name": "Споровая Бомба",
             "description": "Бросок специальной алхимической гранаты. При взрыве она наносит d4 игнорирующего броню урона за ход в течение d4 ходов. Затронутые цели могут только пытаться выйти из зоны поражения.",
             "trigger": "manual",
@@ -1938,7 +1938,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "crippling-shot",
+            "id": "marksmanship-crippling-shot",
             "name": "Травмирующий Выстрел",
             "description": "Точный выстрел, способный пригвоздить цель на месте.",
             "trigger": "manual",
@@ -1976,7 +1976,7 @@
         ],
         "reactions": [
           {
-            "id": "hunters-mark",
+            "id": "hunter-instinct-hunters-mark",
             "name": "Метка Охотника",
             "description": "Переброс неудачных атак дальнего боя по отмеченной цели.",
             "trigger": "onMiss",
@@ -2013,7 +2013,7 @@
         ],
         "reactions": [
           {
-            "id": "hunters-wrath",
+            "id": "hunter-instinct-hunters-wrath",
             "name": "Гнев Охотника",
             "description": "Свободная дальнобойная атака по отмеченной цели при попытке движения.",
             "trigger": "onEnemyMovement",
@@ -2042,7 +2042,7 @@
         ],
         "reactions": [
           {
-            "id": "arrow-jab",
+            "id": "skirmish-arrow-jab",
             "name": "Тычок стрелой",
             "description": "Ответный удар стрелой, штыком или обухом по атакующему в ближнем бою.",
             "trigger": "onAttacked",
@@ -2061,7 +2061,7 @@
         ],
         "reactions": [
           {
-            "id": "arrow-jab",
+            "id": "skirmish-arrow-jab",
             "name": "Тычок стрелой",
             "description": "Ответный удар стрелой, штыком или обухом по атакующему в ближнем бою.",
             "trigger": "onAttacked",
@@ -2080,7 +2080,7 @@
         ],
         "reactions": [
           {
-            "id": "close-quarters-shot",
+            "id": "skirmish-close-quarters-shot",
             "name": "Выстрел с Ближней Дистанции",
             "description": "После успешного тычка стрелой мастер может сразу же сделать свободный выстрел по врагу, даже если враг находится в ближнем бою.",
             "trigger": "onHit",
@@ -2120,7 +2120,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "maiming-shot",
+            "id": "trick-shooting-maiming-shot",
             "name": "Калечащий Выстрел",
             "description": "Прицельный выстрел, который накладывает статусный эффект при попадании. Требует полного действия для выполнения.",
             "trigger": "manual",
@@ -2148,7 +2148,7 @@
         ],
         "reactions": [
           {
-            "id": "parrying-shot",
+            "id": "trick-shooting-parrying-shot",
             "name": "Парирующий Выстрел",
             "description": "Парирование дальнобойным оружием атаки ближнего боя по союзнику или дальней атаки по себе либо союзнику.",
             "trigger": "onAllyAttacked"
@@ -2182,7 +2182,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "volley",
+            "id": "suppressive-fire-volley",
             "name": "Залп",
             "description": "Выпустить дополнительный выстрел, потратив Движение.",
             "trigger": "manual",
@@ -2201,7 +2201,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "volley",
+            "id": "suppressive-fire-volley",
             "name": "Залп",
             "description": "Выпустить дополнительный выстрел.",
             "trigger": "manual",
@@ -2220,7 +2220,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "storm-of-arrows",
+            "id": "suppressive-fire-storm-of-arrows",
             "name": "Град Стрел",
             "description": "Выпустить один дополнительный выстрел.",
             "trigger": "manual",
@@ -2276,7 +2276,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "fan-of-knives",
+            "id": "steel-throw-fan-of-knives",
             "name": "Веер Ножей",
             "description": "Бросить оружие еще раз.",
             "trigger": "manual",
@@ -2295,7 +2295,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "hail-of-iron",
+            "id": "steel-throw-hail-of-iron",
             "name": "Железный Шторм",
             "description": "Бросить оружие еще раз.",
             "trigger": "manual",
@@ -2351,7 +2351,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "flourish",
+            "id": "cloak-dance-flourish",
             "name": "Фокус",
             "description": "Попытка ослепить соседнего врага полотном; при успехе цель считается ослепленной до начала следующего хода.",
             "trigger": "manual",
@@ -2361,7 +2361,7 @@
         ],
         "reactions": [
           {
-            "id": "pounce",
+            "id": "cloak-dance-pounce",
             "name": "Наброситься",
             "description": "Сделать одну Свободную Атаку по любому ослепленному врагу.",
             "trigger": "onHit",
@@ -2425,7 +2425,7 @@
         ],
         "reactions": [
           {
-            "id": "counterattack",
+            "id": "blessed-swordsman-counterattack",
             "name": "Контратака",
             "description": "Свободная атака, доступная после успешной проверки Защиты.",
             "trigger": "onDodged",
@@ -2506,7 +2506,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "heel-kick",
+            "id": "at-the-top-heel-kick",
             "name": "Удар Каблуком",
             "description": "Свободная атака боевыми каблуками, доступная раз за ход.",
             "trigger": "manual",
@@ -2565,7 +2565,7 @@
         ],
         "reactions": [
           {
-            "id": "choking-tie",
+            "id": "entanglement-choking-tie",
             "name": "Удушающий Галстук",
             "description": "После успешной атаки опутывающим оружием можно выполнить специальную атаку Удушающий Галстук. Она наносит d6 игнорирующего броню урона и предотвращает действия цели до разрыва захвата.",
             "trigger": "onHit",
@@ -2624,7 +2624,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "sweeping-strike",
+            "id": "composite-weapon-mastery-sweeping-strike",
             "name": "Сметающий Удар",
             "description": "Атака по всем окружающим врагам на одном размахе.",
             "trigger": "manual",
@@ -2653,7 +2653,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shock-strike",
+            "id": "axe-patterns-shock-strike",
             "name": "Удар Шока",
             "description": "Удар тупой стороной топора, чтобы шокировать и оглушить врага на d6 урона; при успехе следует обычная атака.",
             "trigger": "manual",
@@ -2690,7 +2690,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "whirlwind",
+            "id": "axe-patterns-whirlwind",
             "name": "Вихрь Топоров",
             "description": "Дополнительная атака топором.",
             "trigger": "manual",
@@ -2709,7 +2709,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "ravaging-blow",
+            "id": "axe-patterns-ravaging-blow",
             "name": "Разрушительный Удар",
             "description": "Мощный удар топором, наносящий значительный урон.",
             "trigger": "manual",
@@ -2768,7 +2768,7 @@
         ],
         "reactions": [
           {
-            "id": "reach-strike",
+            "id": "polearm-reach-strike",
             "name": "Достигающий Удар",
             "description": "Совершите свободную атаку против врага, который входит в зону ближнего боя, если он не вооружен длинным оружием.",
             "trigger": "onContact"
@@ -2860,7 +2860,7 @@
         ],
         "reactions": [
           {
-            "id": "second-end-of-the-stick",
+            "id": "staff-mastery-second-end-of-the-stick",
             "name": "Второй Конец Палки",
             "description": "Совершите свободную атаку другим концом посоха после промаха.",
             "trigger": "onMiss",
@@ -2868,7 +2868,7 @@
             "attackAttribute": "accurate"
           },
           {
-            "id": "return-strike",
+            "id": "staff-mastery-return-strike",
             "name": "Возвратный Удар",
             "description": "Совершите свободную атаку посохом после успешной проверки Защиты.",
             "trigger": "onDodged",
@@ -2887,7 +2887,7 @@
         ],
         "reactions": [
           {
-            "id": "knockdown",
+            "id": "staff-mastery-knockdown",
             "name": "Опрокидывание",
             "description": "Попытка опрокинуть противника после успешной атаки; в случае успеха, совершите дополнительную Свободную Атаку на d6 с преимуществом.",
             "trigger": "onHit",
@@ -2938,7 +2938,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "off-hand-strike",
+            "id": "double-strike-off-hand-strike",
             "name": "Вторая Рука",
             "description": "Совершите атаку коротким или легким оружием во второй руке.",
             "trigger": "manual",
@@ -2957,7 +2957,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "off-hand-strike",
+            "id": "double-strike-off-hand-strike",
             "name": "Вторая Рука",
             "description": "Совершите атаку любым одноручным оружием ближнего боя во второй руке.",
             "trigger": "manual",
@@ -3069,7 +3069,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "mighty-blow",
+            "id": "iron-body-mighty-blow",
             "name": "Мощный Удар",
             "description": "Раз в ход мастер может нанести особенно мощный удар, добавляющий d12 урона вместо обычного бонуса.",
             "trigger": "manual",
@@ -3121,7 +3121,7 @@
         ],
         "reactions": [
           {
-            "id": "momentum",
+            "id": "behemoth-momentum",
             "name": "Инерция",
             "description": "После промаха атакой тяжелым двуручным оружием можно совершить последующую атаку, используя возвращающуюся инерцию, нанося до d8 урона.",
             "trigger": "onMiss",
@@ -3204,7 +3204,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shield-bash",
+            "id": "shields-shield-bash",
             "name": "Удар Щитом",
             "description": "Атака щитом, которая наносит d4 урона и может повалить врага на землю.",
             "trigger": "manual",
@@ -3223,7 +3223,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shield-bash",
+            "id": "shields-shield-bash",
             "name": "Удар Щитом",
             "description": "Атака щитом, которая наносит d8 урона и может повалить врага на землю.",
             "trigger": "manual",
@@ -3275,7 +3275,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "elbow-strike",
+            "id": "unarmed-combat-elbow-strike",
             "name": "Локоть",
             "description": "Вторая безоружная атака.",
             "trigger": "manual",
@@ -3294,7 +3294,7 @@
         ],
         "reactions": [
           {
-            "id": "vital-strike",
+            "id": "unarmed-combat-vital-strike",
             "name": "Смертельный Удар",
             "description": "Каждая успешная безоружная атака может нанести до d6 дополнительного урона.",
             "trigger": "onHit",
@@ -3331,7 +3331,7 @@
         ],
         "reactions": [
           {
-            "id": "throw",
+            "id": "wrestling-throw",
             "name": "Бросок",
             "description": "После успешной атаки вы можете попытаться захватить врага и бросить его на землю, нанося d4 урона, игнорирующего броню.",
             "trigger": "onHit",
@@ -3339,7 +3339,7 @@
             "attackAttribute": "strong"
           },
           {
-            "id": "hold",
+            "id": "wrestling-hold",
             "name": "Удержание",
             "description": "После успешной атаки вы можете попытаться захватить врага и удерживать его без нанесения урона, не давая двигаться и действовать.",
             "trigger": "onHit"
@@ -3356,7 +3356,7 @@
         ],
         "reactions": [
           {
-            "id": "grapple",
+            "id": "wrestling-grapple",
             "name": "Захват",
             "description": "Попытка проверки Скорости, чтобы захватить врага, бросить его на землю, нанести d4 урона и прервать его ход.",
             "trigger": "onDodged",
@@ -3379,7 +3379,7 @@
         ],
         "reactions": [
           {
-            "id": "preemptive-grapple",
+            "id": "wrestling-preemptive-grapple",
             "name": "Упреждающий Захват",
             "description": "Поймать врага в его атаке с помощью проверки Скорости; при успехе бросить его на землю, нанести d6 урона и прервать его ход. Затем провести свободную атаку по нему.",
             "trigger": "onAttacked",
@@ -3511,7 +3511,7 @@
         ],
         "reactions": [
           {
-            "id": "instant-recovery",
+            "id": "recovery-instant-recovery",
             "name": "Мгновенное Восстановление",
             "description": "Позволяет использовать Восстановление как реакцию на только что полученные повреждения для восстановления до d8 Выживаемости.",
             "trigger": "onDamaged"
@@ -3583,7 +3583,7 @@
         ],
         "reactions": [
           {
-            "id": "interception",
+            "id": "bodyguard-interception",
             "name": "Перехват",
             "description": "Воля, чтобы перехватить атаку по союзнику, от которой он не может защититься.",
             "trigger": "onAllyAttacked"
@@ -3609,7 +3609,7 @@
         ],
         "reactions": [
           {
-            "id": "punish",
+            "id": "bodyguard-punish",
             "name": "Наказание",
             "description": "Любая атака по союзнику вызывает свободную атаку по нападавшему.",
             "trigger": "onAllyAttacked",
@@ -3680,7 +3680,7 @@
         ],
         "reactions": [
           {
-            "id": "iron-hide",
+            "id": "soldier-iron-hide",
             "name": "Железная Шкура",
             "description": "Сделайте проверку Быстроты, чтобы противодействовать любым эффектам игнорирования или пробивания брони.",
             "trigger": "onAttacked"
@@ -3725,7 +3725,7 @@
         ],
         "reactions": [
           {
-            "id": "mental-backlash",
+            "id": "fortitude-mental-backlash",
             "name": "Ментальный Ответ",
             "description": "Любая провалившаяся ментальная атака по вам вызывает ответную реакцию в d6 игнорирующего броню урона по нападавшему.",
             "trigger": "onResisted",
@@ -4255,7 +4255,7 @@
         ],
         "reactions": [
           {
-            "id": "absorb-corruption",
+            "id": "guided-sin-absorb-corruption",
             "name": "Потребление Порочности",
             "description": "Перенаправьте на себя любую временную Порочность, которая должна была повлиять на кого-то рядом.",
             "trigger": "onSpellCast"
@@ -4281,7 +4281,7 @@
         ],
         "reactions": [
           {
-            "id": "redirect-corruption",
+            "id": "guided-sin-redirect-corruption",
             "name": "Перенаправление Порочности",
             "description": "Перенаправьте на врага любую временную Порочность, которая должна была повлиять на кого-то рядом.",
             "trigger": "onSpellCast"
@@ -4324,7 +4324,7 @@
         ],
         "reactions": [
           {
-            "id": "ground-corruption",
+            "id": "demiurge-hands-ground-corruption",
             "name": "Заземление Порочности",
             "description": "Перенаправьте в ладонь демиурга любую временную Порочность, которая должна была повлиять на носителя.",
             "trigger": "onSpellCast"
@@ -4375,7 +4375,7 @@
         ],
         "reactions": [
           {
-            "id": "attune-to-plug",
+            "id": "demiurge-hands-attune-to-plug",
             "name": "Настройка на Ладонь",
             "description": "Перенаправьте в ладонь демиурга любую временную Порочность, которая должна была повлиять на носителя.",
             "trigger": "onNewDay"
@@ -4560,7 +4560,7 @@
         ],
         "reactions": [
           {
-            "id": "retaliate",
+            "id": "mobile-combat-retaliate",
             "name": "Расплата",
             "description": "Когда мастер становится целью свободной атаки, вызванной разрывом дистанции, он может провести свободную атаку по оппоненту любым доступным оружием.",
             "trigger": "onAttacked"
@@ -4594,7 +4594,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "blinding-powder",
+            "id": "pyrotechnics-blinding-powder",
             "name": "Ослепляющий Порошок",
             "description": "Аккуртность, чтобы бросить ослепляющий порошок, чтобы нанести d4 игнорирующего броню урона и ослепить цель на d4 хода.",
             "trigger": "manual",
@@ -4613,7 +4613,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "smoke-canister",
+            "id": "pyrotechnics-smoke-canister",
             "name": "Дымовая Шашка",
             "description": "Аккуратность, чтобы швырнуть дымовую шашку, которая заполняет область ослепляющим дымом; при успешной проверке Аккуратности все, кто не покинет область, получают d4 игнорирующего броню урона и не могут видеть.",
             "trigger": "manual",
@@ -4632,7 +4632,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "thunder-ball",
+            "id": "pyrotechnics-thunder-ball",
             "name": "Громовой Шар",
             "description": "Использовать громовой шар, который наносит до d12 игнорирующего броню урона при успешной проверке Аккуратности, или d6 при неудаче, и ослепляет цель на d4 раунда.",
             "trigger": "manual",

@@ -53,7 +53,7 @@
         ],
         "reactions": [
           {
-            "id": "bounce-back",
+            "id": "acrobatics-bounce-back",
             "name": "Bounce Back",
             "description": "Attempt to get up instantly.",
             "trigger": "onProne"
@@ -83,7 +83,7 @@
         ],
         "reactions": [
           {
-            "id": "hide-behind-enemy",
+            "id": "acrobatics-hide-behind-enemy",
             "name": "Hide Behind Enemy",
             "description": "Attempt to hide behind an enemy.",
             "trigger": "onAttacked"
@@ -176,7 +176,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "feint",
+            "id": "smoke-and-mirrors-feint",
             "name": "Feint",
             "description": "Perform a Feint attack.",
             "trigger": "manual",
@@ -226,7 +226,7 @@
         ],
         "reactions": [
           {
-            "id": "intrigues",
+            "id": "intrigues-strike-from-shadows",
             "name": "Intrigues",
             "description": "If you have advantage during your turn, you can perform a Backstab attack.",
             "trigger": "onAdvantage"
@@ -234,7 +234,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "backstab",
+            "id": "intrigues-backstab",
             "name": "Backstab",
             "description": "A Backstab is a special attack that can be used once per turn. It deals +d4 damage on top of the normal damage.",
             "trigger": "manual",
@@ -266,7 +266,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "backstab",
+            "id": "intrigues-backstab",
             "name": "Backstab",
             "description": "A Backstab is a special attack that can be used instead of any attack if you have the advantage. It deals +d8 damage on top of the normal damage.",
             "trigger": "manual",
@@ -299,7 +299,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "cheap-shot",
+            "id": "street-fighting-cheap-shot",
             "name": "Cheap Shot",
             "description": "Cheap Shot can stun the target. If successful, you can perform one additional normal attack right after.",
             "trigger": "manual",
@@ -318,7 +318,7 @@
         ],
         "reactions": [
           {
-            "id": "knock-over",
+            "id": "street-fighting-knock-over",
             "name": "Knock Over",
             "description": "After a successful melee atack, can attempt to knock the target prone.",
             "trigger": "onHit"
@@ -335,7 +335,7 @@
         ],
         "reactions": [
           {
-            "id": "riposte",
+            "id": "street-fighting-riposte",
             "name": "Riposte",
             "description": "When targeted by a melee attack, the Master can make a counterattack as a reaction.",
             "trigger": "onAttacked",
@@ -382,7 +382,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "stab",
+            "id": "knife-mastery-stab",
             "name": "Stab",
             "description": "Make an additional knife attack as a bonus action.",
             "trigger": "manual",
@@ -485,7 +485,7 @@
         ],
         "reactions": [
           {
-            "id": "dodge-and-swap",
+            "id": "quick-reflexes-dodge-and-swap",
             "name": "Dodge and Swap",
             "description": "After an enemy misses an attack against you, you can swap places with them as a reaction.",
             "trigger": "onDodged"
@@ -701,7 +701,7 @@
         ],
         "reactions": [
           {
-            "id": "hidden-attack",
+            "id": "poisoner-hidden-attack",
             "name": "Hidden Attack",
             "description": "When you have advantage, you can make a hidden weapon attack as a free action.",
             "trigger": "onAdvantage",
@@ -747,7 +747,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "choking-grapple",
+            "id": "strangling-choking-grapple",
             "name": "Choking Grapple",
             "description": "A Choking Grapple is a special attack that can be performed after a successful hit with advantage. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
             "trigger": "manual",
@@ -766,7 +766,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "spores-dust",
+            "id": "strangling-spores-dust",
             "name": "Spores Dust",
             "description": "A targeted melee distance attack with a special poisonous dust. On contact, it deals d4 armor-ignoring damage per turn for d4 turns; the target can still move and act after being hit.",
             "trigger": "manual",
@@ -785,7 +785,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "spores-grenade",
+            "id": "strangling-spores-grenade",
             "name": "Spores Grenade",
             "description": "A thrown attack with an alchemical grenade. On explosion, it deals d4 armor-ignoring damage per turn for d4 turns. Affected targets can only attempt to move out.",
             "trigger": "manual",
@@ -1905,7 +1905,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "crippling-shot",
+            "id": "marksmanship-crippling-shot",
             "name": "Crippling Shot",
             "description": "A precise shot that can pin the target in place.",
             "trigger": "manual",
@@ -1943,7 +1943,7 @@
         ],
         "reactions": [
           {
-            "id": "hunters-mark",
+            "id": "hunter-instinct-hunters-mark",
             "name": "Hunter's Mark",
             "description": "Reroll failed ranged attacks against marked target.",
             "trigger": "onMiss",
@@ -1980,7 +1980,7 @@
         ],
         "reactions": [
           {
-            "id": "hunters-wrath",
+            "id": "hunter-instinct-hunters-wrath",
             "name": "Hunter's Wrath",
             "description": "Free ranged attack against the marked target when they attempt to move.",
             "trigger": "onEnemyMovement",
@@ -2009,7 +2009,7 @@
         ],
         "reactions": [
           {
-            "id": "arrow-jab",
+            "id": "skirmish-arrow-jab",
             "name": "Arrow Jab",
             "description": "Strike with an arrow, bayonet, or barrel in response to a melee attack against you.",
             "trigger": "onAttacked",
@@ -2028,7 +2028,7 @@
         ],
         "reactions": [
           {
-            "id": "arrow-jab",
+            "id": "skirmish-arrow-jab",
             "name": "Arrow Jab",
             "description": "Strike with an arrow, bayonet, or barrel in response to a melee attack against you.",
             "trigger": "onAttacked",
@@ -2047,7 +2047,7 @@
         ],
         "reactions": [
           {
-            "id": "close-quarters-shot",
+            "id": "skirmish-close-quarters-shot",
             "name": "Close Quarters Shot",
             "description": "After a successful jab, the Master may immediately free shot with their ranged weapon at the enemy even if the enemy is in melee.",
             "trigger": "onHit",
@@ -2080,7 +2080,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "maiming-shot",
+            "id": "trick-shooting-maiming-shot",
             "name": "Maiming Shot",
             "description": "A precise shot that applies a status effect on hit. Costs Full Action to perform.",
             "trigger": "manual",
@@ -2108,7 +2108,7 @@
         ],
         "reactions": [
           {
-            "id": "parrying-shot",
+            "id": "trick-shooting-parrying-shot",
             "name": "Parrying Shot",
             "description": "Parry with a ranged weapon against a melee attack targeting an ally, or a ranged attack against yourself or an ally.",
             "trigger": "onAllyAttacked"
@@ -2142,7 +2142,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "volley",
+            "id": "suppressive-fire-volley",
             "name": "Volley",
             "description": "Fire additional shot by spending Movement.",
             "trigger": "manual",
@@ -2161,7 +2161,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "volley",
+            "id": "suppressive-fire-volley",
             "name": "Volley",
             "description": "Fire additional shot.",
             "trigger": "manual",
@@ -2180,7 +2180,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "storm-of-arrows",
+            "id": "suppressive-fire-storm-of-arrows",
             "name": "Storm of Arrows",
             "description": "Fire one additional shot.",
             "trigger": "manual",
@@ -2236,7 +2236,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "fan-of-knives",
+            "id": "steel-throw-fan-of-knives",
             "name": "Fan of Knives",
             "description": "Throw a weapon an additional time.",
             "trigger": "manual",
@@ -2255,7 +2255,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "hail-of-iron",
+            "id": "steel-throw-hail-of-iron",
             "name": "Hail of Iron",
             "description": "Throw a weapon an additional time.",
             "trigger": "manual",
@@ -2311,7 +2311,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "flourish",
+            "id": "cloak-dance-flourish",
             "name": "Flourish",
             "description": "Attempt to blind an adjacent enemy with the cloth; on success, the target is blinded until the start of the next turn.",
             "trigger": "manual",
@@ -2321,7 +2321,7 @@
         ],
         "reactions": [
           {
-            "id": "pounce",
+            "id": "cloak-dance-pounce",
             "name": "Pounce",
             "description": "Make one free attack against any blinded target.",
             "trigger": "onHit",
@@ -2385,7 +2385,7 @@
         ],
         "reactions": [
           {
-            "id": "counterattack",
+            "id": "blessed-swordsman-counterattack",
             "name": "Counterattack",
             "description": "Enables a free retaliation after a successful Defense check.",
             "trigger": "onDodged",
@@ -2466,7 +2466,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "heel-kick",
+            "id": "at-the-top-heel-kick",
             "name": "Heel Kick",
             "description": "A free combat heel attack that can be used once per turn.",
             "trigger": "manual",
@@ -2525,7 +2525,7 @@
         ],
         "reactions": [
           {
-            "id": "choking-tie",
+            "id": "entanglement-choking-tie",
             "name": "Choking Tie",
             "description": "After a successful attack with an entangling weapon, you can perform a Choking Tie special attack. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
             "trigger": "onHit",
@@ -2584,7 +2584,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "sweeping-strike",
+            "id": "composite-weapon-mastery-sweeping-strike",
             "name": "Sweeping Strike",
             "description": "Attack all surrounding enemies with a sweeping blow.",
             "trigger": "manual",
@@ -2613,7 +2613,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shock-strike",
+            "id": "axe-patterns-shock-strike",
             "name": "Shock Strike",
             "description": "Hit with the blunt side of the axe to shock and stun the enemy for d6 damage; on success, follow up with a normal attack.",
             "trigger": "manual",
@@ -2650,7 +2650,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "whirlwind",
+            "id": "axe-patterns-whirlwind",
             "name": "Whirlwind",
             "description": "Make an additional attack with your axe.",
             "trigger": "manual",
@@ -2669,7 +2669,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "ravaging-blow",
+            "id": "axe-patterns-ravaging-blow",
             "name": "Ravaging Blow",
             "description": "A powerful axe strike that deals significant damage.",
             "trigger": "manual",
@@ -2729,7 +2729,7 @@
         ],
         "reactions": [
           {
-            "id": "reach-strike",
+            "id": "polearm-reach-strike",
             "name": "Reach Strike",
             "description": "Make a free attack against an enemy who comes into melee range, as long as they are not armed with a long weapon.",
             "trigger": "onContact"
@@ -2814,7 +2814,7 @@
         ],
         "reactions": [
           {
-            "id": "second-end-of-the-stick",
+            "id": "staff-mastery-second-end-of-the-stick",
             "name": "Second End of the Stick",
             "description": "Make a free attack with the staff after a missed attack.",
             "trigger": "onMiss",
@@ -2822,7 +2822,7 @@
             "attackAttribute": "accurate"
           },
           {
-            "id": "return-strike",
+            "id": "staff-mastery-return-strike",
             "name": "Return Strike",
             "description": "Make a free attack with the staff after a successful Defense check.",
             "trigger": "onDodged",
@@ -2841,7 +2841,7 @@
         ],
         "reactions": [
           {
-            "id": "knockdown",
+            "id": "staff-mastery-knockdown",
             "name": "Knockdown",
             "description": "Attempt to knock the enemy prone after a successful attack; on success, make a free follow-up attack for d6 with advantage.",
             "trigger": "onHit",
@@ -2892,7 +2892,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "off-hand-strike",
+            "id": "double-strike-off-hand-strike",
             "name": "Off-Hand Strike",
             "description": "Make an attack with a short or light off-hand weapon.",
             "trigger": "manual",
@@ -2911,7 +2911,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "off-hand-strike",
+            "id": "double-strike-off-hand-strike",
             "name": "Off-Hand Strike",
             "description": "Make an attack with any one-handed melee weapon in the off-hand.",
             "trigger": "manual",
@@ -3023,7 +3023,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "mighty-blow",
+            "id": "iron-body-mighty-blow",
             "name": "Mighty Blow",
             "description": "Once per turn, deal an exceptionally powerful strike that adds d12 damage instead of the normal bonus.",
             "trigger": "manual",
@@ -3075,7 +3075,7 @@
         ],
         "reactions": [
           {
-            "id": "momentum",
+            "id": "behemoth-momentum",
             "name": "Momentum",
             "description": "After a missed attack with a two-handed weapon, you can make a follow-up attack using the returning momentum for up to d8 damage.",
             "trigger": "onMiss",
@@ -3158,7 +3158,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shield-bash",
+            "id": "shields-shield-bash",
             "name": "Shield Bash",
             "description": "A shield bash attack that deals d4 damage and may knock the enemy prone.",
             "trigger": "manual",
@@ -3177,7 +3177,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "shield-bash",
+            "id": "shields-shield-bash",
             "name": "Shield Bash",
             "description": "A shield bash attack that deals d8 damage and may knock the enemy prone.",
             "trigger": "manual",
@@ -3229,7 +3229,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "elbow-strike",
+            "id": "unarmed-combat-elbow-strike",
             "name": "Elbow Strike",
             "description": "Make a second unarmed attack.",
             "trigger": "manual",
@@ -3248,7 +3248,7 @@
         ],
         "reactions": [
           {
-            "id": "vital-strike",
+            "id": "unarmed-combat-vital-strike",
             "name": "Vital Strike",
             "description": "Every successful unarmed attack may deal up to d6 additional damage.",
             "trigger": "onHit",
@@ -3285,7 +3285,7 @@
         ],
         "reactions": [
           {
-            "id": "throw",
+            "id": "wrestling-throw",
             "name": "Throw",
             "description": "After a successful attack, you can attempt to grapple the enemy and throw them on the ground for d4 armor-ignoring damage.",
             "trigger": "onHit",
@@ -3293,7 +3293,7 @@
             "attackAttribute": "strong"
           },
           {
-            "id": "hold",
+            "id": "wrestling-hold",
             "name": "Hold",
             "description": "After a successful attack, you can attempt to grapple the enemy and hold them without dealing damage, preventing their movement and actions.",
             "trigger": "onHit"
@@ -3310,7 +3310,7 @@
         ],
         "reactions": [
           {
-            "id": "grapple",
+            "id": "wrestling-grapple",
             "name": "Grapple",
             "description": "Attempt a Quick check to grapple the enemy, throwing them prone, dealing d4 damage, and interrupting their turn.",
             "trigger": "onDodged",
@@ -3333,7 +3333,7 @@
         ],
         "reactions": [
           {
-            "id": "preemptive-grapple",
+            "id": "wrestling-preemptive-grapple",
             "name": "Preemptive Grapple",
             "description": "Caught the enemy in their attack with a Quick check; on success, throw them prone, deal d6 damage, and interrupt their turn. Then make a free attack against them.",
             "trigger": "onAttacked",
@@ -3465,7 +3465,7 @@
         ],
         "reactions": [
           {
-            "id": "instant-recovery",
+            "id": "recovery-instant-recovery",
             "name": "Instant Recovery",
             "description": "Trigger your recovery as a reaction to damage just received for up to d8 Toughness.",
             "trigger": "onDamaged"
@@ -3537,7 +3537,7 @@
         ],
         "reactions": [
           {
-            "id": "interception",
+            "id": "bodyguard-interception",
             "name": "Interception",
             "description": "Make a Resolute check to intercept an attack against an ally that they cannot defend against.",
             "trigger": "onAllyAttacked"
@@ -3563,7 +3563,7 @@
         ],
         "reactions": [
           {
-            "id": "punish",
+            "id": "bodyguard-punish",
             "name": "Punish",
             "description": "Any attack on an ally triggers a free attack against the attacker.",
             "trigger": "onAllyAttacked",
@@ -3634,7 +3634,7 @@
         ],
         "reactions": [
           {
-            "id": "iron-hide",
+            "id": "soldier-iron-hide",
             "name": "Iron Hide",
             "description": "Make a Quick check to counter any armor-bypassing or armor-piercing effects.",
             "trigger": "onAttacked"
@@ -3679,7 +3679,7 @@
         ],
         "reactions": [
           {
-            "id": "mental-backlash",
+            "id": "fortitude-mental-backlash",
             "name": "Mental Backlash",
             "description": "Any failed mental attack against you triggers a d6 armor-ignoring damage reaction against the attacker.",
             "trigger": "onResisted",
@@ -4216,7 +4216,7 @@
         ],
         "reactions": [
           {
-            "id": "absorb-corruption",
+            "id": "guided-sin-absorb-corruption",
             "name": "Absorb Corruption",
             "description": "Redirect onto yourself any temporary Corruption that was about to affect someone nearby.",
             "trigger": "onSpellCast"
@@ -4242,7 +4242,7 @@
         ],
         "reactions": [
           {
-            "id": "redirect-corruption",
+            "id": "guided-sin-redirect-corruption",
             "name": "Redirect Corruption",
             "description": "Redirect onto enemy any temporary Corruption that was about to affect someone nearby.",
             "trigger": "onSpellCast"
@@ -4285,7 +4285,7 @@
         ],
         "reactions": [
           {
-            "id": "ground-corruption",
+            "id": "demiurge-hands-ground-corruption",
             "name": "Ground Corruption",
             "description": "Redirect into the plug any temporary Corruption that was about to affect the wielder.",
             "trigger": "onSpellCast"
@@ -4336,7 +4336,7 @@
         ],
         "reactions": [
           {
-            "id": "attune-to-plug",
+            "id": "demiurge-hands-attune-to-plug",
             "name": "Attune to Plug",
             "description": "Redirect into the plug any temporary Corruption that was about to affect the wielder.",
             "trigger": "onNewDay"
@@ -4529,7 +4529,7 @@
         ],
         "reactions": [
           {
-            "id": "retaliate",
+            "id": "mobile-combat-retaliate",
             "name": "Retaliate",
             "description": "When targeted by a free attack triggered by disengaging, make a free attack against the opponent using any available weapon.",
             "trigger": "onAttacked"
@@ -4563,7 +4563,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "blinding-powder",
+            "id": "pyrotechnics-blinding-powder",
             "name": "Blinding Powder",
             "description": "Throw blinding powder to deal d4 armor-ignoring damage and blind the target for d4 rounds on a successful Accurate check.",
             "trigger": "manual",
@@ -4582,7 +4582,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "smoke-canister",
+            "id": "pyrotechnics-smoke-canister",
             "name": "Smoke Canister",
             "description": "Deploy a smoke canister that fills an area with blinding smoke; on a successful Accurate check, all who do not leave the area take d4 armor-ignoring damage and cannot see.",
             "trigger": "manual",
@@ -4601,7 +4601,7 @@
         ],
         "specialAttacks": [
           {
-            "id": "thunder-ball",
+            "id": "pyrotechnics-thunder-ball",
             "name": "Thunder Ball",
             "description": "Use a thunder ball that deals up to d12 armor-ignoring damage on a successful Accurate check, or d6 on failure, and blinds the target for d4 rounds.",
             "trigger": "manual",
