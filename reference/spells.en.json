@@ -762,7 +762,7 @@
         ],
         "reactions": [
           {
-            "id": "purgatory-eye-for-eye",
+            "id": "purgatory-eye-for-an-eye",
             "name": "Purgatory: Eye for an Eye",
             "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
             "trigger": "onSpellCast"
