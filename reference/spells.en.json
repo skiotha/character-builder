@@ -54,6 +54,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-survive",
             "name": "Illusory Correction: Survive",
             "description": "Reroll Defense check.",
             "trigger": "onAttacked"
@@ -70,6 +71,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-destiny",
             "name": "Illusory Correction: Destiny",
             "description": "Reroll any failed check involving the mystic.",
             "trigger": "onCheck"
@@ -86,6 +88,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-world",
             "name": "Illusory Correction: World",
             "description": "Force reroll any check around the mystic.",
             "trigger": "onCheck"
@@ -165,6 +168,7 @@
         ],
         "reactions": [
           {
+            "id": "telekinesis-defense",
             "name": "Telekinesis: Defense",
             "description": "Resolute to protect yourself against any physical or mental attack with telekinesis.",
             "trigger": "onAttacked"
@@ -172,6 +176,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "telekinesis-attack",
             "name": "Telekinesis: Attack",
             "description": "Lift and throw an object at a target for damage.",
             "trigger": "manual",
@@ -189,6 +194,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "telekinesis-control",
             "name": "Telekinesis: Control",
             "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
             "trigger": "manual",
@@ -206,6 +212,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "telekinesis-control",
             "name": "Telekinesis: Control",
             "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
             "trigger": "manual",
@@ -352,6 +359,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-certainty",
             "name": "Psychic Strike: Certainty",
             "description": "Reroll Attack check.",
             "trigger": "onMiss"
@@ -368,6 +376,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-control",
             "name": "Psychic Strike: Control",
             "description": "Resolute to stun an enemy on successful weapon attack.",
             "trigger": "onHit"
@@ -384,6 +393,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-power",
             "name": "Psychic Strike: Power",
             "description": "Any successful physical attack inflicts additional non-avoidable psychic damage.",
             "trigger": "onHit",
@@ -448,6 +458,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Witch Hammer: Smash",
             "description": "Any successful physical attack inflicts additional damage.",
             "trigger": "onHit",
@@ -465,6 +476,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Witch Hammer: Smash",
             "description": "Any successful physical attack inflicts additional damage.",
             "trigger": "onHit",
@@ -482,6 +494,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Witch Hammer: Smash",
             "description": "Any successful physical attack inflicts additional damage.",
             "trigger": "onHit",
@@ -583,12 +596,14 @@
         ],
         "specialAttacks": [
           {
+            "id": "burning-glass-ray",
             "name": "Burning Glass: Ray",
             "description": "A ray of light that burns monsters harder than anything else.",
             "trigger": "manual",
             "damage": 6
           },
           {
+            "id": "burning-glass-ray-monster",
             "name": "Burning Glass: Ray (Monster)",
             "description": "The ray of light deals extra damage to monsters.",
             "trigger": "manual",
@@ -606,12 +621,14 @@
         ],
         "specialAttacks": [
           {
+            "id": "burning-glass-explosion",
             "name": "Burning Glass: Explosion",
             "description": "An explosion of light that burns monsters harder than anything else.",
             "trigger": "manual",
             "damage": 8
           },
           {
+            "id": "burning-glass-explosion-monster",
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals extra damage to monsters.",
             "trigger": "manual",
@@ -629,6 +646,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "burning-glass-explosion-monster",
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals damage to monsters and can stun them.",
             "trigger": "manual",
@@ -708,6 +726,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "purgatory-ray",
             "name": "Purgatory: Ray",
             "description": "The ray of radiance deals armor-piercing damage to a monster and can paralyze them.",
             "trigger": "manual",
@@ -725,6 +744,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "purgatory-blast",
             "name": "Purgatory: Blast",
             "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
             "trigger": "manual",
@@ -742,6 +762,7 @@
         ],
         "reactions": [
           {
+            "id": "purgatory-eye-for-eye",
             "name": "Purgatory: Eye for an Eye",
             "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
             "trigger": "onSpellCast"
@@ -813,6 +834,7 @@
         ],
         "reactions": [
           {
+            "id": "inherit-wound-suffer",
             "name": "Inherit Wound: Suffer",
             "description": "Can transfer ally's received damage onto yourself.",
             "trigger": "onAllyAttacked"
@@ -829,6 +851,7 @@
         ],
         "reactions": [
           {
+            "id": "inherit-wound-suffer",
             "name": "Inherit Wound: Suffer",
             "description": "Can transfer ally's received damage and physical status ailments onto yourself. Half of the damage dissipates.",
             "trigger": "onAllyAttacked"
@@ -845,6 +868,7 @@
         ],
         "reactions": [
           {
+            "id": "inherit-wound-punish",
             "name": "Inherit Wound: Punish",
             "description": "Can transfer ally's received damage to another creature, even to an unwilling one.",
             "trigger": "onAllyAttacked"
@@ -1109,6 +1133,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-discharge",
             "name": "Storm Arrow: Discharge",
             "description": "Launch up an enchanted arrow at the enemy as a Free Action.",
             "trigger": "manual",
@@ -1126,6 +1151,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-volley",
             "name": "Storm Arrow: Volley",
             "description": "Launch up to two enchanted arrows at the enemy as a Free Action.",
             "trigger": "manual",
@@ -1143,6 +1169,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-volley",
             "name": "Storm Arrow: Volley",
             "description": "Launch up to three enchanted arrows at the enemy as a Free Action.",
             "trigger": "manual",
@@ -1252,6 +1279,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
@@ -1269,6 +1297,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
@@ -1286,6 +1315,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
@@ -1350,6 +1380,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Ghost Strike: Ravage",
             "description": "Any successful physical attack inflicts additional damage.",
             "trigger": "onHit",
@@ -1367,6 +1398,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Ghost Strike: Ravage",
             "description": "Any successful physical attack inflicts additional damage and may raise the target as undead.",
             "trigger": "onHit",
@@ -1384,6 +1416,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Ghost Strike: Ravage",
             "description": "Any successful physical attack inflicts additional damage and may raise the target as undead.",
             "trigger": "onHit",
@@ -1456,6 +1489,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "black-arrow-shoot",
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain the target.",
             "trigger": "manual",
@@ -1473,6 +1507,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "black-arrow-shoot",
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain all targets.",
             "trigger": "manual",
@@ -1571,6 +1606,7 @@
         ],
         "reactions": [
           {
+            "id": "spirit-path-evasion",
             "name": "Spirit Path: Evasion",
             "description": "Become a spirit as a reaction to a physical attack, then return to normal immediately afterward.",
             "trigger": "onAttacked"
@@ -1704,6 +1740,7 @@
         ],
         "reactions": [
           {
+            "id": "retribution-link",
             "name": "Retribution: Link",
             "description": "As a reaction to being attacked, forge a link to the attacker that mirrors all damage the mystic receives from that target back onto it.",
             "trigger": "onAttacked"
@@ -1720,6 +1757,7 @@
         ],
         "reactions": [
           {
+            "id": "retribution-chain",
             "name": "Retribution: Chain",
             "description": "As a reaction to being attacked, forge a link to the attacker that mirrors all damage the mystic receives from any target back onto all linked enemies.",
             "trigger": "onAttacked"
@@ -1746,6 +1784,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "sulfur-cascade-scorch",
             "name": "Sulfur Cascade: Scorch",
             "description": "Strike an enemy with a cascade of fire that can deal damage even on a miss.",
             "trigger": "manual",
@@ -1763,6 +1802,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "sulfur-cascade-pyroclasm",
             "name": "Sulfur Cascade: Pyroclasm",
             "description": "Strike all enemies with cascades of fire that can deal damage even on a miss.",
             "trigger": "manual",
@@ -1836,6 +1876,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-blazing-shield",
             "name": "Fire Soul: Blazing Shield",
             "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
             "trigger": "onAttacked",
@@ -1853,6 +1894,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-blazing-shield",
             "name": "Fire Soul: Blazing Shield",
             "description": "As a reaction to being attacked, deal fire damage to the attacker and gain temporary Armor against fire.",
             "trigger": "onAttacked",
@@ -1876,6 +1918,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-pyromancy",
             "name": "Fire Soul: Pyromancy",
             "description": "Heal half of any fire damage received.",
             "trigger": "onDamaged"
@@ -1974,6 +2017,7 @@
         ],
         "reactions": [
           {
+            "id": "elegy-mental-fortitude",
             "name": "Elegy: Mental Fortitude",
             "description": "Prevent temporary Corruption.",
             "trigger": "onSpellCast"
@@ -2293,6 +2337,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "staff-projectile-throw",
             "name": "Staff Projectile: Throw",
             "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
             "trigger": "manual",
@@ -2310,6 +2355,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "staff-projectile-throw",
             "name": "Staff Projectile: Throw",
             "description": "Throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
             "trigger": "manual",

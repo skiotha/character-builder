@@ -54,6 +54,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-survive",
             "name": "Иллюзорная Коррекция: Выживание",
             "description": "Повтор проверки Защиты.",
             "trigger": "onAttacked"
@@ -70,6 +71,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-destiny",
             "name": "Иллюзорная Коррекция: Судьба",
             "description": "Повтор любой неудачной проверки, связанной с мистиком.",
             "trigger": "onCheck"
@@ -86,6 +88,7 @@
         ],
         "reactions": [
           {
+            "id": "illusory-correction-world",
             "name": "Иллюзорная Коррекция: Мир",
             "description": "Повтор любой проверки вокруг мистика.",
             "trigger": "onCheck"
@@ -157,6 +160,7 @@
         ],
         "reactions": [
           {
+            "id": "telekinesis-defense",
             "name": "Телекинез: Защита",
             "description": "Воля защищает от любой физической или ментальной атаки с помощью телекинеза.",
             "trigger": "onAttacked"
@@ -164,6 +168,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "telekinesis-attack",
             "name": "Телекинез: Атака",
             "description": "Поднять и бросить объект в цель для нанесения урона.",
             "trigger": "manual",
@@ -181,8 +186,9 @@
         ],
         "specialAttacks": [
           {
-            "name": "Telekinesis: Control",
-            "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
+            "id": "telekinesis-control",
+            "name": "Телекинез: Контроль",
+            "description": "Поднять и бросить врага. При успехе цель получает урон и оказывается поверженной.",
             "trigger": "manual",
             "damage": 8
           }
@@ -198,8 +204,9 @@
         ],
         "specialAttacks": [
           {
-            "name": "Telekinesis: Control",
-            "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
+            "id": "telekinesis-control",
+            "name": "Телекинез: Контроль",
+            "description": "Поднять и бросить всех врагов вокруг мистика. При успехе каждая цель получает урон и оказывается поверженной.",
             "trigger": "manual",
             "damage": 8
           }
@@ -352,6 +359,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-certainty",
             "name": "Психический Удар: Уверенность",
             "description": "Повтор проверки атаки.",
             "trigger": "onMiss"
@@ -368,6 +376,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-control",
             "name": "Психический Удар: Контроль",
             "description": "Воля позволяет парализовать врага при успешной атаке оружием.",
             "trigger": "onHit"
@@ -384,6 +393,7 @@
         ],
         "reactions": [
           {
+            "id": "psychic-strike-power",
             "name": "Психический Удар: Сила",
             "description": "Любая успешная физическая атака наносит дополнительный неизбежный психический урон.",
             "trigger": "onHit",
@@ -448,6 +458,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Молот Ведьм: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон.",
             "trigger": "onHit",
@@ -465,6 +476,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Молот Ведьм: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон.",
             "trigger": "onHit",
@@ -482,6 +494,7 @@
         ],
         "reactions": [
           {
+            "id": "witch-hammer-smash",
             "name": "Молот Ведьм: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон.",
             "trigger": "onHit",
@@ -583,12 +596,14 @@
         ],
         "specialAttacks": [
           {
+            "id": "burning-glass-ray",
             "name": "Горящее Стекло: Луч",
             "description": "Луч света, который особенно сильно обжигает монстров.",
             "trigger": "manual",
             "damage": 6
           },
           {
+            "id": "burning-glass-ray-monster",
             "name": "Горящее Стекло: Луч (Монстр)",
             "description": "Луч света наносит дополнительный урон монстрам.",
             "trigger": "manual",
@@ -606,12 +621,14 @@
         ],
         "specialAttacks": [
           {
+            "id": "burning-glass-explosion",
             "name": "Горящее Стекло: Взрыв",
             "description": "Взрыв света, который особенно сильно обжигает монстров.",
             "trigger": "manual",
             "damage": 8
           },
           {
+            "id": "burning-glass-explosion-monster",
             "name": "Горящее Стекло: Взрыв (Монстр)",
             "description": "Взрыв света наносит дополнительный урон монстрам.",
             "trigger": "manual",
@@ -629,8 +646,9 @@
         ],
         "specialAttacks": [
           {
-            "name": "Burning Glass: Explosion (Monster)",
-            "description": "The explosion of light deals damage to monsters and can stun them.",
+            "id": "burning-glass-explosion-monster",
+            "name": "Горящее Стекло: Взрыв (Монстр)",
+            "description": "Взрыв света наносит урон монстрам и может оглушить их.",
             "trigger": "manual",
             "damage": 12
           }
@@ -709,6 +727,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "purgatory-ray",
             "name": "Чистилище: Луч",
             "description": "Луч света наносит урон, игнорирующий броню, и может парализовать цель.",
             "trigger": "manual",
@@ -726,8 +745,9 @@
         ],
         "specialAttacks": [
           {
-            "name": "Purgatory: Blast",
-            "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
+            "id": "purgatory-blast",
+            "name": "Чистилище: Взрыв",
+            "description": "Взрыв света наносит урон, игнорирующий броню, всем монстрам и может парализовать их.",
             "trigger": "manual",
             "damage": 6
           }
@@ -743,8 +763,9 @@
         ],
         "reactions": [
           {
-            "name": "Purgatory: Eye for an Eye",
-            "description": "The blast of radiance deals armor-piercing damage to a spellcasting corrupted creature.",
+            "id": "purgatory-eye-for-an-eye",
+            "name": "Чистилище: Глаз за Глаз",
+            "description": "Луч света наносит урон, игнорирующий броню, и может парализовать цель.",
             "trigger": "onSpellCast"
           }
         ]
@@ -814,8 +835,9 @@
         ],
         "reactions": [
           {
-            "name": "Inherit Wound: Suffer",
-            "description": "Can transfer ally's received damage onto yourself.",
+            "id": "inherit-wound-suffer",
+            "name": "Наследовать Рану: Страдать",
+            "description": "Может перенести полученный союзником урон на себя.",
             "trigger": "onAllyAttacked"
           }
         ]
@@ -830,8 +852,9 @@
         ],
         "reactions": [
           {
-            "name": "Inherit Wound: Suffer",
-            "description": "Can transfer ally's received damage and physical status ailments onto yourself. Half of the damage dissipates.",
+            "id": "inherit-wound-suffer",
+            "name": "Наследовать Рану: Страдать",
+            "description": "Может перенести полученный союзником урон и физические статусные эффекты на себя. Половина урона рассеивается.",
             "trigger": "onAllyAttacked"
           }
         ]
@@ -846,8 +869,9 @@
         ],
         "reactions": [
           {
-            "name": "Inherit Wound: Punish",
-            "description": "Can transfer ally's received damage to another creature, even to an unwilling one.",
+            "id": "inherit-wound-punish",
+            "name": "Наследовать Рану: Наказать",
+            "description": "Может перенести полученный союзником урон на другое существо, даже если оно не согласилось.",
             "trigger": "onAllyAttacked"
           }
         ]
@@ -1110,6 +1134,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-discharge",
             "name": "Штормовая Стрела: Выстрел",
             "description": "Запуск зачарованной стрелы во врага как свободное действие.",
             "trigger": "manual",
@@ -1127,6 +1152,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-volley",
             "name": "Штормовая Стрела: Залп",
             "description": "Запуск до двух зачарованных стрел во врага как свободное действие.",
             "trigger": "manual",
@@ -1144,6 +1170,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "storm-arrow-volley",
             "name": "Штормовая Стрела: Залп",
             "description": "Запуск до трех зачарованных стрел во врага как свободное действие.",
             "trigger": "manual",
@@ -1253,6 +1280,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
@@ -1270,6 +1298,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
@@ -1287,6 +1316,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "larval-pustule-infest",
             "name": "Личиночный Нарыв: Заселение",
             "description": "Заселяет врага личинками, которые наносят урон с течением времени и нарушают концентрацию.",
             "trigger": "manual",
@@ -1351,6 +1381,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Призрачный Удар: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон.",
             "trigger": "onHit",
@@ -1368,6 +1399,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Призрачный Удар: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон и может поднять цель как нежить.",
             "trigger": "onHit",
@@ -1385,6 +1417,7 @@
         ],
         "reactions": [
           {
+            "id": "ghost-strike-ravage",
             "name": "Призрачный Удар: Разрушение",
             "description": "Любая успешная физическая атака наносит дополнительный урон и может поднять цель как нежить.",
             "trigger": "onHit",
@@ -1457,6 +1490,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "black-arrow-shoot",
             "name": "Черная Стрела: Выстрел",
             "description": "Запускает Черную Стрелу, которая наносит урон и может удерживать цель.",
             "trigger": "manual",
@@ -1474,6 +1508,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "black-arrow-shoot",
             "name": "Черная Стрела: Выстрел",
             "description": "Запускает Черную Стрелу, которая наносит урон и может удерживать все цели.",
             "trigger": "manual",
@@ -1579,6 +1614,7 @@
         ],
         "reactions": [
           {
+            "id": "spirit-path-evasion",
             "name": "Тропа Духов: Уклонение",
             "description": "Становится духом как реакция на физическую атаку, затем сразу возвращается в нормальную форму.",
             "trigger": "onAttacked"
@@ -1712,6 +1748,7 @@
         ],
         "reactions": [
           {
+            "id": "retribution-link",
             "name": "Возмездие: Связь",
             "description": "Как реакция на атаку, создайте связь с нападающим, которая отражает весь урон, получаемый мистиком от этой цели, обратно на нее.",
             "trigger": "onAttacked"
@@ -1728,6 +1765,7 @@
         ],
         "reactions": [
           {
+            "id": "retribution-chain",
             "name": "Возмездие: Цепь",
             "description": "Как реакция на атаку, создайте связь с нападающим, которая отражает весь урон, получаемый мистиком от любой цели, обратно на всех связанных врагов.",
             "trigger": "onAttacked"
@@ -1754,6 +1792,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "sulfur-cascade-scorch",
             "name": "Каскад Серы: Обжиг",
             "description": "Ударьте врага каскадом огня, который может нанести урон даже при промахе.",
             "trigger": "manual",
@@ -1771,6 +1810,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "sulfur-cascade-pyroclasm",
             "name": "Каскад Серы: Пироклазм",
             "description": "Ударьте всех врагов каскадами огня, которые могут нанести урон даже при промахе.",
             "trigger": "manual",
@@ -1844,6 +1884,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-blazing-shield",
             "name": "Огненная Душа: Пылающий Щит",
             "description": "Как реакция на атаку, нанесите огненный урон нападающему и получите временную Броню против огня.",
             "trigger": "onAttacked",
@@ -1861,6 +1902,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-blazing-shield",
             "name": "Огненная Душа: Пылающий Щит",
             "description": "Как реакция на атаку, нанесите огненный урон нападающему и получите временную Броню против огня.",
             "trigger": "onAttacked",
@@ -1884,6 +1926,7 @@
         ],
         "reactions": [
           {
+            "id": "fire-soul-pyromancy",
             "name": "Огненная Душа: Пиромантия",
             "description": "Исцеляет половину полученного огненного урона.",
             "trigger": "onDamaged"
@@ -1982,6 +2025,7 @@
         ],
         "reactions": [
           {
+            "id": "elegy-mental-fortitude",
             "name": "Элегия: Ментальная Стойкость",
             "description": "Предотвращает временную Порочность.",
             "trigger": "onSpellCast"
@@ -2300,6 +2344,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "staff-projectile-throw",
             "name": "Снаряд-Посох: Бросок",
             "description": "Бросок посоха с использованием Воли вместо Аккуратности и передача через него всех существующих чар.",
             "trigger": "manual",
@@ -2317,6 +2362,7 @@
         ],
         "specialAttacks": [
           {
+            "id": "staff-projectile-throw",
             "name": "Снаряд-Посох: Бросок",
             "description": "Бросок посоха с использованием Воли вместо Аккуратности и передача через него всех существующих чар.",
             "trigger": "manual",
