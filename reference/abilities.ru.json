@@ -167,7 +167,7 @@
         ]
       },
       "master": {
-        "description": "Дает шанс на дополнительную Свободную Атаку во время собственного хода.",
+        "description": "Свободная Атака во время собственного хода.",
         "effects": [
           {
             "tier": "C",
@@ -180,8 +180,11 @@
             "name": "Финт",
             "description": "Выполнить Финт.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "discreet"
+            "isFree": true,
+            "appliesTo": [
+              { "kind": "type", "values": ["short"] },
+              { "kind": "quality", "values": ["precise"] }
+            ]
           }
         ]
       }
@@ -216,7 +219,7 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -237,8 +240,9 @@
             "name": "Удар в Спину",
             "description": "Удар в Спину -- специальная атака, которую можно использовать один раз за ход и только, когда есть Преимущество. Она наносит +d4 урона сверх обычного урона.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "discreet"
+            "damageBonus": 4,
+            "inflicts": ["bleeding"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       },
@@ -269,8 +273,9 @@
             "name": "Удар в Спину",
             "description": "Удар в Спину -- специальная атака, которую можно использовать вместо любой атаки, когда есть Преимущество. Она наносит +d8 урона сверх обычного урона.",
             "trigger": "manual",
-            "damage": 14,
-            "attackAttribute": "discreet"
+            "damageBonus": 8,
+            "inflicts": ["bleeding"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       }
@@ -303,7 +308,7 @@
             "description": "Подлый Удар может оглушить цель. Если успешен, можно совершить комбо атаку сразу после.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "quick"
+            "inflicts": ["stunned"]
           }
         ]
       },
@@ -320,7 +325,9 @@
             "id": "street-fighting-knock-over",
             "name": "Подножка",
             "description": "После любой успешной атаки в ближнем бою можно попытаться опрокинуть цель на землю.",
-            "trigger": "onHit"
+            "trigger": "onHit",
+            "inflicts": ["prone"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       },
@@ -385,8 +392,8 @@
             "name": "Тычок",
             "description": "Совершить дополнительную атаку ножом.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "quick"
+            "isFree": true,
+            "appliesTo": [{ "kind": "quality", "values": ["short"] }]
           }
         ]
       },
@@ -765,7 +772,9 @@
             "description": "Душащий Захват — это специальная атака, которую можно выполнить после успешного удара с преимуществом. Она наносит d6 игнорирующего броню урона и не позволяет цели совершать действия, пока захват не будет разорван.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -784,7 +793,9 @@
             "description": "Целевая атака на ближнем расстоянии с использованием специальной ядовитой пыли. При контакте наносит d4 игнорирующего броню урона за ход в течение d4 ходов; цель может двигаться и действовать после попадания.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["confused"]
           }
         ]
       },
@@ -803,7 +814,9 @@
             "description": "Бросок специальной алхимической гранаты. При взрыве она наносит d4 игнорирующего броню урона за ход в течение d4 ходов. Затронутые цели могут только пытаться выйти из зоны поражения.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["confused"]
           }
         ]
       }
@@ -956,7 +969,7 @@
               "type": "addFlat",
               "value": 4
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -978,7 +991,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       }
@@ -1103,7 +1116,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -1942,8 +1955,13 @@
             "name": "Травмирующий Выстрел",
             "description": "Точный выстрел, способный пригвоздить цель на месте.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "inflicts": ["crippled"],
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2124,8 +2142,13 @@
             "name": "Калечащий Выстрел",
             "description": "Прицельный выстрел, который накладывает статусный эффект при попадании. Требует полного действия для выполнения.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "inflicts": ["crippled", "confused"],
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2186,8 +2209,13 @@
             "name": "Залп",
             "description": "Выпустить дополнительный выстрел, потратив Движение.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2205,8 +2233,13 @@
             "name": "Залп",
             "description": "Выпустить дополнительный выстрел.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2224,8 +2257,13 @@
             "name": "Град Стрел",
             "description": "Выпустить один дополнительный выстрел.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       }
@@ -2280,8 +2318,13 @@
             "name": "Веер Ножей",
             "description": "Бросить оружие еще раз.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["thrown"]
+              }
+            ]
           }
         ]
       },
@@ -2299,8 +2342,13 @@
             "name": "Железный Шторм",
             "description": "Бросить оружие еще раз.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["thrown"]
+              }
+            ]
           }
         ]
       }
@@ -2356,7 +2404,8 @@
             "description": "Попытка ослепить соседнего врага полотном; при успехе цель считается ослепленной до начала следующего хода.",
             "trigger": "manual",
             "damage": 0,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "inflicts": ["blinded"]
           }
         ],
         "reactions": [
@@ -2510,8 +2559,8 @@
             "name": "Удар Каблуком",
             "description": "Свободная атака боевыми каблуками, доступная раз за ход.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           }
         ]
       },
@@ -2570,7 +2619,9 @@
             "description": "После успешной атаки опутывающим оружием можно выполнить специальную атаку Удушающий Галстук. Она наносит d6 игнорирующего броню урона и предотвращает действия цели до разрыва захвата.",
             "trigger": "onHit",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["incapacitated"]
           }
         ]
       }
@@ -2628,8 +2679,8 @@
             "name": "Сметающий Удар",
             "description": "Атака по всем окружающим врагам на одном размахе.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [{ "kind": "quality", "values": ["composite"] }]
           }
         ]
       }
@@ -2658,7 +2709,13 @@
             "description": "Удар тупой стороной топора, чтобы шокировать и оглушить врага на d6 урона; при успехе следует обычная атака.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "inflicts": ["stunned"],
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       },
@@ -2694,8 +2751,13 @@
             "name": "Вихрь Топоров",
             "description": "Дополнительная атака топором.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       },
@@ -2713,8 +2775,13 @@
             "name": "Разрушительный Удар",
             "description": "Мощный удар топором, наносящий значительный урон.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "accurate"
+            "damageBonus": 4,
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       }
@@ -2892,7 +2959,8 @@
             "description": "Попытка опрокинуть противника после успешной атаки; в случае успеха, совершите дополнительную Свободную Атаку на d6 с преимуществом.",
             "trigger": "onHit",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "attackAttribute": "accurate",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -2942,8 +3010,17 @@
             "name": "Вторая Рука",
             "description": "Совершите атаку коротким или легким оружием во второй руке.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "quality",
+                "values": ["short"]
+              },
+              {
+                "kind": "type",
+                "values": ["light"]
+              }
+            ]
           }
         ]
       },
@@ -2961,8 +3038,13 @@
             "name": "Вторая Рука",
             "description": "Совершите атаку любым одноручным оружием ближнего боя во второй руке.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main", "light", "natural"]
+              }
+            ]
           }
         ]
       },
@@ -3071,10 +3153,22 @@
           {
             "id": "iron-body-mighty-blow",
             "name": "Мощный Удар",
-            "description": "Раз в ход мастер может нанести особенно мощный удар, добавляющий d12 урона вместо обычного бонуса.",
+            "description": "Раз в ход мастер может нанести особенно мощный удар, добавляющий d8 урона к обычной атаке.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "strong"
+            "bonusDamage": 8,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "heavy",
+                  "polearm",
+                  "main",
+                  "shield",
+                  "light",
+                  "natural"
+                ]
+              }
+            ]
           }
         ]
       }
@@ -3202,14 +3296,15 @@
             "description": "Сила, чтобы определить, смогла ли эта атака щитом также повалить противника на землю."
           }
         ],
-        "specialAttacks": [
+        "reactions": [
           {
             "id": "shields-shield-bash",
             "name": "Удар Щитом",
             "description": "Атака щитом, которая наносит d4 урона и может повалить врага на землю.",
-            "trigger": "manual",
+            "trigger": "onHit",
             "damage": 4,
-            "attackAttribute": "strong"
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           }
         ]
       },
@@ -3221,14 +3316,15 @@
             "description": "Удар щитом наносит до d8 урона."
           }
         ],
-        "specialAttacks": [
+        "reactions": [
           {
             "id": "shields-shield-bash",
             "name": "Удар Щитом",
             "description": "Атака щитом, которая наносит d8 урона и может повалить врага на землю.",
-            "trigger": "manual",
+            "trigger": "onHit",
             "damage": 8,
-            "attackAttribute": "strong"
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -3279,8 +3375,13 @@
             "name": "Локоть",
             "description": "Вторая безоружная атака.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["natural"]
+              }
+            ]
           }
         ]
       },
@@ -3336,13 +3437,18 @@
             "description": "После успешной атаки вы можете попытаться захватить врага и бросить его на землю, нанося d4 урона, игнорирующего броню.",
             "trigger": "onHit",
             "damage": 4,
-            "attackAttribute": "strong"
+            "ignoresArmor": true,
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           },
           {
             "id": "wrestling-hold",
             "name": "Удержание",
             "description": "После успешной атаки вы можете попытаться захватить врага и удерживать его без нанесения урона, не давая двигаться и действовать.",
-            "trigger": "onHit"
+            "trigger": "onHit",
+            "damage": 0,
+            "ignoresArmor": true,
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -3361,7 +3467,9 @@
             "description": "Попытка проверки Скорости, чтобы захватить врага, бросить его на землю, нанести d4 урона и прервать его ход.",
             "trigger": "onDodged",
             "damage": 4,
-            "attackAttribute": "quick"
+            "ignoresArmor": true,
+            "attackAttribute": "quick",
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -3384,7 +3492,9 @@
             "description": "Поймать врага в его атаке с помощью проверки Скорости; при успехе бросить его на землю, нанести d6 урона и прервать его ход. Затем провести свободную атаку по нему.",
             "trigger": "onAttacked",
             "damage": 6,
-            "attackAttribute": "quick"
+            "ignoresArmor": true,
+            "attackAttribute": "quick",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -3448,7 +3558,7 @@
             "description": "Адепт получает на d4 меньше урона от всех атак.",
             "target": { "kind": "secondary", "stat": "armor" },
             "modifier": { "type": "addFlat", "value": 4 },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       },
@@ -3636,7 +3746,7 @@
             "description": "Любая броня защищает на +d2 лучше: легкая дает d6 вместо d4, средняя -- d8 вместо d6, тяжелая -- d10 вместо d8.",
             "target": { "kind": "secondary", "stat": "armor" },
             "modifier": { "type": "addFlat", "value": 2 },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       },
@@ -3730,6 +3840,7 @@
             "description": "Любая провалившаяся ментальная атака по вам вызывает ответную реакцию в d6 игнорирующего броню урона по нападавшему.",
             "trigger": "onResisted",
             "damage": 6,
+            "ignoresArmor": true,
             "attackAttribute": "strong"
           }
         ]
@@ -4599,7 +4710,9 @@
             "description": "Аккуртность, чтобы бросить ослепляющий порошок, чтобы нанести d4 игнорирующего броню урона и ослепить цель на d4 хода.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       },
@@ -4618,7 +4731,9 @@
             "description": "Аккуратность, чтобы швырнуть дымовую шашку, которая заполняет область ослепляющим дымом; при успешной проверке Аккуратности все, кто не покинет область, получают d4 игнорирующего броню урона и не могут видеть.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       },
@@ -4637,7 +4752,9 @@
             "description": "Использовать громовой шар, который наносит до d12 игнорирующего броню урона при успешной проверке Аккуратности, или d6 при неудаче, и ослепляет цель на d4 раунда.",
             "trigger": "manual",
             "damage": 12,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       }

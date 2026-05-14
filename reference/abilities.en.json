@@ -167,7 +167,7 @@
         ]
       },
       "master": {
-        "description": "Grants a chance to make an extra free attack during your own turn.",
+        "description": "Grants an extra free attack during your own turn.",
         "effects": [
           {
             "tier": "C",
@@ -180,8 +180,11 @@
             "name": "Feint",
             "description": "Perform a Feint attack.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "discreet"
+            "isFree": true,
+            "appliesTo": [
+              { "kind": "type", "values": ["short"] },
+              { "kind": "quality", "values": ["precise"] }
+            ]
           }
         ]
       }
@@ -217,7 +220,7 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -238,8 +241,9 @@
             "name": "Backstab",
             "description": "A Backstab is a special attack that can be used once per turn. It deals +d4 damage on top of the normal damage.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "discreet"
+            "damageBonus": 4,
+            "inflicts": ["bleeding"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       },
@@ -270,8 +274,9 @@
             "name": "Backstab",
             "description": "A Backstab is a special attack that can be used instead of any attack if you have the advantage. It deals +d8 damage on top of the normal damage.",
             "trigger": "manual",
-            "damage": 14,
-            "attackAttribute": "discreet"
+            "damageBonus": 8,
+            "inflicts": ["bleeding"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       }
@@ -304,7 +309,7 @@
             "description": "Cheap Shot can stun the target. If successful, you can perform one additional normal attack right after.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "quick"
+            "inflicts": ["stunned"]
           }
         ]
       },
@@ -321,7 +326,9 @@
             "id": "street-fighting-knock-over",
             "name": "Knock Over",
             "description": "After a successful melee atack, can attempt to knock the target prone.",
-            "trigger": "onHit"
+            "trigger": "onHit",
+            "inflicts": ["prone"],
+            "appliesTo": [{ "kind": "any" }]
           }
         ]
       },
@@ -386,8 +393,8 @@
             "name": "Stab",
             "description": "Make an additional knife attack as a bonus action.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "quick"
+            "isFree": true,
+            "appliesTo": [{ "kind": "quality", "values": ["short"] }]
           }
         ]
       },
@@ -752,7 +759,9 @@
             "description": "A Choking Grapple is a special attack that can be performed after a successful hit with advantage. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -771,7 +780,9 @@
             "description": "A targeted melee distance attack with a special poisonous dust. On contact, it deals d4 armor-ignoring damage per turn for d4 turns; the target can still move and act after being hit.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["confused"]
           }
         ]
       },
@@ -790,7 +801,9 @@
             "description": "A thrown attack with an alchemical grenade. On explosion, it deals d4 armor-ignoring damage per turn for d4 turns. Affected targets can only attempt to move out.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "cunning"
+            "ignoresArmor": true,
+            "attackAttribute": "cunning",
+            "inflicts": ["confused"]
           }
         ]
       }
@@ -936,7 +949,7 @@
               "type": "addFlat",
               "value": 4
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -958,7 +971,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       }
@@ -1077,7 +1090,7 @@
               "type": "addFlat",
               "value": 2
             },
-            "appliesTo": []
+            "appliesTo": ["any"]
           },
           {
             "tier": "C",
@@ -1909,8 +1922,13 @@
             "name": "Crippling Shot",
             "description": "A precise shot that can pin the target in place.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "inflicts": ["crippled"],
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2084,8 +2102,13 @@
             "name": "Maiming Shot",
             "description": "A precise shot that applies a status effect on hit. Costs Full Action to perform.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "inflicts": ["crippled", "confused"],
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2146,8 +2169,13 @@
             "name": "Volley",
             "description": "Fire additional shot by spending Movement.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2165,8 +2193,13 @@
             "name": "Volley",
             "description": "Fire additional shot.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       },
@@ -2184,8 +2217,13 @@
             "name": "Storm of Arrows",
             "description": "Fire one additional shot.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["bows", "firearm"]
+              }
+            ]
           }
         ]
       }
@@ -2240,8 +2278,13 @@
             "name": "Fan of Knives",
             "description": "Throw a weapon an additional time.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["thrown"]
+              }
+            ]
           }
         ]
       },
@@ -2259,8 +2302,13 @@
             "name": "Hail of Iron",
             "description": "Throw a weapon an additional time.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["thrown"]
+              }
+            ]
           }
         ]
       }
@@ -2316,7 +2364,8 @@
             "description": "Attempt to blind an adjacent enemy with the cloth; on success, the target is blinded until the start of the next turn.",
             "trigger": "manual",
             "damage": 0,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "inflicts": ["blinded"]
           }
         ],
         "reactions": [
@@ -2470,8 +2519,8 @@
             "name": "Heel Kick",
             "description": "A free combat heel attack that can be used once per turn.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [{ "kind": "id", "values": ["heels"] }]
           }
         ]
       },
@@ -2530,7 +2579,9 @@
             "description": "After a successful attack with an entangling weapon, you can perform a Choking Tie special attack. It deals d6 armor-ignoring damage and prevents the target from taking actions until the grapple is broken.",
             "trigger": "onHit",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["incapacitated"]
           }
         ]
       }
@@ -2588,8 +2639,8 @@
             "name": "Sweeping Strike",
             "description": "Attack all surrounding enemies with a sweeping blow.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [{ "kind": "quality", "values": ["composite"] }]
           }
         ]
       }
@@ -2618,7 +2669,13 @@
             "description": "Hit with the blunt side of the axe to shock and stun the enemy for d6 damage; on success, follow up with a normal attack.",
             "trigger": "manual",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "inflicts": ["stunned"],
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       },
@@ -2654,8 +2711,13 @@
             "name": "Whirlwind",
             "description": "Make an additional attack with your axe.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       },
@@ -2673,8 +2735,13 @@
             "name": "Ravaging Blow",
             "description": "A powerful axe strike that deals significant damage.",
             "trigger": "manual",
-            "damage": 10,
-            "attackAttribute": "accurate"
+            "damageBonus": 4,
+            "appliesTo": [
+              {
+                "kind": "id",
+                "values": ["axe", "two_handed_axe"]
+              }
+            ]
           }
         ]
       }
@@ -2846,7 +2913,8 @@
             "description": "Attempt to knock the enemy prone after a successful attack; on success, make a free follow-up attack for d6 with advantage.",
             "trigger": "onHit",
             "damage": 6,
-            "attackAttribute": "accurate"
+            "attackAttribute": "accurate",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -2896,8 +2964,17 @@
             "name": "Off-Hand Strike",
             "description": "Make an attack with a short or light off-hand weapon.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "quality",
+                "values": ["short"]
+              },
+              {
+                "kind": "type",
+                "values": ["light"]
+              }
+            ]
           }
         ]
       },
@@ -2915,8 +2992,13 @@
             "name": "Off-Hand Strike",
             "description": "Make an attack with any one-handed melee weapon in the off-hand.",
             "trigger": "manual",
-            "damage": 8,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["main", "light", "natural"]
+              }
+            ]
           }
         ]
       },
@@ -3025,10 +3107,22 @@
           {
             "id": "iron-body-mighty-blow",
             "name": "Mighty Blow",
-            "description": "Once per turn, deal an exceptionally powerful strike that adds d12 damage instead of the normal bonus.",
+            "description": "Once per turn, deal an exceptionally powerful strike that adds d8 damage instead of the normal bonus.",
             "trigger": "manual",
-            "damage": 12,
-            "attackAttribute": "strong"
+            "bonusDamage": 8,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": [
+                  "heavy",
+                  "polearm",
+                  "main",
+                  "shield",
+                  "light",
+                  "natural"
+                ]
+              }
+            ]
           }
         ]
       }
@@ -3156,14 +3250,15 @@
             "description": "Strong check to determine whether the shield bash also knocks the enemy prone."
           }
         ],
-        "specialAttacks": [
+        "reactions": [
           {
             "id": "shields-shield-bash",
             "name": "Shield Bash",
             "description": "A shield bash attack that deals d4 damage and may knock the enemy prone.",
-            "trigger": "manual",
+            "trigger": "onHit",
             "damage": 4,
-            "attackAttribute": "strong"
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           }
         ]
       },
@@ -3175,14 +3270,15 @@
             "description": "A shield bash deals up to d8 damage."
           }
         ],
-        "specialAttacks": [
+        "reactions": [
           {
             "id": "shields-shield-bash",
             "name": "Shield Bash",
             "description": "A shield bash attack that deals d8 damage and may knock the enemy prone.",
-            "trigger": "manual",
+            "trigger": "onHit",
             "damage": 8,
-            "attackAttribute": "strong"
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -3233,8 +3329,13 @@
             "name": "Elbow Strike",
             "description": "Make a second unarmed attack.",
             "trigger": "manual",
-            "damage": 6,
-            "attackAttribute": "accurate"
+            "isFree": true,
+            "appliesTo": [
+              {
+                "kind": "type",
+                "values": ["natural"]
+              }
+            ]
           }
         ]
       },
@@ -3290,13 +3391,18 @@
             "description": "After a successful attack, you can attempt to grapple the enemy and throw them on the ground for d4 armor-ignoring damage.",
             "trigger": "onHit",
             "damage": 4,
-            "attackAttribute": "strong"
+            "ignoresArmor": true,
+            "attackAttribute": "strong",
+            "inflicts": ["prone"]
           },
           {
             "id": "wrestling-hold",
             "name": "Hold",
             "description": "After a successful attack, you can attempt to grapple the enemy and hold them without dealing damage, preventing their movement and actions.",
-            "trigger": "onHit"
+            "trigger": "onHit",
+            "damage": 0,
+            "ignoresArmor": true,
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -3315,7 +3421,9 @@
             "description": "Attempt a Quick check to grapple the enemy, throwing them prone, dealing d4 damage, and interrupting their turn.",
             "trigger": "onDodged",
             "damage": 4,
-            "attackAttribute": "quick"
+            "ignoresArmor": true,
+            "attackAttribute": "quick",
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -3338,7 +3446,9 @@
             "description": "Caught the enemy in their attack with a Quick check; on success, throw them prone, deal d6 damage, and interrupt their turn. Then make a free attack against them.",
             "trigger": "onAttacked",
             "damage": 6,
-            "attackAttribute": "quick"
+            "ignoresArmor": true,
+            "attackAttribute": "quick",
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -3402,7 +3512,7 @@
             "description": "The Adept takes d4 less damage from all attacks.",
             "target": { "kind": "secondary", "stat": "armor" },
             "modifier": { "type": "addFlat", "value": 4 },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       },
@@ -3590,7 +3700,7 @@
             "description": "Any armor protects +d2 better: light grants d6 instead of d4, medium d8 instead of d6, heavy d10 instead of d8.",
             "target": { "kind": "secondary", "stat": "armor" },
             "modifier": { "type": "addFlat", "value": 2 },
-            "appliesTo": []
+            "appliesTo": ["any"]
           }
         ]
       },
@@ -3684,6 +3794,7 @@
             "description": "Any failed mental attack against you triggers a d6 armor-ignoring damage reaction against the attacker.",
             "trigger": "onResisted",
             "damage": 6,
+            "ignoresArmor": true,
             "attackAttribute": "strong"
           }
         ]
@@ -4568,7 +4679,9 @@
             "description": "Throw blinding powder to deal d4 armor-ignoring damage and blind the target for d4 rounds on a successful Accurate check.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       },
@@ -4587,7 +4700,9 @@
             "description": "Deploy a smoke canister that fills an area with blinding smoke; on a successful Accurate check, all who do not leave the area take d4 armor-ignoring damage and cannot see.",
             "trigger": "manual",
             "damage": 4,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       },
@@ -4606,7 +4721,9 @@
             "description": "Use a thunder ball that deals up to d12 armor-ignoring damage on a successful Accurate check, or d6 on failure, and blinds the target for d4 rounds.",
             "trigger": "manual",
             "damage": 12,
-            "attackAttribute": "accurate"
+            "ignoresArmor": true,
+            "attackAttribute": "accurate",
+            "inflicts": ["blinded"]
           }
         ]
       }
