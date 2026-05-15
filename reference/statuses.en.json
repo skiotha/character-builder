@@ -1,0 +1,42 @@
+[
+  {
+    "id": "bleeding",
+    "name": "Bleeding",
+    "description": "The target is bleeding, taking damage. Status can be remedied only by medical attention, magical healing, or special status removal items."
+  },
+  {
+    "id": "blinded",
+    "name": "Blinded",
+    "description": "The target is blinded, unable to see and suffering penalties to accuracy and perception. All attacks against them have advantage. Unless specified otherwise, the status has a set duration."
+  },
+  {
+    "id": "confused",
+    "name": "Confused",
+    "description": "The target is confused, unable to act rationally or follow commands. The target can move but can't perform actions."
+  },
+  {
+    "id": "crippled",
+    "name": "Crippled",
+    "description": "The target is crippled, reducing their movement speed and agility. The target can act but is unable to move."
+  },
+  {
+    "id": "distracted",
+    "name": "Distracted",
+    "description": "The target is distracted and is unable to maintain concentration."
+  },
+  {
+    "id": "incapacitated",
+    "name": "Incapacitated",
+    "description": "The target is incapacitated, unable to move or take any actions other than attempts to remove that status effect."
+  },
+  {
+    "id": "stunned",
+    "name": "Stunned",
+    "description": "The target is stunned, unable to take actions, react, or move until the effect ends. The status cannot be removed manually until the effect ends."
+  },
+  {
+    "id": "prone",
+    "name": "Prone",
+    "description": "The target is prone, making them easier to hit with melee attacks but harder to attack with ranged weapon. The status can be removed by spending a movement action."
+  }
+]
