@@ -198,7 +198,8 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw an enemy. On success, the target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8
+            "damage": 8,
+            "inflicts": ["prone"]
           }
         ]
       },
@@ -216,7 +217,8 @@
             "name": "Telekinesis: Control",
             "description": "Lift and throw all enemies around the mystic. On success, each target takes damage and is knocked prone.",
             "trigger": "manual",
-            "damage": 8
+            "damage": 8,
+            "inflicts": ["prone"]
           }
         ]
       }
@@ -379,7 +381,8 @@
             "id": "psychic-strike-control",
             "name": "Psychic Strike: Control",
             "description": "Resolute to stun an enemy on successful weapon attack.",
-            "trigger": "onHit"
+            "trigger": "onHit",
+            "inflicts": ["stunned"]
           }
         ]
       },
@@ -397,7 +400,8 @@
             "name": "Psychic Strike: Power",
             "description": "Any successful physical attack inflicts additional non-avoidable psychic damage.",
             "trigger": "onHit",
-            "damage": 4
+            "damage": 4,
+            "ignoresArmor": true
           }
         ]
       }
@@ -598,7 +602,7 @@
           {
             "id": "burning-glass-ray",
             "name": "Burning Glass: Ray",
-            "description": "A ray of light that burns monsters harder than anything else.",
+            "description": "A ray of light that burns the target.",
             "trigger": "manual",
             "damage": 6
           },
@@ -623,7 +627,7 @@
           {
             "id": "burning-glass-explosion",
             "name": "Burning Glass: Explosion",
-            "description": "An explosion of light that burns monsters harder than anything else.",
+            "description": "An explosion of light that burns every target around the caster.",
             "trigger": "manual",
             "damage": 8
           },
@@ -650,7 +654,8 @@
             "name": "Burning Glass: Explosion (Monster)",
             "description": "The explosion of light deals damage to monsters and can stun them.",
             "trigger": "manual",
-            "damage": 12
+            "damage": 12,
+            "inflicts": ["stunned"]
           }
         ]
       }
@@ -730,7 +735,9 @@
             "name": "Purgatory: Ray",
             "description": "The ray of radiance deals armor-piercing damage to a monster and can paralyze them.",
             "trigger": "manual",
-            "damage": 6
+            "damage": 6,
+            "ignoresArmor": true,
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -748,7 +755,9 @@
             "name": "Purgatory: Blast",
             "description": "The blast of radiance deals armor-piercing damage to all monsters and can paralyze them.",
             "trigger": "manual",
-            "damage": 6
+            "damage": 6,
+            "ignoresArmor": true,
+            "inflicts": ["incapacitated"]
           }
         ]
       },
@@ -1283,7 +1292,8 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 4
+            "damage": 4,
+            "inflicts": ["distracted"]
           }
         ]
       },
@@ -1301,7 +1311,8 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 6
+            "damage": 6,
+            "inflicts": ["distracted"]
           }
         ]
       },
@@ -1319,7 +1330,8 @@
             "name": "Larval Pustule: Infest",
             "description": "Infest an enemy with larvae that deal damage over time and break concentration.",
             "trigger": "manual",
-            "damage": 8
+            "damage": 8,
+            "inflicts": ["distracted"]
           }
         ]
       }
@@ -1493,7 +1505,8 @@
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain the target.",
             "trigger": "manual",
-            "damage": 6
+            "damage": 6,
+            "inflicts": ["crippled"]
           }
         ]
       },
@@ -1511,7 +1524,8 @@
             "name": "Black Arrow: Shoot",
             "description": "Fire a Black Arrow that deals damage and can restrain all targets.",
             "trigger": "manual",
-            "damage": 6
+            "damage": 6,
+            "inflicts": ["crippled"]
           }
         ]
       },
