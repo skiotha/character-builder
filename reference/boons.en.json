@@ -13,7 +13,14 @@
     "category": "boon",
     "tags": ["boon", "profession", "knowledge", "support"],
     "levels": 3,
-    "description": "Lets the character join expeditions and ship crews without paying passage, and also work as a navigator or guide. Grants a +1 bonus on all checks related to navigation at sea, on land, and in dungeons."
+    "description": "Lets the character join expeditions and ship crews without paying passage, and also work as a navigator or guide. Grants a +1 bonus on all checks related to navigation at sea, on land, and in dungeons.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:geography" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "enterprise",
@@ -21,7 +28,14 @@
     "category": "boon",
     "tags": ["boon", "profession", "support", "cunning", "appealing"],
     "levels": 1,
-    "description": "Once per adventure, the character can make a Cunning or Appealing check, depending on the business, and earn 10+5d10 gold coins beyond already paid expenses."
+    "description": "Once per adventure, the character can make a Cunning or Appealing check, depending on the business, and earn 10+5d10 gold coins beyond already paid expenses.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:commerce" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "prostitution",
@@ -29,7 +43,14 @@
     "category": "boon",
     "tags": ["boon", "appealing", "profession", "corruption"],
     "levels": 1,
-    "description": "Whenever the character removes Corruption with a member of civilization, they can test their Appealing to demand payment: 1+d40 silver coins from a commoner, 1+d40 copper coins from a soldier or merchant, or 1+d4 gold coins from an aristocrat. It also lets the character enter closed social gatherings without an invitation, but one runic tattoo slot is permanently occupied by a professional tattoo."
+    "description": "Whenever the character removes Corruption with a member of civilization, they can test their Appealing to demand payment: 1+d40 silver coins from a commoner, 1+d40 copper coins from a soldier or merchant, or 1+d4 gold coins from an aristocrat. It also lets the character enter closed social gatherings without an invitation, but one runic tattoo slot is permanently occupied by a professional tattoo.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:commerce" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "language-of-beasts",
@@ -37,7 +58,14 @@
     "category": "boon",
     "tags": ["boon", "knowledge", "support"],
     "levels": 1,
-    "description": "Lets the character speak with animals. They can answer questions about beings in their area, who passed by, and roughly how many there were, but they do not perform services."
+    "description": "Lets the character speak with animals. They can answer questions about beings in their area, who passed by, and roughly how many there were, but they do not perform services.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:nature" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "powerful-voice",
@@ -133,7 +161,14 @@
     "category": "boon",
     "tags": ["boon", "alchemy", "crafting", "knowledge", "cunning"],
     "levels": 1,
-    "description": "The character knows all formulas for alchemical remedies and all secrets of artifact creation available at their current Alchemist and Artifact Creation ranks, including forbidden and formerly secret recipes and designs."
+    "description": "The character knows all formulas for alchemical remedies and all secrets of artifact creation available at their current Alchemist and Artifact Creation ranks, including forbidden and formerly secret recipes and designs.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:alchemy" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "lockpicker",
@@ -165,7 +200,14 @@
     "category": "boon",
     "tags": ["boon", "poison", "defense"],
     "levels": 1,
-    "description": "Any poison used against the character counts as one rank lower, and weak poison cannot deal more than 1 damage per turn. Against toxins with other harmful effects, the character gets a second chance to resist; the poison’s duration does not change."
+    "description": "Any poison used against the character counts as one rank lower, and weak poison cannot deal more than 1 damage per turn. Against toxins with other harmful effects, the character gets a second chance to resist; the poison’s duration does not change.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "poisonResistance" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "natural-healing",
@@ -181,7 +223,14 @@
     "category": "boon",
     "tags": ["boon", "magic", "defense"],
     "levels": 1,
-    "description": "Grants mystical +1 protection against fire effects and a +1 bonus on all checks related to using fire or resisting it."
+    "description": "Grants mystical +1 protection against fire effects and a +1 bonus on all checks related to using fire or resisting it.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "fireResistance" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "inheritance",
@@ -276,7 +325,14 @@
     "category": "boon",
     "tags": ["boon", "vigilant", "profession", "support"],
     "levels": 1,
-    "description": "With a successful Vigilant test, the character can find enough food and water for themselves while traveling through the wilderness. If they gather for a small group as well, that group cannot move while the foraging happens."
+    "description": "With a successful Vigilant test, the character can find enough food and water for themselves while traveling through the wilderness. If they gather for a small group as well, that group cannot move while the foraging happens.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:nature" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "fortification",
@@ -308,7 +364,14 @@
     "category": "boon",
     "tags": ["boon", "alchemy", "support"],
     "levels": 3,
-    "description": "Grants a +1 bonus on all checks related to the challenges of nature, including finding food and shelter, moving through dense growth, and spotting or avoiding natural traps. The same bonus also applies to all checks to use the Alchemist ability."
+    "description": "Grants a +1 bonus on all checks related to the challenges of nature, including finding food and shelter, moving through dense growth, and spotting or avoiding natural traps. The same bonus also applies to all checks to use the Alchemist ability.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:nature" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "perfect-body",
@@ -340,7 +403,14 @@
     "category": "boon",
     "tags": ["boon", "knowledge", "support", "cunning", "profession"],
     "levels": 3,
-    "description": "Grants a +1 bonus on all checks related to libraries, archives, and repositories."
+    "description": "Grants a +1 bonus on all checks related to libraries, archives, and repositories.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "augur",
@@ -380,7 +450,14 @@
     "category": "boon",
     "tags": ["boon", "vigilant", "profession"],
     "levels": 1,
-    "description": "Lets the character repeat any failed Vigilant check related to finding tracks, following them, finding a way to a place, or finding the road back."
+    "description": "Lets the character repeat any failed Vigilant check related to finding tracks, following them, finding a way to a place, or finding the road back.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world:geography" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "packhorse",
@@ -412,6 +489,13 @@
     "category": "boon",
     "tags": ["boon", "defense"],
     "levels": 1,
-    "description": "In any situation that could destroy the character, they may make two checks instead of one and choose the better result."
+    "description": "In any situation that could destroy the character, they may make two checks instead of one and choose the better result.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "deathDenial" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   }
 ]

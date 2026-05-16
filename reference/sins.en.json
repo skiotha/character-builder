@@ -61,7 +61,14 @@
     "category": "sin",
     "tags": ["sin", "status"],
     "levels": 1,
-    "description": "The first attribute check of each day determines the character’s condition. If it fails, the character takes a -1 penalty to all checks until the end of the day."
+    "description": "The first attribute check of each day determines the character’s condition. If it fails, the character takes a -1 penalty to all checks until the end of the day.",
+    "effects": [
+      {
+        "tier": "B",
+        "target": { "kind": "flag", "name": "knowledge:world" },
+        "modifier": { "type": "addFlat", "value": 1 }
+      }
+    ]
   },
   {
     "id": "impulsiveness",

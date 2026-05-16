@@ -517,18 +517,15 @@ and an optional `inflicts?: StatusKind[]` field on `Action`.
 // duration, stacking, and resolution. The engine only carries the labels
 // through to consumers. Same lifecycle policy as EffectFlag.
 export type StatusKind =
-  | "stun"
-  | "bleed"
-  | "prone"
-  | "choke"
-  | "poisoned"
-  | "burning"
-  | "frozen"
+  | "bleeding"
   | "blinded"
-  | "silenced"
-  | "entangled"
-  | "frightened"
-  | "disarmed";
+  | "confused"
+  | "crippled"
+  | "distracted"
+  | "stunned"
+  | "incapacitated"
+  | "prone"
+  | "entangled";
 // NOTE: starting set; expand during the authoring pass.
 
 export interface Action {
