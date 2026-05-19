@@ -95,6 +95,13 @@
 - **Fix:** Rename when applicator is reworked in Phase 6 Chunk C; reference data updated in bulk in Chunk F.
 - **Status:** 📋 Already tracked — Phase 6 Chunks C + F, deferred-tasks §1.6
 
+### 34. `secondary` + `appliesTo` has no engine semantics
+- **Where:** `src/rules/effects.mts` (parser), `src/rules/applicator.mts` (`secondary` apply paths). Authoring discovered: 9 abilities/spells carry `target.kind: "secondary"` effects with a `WeaponPredicate` `appliesTo` (e.g. Oils Novice, Cloak Dance Novice, Staff Mastery Novice ×2, Double Strike Novice, Shields Novice, Berserk Adept, Soldier Novice, Spirit Path Adept).
+- **Impact:** The engine has **no slot-aware path for character-level `secondary` aggregates** (`defense`, `toughness`, `armor`, `painThreshold`, `corruptionThreshold`, `corruptionMax`). `appliesTo` was designed exclusively for per-slot weapon narrowing in `deriveCombatSlots`; on a character-level target it has nowhere to evaluate. Today: parser warn-strips (until J.4b), engine ignores. Authoring needs the gate (e.g. "+1 defense only while wielding a staff") but the engine can't honor it.
+- **Open question — semantics:** What does "this secondary bonus applies while a matching weapon is carried" mean operationally? Options: (a) bonus fires if **any** carried slot satisfies the predicate (OR fold), (b) bonus is per-slot like combat-target effects but secondaries aren't per-slot today, (c) introduce a new gating mechanism distinct from `appliesTo`. Needs design.
+- **Current decision (Chunk J, 2026-05-19):** Item 12 placement table **widens** to accept `appliesTo` on `secondary` so the strict parser doesn't reject authored data. Engine still ignores the predicate. The catalog stays as-is; sibling apps treat the predicate as documentary.
+- **Status:** ⚠️ Open — engine wiring deferred to a future chunk after Chunk J. Authoring is permitted; runtime gate is a no-op until then.
+
 ## MEDIUM — Address During Engine Work
 
 ### 21. Double toughness clamping (redundant logic)
