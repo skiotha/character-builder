@@ -63,6 +63,13 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
     ["weapons", [{ id: "test-weapon", name: "Test Weapon" }]],
     ["armor", [{ id: "test-armor", name: "Test Armor" }]],
     ["qualities", qualitySeed],
+    [
+      "statuses",
+      [
+        { id: "bleeding", name: "Bleeding" },
+        { id: "stunned", name: "Stunned" },
+      ],
+    ],
   ];
   for (const [topic, payload] of seedTopics) {
     for (const locale of ["en", "ru"]) {

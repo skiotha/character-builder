@@ -17,6 +17,7 @@ import {
   handleGetWeapons,
   handleGetArmor,
   handleGetQualities,
+  handleGetStatuses,
   handleGetCharacters,
   handleUpdateCharacter,
   handleCreateCharacter,
@@ -272,7 +273,7 @@ async function handleApi(
       return await handleGetCharacters(req, res, url);
     }
 
-    // GET /api/v1/traits | /talents | /rituals | /weapons | /armor | /qualities
+    // GET /api/v1/traits | /talents | /rituals | /weapons | /armor | /qualities | /statuses
     if (req.method === "GET" && pathParts[0] && !pathParts[1]) {
       switch (pathParts[0]) {
         case "traits":
@@ -287,6 +288,8 @@ async function handleApi(
           return await handleGetArmor(req, res);
         case "qualities":
           return await handleGetQualities(req, res);
+        case "statuses":
+          return await handleGetStatuses(req, res);
       }
     }
 

@@ -46,8 +46,9 @@ The bot reads the following files from the website's `data/` directory:
 | `reference/weapons.{locale}.json`   | Weapon definitions                     |
 | `reference/armor.{locale}.json`     | Armor definitions                      |
 | `reference/qualities.{locale}.json` | Quality registry (ADR-016)             |
+| `reference/statuses.{locale}.json`  | Localized status descriptions          |
 
-> The website's `/api/v1/{traits,talents,rituals,weapons,armor,qualities}` endpoints are
+> The website's `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` endpoints are
 > intended for the website's own client and are **not** part of the bot's stable
 > contract. The bot reads the split files directly from disk.
 

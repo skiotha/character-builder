@@ -69,6 +69,10 @@ const handleGetQualities = createReferenceHandler({
   kind: "single",
   topic: "qualities",
 });
+const handleGetStatuses = createReferenceHandler({
+  kind: "single",
+  topic: "statuses",
+});
 
 export {
   handleGetTraits,
@@ -77,4 +81,5 @@ export {
   handleGetWeapons,
   handleGetArmor,
   handleGetQualities,
+  handleGetStatuses,
 };

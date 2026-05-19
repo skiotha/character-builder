@@ -272,6 +272,7 @@ GET /api/v1/rituals?locale=en
 GET /api/v1/weapons?locale=en
 GET /api/v1/armor?locale=en
 GET /api/v1/qualities?locale=en  # quality registry (ADR-016): id-keyed effects shared by weapons + armor
+GET /api/v1/statuses?locale=en   # localized status descriptions (display-only; engine treats statuses as opaque EffectFlag tokens)
 ```
 
 Locale is resolved as: `?locale=` query → first matching primary subtag in `Accept-Language` → `en` default. Unknown locales return `400`.

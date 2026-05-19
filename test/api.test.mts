@@ -914,6 +914,39 @@ describe("GET /api/v1/qualities", () => {
   });
 });
 
+describe("GET /api/v1/statuses", () => {
+  it("returns 200 with localized entries", async () => {
+    const res = await fetch(`${BASE}/api/v1/statuses?locale=en`);
+
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as Array<{ id: string; name: string }>;
+    assert.ok(Array.isArray(body));
+    assert.ok(body.length > 0);
+    assert.ok(body.every((entry) => typeof entry.id === "string"));
+  });
+
+  it("returns translated entries for ru", async () => {
+    const enRes = await fetch(`${BASE}/api/v1/statuses?locale=en`);
+    const ruRes = await fetch(`${BASE}/api/v1/statuses?locale=ru`);
+
+    const enBody = (await enRes.json()) as Array<{ id: string; name: string }>;
+    const ruBody = (await ruRes.json()) as Array<{ id: string; name: string }>;
+
+    assert.equal(ruBody.length, enBody.length);
+    assert.deepEqual(
+      ruBody.map((e) => e.id),
+      enBody.map((e) => e.id),
+    );
+  });
+
+  it("rejects an unknown locale with 400", async () => {
+    const res = await fetch(`${BASE}/api/v1/statuses?locale=fr`);
+
+    assert.equal(res.status, 400);
+    await res.text();
+  });
+});
+
 describe("GET /api/v1/abilities", () => {
   it("returns 404 (endpoint removed)", async () => {
     const res = await fetch(`${BASE}/api/v1/abilities`);

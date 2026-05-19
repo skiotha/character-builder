@@ -11,7 +11,13 @@ interface ReferenceEntry {
   [key: string]: unknown;
 }
 
-const SINGLE_TOPICS = ["rituals", "weapons", "armor", "qualities"] as const;
+const SINGLE_TOPICS = [
+  "rituals",
+  "weapons",
+  "armor",
+  "qualities",
+  "statuses",
+] as const;
 type SingleTopic = (typeof SINGLE_TOPICS)[number];
 
 const MERGED_TOPICS = ["traits", "talents"] as const;

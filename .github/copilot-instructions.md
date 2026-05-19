@@ -36,7 +36,7 @@ Key layers:
 - `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
 - `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
-- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ.
+- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`, `statuses`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). `statuses` is display-only metadata for sibling apps; the engine treats statuses as opaque `EffectFlag` tokens. A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ.
 - `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
 ## Key Design Decisions

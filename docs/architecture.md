@@ -45,6 +45,7 @@ The Nagara Character Builder is a web application for creating and managing RPG 
 │   │   reference/{boons,sins,rituals}.{en,ru}.json             │      │
 │   │   reference/{weapons,armor,runes}.{en,ru}.json            │      │
 │   │   reference/qualities.{en,ru}.json   (ADR-016)            │      │
+│   │   reference/statuses.{en,ru}.json                          │      │
 │   └───────────────────────────────────────────────────────────┘      │
 │                                                                      │
 │   ┌───────────────────────────────────────────────────────────┐      │
@@ -109,6 +110,7 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 | `handleGetWeapons`      | `/api/v1/weapons`                 | GET    |
 | `handleGetArmor`        | `/api/v1/armor`                   | GET    |
 | `handleGetQualities`    | `/api/v1/qualities`               | GET    |
+| `handleGetStatuses`     | `/api/v1/statuses`                | GET    |
 | `handleValidateDM`      | `/api/v1/validate-dm`             | POST   |
 | `handleGetSchema`       | `/api/v1/schema`                  | GET    |
 
@@ -117,6 +119,9 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 > `boons` + `sins`, with each entry stamped `source: "ability" | "spell" | "boon" | "sin"`.
 > `/qualities` is a single-source endpoint backed by `reference/qualities.{en,ru}.json`
 > (the engine-canonical registry from [ADR-016](decisions/016-quality-registry.md)).
+> `/statuses` is a single-source endpoint backed by `reference/statuses.{en,ru}.json`
+> (user-facing status descriptions for sibling apps; the engine treats statuses as
+> opaque `EffectFlag` tokens — see `src/rpg-types.mts`).
 > Reference JSON files live in `reference/` (not `data/`) and are **not** served as
 > static files — only via these API endpoints. A locale-drift lint test
 > (`test/reference-locale-drift.test.mts`) keeps the `{en,ru}` pairs structurally

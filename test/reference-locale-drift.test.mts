@@ -35,6 +35,7 @@ const TOPICS = [
   "weapons",
   "armor",
   "qualities",
+  "statuses",
 ] as const;
 
 const LOCALIZED_FIELDS: ReadonlySet<string> = new Set([
