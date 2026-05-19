@@ -86,6 +86,37 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 > required `id` as the dedupe key. Sibling apps that need provenance
 > can recover it from the trait list itself.
 
+> **Post-Chunk-F amendment (2026-05-19, amendment Items 1, 6, 8, 12).**
+> `Action` gained five optional declarative fields:
+>
+> - `damageBonus?: number` — flat bonus added on top of the carrying
+>   slot's inherited base damage (Backstab pattern). Requires non-empty
+>   `appliesTo` to scope which slots the bonus fires on.
+> - `ignoresArmor?: boolean` — bypasses target armor. `manual` triggers
+>   only.
+> - `inflicts?: string[]` — status ids the action applies to its target.
+>   Validated by `scripts/audit-reference.mts` against
+>   `reference/statuses.{en,ru}.json` (a data-driven registry, *not* a
+>   `StatusKind` TypeScript union). Engine declares; sibling combat
+>   resolvers own duration, stacking, and saves — same lifecycle policy
+>   as `EffectFlag`.
+> - `isFree?: boolean` — does not consume the action economy. `manual`
+>   triggers only. Engine carries the flag verbatim; **no derived
+>   `combat.freeAttacks` counter** is computed. Sibling apps sum free
+>   attacks themselves (typically one per turn, ability-modified).
+> - `appliesTo?: WeaponPredicate[]` — narrows which carried slots an
+>   action applies to (same vocabulary as effect `appliesTo`).
+>   `[{ "kind": "any" }]` is the canonical "every slot" form for
+>   actions whose semantics are slot-bound; omit on innate / monster
+>   attacks. Required when `damageBonus` is present.
+>
+> Engine consumption is **declarative-only** in the post-Chunk-F
+> landing: the fields round-trip through the catalog and reach sibling
+> apps verbatim. Per-slot inheritance resolution at recalc time
+> (inlining the matched slot's `damage` / `attackAttribute` when
+> omitted) is the remaining Item 1 engine work, scheduled against the
+> Chunk G production registry landing.
+
 **Distinction is purely semantic** — same shape, two collections:
 
 - `trigger === "manual"` → `SpecialAttack` (player-invoked on their own turn).

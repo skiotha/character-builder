@@ -100,21 +100,37 @@ describe("normalizeRawEffect", () => {
     }
   });
 
-  it("strips appliesTo on non-combat targets with a warn", () => {
+  it("rejects appliesTo on non-accepting targets with a warn (J.4b)", () => {
+    // Allow-list (Item 12, widened Chunk J): combat / weaponQuality / flag /
+    // secondary. `primary` is character-global and pre-pipeline; appliesTo
+    // there is misplaced authoring.
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw: RawEffect = {
-        target: { kind: "secondary", stat: "defense" },
+        target: { kind: "primary", attribute: "quick" },
         modifier: { type: "addFlat", value: 1 },
         appliesTo: [{ kind: "any" }],
       };
       const resolved = normalizeRawEffect(raw, "test");
-      assert.ok(resolved);
-      assert.equal(resolved.appliesTo, undefined);
+      assert.equal(resolved, null);
       assert.ok(warnMock.mock.callCount() >= 1);
     } finally {
       warnMock.mock.restore();
     }
+  });
+
+  it("accepts appliesTo on secondary targets as documentary metadata (Bug #34, Chunk J)", () => {
+    // Chunk J widening: secondary accepts appliesTo at the parser, but the
+    // engine has no slot-aware secondary path yet — the predicate is a
+    // documentary no-op at runtime (Bug #34, deferred).
+    const raw: RawEffect = {
+      target: { kind: "secondary", stat: "defense" },
+      modifier: { type: "addFlat", value: 1 },
+      appliesTo: [{ kind: "type", values: ["staff"] }],
+    };
+    const resolved = normalizeRawEffect(raw, "test");
+    assert.ok(resolved);
+    assert.deepEqual(resolved.appliesTo, [{ kind: "type", values: ["staff"] }]);
   });
 
   it("preserves appliesTo on combat targets", () => {
@@ -224,7 +240,7 @@ describe("collectAllEffects", () => {
     }
   });
 
-  it("does NOT collect talents (Chunk C / TODO post-G regression guard)", () => {
+  it("collects talents via registry.lookupTalent (Chunk J / J.4a)", () => {
     const registry = createInMemoryRegistry({
       talents: {
         "noctis:1": {
@@ -240,11 +256,29 @@ describe("collectAllEffects", () => {
     });
     const collected = collectAllEffects(
       {
-        talents: [{ id: "noctis", level: 1, source: "boon" }] as unknown[],
+        talents: [{ id: "noctis", level: 1, source: "boon" }],
       },
       registry,
     );
-    assert.equal(collected.length, 0);
+    assert.equal(collected.length, 1);
+    assert.equal(collected[0]!.source, "noctis");
+  });
+
+  it("warns and skips unknown talents", () => {
+    const registry = createInMemoryRegistry();
+    const warnMock = mock.method(console, "warn", () => {});
+    try {
+      const collected = collectAllEffects(
+        {
+          talents: [{ id: "missing", level: 1, source: "boon" }],
+        },
+        registry,
+      );
+      assert.equal(collected.length, 0);
+      assert.ok(warnMock.mock.callCount() >= 1);
+    } finally {
+      warnMock.mock.restore();
+    }
   });
 
   it("does NOT collect equipment effects (Chunk C / Chunk-E TODO regression guard)", () => {

@@ -30,6 +30,37 @@ Cross-references:
 
 ## Item 1 — Special Attacks & Reactions: inherit-by-default shape
 
+### Status
+
+⏳ **Partial — wire shape and authoring shipped; engine runtime
+pending** (2026-05-19). Wire shape locked: `Action` carries
+`damageBonus?`, `ignoresArmor?`, and `appliesTo?: WeaponPredicate[]`
+(the final name chosen instead of the staging-file's `weaponFilter` to
+reuse the existing per-slot scoping vocabulary). Audit-reference lint
+(section 12 — Action inheritance shape coherence) enforces
+`damageBonus` requires non-empty `appliesTo`, and forbids
+`ignoresArmor` / `damageBonus` on non-`manual` triggers. **Authoring
+sweep complete:** entries that *should* inherit (`intrigues-backstab`
+novice & master) re-authored with `damageBonus` + `appliesTo`; entries
+that are *legitimately* bespoke (Cheap Shot, Strangling armor-ignoring
+choke, Riposte armor-ignoring d6, poisoner reactions, hunter/skirmish
+reactions) correctly retain hardcoded `damage` / `attackAttribute` per
+the original Item 1 design ("Cheap Shot and innate / monster attacks
+stay as-is"). Docs shipped: ADR-014 post-Chunk-F amendment block
+(`docs/decisions/014-per-slot-combat-special-attacks.md`),
+`docs/data-contracts.md` Action shape extended,
+`docs/authoring-effects.md` §10 covers inheritance defaults +
+`damageBonus` + `ignoresArmor` + `appliesTo` on actions. **Remaining:**
+engine runtime that resolves per-slot inheritance at recalc time and
+inlines the carrying slot's weapon stats into the resulting
+`SpecialAttack`/`Reaction` — scheduled against the Chunk G production
+talent-registry landing per
+[`.github/plans/phase6-plan.md`](phase6-plan.md). Item 1 closure flips
+when the engine resolver ships.
+
+---
+
+
 ### Problem
 
 The original `SpecialAttack` / `Reaction` shape (ADR-014) requires
@@ -487,6 +518,33 @@ field on effects, which keeps ADR-015 lean.
 
 ## Item 6 — Status infliction tracking on `Action` / `SpecialAttack` / `Reaction`
 
+### Status
+
+✅ **Implemented** (2026-05-19). Field shipped as `inflicts?: string[]`
+on `Action` (validated against a data-driven status registry, not as a
+hard-coded `StatusKind` TypeScript union — the staging-file sketch was
+upgraded to match the existing reference-catalog pattern). Added:
+`reference/statuses.{en,ru}.json` (display metadata only — engine
+treats statuses as opaque tokens, sibling apps render the rich
+description), `/api/v1/statuses` locale-aware endpoint wired into
+[`src/app.mts`](../../src/app.mts), `statuses` topic in
+[`src/models/reference.mts`](../../src/models/reference.mts), and an
+`audit-reference.mts` lint section (section 10) that resolves every
+`inflicts[]` entry against the registry and flags unknown ids.
+Locale-drift test extended to cover the `{en,ru}` pair. Authoring
+sweep complete — audit reports 8 distinct status ids referenced, all
+resolve. Docs landed: ADR-014 post-Chunk-F amendment block,
+`docs/data-contracts.md` Action shape extended,
+`docs/authoring-effects.md` §10 documents the field semantics +
+lifecycle policy + sibling responsibilities. Sibling-project contracts
+([`docs/addon-integration.md`](../../docs/addon-integration.md),
+[`docs/bot-integration.md`](../../docs/bot-integration.md)) pick up the
+field through the standard ADR-014 `Action` reference — no separate
+heads-up needed; sibling-engineer onboarding folds it in naturally.
+
+---
+
+
 ### Problem
 
 Real abilities and spells inflict statuses on their targets:
@@ -601,6 +659,30 @@ export interface Action {
 
 ## Item 7 — Boons / Sins authoring policy: opportunistic engine effects
 
+### Status
+
+✅ **Implemented** (2026-05-19). Engine path complete:
+`collectAllEffects` in
+[`src/rules/effects.mts`](../../src/rules/effects.mts) walks
+`character.talents[]` via `registry.lookupTalent(id, level)`,
+warn-and-skip on unknown ids — same pattern as traits.
+[`test/rules/effects.test.mts`](../../test/rules/effects.test.mts)
+covers the happy path (talent effects collected with
+`source === "noctis"`) and the unknown-talent warn path.
+Audit-reference lint gained explicit acceptance of top-level
+`effects[]` on boon / sin entries (no longer treated as a placement
+error). Authoring sweep complete (12 boons + 1 sin currently carry
+`effects[]`). Docs landed: `docs/authoring-effects.md` §3 and §4
+document the opportunistic-effects rule with the rule-of-thumb test
+and examples. Production registry's `lookupTalent: () => null` stub in
+[`src/app.mts`](../../src/app.mts) is intentional and called out in
+§3 — real talent effects start flowing once Chunk G's real registry
+loader lands; the in-memory test registry already exercises the full
+path end-to-end.
+
+---
+
+
 ### Background
 
 ADR-014 / Chunk F initially declared boons and sins **non-combat** — they
@@ -704,6 +786,25 @@ type changes needed.
 ---
 
 ## Item 8 — Free-attack tracking on `SpecialAttack`
+
+### Status
+
+✅ **Implemented** (2026-05-19). Wire shape locked: `isFree?: boolean`
+on `Action` ([`src/rpg-types.mts`](../../src/rpg-types.mts)).
+Audit-reference lint (section 11) enforces `isFree: true` is only set
+on `trigger: "manual"` actions — reactions / passive triggers cannot
+be free since they don't consume the action economy in the first
+place. Engine remains declarative-only per the staging-file decision
+— **no derived `combat.freeAttacks` counter** is computed; sibling
+apps sum free attacks themselves. Authoring sweep complete (Knife
+Mastery `stab`, Smoke and Mirrors `feint`, Quick Reload, Two Weapons
+off-hand strike, etc.); audit reports zero violations. Docs landed:
+ADR-014 post-Chunk-F amendment block documents the field and the
+no-engine-count rule; `docs/authoring-effects.md` §10 covers it under
+"Free attacks (Item 8)".
+
+---
+
 
 ### Problem
 
@@ -1152,6 +1253,36 @@ writes to `.max`, leaves `.current` untouched) in
 ---
 
 ## Item 12 — Cosmetic conventions: explicit `appliesTo` and `stat`/`field` naming
+
+### Status
+
+✅ **Implemented** (2026-05-19). 12a (explicit-`any` placement
+discipline): parser in
+[`src/rules/effects.mts`](../../src/rules/effects.mts) flipped from
+strip-with-warn to **reject-null** for misplaced `appliesTo` /
+`condition` — misplacement now drops the entire effect rather than
+silently stripping the predicate. Accept-lists per ADR-015 §3
+widening: `appliesTo` accepted on `combat | weaponQuality | flag |
+secondary` (the last per Bug #34 — engine ignores it at runtime today,
+carries it as documentary metadata); `condition` accepted on
+`secondary | armorQuality` (unchanged). Audit-reference lint sections
+9–12 enforce the per-`kind` placement table at catalog-build time;
+authoring sweep complete — audit reports zero placement violations.
+12b (`stat` vs `field` discriminator naming): keep-current decision
+unchanged; no work. Placement table and §9.5 `condition` vocabulary
+folded into [`docs/authoring-effects.md`](../../docs/authoring-effects.md)
+§9 / §9.5; the standalone amendment doc has been retired.
+
+Related bugs discovered while wiring the placement widening:
+[`engine-weak-points.md`](../bugs/engine-weak-points.md) #34
+(`secondary` + `appliesTo` accepted by parser, ignored by engine — no
+per-slot weighting mechanism for `secondary` targets) and #35
+(`secondary` + `setBase` rejected by parser — no primary-substitution
+mechanism; sibling to #34). Both stay open with three design options
+sketched.
+
+---
+
 
 Two bikeshed-tier proposals raised mid-authoring. Both are pure cosmetics —
 no engine semantics change. Decisions captured here so the bulk re-authoring

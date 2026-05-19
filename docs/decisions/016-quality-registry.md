@@ -33,7 +33,7 @@ improvement, while costs accumulated (loader split, projection helper, migration
 script, sibling-project migration, parametric-quality test paths, locale-key
 collision rule). The narrower drift-prevention goal is met by a tiny CI lint test
 that compares non-localized fields between locales — see
-[phase6-chunkF-prereqs-plan.md](../../.github/plans/phase6-chunkF-prereqs-plan.md)
+[phase6-chunkF-prereqs-plan.md](../../.github/plans/done/phase6-chunkF-prereqs-plan.md)
 Task 1. Locale files stay split.
 
 ## Decision
@@ -219,6 +219,6 @@ narrow. Promote only when a real case emerges.
 
 ## References
 
-- [phase6-chunkF-prereqs-plan.md](../../.github/plans/phase6-chunkF-prereqs-plan.md)
+- [phase6-chunkF-prereqs-plan.md](../../.github/plans/done/phase6-chunkF-prereqs-plan.md)
 - [ADR-014](014-per-slot-combat-special-attacks.md)
 - [ADR-015](015-typed-effect-targets-final.md)

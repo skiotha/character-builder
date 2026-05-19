@@ -306,7 +306,7 @@ If a spell does no damage and has no triggered behaviour, omit all three.
 
 ## 3. Boons (`boons.{en,ru}.json`)
 
-### Entry shape (locked — flat, no `effects[]`)
+### Entry shape (mostly flat; optional opportunistic `effects[]`)
 
 ```jsonc
 {
@@ -315,25 +315,54 @@ If a spell does no damage and has no triggered behaviour, omit all three.
   "category": "boon",                      // literal "boon"
   "tags": ["boon", "profession"],          // localized; free-form
   "levels": 3,                             // total ranks the character can buy
-  "description": "..."                     // localized; covers all ranks (more ranks = more of the same)
+  "description": "...",                    // localized; covers all ranks (more ranks = more of the same)
+  "effects": []                            // OPTIONAL — see "Opportunistic engine effects" below
 }
 ```
 
-Boons are non-combat narrative characteristics. The engine does not
-resolve them, and most carry only one rank doing one thing (multi-rank
-boons are typically just "more of the same number"). Adding a per-rank
-`effects[]` shape would be authoring overhead with zero engine payoff —
-so the catalog stays flat.
+Boons are primarily non-combat narrative characteristics. Most carry
+no `effects[]` at all. The engine resolves any that *are* declared
+through the same `collectAllEffects` pipeline as traits (looked up via
+`registry.lookupTalent(id, level)`).
 
-If a real engine-relevant boon ever appears, we'll add `effects[]` (and
-if needed, a `ranks` object) at that point. **YAGNI for now.**
+### Opportunistic engine effects (post-Chunk-F amendment, Item 7)
+
+> Status: **shipped** (2026-05-19). Engine path wired and tested
+> (`test/rules/effects.test.mts`); audit lint accepts top-level
+> `effects[]` on boons/sins; production registry's `lookupTalent`
+> stub in [`src/app.mts`](../src/app.mts) returns `null` until the
+> Chunk G real loader lands, so authored effects round-trip but don't
+> mutate derived state in production yet.
+
+**Author engine effects on a boon *only when* it produces a typed
+observable consequence:**
+
+- A `flag` consumed by combat or another typed effect
+  (`fireResistance`, `darkvision`, `trueSight`, `evasion`, …).
+- A `secondary` modifier (defense, armor, painThreshold, …).
+- A `setBase` on a derived attribute (`magicAttribute`,
+  `initiativeAttribute`, `combat.attackAttribute`).
+- A `weaponQuality` / `armorQuality` toggle that affects an equipped
+  item.
+
+**Rule of thumb:** if removing the boon would change *any* other typed
+effect or per-slot calculation's output, author the effect(s). If the
+boon is purely narrative ("loved by everyone", "prone to brooding"),
+omit `effects` — that is correct, not a gap.
+
+Boons are flat (no per-rank effects); a single `effects[]` array
+applies regardless of how many ranks the character has bought. If
+ranked engine effects become necessary, revisit the schema.
 
 ---
 
 ## 4. Sins (`sins.{en,ru}.json`)
 
-Identical to boons (§3), with `category: "sin"`. Same flat shape, same
-rationale — sins are non-combat narrative constraints.
+Same shape and same opportunistic-effects policy as boons (§3), with
+`category: "sin"`. Author `effects[]` only when a sin produces a typed
+observable consequence (e.g. a flag the engine or sibling apps
+consume, a secondary cap, a combat-relevant downside). Most sins
+remain flat narrative entries.
 
 ---
 
@@ -794,12 +823,12 @@ piece's quality never bleeds onto the plug.
 
 ---
 
-## 10. Deferred — picked up after the bulk pass
+## 10. `SpecialAttack` / `Reaction` wire shape on tier objects
 
-> Tracked in [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md)
-> Chunk F follow-up section so we don't lose them.
-
-### `SpecialAttack` / `Reaction` wire shape on tier objects
+> Status: **shipped** (post-Chunk-F amendment Items 1, 6, 8, 12 —
+> 2026-05-19). Engine consumes the declarative fields verbatim;
+> per-slot inheritance resolution at recalc time is the remaining
+> Item 1 engine work, scheduled against Chunk G.
 
 ADR-014 says these are derived collections distinguished by
 `trigger === "manual"`. The wire shape on tier objects is:
@@ -815,8 +844,13 @@ ADR-014 says these are derived collections distinguished by
           "id": "whirlwind-spin",            // REQUIRED, locale-independent
           "name": "Whirlwind",
           "trigger": "manual",
-          "damage": 4,
-          "attackAttribute": "strong"
+          "damage": 4,                       // optional — bespoke override; omit to inherit from carrying weapon
+          "attackAttribute": "strong",       // optional — bespoke override; omit to inherit
+          "damageBonus": 4,                  // optional — flat bonus on top of inherited base (Backstab pattern)
+          "ignoresArmor": true,              // optional, manual only — bypasses target armor
+          "inflicts": ["bleeding"],          // optional — status ids from reference/statuses.{en,ru}.json
+          "isFree": true,                    // optional, manual only — does not consume the action economy
+          "appliesTo": [{ "kind": "any" }]    // optional — narrows to matching carried slots (required when damageBonus is set)
         }
       ],
       "reactions": [
@@ -824,7 +858,8 @@ ADR-014 says these are derived collections distinguished by
           "id": "riposte-counter",
           "name": "Riposte",
           "trigger": "onAttacked",
-          "damage": 2
+          "damage": 2,
+          "attackAttribute": "quick"
         }
       ]
     }
@@ -837,6 +872,37 @@ same `id` appears at two tiers of the same parent ability/spell, the
 higher tier replaces the lower. Different ids coexist. So to "upgrade"
 a novice special attack at the master tier, repeat the same `id` and
 edit the other fields:
+
+**Inheritance defaults (Item 1).** Omit `damage` / `attackAttribute`
+when the action should fire with the carrying weapon's own values
+(Backstab, Stab, off-hand strikes). Set them only for bespoke actions
+that don't care which weapon you carry (Cheap Shot, magic attacks).
+Use `damageBonus` for the Backstab pattern (inherit base, add a flat
+bonus); the audit lint requires a non-empty `appliesTo` whenever
+`damageBonus` is present to scope which slots earn the bonus.
+
+**Status infliction (Item 6).** `inflicts[]` declares what statuses
+the action applies to its **target** on a successful hit. Values must
+resolve against `reference/statuses.{en,ru}.json` (the audit script
+flags unknown ids). Engine declares only — sibling combat resolvers
+own duration, stacking, and saves. Same lifecycle policy as
+`EffectFlag` (which describes the *character*, not the *target*).
+
+**Free attacks (Item 8).** `isFree: true` marks special attacks that
+don't consume the action economy (Two Weapons off-hand, Stab, Quick
+Reload). Accepted on `trigger: "manual"` only — reactions are already
+out-of-band and the flag would be meaningless. **No derived
+`combat.freeAttacks` counter** is computed; sibling apps sum free
+attacks themselves (typically one per turn, ability-modified).
+
+**Armor-ignoring damage (Item 1).** `ignoresArmor: true` on `manual`
+actions only. Useful for Strangling, Riposte armor-ignoring d6, and
+similar bespoke armor-bypassing strikes.
+
+**Predicate scoping (Item 12).** `appliesTo` on actions uses the same
+`WeaponPredicate[]` vocabulary as effects (§9). `[{ "kind": "any" }]`
+is the canonical "any carried weapon" form for slot-bound actions;
+omit on innate / monster attacks that don't depend on what's carried.
 
 ```jsonc
 {

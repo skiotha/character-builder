@@ -122,8 +122,6 @@ export type EffectFlag =
   | "knowledge:magic:shadow"
   | "knowledge:magic:enchantment"
   | "trueSight";
-// NOTE: This is a placeholder starting set. The authoring pass in Chunk F
-// will surface the real vocabulary; this enum is expected to expand.
 
 export type EffectTarget =
   | { kind: "primary"; stat: PrimaryAttributeName }
@@ -192,19 +190,28 @@ export interface ResolvedEffect {
 
 // ── Triggered Actions (ADR-014) ──────────────────────────────────
 
+/**
+ * Locked vocabulary mirroring [ADR-015 §5](../docs/decisions/015-typed-effect-targets-final.md).
+ * The engine treats every value as opaque — only `"manual"` carries
+ * semantics (routes the action into `SpecialAttack[]` rather than
+ * `Reaction[]`). Adding or removing a value is a one-line change.
+ */
 export type TriggerKind =
   | "manual"
-  | "onTurnStart"
-  | "onTurnEnd"
+  | "onHit"
+  | "onMiss"
+  | "onContact"
+  | "onProne"
   | "onAttacked"
-  | "onDamaged"
-  | "onCrit"
-  | "onAllyDamaged"
+  | "onCheck"
+  | "onDodged"
+  | "onAdvantage"
+  | "onEnemyMovement"
+  | "onAllyAttacked"
+  | "onResisted"
   | "onSpellCast"
-  | "onMovement"
-  | "onSightOf"
-  | "onRageStart"
-  | "onRageEnd";
+  | "onNewDay"
+  | "onDamaged";
 
 export interface Action {
   /**
@@ -220,9 +227,50 @@ export interface Action {
    */
   id: string;
   name: string;
+  /**
+   * Optional locale-bearing prose describing the action's effect for
+   * UI / sibling-app display. The engine never reads this. Authoring
+   * convention: keep it short — long-form lore belongs on the parent
+   * ability/spell.
+   */
+  description?: string;
   trigger: TriggerKind;
   attackAttribute?: PrimaryAttributeName;
   damage?: number;
+  /**
+   * Per-weapon damage bonus added on top of the carrying slot's base
+   * damage when the action inherits from a weapon (Item 1 authoring
+   * shape, amendment §1.1). Requires `appliesTo` to scope which weapons
+   * the bonus applies to. Engine runtime resolution is deferred (see
+   * amendment "Item 1 engine" status).
+   */
+  damageBonus?: number;
+  /**
+   * Marks the action as bypassing armor. Display-only today; engine
+   * runtime wiring deferred with the rest of Item 1.
+   */
+  ignoresArmor?: boolean;
+  /**
+   * Status ids inflicted on the target on resolution (amendment §6).
+   * Each entry must match an id in `reference/statuses.{en,ru}.json`;
+   * the audit-reference lint enforces this. Engine treats statuses as
+   * opaque tokens — sibling apps render the rich description.
+   */
+  inflicts?: string[];
+  /**
+   * Per-slot narrowing for actions that inherit from a weapon (Item 1
+   * authoring shape, amendment §1.2). When present on a manual /
+   * triggered action, the action only fires for slots whose weapon
+   * matches every predicate (AND-list; OR within `values[]`). Engine
+   * runtime resolution is deferred.
+   */
+  appliesTo?: WeaponPredicate[];
+  /**
+   * If `true`, the action does not consume the actor's action economy
+   * (amendment §8). Authoring lint forbids `isFree: true` on anything
+   * other than `trigger: "manual"`.
+   */
+  isFree?: boolean;
   effects?: ResolvedEffect[];
 }
 

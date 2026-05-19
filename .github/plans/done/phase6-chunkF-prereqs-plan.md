@@ -4,7 +4,7 @@
 > shipped; engine throws on unknown ids; `/api/v1/qualities` live;
 > qualities catalog scaffolded id-only (en+ru) with content authoring
 > deferred to Chunk F bulk pass; docs updated.
-> **Gate:** Must complete before [phase6-plan.md § Chunk F](phase6-plan.md#chunk-f--effect-normalization-data).
+> **Gate:** Must complete before [phase6-plan.md § Chunk F](../phase6-plan.md#chunk-f--effect-normalization-data).
 > Chunk F's bulk authoring pass operates on the registry-aware shape from edit one — adding the registry afterwards would mean re-touching every weapon and armor entry to strip duplicated boilerplate.
 >
 > **Why a separate plan:** the quality registry refactor crosses engine code, reference data, the loader, the API, tests, and three doc files. Doing it inline with Chunk F's hand-authoring pass would conflate mechanical refactor with creative authoring and make the diff unreviewable.

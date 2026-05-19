@@ -127,7 +127,7 @@ describe("magicAttribute", () => {
     }
   });
 
-  it("strips appliesTo on magicAttribute targets with a warn", () => {
+  it("rejects appliesTo on magicAttribute targets with a warn (J.4b)", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw: RawEffect = {
@@ -136,8 +136,7 @@ describe("magicAttribute", () => {
         appliesTo: [{ kind: "any" }],
       };
       const resolved = normalizeRawEffect(raw, "test");
-      assert.ok(resolved);
-      assert.equal(resolved.appliesTo, undefined);
+      assert.equal(resolved, null);
       assert.ok(warnMock.mock.callCount() >= 1);
     } finally {
       warnMock.mock.restore();

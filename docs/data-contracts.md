@@ -269,12 +269,35 @@ re-dedupe. The `Action` shape is:
 {
   "id": "string",                            // required, locale-independent
   "name": "string",
+  "description": "string",                   // optional
   "trigger": "manual" | "onAttacked" | ...,
-  "attackAttribute": "strong" | ...,         // optional
-  "damage": 4,                               // optional, number or dice
+  "attackAttribute": "strong" | ...,         // optional — bespoke override; absent ⇒ inherit from carrying weapon
+  "damage": 4,                               // optional — bespoke override (number or dice); absent ⇒ inherit
+  "damageBonus": 4,                          // optional — flat bonus added on top of inherited base damage (Backstab pattern)
+  "ignoresArmor": true,                      // optional, manual triggers only — bypasses target armor
+  "inflicts": ["bleeding", "stunned"],       // optional — status ids from reference/statuses.{locale}.json; engine declares, siblings model lifecycle
+  "isFree": true,                            // optional, manual triggers only — does not consume the action economy
+  "appliesTo": [ /* WeaponPredicate[] */ ],   // optional — narrows which carried slots the action applies to (AND-list, OR within values[])
   "effects": [ /* ResolvedEffect[] */ ]       // optional
 }
 ```
+
+`damageBonus`, `ignoresArmor`, `inflicts`, `isFree`, and `appliesTo`
+are the post-Chunk-F wire additions (amendment Items 1, 6, 8, 12).
+They are **declarative** — the engine carries them through to sibling
+apps verbatim. Inheritance resolution at recalc time (inlining the
+carrying slot's `damage` / `attackAttribute` when omitted) is the
+remaining Item 1 engine work, tracked against the Chunk G registry
+landing.
+
+`inflicts[]` entries are validated against the canonical status
+registry (`reference/statuses.{en,ru}.json`, served at
+`/api/v1/statuses`) by `scripts/audit-reference.mts`. Statuses are
+display-only metadata — the engine does not model duration, stacking,
+or saves; sibling combat resolvers own that.
+
+The audit lint enforces: `damageBonus` requires non-empty `appliesTo`;
+`ignoresArmor` / `isFree` are rejected on non-`manual` triggers.
 
 > The pre-Item-9 drafts of ADR-014 included a structured `source`
 > field on `Action`. It was never read by the engine and was dropped;

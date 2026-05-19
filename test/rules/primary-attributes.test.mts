@@ -321,7 +321,7 @@ describe("normalizeRawEffect — primary target", () => {
     }
   });
 
-  it("strips appliesTo with a warn (character-level, not slot-level)", () => {
+  it("rejects appliesTo with a warn (character-level, not slot-level) (J.4b)", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw: RawEffect = {
@@ -330,8 +330,7 @@ describe("normalizeRawEffect — primary target", () => {
         appliesTo: [{ kind: "type", values: ["sword"] }],
       };
       const resolved = normalizeRawEffect(raw, "test");
-      assert.ok(resolved);
-      assert.equal(resolved.appliesTo, undefined);
+      assert.equal(resolved, null);
       assert.ok(warnMock.mock.callCount() >= 1);
     } finally {
       warnMock.mock.restore();

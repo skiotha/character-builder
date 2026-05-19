@@ -57,12 +57,53 @@ const KNOWN_CONDITION_KINDS = new Set([
 ]);
 const KNOWN_ARMOR_SLOTS = new Set(["body", "plug"]);
 const CONDITION_ACCEPTING_TARGETS = new Set(["secondary", "armorQuality"]);
+// Item 12 placement table (Chunk J, revised 2026-05-19). `appliesTo` widened
+// to include "secondary" per user-locked policy (b) — see bug #34 in
+// `.github/bugs/engine-weak-points.md` for the engine-gap follow-up.
+const APPLIES_TO_ACCEPTING_TARGETS = new Set([
+  "combat",
+  "weaponQuality",
+  "flag",
+  "secondary",
+]);
+const APPLIES_TO_REQUIRED_TARGETS = new Set(["combat", "weaponQuality"]);
 const KNOWN_MODIFIER_TYPES = new Set([
   "setBase",
   "addFlat",
   "multiply",
   "cap",
   "remove",
+]);
+// EffectFlag vocabulary — kept in sync with `src/rpg-types.mts` `EffectFlag`.
+// Used by Item 6 (`inflicts[]` are NOT flags; statuses) and as a sanity
+// check on `target.kind="flag"` names.
+const KNOWN_EFFECT_FLAGS = new Set([
+  "evasion",
+  "advantage",
+  "deathDenial",
+  "darkvision",
+  "initiativeExemption",
+  "fastSwap",
+  "elementsProtection",
+  "fireResistance",
+  "poisonResistance",
+  "knowledge:alchemy",
+  "knowledge:alchemy:poisons",
+  "knowledge:world",
+  "knowledge:world:nature",
+  "knowledge:world:warfare",
+  "knowledge:world:geography",
+  "knowledge:world:underworld",
+  "knowledge:world:commerce",
+  "knowledge:magic",
+  "knowledge:magic:arcane",
+  "knowledge:magic:nature",
+  "knowledge:magic:light",
+  "knowledge:magic:elementalism",
+  "knowledge:magic:fel",
+  "knowledge:magic:shadow",
+  "knowledge:magic:enchantment",
+  "trueSight",
 ]);
 
 // ── Findings buckets ──
@@ -76,11 +117,28 @@ const findings: Record<string, Finding[]> = {
   amendmentBlockers: [],
   rogueFields: [],
   actionIds: [],
+  // J.3 buckets (Chunk J post-sweep):
+  //   placement   — Item 12, appliesTo/condition placement discipline
+  //   inflicts    — Item 6, status-id resolution on actions
+  //   isFree      — Item 8, trigger="manual" gate
+  //   inheritance — Item 1, optional inheritance-shape fields on actions
+  placement: [],
+  inflicts: [],
+  isFree: [],
+  inheritance: [],
 };
 const flagNames = new Set<string>();
 const flagOccurrences: Record<string, number> = {};
 const qualityIds = new Set<string>();
 const qualityRefs = new Map<
+  string,
+  { file: string; entryId: string; via: string }[]
+>();
+// Status registry + outgoing inflicts[] references (J.3, Item 6). Same
+// resolution pattern as qualities: registry populated by walking
+// reference/statuses.*.json; refs accumulated from action.inflicts[].
+const statusIds = new Set<string>();
+const statusRefs = new Map<
   string,
   { file: string; entryId: string; via: string }[]
 >();
@@ -109,6 +167,16 @@ function noteQualityRef(
 ): void {
   if (!qualityRefs.has(id)) qualityRefs.set(id, []);
   qualityRefs.get(id)!.push({ file, entryId, via });
+}
+
+function noteStatusRef(
+  id: string,
+  file: string,
+  entryId: string,
+  via: string,
+): void {
+  if (!statusRefs.has(id)) statusRefs.set(id, []);
+  statusRefs.get(id)!.push({ file, entryId, via });
 }
 
 // ── Per-effect inspection ──
@@ -397,19 +465,34 @@ function inspectEffect(
   // appliesTo hygiene.
   if (effect.appliesTo !== undefined) {
     const targetKind = target?.kind;
-    // `combat`, `weaponQuality`, and `flag` accept `appliesTo`. For `flag` the
-    // engine treats it as documentary metadata for siblings (Item 13).
+    // Item 12 placement table (J.3): `appliesTo` allowed on
+    // {combat, weaponQuality, flag, secondary}. `secondary` is the
+    // 2026-05-19 widening (policy b) — engine still ignores the predicate
+    // there; see bug #34. Anywhere else the parser strip-warns today and
+    // will hard-reject after J.4b.
     if (
-      targetKind &&
-      targetKind !== "combat" &&
-      targetKind !== "weaponQuality" &&
-      targetKind !== "flag"
+      typeof targetKind === "string" &&
+      !APPLIES_TO_ACCEPTING_TARGETS.has(targetKind)
     ) {
-      addFinding("predicateHygiene", {
+      addFinding("placement", {
         file,
         entryId,
         tier,
-        detail: `${context}: appliesTo on target kind "${targetKind}" — silently stripped by parser`,
+        detail: `${context}: appliesTo on target kind "${targetKind}" — only {combat, weaponQuality, flag, secondary} accept appliesTo (parser will reject)`,
+      });
+    }
+    // Items requiring NON-EMPTY appliesTo to be meaningful.
+    if (
+      typeof targetKind === "string" &&
+      APPLIES_TO_REQUIRED_TARGETS.has(targetKind) &&
+      Array.isArray(effect.appliesTo) &&
+      effect.appliesTo.length === 0
+    ) {
+      addFinding("placement", {
+        file,
+        entryId,
+        tier,
+        detail: `${context}: ${targetKind} target has empty appliesTo[] — must constrain to at least one weapon predicate`,
       });
     }
     if (Array.isArray(effect.appliesTo)) {
@@ -444,11 +527,11 @@ function inspectEffect(
       typeof targetKind === "string" &&
       !CONDITION_ACCEPTING_TARGETS.has(targetKind)
     ) {
-      addFinding("predicateHygiene", {
+      addFinding("placement", {
         file,
         entryId,
         tier,
-        detail: `${context}: condition on target kind "${targetKind}" — only "secondary" / "armorQuality" accept condition (parser strips with warn)`,
+        detail: `${context}: condition on target kind "${targetKind}" — only {secondary, armorQuality} accept condition (parser will reject)`,
       });
     }
     if (!Array.isArray(condition)) {
@@ -523,7 +606,7 @@ function inspectEffect(
     !file.includes("qualities.") &&
     (!Array.isArray(condition) || condition.length === 0)
   ) {
-    addFinding("predicateHygiene", {
+    addFinding("placement", {
       file,
       entryId,
       tier,
@@ -598,6 +681,156 @@ function inspectActionIds(
   });
 }
 
+/**
+ * J.3 per-action shape lint covering three amendment items at once:
+ *
+ *   Item 1 (inheritance) — optional `damageBonus`/`ignoresArmor`/
+ *     `appliesTo` fields must be well-typed. Today these are display-
+ *     only (engine runtime resolution deferred), so the lint is the
+ *     only thing keeping the catalog honest.
+ *   Item 6 (`inflicts[]`) — must be an array of string ids that each
+ *     resolve in the global status registry (see Section 11 report).
+ *   Item 8 (`isFree`) — must be a boolean and may only be `true` on
+ *     actions with `trigger: "manual"` (free reactions are nonsensical;
+ *     reactions are out-of-turn by definition).
+ */
+function inspectAction(
+  file: string,
+  parentId: string,
+  tier: string,
+  field: "specialAttack" | "reaction",
+  i: number,
+  action: any,
+): void {
+  if (!action || typeof action !== "object") return;
+  const path = `${parentId}.tiers.${tier}.${field}s[${i}]`;
+  const trigger = action.trigger;
+
+  // Item 8: isFree.
+  if (action.isFree !== undefined) {
+    if (typeof action.isFree !== "boolean") {
+      addFinding("isFree", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: isFree must be boolean (got ${typeof action.isFree})`,
+      });
+    } else if (action.isFree === true && trigger !== "manual") {
+      addFinding("isFree", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: isFree=true with trigger="${trigger}" — only manual actions can be free (reactions are out-of-turn already)`,
+      });
+    }
+  }
+
+  // Item 6: inflicts[].
+  if (action.inflicts !== undefined) {
+    if (!Array.isArray(action.inflicts)) {
+      addFinding("inflicts", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: inflicts must be an array of status ids`,
+      });
+    } else {
+      action.inflicts.forEach((sid: unknown, j: number) => {
+        if (typeof sid !== "string" || sid.length === 0) {
+          addFinding("inflicts", {
+            file,
+            entryId: parentId,
+            tier,
+            detail: `${path}.inflicts[${j}]: not a non-empty string`,
+          });
+          return;
+        }
+        noteStatusRef(sid, file, parentId, `${field}.inflicts`);
+      });
+    }
+  }
+
+  // Item 1: inheritance-shape optional fields.
+  if (action.damageBonus !== undefined) {
+    if (
+      typeof action.damageBonus !== "number" ||
+      !Number.isFinite(action.damageBonus)
+    ) {
+      addFinding("inheritance", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: damageBonus must be a finite number (got ${JSON.stringify(action.damageBonus)})`,
+      });
+    } else if (
+      !Array.isArray(action.appliesTo) ||
+      action.appliesTo.length === 0
+    ) {
+      // damageBonus without appliesTo would apply to every carrying slot —
+      // certainly not authoring intent. Amendment §1.1 ties them together.
+      addFinding("inheritance", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: damageBonus=${action.damageBonus} without non-empty appliesTo[] — must scope which weapons the bonus applies to`,
+      });
+    }
+  }
+  if (
+    action.ignoresArmor !== undefined &&
+    typeof action.ignoresArmor !== "boolean"
+  ) {
+    addFinding("inheritance", {
+      file,
+      entryId: parentId,
+      tier,
+      detail: `${path}: ignoresArmor must be boolean (got ${typeof action.ignoresArmor})`,
+    });
+  }
+  if (action.appliesTo !== undefined) {
+    if (!Array.isArray(action.appliesTo)) {
+      addFinding("inheritance", {
+        file,
+        entryId: parentId,
+        tier,
+        detail: `${path}: appliesTo must be an array of WeaponPredicate`,
+      });
+    } else {
+      action.appliesTo.forEach((pred: any, j: number) => {
+        if (
+          !pred ||
+          typeof pred !== "object" ||
+          typeof pred.kind !== "string" ||
+          !KNOWN_PREDICATE_KINDS.has(pred.kind)
+        ) {
+          addFinding("inheritance", {
+            file,
+            entryId: parentId,
+            tier,
+            detail: `${path}.appliesTo[${j}].kind="${pred?.kind}" invalid`,
+          });
+          return;
+        }
+        if (pred.kind === "quality" && Array.isArray(pred.values)) {
+          for (const v of pred.values) {
+            if (typeof v === "string")
+              noteQualityRef(v, file, parentId, `${field}.appliesTo predicate`);
+          }
+        }
+      });
+    }
+  }
+
+  // Walk inner action.effects[] (already handled at tier level for
+  // tier.effects; action.effects is the per-action variant from
+  // amendment §1). Reuse inspectEffect for full target/modifier coverage.
+  if (Array.isArray(action.effects)) {
+    action.effects.forEach((eff: any, j: number) =>
+      inspectEffect(eff, file, parentId, `${path}.effects[${j}]`),
+    );
+  }
+}
+
 function walkAbilitiesOrSpells(file: string, data: any[]): void {
   for (const entry of data) {
     if (!entry || typeof entry !== "object") continue;
@@ -615,6 +848,9 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
       const specialAttacks = (tierVal as any).specialAttacks;
       if (Array.isArray(specialAttacks)) {
         inspectActionIds(file, id, tierKey, "specialAttack", specialAttacks);
+        specialAttacks.forEach((sa: any, i: number) =>
+          inspectAction(file, id, tierKey, "specialAttack", i, sa),
+        );
         specialAttacks.forEach((sa, i) => {
           if (
             sa &&
@@ -633,6 +869,9 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
       const reactions = (tierVal as any).reactions;
       if (Array.isArray(reactions)) {
         inspectActionIds(file, id, tierKey, "reaction", reactions);
+        reactions.forEach((r: any, i: number) =>
+          inspectAction(file, id, tierKey, "reaction", i, r),
+        );
         reactions.forEach((r, i) => {
           if (
             r &&
@@ -662,16 +901,21 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
 }
 
 function walkBoonsSinsRituals(file: string, data: any[]): void {
-  // Spec says these are FLAT — should not have effects[]. Surface any that do.
+  // Boons/sins MAY carry top-level effects[] per amendment Item 7.
+  // Rituals remain flat (no effects[]) until further notice.
+  const isRitual = file.startsWith("rituals.");
   for (const entry of data) {
     if (!entry || typeof entry !== "object") continue;
     const id = entry.id ?? "<no-id>";
     if (Array.isArray(entry.effects) && entry.effects.length > 0) {
-      addFinding("rogueFields", {
-        file,
-        entryId: id,
-        detail: `${id}: top-level effects[] (spec says flat — only abilities/spells carry effects). Inspecting anyway:`,
-      });
+      if (isRitual) {
+        addFinding("rogueFields", {
+          file,
+          entryId: id,
+          detail: `${id}: top-level effects[] on a ritual (spec says flat — rituals don't carry effects). Inspecting anyway:`,
+        });
+      }
+      // Either way, validate the effect contents.
       entry.effects.forEach((eff: any, i: number) =>
         inspectEffect(eff, file, id, `${id}.effects[${i}]`),
       );
@@ -727,6 +971,14 @@ function walkQualities(file: string, data: any[]): void {
   }
 }
 
+function walkStatuses(_file: string, data: any[]): void {
+  for (const entry of data) {
+    if (!entry || typeof entry !== "object") continue;
+    const id = entry.id;
+    if (typeof id === "string" && id.length > 0) statusIds.add(id);
+  }
+}
+
 // ── Drive ──
 
 const files = readdirSync(RESOLVED_REF).filter((f) => f.endsWith(".json"));
@@ -762,6 +1014,8 @@ for (const file of files) {
     walkWeaponsOrArmor(file, data, "armor");
   } else if (file.startsWith("qualities.")) {
     walkQualities(file, data);
+  } else if (file.startsWith("statuses.")) {
+    walkStatuses(file, data);
   }
 }
 
@@ -864,5 +1118,51 @@ header("8. Action ids (specialAttacks / reactions, ADR-014 Item 9)");
 const actionIdFindings = dedupe(findings.actionIds!);
 if (actionIdFindings.length === 0) console.log("  (none)");
 else actionIdFindings.forEach((f) => console.log(`  ${f.detail}`));
+
+header("9. Placement discipline (Item 12 — appliesTo / condition)");
+const placementFindings = dedupe(findings.placement!);
+if (placementFindings.length === 0) console.log("  (none)");
+else placementFindings.forEach((f) => console.log(`  ${f.detail}`));
+
+header("10. Action inflicts[] (Item 6 — status-id resolution)");
+const inflictsFindings = dedupe(findings.inflicts!);
+if (inflictsFindings.length === 0 && statusRefs.size === 0) {
+  console.log("  (no inflicts[] in catalog)");
+} else {
+  inflictsFindings.forEach((f) => console.log(`  ${f.detail}`));
+  // Status-id resolution sweep.
+  const unresolvedStatuses = new Map<
+    string,
+    { file: string; entryId: string; via: string }[]
+  >();
+  for (const [id, refs] of statusRefs) {
+    if (!statusIds.has(id)) unresolvedStatuses.set(id, refs);
+  }
+  console.log(
+    `  Status registry: ${statusIds.size} ids — ${statusRefs.size} distinct ids referenced via inflicts[]`,
+  );
+  if (unresolvedStatuses.size > 0) {
+    console.log(`  ${unresolvedStatuses.size} unresolved status id(s):`);
+    for (const [id, refs] of unresolvedStatuses) {
+      console.log(
+        `    - "${id}" referenced ${refs.length}x — first: ${refs[0]!.file} entry=${refs[0]!.entryId} via ${refs[0]!.via}`,
+      );
+    }
+  } else if (statusRefs.size > 0) {
+    console.log("  All referenced status ids resolve.");
+  }
+}
+
+header("11. Action isFree (Item 8 — manual-only gate)");
+const isFreeFindings = dedupe(findings.isFree!);
+if (isFreeFindings.length === 0) console.log("  (none)");
+else isFreeFindings.forEach((f) => console.log(`  ${f.detail}`));
+
+header(
+  "12. Action inheritance shape (Item 1 — damageBonus/ignoresArmor/appliesTo)",
+);
+const inheritanceFindings = dedupe(findings.inheritance!);
+if (inheritanceFindings.length === 0) console.log("  (none)");
+else inheritanceFindings.forEach((f) => console.log(`  ${f.detail}`));
 
 console.log("\n--- end of audit ---");

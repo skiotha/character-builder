@@ -16,9 +16,6 @@
 //   * Groups results by `EffectPhase` for the ordered pipeline.
 //
 // What this module does NOT do (deferred):
-//   * Talents (`character.talents[]`) — TODO(phase6-post-G). The decision
-//     on whether talents contribute engine effects is pending; the
-//     registry interface declares `lookupTalent` for forward compat.
 //   * Equipment effects (`equipment.weapons[*].effects`,
 //     `equipment.armor.*`, `equipment.runes[*]`) — TODO(phase6-chunk-E),
 //     handled by per-slot combat fanout.
@@ -29,6 +26,7 @@ import type {
   EffectModifier,
   EffectPhase,
   EffectTarget,
+  LearnedTalent,
   LearnedTrait,
   PrimaryAttributeName,
   RawEffect,
@@ -121,25 +119,31 @@ export function normalizeRawEffect(
   };
 
   if (raw.appliesTo !== undefined) {
-    // `combat` and `weaponQuality`: appliesTo is engine-evaluated (per-slot fanout).
-    // `flag`: appliesTo is preserved as documentary metadata for siblings (roll-time
-    //   modifiers like `advantage` are sibling-side; the engine still adds the flag
-    //   name to the global set regardless of `appliesTo`). See ADR-015 + Item 13.
-    // All other target kinds: silently stripped with a warn (per ADR-015 §3a).
+    // Item 12 placement table (Chunk J, revised 2026-05-19). `appliesTo`
+    // is engine-evaluated on `combat` / `weaponQuality` (per-slot fanout
+    // in `deriveCombatSlots`), preserved as documentary metadata on
+    // `flag` (roll-time, sibling-evaluated; engine still adds the flag
+    // name globally), and ACCEPTED on `secondary` per Chunk J widening
+    // (engine has no slot-aware secondary path yet — see Bug #34 — so
+    // the predicate is currently a documentary no-op at runtime).
+    // Any other target kind is a parser-reject: misplaced authoring,
+    // not a silent strip.
     if (
       target.kind !== "combat" &&
       target.kind !== "weaponQuality" &&
-      target.kind !== "flag"
+      target.kind !== "flag" &&
+      target.kind !== "secondary"
     ) {
       console.warn(
-        `[effects] Stripping appliesTo from target kind ${target.kind} ` +
-          `(only combat / weaponQuality / flag accept appliesTo, source=${effectSource}).`,
+        `[effects] Rejecting effect: appliesTo not accepted on target ` +
+          `kind ${target.kind} (only combat / weaponQuality / flag / ` +
+          `secondary; source=${effectSource}).`,
       );
-    } else {
-      const predicates = parseAppliesTo(raw.appliesTo, effectSource);
-      if (predicates && predicates.length > 0) {
-        result.appliesTo = predicates;
-      }
+      return null;
+    }
+    const predicates = parseAppliesTo(raw.appliesTo, effectSource);
+    if (predicates && predicates.length > 0) {
+      result.appliesTo = predicates;
     }
   }
 
@@ -149,18 +153,19 @@ export function normalizeRawEffect(
     // on `secondary` and `armorQuality` targets — every other target is
     // either character-global (flag, magicAttribute, initiativeAttribute),
     // per-slot (combat, weaponQuality), pre-pipeline (primary), or set-
-    // membership without a meaningful gate use case (armorQuality is the
-    // only set-membership target where character-level gating matters).
+    // membership without a meaningful gate use case. Misplacement is a
+    // parser-reject (J.4b), not a silent strip.
     if (target.kind !== "secondary" && target.kind !== "armorQuality") {
       console.warn(
-        `[effects] Stripping condition from target kind ${target.kind} ` +
-          `(only secondary / armorQuality accept condition, source=${effectSource}).`,
+        `[effects] Rejecting effect: condition not accepted on target ` +
+          `kind ${target.kind} (only secondary / armorQuality; ` +
+          `source=${effectSource}).`,
       );
-    } else {
-      const conditions = parseCondition(rawCondition, effectSource);
-      if (conditions && conditions.length > 0) {
-        result.condition = conditions;
-      }
+      return null;
+    }
+    const conditions = parseCondition(rawCondition, effectSource);
+    if (conditions && conditions.length > 0) {
+      result.condition = conditions;
     }
   }
 
@@ -170,7 +175,7 @@ export function normalizeRawEffect(
 export function collectAllEffects(
   character: {
     traits?: LearnedTrait[];
-    talents?: unknown[];
+    talents?: LearnedTalent[];
     effects?: RawEffect[];
     equipment?: {
       armor?: {
@@ -204,8 +209,22 @@ export function collectAllEffects(
     collected.push(...result.effects);
   }
 
-  // Talents — TODO(phase6-post-G): decide whether talents contribute
-  // engine effects. Currently ignored; `character.talents` is left alone.
+  // Talents (boons / sins) → registry lookup. Same warn-and-skip
+  // policy as traits; Chunk G's reference-lint promotes the miss to a
+  // hard failure. The registry returns null for stubbed talents in
+  // production (`emptyRegistry` in `app.mts`) until the real loader
+  // lands.
+  for (const talent of character.talents ?? []) {
+    const result = registry.lookupTalent(talent.id, talent.level);
+    if (!result) {
+      console.warn(
+        `[effects] Unknown talent ${talent.id}:${talent.level} — skipped. ` +
+          `Chunk G's reference-lint promotes this to a hard failure.`,
+      );
+      continue;
+    }
+    collected.push(...result.effects);
+  }
 
   // Manual / persistent overrides on the character itself.
   for (const raw of character.effects ?? []) {
