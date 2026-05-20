@@ -231,3 +231,5 @@ This ADR is implemented across Phase 6 chunks B–H per
 | Effect-data normalization      | F     |
 | Registry wiring                | G     |
 | Validators + sibling docs      | H     |
+
+See also: [docs/reference-authoring.md](../reference-authoring.md) for the practical authoring guide that consumes this decision.

@@ -138,7 +138,7 @@ rendering. Single rendering path for initial load and SSE updates.
 **Basis:** [ADR-009](decisions/009-schema-driven-rendering.md)
 (supersedes [ADR-004](decisions/004-hybrid-spa-server-views.md))
 
-**Detailed plan:** [phase3-plan.md](../.github/plans/phase3-plan.md) — session-by-session
+**Detailed plan:** [phase3-plan.md](../.github/plans/done/phase3-plan.md) — session-by-session
 breakdown with file references, verification steps, and session closeout
 checklists.
 
@@ -181,7 +181,7 @@ The schema-driven renderer produces 15 flat sections; CSS expects 5 semantic
 groups (`attributes`, `talents`, `portrait`, `traits`, `information`) with
 internal sub-structure. A two-level section hierarchy (parent/child) is
 needed to produce DOM that matches the CSS grid. Also restores lost `<nav>`
-and `div#character-name`. See [phase3-plan.md § Session 2.5](../.github/plans/phase3-plan.md)
+and `div#character-name`. See [phase3-plan.md § Session 2.5](../.github/plans/done/phase3-plan.md)
 for full details.
 
 - [x] Restructure section registry with parent/child model
@@ -213,7 +213,7 @@ for full details.
 
 Fix broken secondary attribute live updates, eliminate redundant HTML
 attributes on form fields, extract duplicated nav generation. See
-[phase3-plan.md § Session 3.5](../.github/plans/phase3-plan.md) for full analysis.
+[phase3-plan.md § Session 3.5](../.github/plans/done/phase3-plan.md) for full analysis.
 
 - [x] Fix `SECONDARY_ATTRIBUTES_RULES` / `PRIMARY_TO_SECONDARY` key mismatch
 - [x] Remove dead `data-field-path` wrapper attribute; keep `data-path`
@@ -252,7 +252,7 @@ data. One rendering path for both initial load and real-time updates.
 Session 8 (RPG Engine tests) is deferred — runs alongside Phase 6 as new
 engine code is delivered.
 
-**Detailed plan:** [phase4-plan.md](../.github/plans/phase4-plan.md) — 8-session
+**Detailed plan:** [phase4-plan.md](../.github/plans/done/phase4-plan.md) — 8-session
 breakdown covering pure utilities, validation, auth, rules engine baseline,
 storage, HTTP API, SSE, and RPG engine (ongoing with Phase 6).
 
@@ -315,7 +315,7 @@ RPG engine test rewrite deferred to Phase 6 (typed pipeline not yet built).
 
 **Result:** 444 tests passing (385 → 444 over the phase). Typecheck clean.
 All High-, Medium-, and Low-priority items resolved or relocated to a phase
-with the right prerequisites. See [phase5-plan.md](../.github/plans/phase5-plan.md)
+with the right prerequisites. See [phase5-plan.md](../.github/plans/done/phase5-plan.md)
 for session-by-session detail (Sessions 0–5 + 4.5).
 
 ### High Priority
@@ -425,7 +425,7 @@ for session-by-session detail (Sessions 0–5 + 4.5).
 - [x] Fix SSE typos: `idDM` → `isDM`, `characrer` → `character` —
       **Resolved** — both typos already fixed. Remaining `timeStamp` →
       `timestamp` casing fix tracked in
-      [phase5-plan.md](../.github/plans/phase5-plan.md) Session 4.
+      [phase5-plan.md](../.github/plans/done/phase5-plan.md) Session 4.
 - [x] Replace `buffer.slice` with `buffer.subarray` in multipart parser —
       **Resolved** — no `.slice()` on Buffer found anywhere in `src/`.
       Already resolved before Phase 5.
@@ -455,7 +455,7 @@ by tests (444 / 444 green; +59 from Phase 4 baseline of 385). Client-side
 items deferred to Phase 8. RPG-engine-dependent items (`#19`, `#20`, `#21`,
 `#22`, `#23`, plus the residual `setBase` non-null assertion) deferred to
 Phase 6 Step 0 — they are subsumed by the typed pipeline rewrite. See
-[phase5-plan.md](../.github/plans/phase5-plan.md) for session-by-session
+[phase5-plan.md](../.github/plans/done/phase5-plan.md) for session-by-session
 breakdown.
 
 ---

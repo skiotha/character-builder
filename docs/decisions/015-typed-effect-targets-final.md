@@ -293,3 +293,5 @@ The enum is expected to evolve as Chunk F surfaces new patterns; adding or remov
 | Effect-data rewrite                       | F     |
 | Registry deserializer (validates targets) | G     |
 | Sibling integration docs                  | H     |
+
+See also: [docs/reference-authoring.md](../reference-authoring.md) for the practical authoring guide that consumes this decision.

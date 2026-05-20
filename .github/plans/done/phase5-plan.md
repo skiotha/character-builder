@@ -1,6 +1,6 @@
 # Phase 5 — Bug Fixes & Hardening: Multi-Session Plan
 
-> Detailed implementation plan for [Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening).
+> Detailed implementation plan for [Phase 5](../../../docs/roadmap.md#phase-5--bug-fixes--hardening).
 > Each session leaves the project in a working state with all tests passing.
 > Pure logic fixes first, then security, then HTTP-layer hardening, then cleanup.
 >
@@ -505,7 +505,7 @@ deferred to Phase 6 (ADR-011 typed effect targets) with `// TODO` marker.
      Removed the `@TODO Phase 5` comment.
 
 _(Note: "Fix duplicate `updateCharacter()`" was originally task 5 of this
-session. Per [ADR-013](../../docs/decisions/013-domain-layer-mutation-gate.md)
+session. Per [ADR-013](../../../docs/decisions/013-domain-layer-mutation-gate.md)
 it was promoted to its own session — see Session 4.5 below.)_
 
 ### New/Updated Tests
@@ -549,7 +549,7 @@ it was promoted to its own session — see Session 4.5 below.)_
 ## Session 4.5 — Domain Layer Consolidation (ADR-013) ✓ DONE
 
 **Goal:** Cement the domain layer as the single mutation gate per
-[ADR-013](../../docs/decisions/013-domain-layer-mutation-gate.md).
+[ADR-013](../../../docs/decisions/013-domain-layer-mutation-gate.md).
 Collapses the duplicate `updateCharacter`, fixes the latent
 `skipUndefined` bug in `handleUploadPortrait`, moves cross-cutting
 invariants (recalc, broadcast) into the domain layer, and adds the

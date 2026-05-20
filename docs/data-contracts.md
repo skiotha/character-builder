@@ -172,7 +172,7 @@ This is the **source of truth** — all other formats derive from it.
 
 ### 1.1 Effect Object
 
-The canonical shape is locked in [ADR-015 — Typed Effect Targets, Final Vocabulary](decisions/015-typed-effect-targets-final.md) (supersedes ADR-011) and [ADR-014 — Per-Slot Combat, Special Attacks & Reactions](decisions/014-per-slot-combat-special-attacks.md).
+The canonical shape is locked in [ADR-015 — Typed Effect Targets, Final Vocabulary](decisions/015-typed-effect-targets-final.md) (supersedes ADR-011) and [ADR-014 — Per-Slot Combat, Special Attacks & Reactions](decisions/014-per-slot-combat-special-attacks.md). Practical authoring guidance — worked examples for every `EffectTarget` kind, `WeaponPredicate` / `condition` placement rules, and the `SpecialAttack` / `Reaction` wire shape — is in [`docs/reference-authoring.md`](reference-authoring.md).
 
 ```jsonc
 {

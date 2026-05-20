@@ -20,11 +20,11 @@ When ready, copy the relevant items into `phase6-plan.md` as concrete chunks
 
 Cross-references:
 
-- [`docs/authoring-effects.md`](../../docs/authoring-effects.md) — current authoring spec (Chunk F)
-- [`docs/decisions/014-per-slot-combat-special-attacks.md`](../../docs/decisions/014-per-slot-combat-special-attacks.md) — ADR-014 (will be amended)
-- [`docs/decisions/015-typed-effect-targets-final.md`](../../docs/decisions/015-typed-effect-targets-final.md) — ADR-015 (will be amended)
-- [`docs/data-contracts.md`](../../docs/data-contracts.md) — schema contract (will be amended)
-- [`src/rpg-types.mts`](../../src/rpg-types.mts) — type home for all changes
+- [`docs/reference-authoring.md`](../../../docs/reference-authoring.md) — current authoring spec (Chunk F)
+- [`docs/decisions/014-per-slot-combat-special-attacks.md`](../../../docs/decisions/014-per-slot-combat-special-attacks.md) — ADR-014 (will be amended)
+- [`docs/decisions/015-typed-effect-targets-final.md`](../../../docs/decisions/015-typed-effect-targets-final.md) — ADR-015 (will be amended)
+- [`docs/data-contracts.md`](../../../docs/data-contracts.md) — schema contract (will be amended)
+- [`src/rpg-types.mts`](../../../src/rpg-types.mts) — type home for all changes
 
 ---
 
@@ -49,13 +49,13 @@ the original Item 1 design ("Cheap Shot and innate / monster attacks
 stay as-is"). Docs shipped: ADR-014 post-Chunk-F amendment block
 (`docs/decisions/014-per-slot-combat-special-attacks.md`),
 `docs/data-contracts.md` Action shape extended,
-`docs/authoring-effects.md` §10 covers inheritance defaults +
+`docs/reference-authoring.md` §10 covers inheritance defaults +
 `damageBonus` + `ignoresArmor` + `appliesTo` on actions. **Remaining:**
 engine runtime that resolves per-slot inheritance at recalc time and
 inlines the carrying slot's weapon stats into the resulting
 `SpecialAttack`/`Reaction` — scheduled against the Chunk G production
 talent-registry landing per
-[`.github/plans/phase6-plan.md`](phase6-plan.md). Item 1 closure flips
+[`.github/plans/phase6-plan.md`](../phase6-plan.md). Item 1 closure flips
 when the engine resolver ships.
 
 ---
@@ -230,7 +230,7 @@ in the same pass.
 - `src/rules/applicator.mts` — switch arm for the new kind in any phase that walks targets (likely a no-op outside the new derived stage).
 - `docs/decisions/015-typed-effect-targets-final.md` — amend ADR-015 to document the 6-kind union and §3c (magicAttribute rules).
 - `docs/data-contracts.md` — add `magicAttribute` to the Character shape table; mark derived; flag UI-hidden.
-- `docs/authoring-effects.md` — `§7 Spells` and `§9 Effect targets table` updated.
+- `docs/reference-authoring.md` — `§7 Spells` and `§9 Effect targets table` updated.
 - `reference/spells.{en,ru}.json` — strip per-spell `attackAttribute`.
 - `reference/boons.{en,ru}.json` — author `Leader` as a typed effect.
 - Tests: extend `test/rules/combat.test.mts` (or a new `test/rules/magic.test.mts`) to cover `magicAttribute` default + override + invalid-modifier rejection.
@@ -243,7 +243,7 @@ in the same pass.
 
 ### The question
 
-> [`reference/abilities.en.json`](../../reference/abilities.en.json) lines 794–802 — Combat Oils Novice:
+> [`reference/abilities.en.json`](../../../reference/abilities.en.json) lines 794–802 — Combat Oils Novice:
 > ```jsonc
 > {
 >   "tier": "A",
@@ -261,8 +261,8 @@ in the same pass.
 **The engine does not understand armor predicates.** Confirmed in code:
 
 - `appliesTo` is typed as `WeaponPredicate[]` — the name is literal.
-  See [`src/rpg-types.mts`](../../src/rpg-types.mts) `WeaponPredicate`.
-- `applyArmorQuality` in [`src/rules/applicator.mts`](../../src/rules/applicator.mts) (lines 233–246) **never reads `effect.appliesTo`**. It walks `body` and `plug` and applies (or removes) the named quality on both unconditionally.
+  See [`src/rpg-types.mts`](../../../src/rpg-types.mts) `WeaponPredicate`.
+- `applyArmorQuality` in [`src/rules/applicator.mts`](../../../src/rules/applicator.mts) (lines 233–246) **never reads `effect.appliesTo`**. It walks `body` and `plug` and applies (or removes) the named quality on both unconditionally.
 - The `secondary.armor` target in the Combat Oils effect doesn't even *try* to consult `appliesTo`; numeric secondary effects are accumulated globally regardless of predicates.
 
 So the Combat Oils Novice effect as authored:
@@ -290,7 +290,7 @@ Two parts, both deferred:
 - `src/rules/applicator.mts` — gate `applyArmorQuality` and any character-level numeric application on the new condition.
 - `src/rules/effects.mts` — normalization of the new field.
 - `docs/decisions/015-typed-effect-targets-final.md` — amend.
-- `docs/authoring-effects.md` — document the new vocabulary and which target kinds it applies to.
+- `docs/reference-authoring.md` — document the new vocabulary and which target kinds it applies to.
 - `.github/bugs/engine-weak-points.md` — open a tracker entry for "armor `appliesTo` ignored"; close on implementation.
 
 ---
@@ -372,7 +372,7 @@ Same shape as Item 2:
 - `src/rules/applicator.mts` — switch arm for new kind.
 - `docs/decisions/015-typed-effect-targets-final.md` — same amendment as Item 2 (one revision, both kinds).
 - `docs/data-contracts.md` — add `initiativeAttribute`.
-- `docs/authoring-effects.md` — §9 effect targets table.
+- `docs/reference-authoring.md` — §9 effect targets table.
 - `reference/abilities.{en,ru}.json` — re-author Tactics Novice; audit other initiative-related abilities surfaced during the bulk pass.
 - Tests: cover default, override, conflict policy, invalid modifier rejection.
 
@@ -380,11 +380,11 @@ Same shape as Item 2:
 
 ## Item 5 — Universal conflict resolution for `setBase`
 
-**Status:** ✅ Implemented (G2.A — 2026-05-08). Extracted as `resolveSetBase(defaultName, candidates, primary)` in [src/rules/setbase.mts](../../src/rules/setbase.mts). Default-inclusive max-by-primary, strict `>` comparison so the field default wins ties. `applySetBase` is now a candidate-collector — resolution runs after the primary phase against the post-effect snapshot (`primaryEffective`) and is reused per-slot in `deriveCombatSlots` for `combat.attackAttribute`, plus once each in `deriveMagicAttribute` / `deriveInitiativeAttribute`. ADR-015 §4a documents the rule. **Behavioural note:** three secondary-defense `setBase` authors (*Smoke and Mirrors-novice*, *Tactics-adept*, *Sixth Sense-adept*) now coexist correctly on the same character vs the pre-G2 "last wins" semantics.
+**Status:** ✅ Implemented (G2.A — 2026-05-08). Extracted as `resolveSetBase(defaultName, candidates, primary)` in [src/rules/setbase.mts](../../../src/rules/setbase.mts). Default-inclusive max-by-primary, strict `>` comparison so the field default wins ties. `applySetBase` is now a candidate-collector — resolution runs after the primary phase against the post-effect snapshot (`primaryEffective`) and is reused per-slot in `deriveCombatSlots` for `combat.attackAttribute`, plus once each in `deriveMagicAttribute` / `deriveInitiativeAttribute`. ADR-015 §4a documents the rule. **Behavioural note:** three secondary-defense `setBase` authors (*Smoke and Mirrors-novice*, *Tactics-adept*, *Sixth Sense-adept*) now coexist correctly on the same character vs the pre-G2 "last wins" semantics.
 
 ### Why this is universal
 
-Look at `EffectModifier` in [src/rpg-types.mts](../../src/rpg-types.mts):
+Look at `EffectModifier` in [src/rpg-types.mts](../../../src/rpg-types.mts):
 
 ```ts
 export type EffectModifier =
@@ -407,9 +407,9 @@ The policy below is therefore not target-specific — it is **the** semantics of
 
 Multiple effects can `setBase` the same scope. Authored cases already exist:
 
-- **Knife Mastery Novice** ([abilities.en.json:350-364](../../reference/abilities.en.json#L350-L364)) —
+- **Knife Mastery Novice** ([abilities.en.json:350-364](../../../reference/abilities.en.json#L350-L364)) —
   `combat.attackAttribute := quick`, `appliesTo: [{ kind: "quality", values: ["short"] }]`.
-- **Iron Body Novice** ([abilities.en.json:2913-2939](../../reference/abilities.en.json#L2913-L2939)) —
+- **Iron Body Novice** ([abilities.en.json:2913-2939](../../../reference/abilities.en.json#L2913-L2939)) —
   `combat.attackAttribute := strong`, `appliesTo: [{ kind: "type", values: ["heavy", "polearm", "main", "shield", "light", "natural"] }]`.
 
 A character with both abilities, carrying a *light short knife*, matches both
@@ -480,7 +480,7 @@ over the surviving candidates only.
 
 ### Required engine changes
 
-1. **`combat.attackAttribute`** — currently `applySlotPhases` in [src/rules/derived.mts](../../src/rules/derived.mts)
+1. **`combat.attackAttribute`** — currently `applySlotPhases` in [src/rules/derived.mts](../../../src/rules/derived.mts)
    applies `setBase` directly per-effect (last-wins by iteration order). Refactor:
    collect candidates first, reduce via `resolveSetBase(weapon.attackAttribute, candidates, primary)`, apply once.
 2. **`secondary.defense`** — same refactor in the secondary-attribute pipeline. Today only Tactics Adept writes this, so the change is observationally a no-op until a second author lands; do it anyway for consistency.
@@ -500,7 +500,7 @@ accumulation semantics. The policy only governs `setBase`.
   semantics paragraph: "`setBase` resolution is highest-attribute-wins; the
   default value is always in the candidate set." Update §3a/§3b prose to
   reference the unified rule.
-- `docs/authoring-effects.md` — add a one-paragraph note: conflicting
+- `docs/reference-authoring.md` — add a one-paragraph note: conflicting
   `setBase` effects need no manual reconciliation; the engine picks the best.
 - Tests: dedicated `test/rules/setbase-resolution.test.mts`
   covering: single setBase, two setBases (better wins), two setBases
@@ -527,18 +527,18 @@ upgraded to match the existing reference-catalog pattern). Added:
 `reference/statuses.{en,ru}.json` (display metadata only — engine
 treats statuses as opaque tokens, sibling apps render the rich
 description), `/api/v1/statuses` locale-aware endpoint wired into
-[`src/app.mts`](../../src/app.mts), `statuses` topic in
-[`src/models/reference.mts`](../../src/models/reference.mts), and an
+[`src/app.mts`](../../../src/app.mts), `statuses` topic in
+[`src/models/reference.mts`](../../../src/models/reference.mts), and an
 `audit-reference.mts` lint section (section 10) that resolves every
 `inflicts[]` entry against the registry and flags unknown ids.
 Locale-drift test extended to cover the `{en,ru}` pair. Authoring
 sweep complete — audit reports 8 distinct status ids referenced, all
 resolve. Docs landed: ADR-014 post-Chunk-F amendment block,
 `docs/data-contracts.md` Action shape extended,
-`docs/authoring-effects.md` §10 documents the field semantics +
+`docs/reference-authoring.md` §10 documents the field semantics +
 lifecycle policy + sibling responsibilities. Sibling-project contracts
-([`docs/addon-integration.md`](../../docs/addon-integration.md),
-[`docs/bot-integration.md`](../../docs/bot-integration.md)) pick up the
+([`docs/addon-integration.md`](../../../docs/addon-integration.md),
+[`docs/bot-integration.md`](../../../docs/bot-integration.md)) pick up the
 field through the standard ADR-014 `Action` reference — no separate
 heads-up needed; sibling-engineer onboarding folds it in naturally.
 
@@ -650,7 +650,7 @@ export interface Action {
 - `src/models/character.mts` — no schema change (specialAttacks/reactions are derived, server-controlled).
 - `src/rules/effects.mts` — if/when actions are normalized through the effects pipeline, validate `inflicts[]` entries are known `StatusKind`s.
 - `docs/decisions/014-per-slot-combat-special-attacks.md` — amend to document the `inflicts` field and the no-lifecycle policy.
-- `docs/authoring-effects.md` — add a `§Status infliction` section listing the enum and the rule "declare what gets applied; engine doesn't model duration."
+- `docs/reference-authoring.md` — add a `§Status infliction` section listing the enum and the rule "declare what gets applied; engine doesn't model duration."
 - `docs/data-contracts.md` — add `inflicts` to the SpecialAttack/Reaction shape; sibling-project contracts get a heads-up.
 - `reference/abilities.{en,ru}.json` and `reference/spells.{en,ru}.json` — walk every authored special attack / reaction; add `inflicts[]` where the description implies it. Audit by Ctrl-F on "stun", "bleed", "prone", "choke", "burn", etc.
 - Tests: round-trip `inflicts` through serialization; verify unknown statuses fail validation.
@@ -663,19 +663,19 @@ export interface Action {
 
 ✅ **Implemented** (2026-05-19). Engine path complete:
 `collectAllEffects` in
-[`src/rules/effects.mts`](../../src/rules/effects.mts) walks
+[`src/rules/effects.mts`](../../../src/rules/effects.mts) walks
 `character.talents[]` via `registry.lookupTalent(id, level)`,
 warn-and-skip on unknown ids — same pattern as traits.
-[`test/rules/effects.test.mts`](../../test/rules/effects.test.mts)
+[`test/rules/effects.test.mts`](../../../test/rules/effects.test.mts)
 covers the happy path (talent effects collected with
 `source === "noctis"`) and the unknown-talent warn path.
 Audit-reference lint gained explicit acceptance of top-level
 `effects[]` on boon / sin entries (no longer treated as a placement
 error). Authoring sweep complete (12 boons + 1 sin currently carry
-`effects[]`). Docs landed: `docs/authoring-effects.md` §3 and §4
+`effects[]`). Docs landed: `docs/reference-authoring.md` §3 and §4
 document the opportunistic-effects rule with the rule-of-thumb test
 and examples. Production registry's `lookupTalent: () => null` stub in
-[`src/app.mts`](../../src/app.mts) is intentional and called out in
+[`src/app.mts`](../../../src/app.mts) is intentional and called out in
 §3 — real talent effects start flowing once Chunk G's real registry
 loader lands; the in-memory test registry already exercises the full
 path end-to-end.
@@ -756,12 +756,12 @@ For each boon/sin, ask:
 ### Schema impact
 
 Minimal. The boon/sin shape already permits an optional `effects[]` (it just
-wasn't being used). Authoring rule lives in `docs/authoring-effects.md`; no
+wasn't being used). Authoring rule lives in `docs/reference-authoring.md`; no
 type changes needed.
 
 ### Affected code & docs
 
-- `docs/authoring-effects.md` — amend §3 (Boons) and §4 (Sins) to document the
+- `docs/reference-authoring.md` — amend §3 (Boons) and §4 (Sins) to document the
   opportunistic-effect policy with the rule of thumb and examples above.
 - `reference/boons.{en,ru}.json` and `reference/sins.{en,ru}.json` — during
   the bulk pass, walk each entry and apply the rule of thumb. Most stay flat;
@@ -790,7 +790,7 @@ type changes needed.
 ### Status
 
 ✅ **Implemented** (2026-05-19). Wire shape locked: `isFree?: boolean`
-on `Action` ([`src/rpg-types.mts`](../../src/rpg-types.mts)).
+on `Action` ([`src/rpg-types.mts`](../../../src/rpg-types.mts)).
 Audit-reference lint (section 11) enforces `isFree: true` is only set
 on `trigger: "manual"` actions — reactions / passive triggers cannot
 be free since they don't consume the action economy in the first
@@ -800,7 +800,7 @@ apps sum free attacks themselves. Authoring sweep complete (Knife
 Mastery `stab`, Smoke and Mirrors `feint`, Quick Reload, Two Weapons
 off-hand strike, etc.); audit reports zero violations. Docs landed:
 ADR-014 post-Chunk-F amendment block documents the field and the
-no-engine-count rule; `docs/authoring-effects.md` §10 covers it under
+no-engine-count rule; `docs/reference-authoring.md` §10 covers it under
 "Free attacks (Item 8)".
 
 ---
@@ -887,7 +887,7 @@ and add a derived `combat.freeAttacks: number` per-slot field. Don't pre-build i
 - `src/rpg-types.mts` — add `isFree?: boolean` to `Action`.
 - `docs/decisions/014-per-slot-combat-special-attacks.md` — document the field
   and the no-engine-count rule.
-- `docs/authoring-effects.md` — note in the special-attacks section: mark
+- `docs/reference-authoring.md` — note in the special-attacks section: mark
   `isFree: true` for ability-granted free attacks; omit otherwise.
 - `reference/abilities.{en,ru}.json` — audit during the bulk pass; add
   `isFree: true` to free-attack entries (Two Weapons, Knife Mastery Stab,
@@ -921,7 +921,7 @@ cross-parent collision); current catalog reports zero findings.
 Locale-drift test gained an explicit nested-action-id parity pin for
 abilities + spells. ADR-014 amended (§9 "Action rewrite by id" + history
 note on `source` removal); `docs/data-contracts.md` and
-`docs/authoring-effects.md` §10 updated with the rewrite convention
+`docs/reference-authoring.md` §10 updated with the rewrite convention
 and worked examples (Intrigues/Backstab, Sulfur Cascade).
 
 ### Problem
@@ -1028,7 +1028,7 @@ To make authoring errors loud, add three lint checks:
   Stamp `rank` per granted tier during collection.
 - `docs/decisions/014-per-slot-combat-special-attacks.md` — document the
   rewrite-by-id rule and rank semantics.
-- `docs/authoring-effects.md` — explain the same-id-rewrites convention with
+- `docs/reference-authoring.md` — explain the same-id-rewrites convention with
   Shield Bash and Sulfur Cascade as the worked examples.
 - `reference/abilities.{en,ru}.json`, `reference/spells.{en,ru}.json` — bulk
   pass adds `id` to every special-attack / reaction entry.
@@ -1070,7 +1070,7 @@ its normal cap*. Examples:
 Authoring already in place (`reference/abilities.en.json` lines 1262-1275)
 writes `"target": { "kind": "primary", "stat": "quick" }`. **The current
 `EffectTarget` union has no `"primary"` kind** — see
-[`src/rpg-types.mts`](../../src/rpg-types.mts) line 111. The parser
+[`src/rpg-types.mts`](../../../src/rpg-types.mts) line 111. The parser
 (`parseModifier` / target validator) will reject these effects today.
 
 ### Decision
@@ -1136,7 +1136,7 @@ Replaces direct reads of `character.attributes.primary` in the engine.
 - `src/rules/applicator.mts` — switch arm for the new kind.
 - `docs/decisions/015-typed-effect-targets-final.md` — add §3e for
   `"primary"`.
-- `docs/authoring-effects.md` — add §8 entry for `kind: "primary"`.
+- `docs/reference-authoring.md` — add §8 entry for `kind: "primary"`.
 - `reference/abilities.{en,ru}.json` — the already-authored Quick entries
   start working as-is once the kind is added.
 - Tests: cover Quick novice/adept/master stacking, interaction with cap
@@ -1150,7 +1150,7 @@ strips `appliesTo` with warn. New `derivePrimaryAttributes` pre-pipeline
 stage runs ahead of `setBase`. Applicator gained no-op exhaustiveness arms.
 15-test suite (`test/rules/primary-attributes.test.mts`) covers stacking,
 cap precedence, propagation into secondary toughness, parser rejection.
-ADR-015 §3e and authoring-effects §8 published; audit script's
+ADR-015 §3e and reference-authoring §8 published; audit script's
 `KNOWN_TARGET_KINDS` extended.
 
 #### Follow-up fix — `attributes.primaryEffective` sibling field (2026-05-07)
@@ -1182,7 +1182,7 @@ Resolution (Option A, no schema-version bump):
   (561 → 564). Pre-existing on-disk characters wiped via `hard-delete --all`.
 - Docs: `docs/data-contracts.md` JSONC mockup gains `primaryEffective`
   block; ADR-015 §3e amended with the writes-to-primaryEffective rule
-  and the `serverControlled` callout; `docs/authoring-effects.md` §8
+  and the `serverControlled` callout; `docs/reference-authoring.md` §8
   `primary` entry gains a "Display semantics" callout.
 
 ---
@@ -1233,7 +1233,7 @@ One writable target per `SecondaryAttributeName`. Done.
 - `src/rules/derived.mts` — the secondary-derivation stage that initializes
   `toughness.max` from primary attributes and effects already operates this
   way; verify and document.
-- `docs/authoring-effects.md` — add a note in §8 `secondary` entry: "For
+- `docs/reference-authoring.md` — add a note in §8 `secondary` entry: "For
   `toughness`, modifiers operate on `.max`; `.current` is runtime state."
 - `reference/abilities.{en,ru}.json` — search-and-replace `"toughness.max"`
   → `"toughness"`.
@@ -1258,7 +1258,7 @@ writes to `.max`, leaves `.current` untouched) in
 
 ✅ **Implemented** (2026-05-19). 12a (explicit-`any` placement
 discipline): parser in
-[`src/rules/effects.mts`](../../src/rules/effects.mts) flipped from
+[`src/rules/effects.mts`](../../../src/rules/effects.mts) flipped from
 strip-with-warn to **reject-null** for misplaced `appliesTo` /
 `condition` — misplacement now drops the entire effect rather than
 silently stripping the predicate. Accept-lists per ADR-015 §3
@@ -1270,7 +1270,7 @@ carries it as documentary metadata); `condition` accepted on
 authoring sweep complete — audit reports zero placement violations.
 12b (`stat` vs `field` discriminator naming): keep-current decision
 unchanged; no work. Placement table and §9.5 `condition` vocabulary
-folded into [`docs/authoring-effects.md`](../../docs/authoring-effects.md)
+folded into [`docs/reference-authoring.md`](../../../docs/reference-authoring.md)
 §9 / §9.5; the standalone amendment doc has been retired.
 
 Related bugs discovered while wiring the placement widening:
@@ -1291,7 +1291,7 @@ pass touches them once.
 ### 12a. Explicit "applies to everything" form
 
 **Today:** `appliesTo` omitted (or `[]`) means "every slot." Documented in
-[`docs/authoring-effects.md`](../../docs/authoring-effects.md) §9.
+[`docs/reference-authoring.md`](../../../docs/reference-authoring.md) §9.
 
 **Proposal:** prefer the explicit canonical form `[{ "kind": "any" }]`
 wherever `appliesTo` would be meaningful but the author wants "all weapons."
@@ -1413,7 +1413,7 @@ preserved verbatim on the resolved effect so siblings can read it.
 result.
 
 **(c) Spec change:** new §8.5 "Roll-time modifier passthrough" in
-`docs/authoring-effects.md` documents the boundary and the two known
+`docs/reference-authoring.md` documents the boundary and the two known
 patterns (`precise`, `advantage`). §8 `flag` and §9 `WeaponPredicate`
 sections cross-reference it.
 
@@ -1431,7 +1431,7 @@ churn, no engine math change.
   targets (documentary metadata)" case.
 - `scripts/audit-reference.mts` — `predicateHygiene` no longer flags
   `flag + appliesTo`.
-- `docs/authoring-effects.md` — new §8.5 and §8/§9 cross-references.
+- `docs/reference-authoring.md` — new §8.5 and §8/§9 cross-references.
 - `reference/qualities.{en,ru}.json` — `precise.effects` cleared.
 
 ### Non-goals

@@ -230,6 +230,10 @@ armor, and runes — each per locale.
   `reference/` is the engine-readable encoded form. Both are committed and
   authoritative; they describe the same rules at different fidelities for
   different audiences.
+- **Authoring:** the wire shape of every catalog entry — effect targets,
+  modifiers, predicates, conditions, status registry, special-attack /
+  reaction shape — is specified in
+  [`docs/reference-authoring.md`](reference-authoring.md).
 
 ## 4. Data Flow
 

@@ -36,7 +36,7 @@ Key layers:
 - `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
 - `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
-- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`, `statuses`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). `statuses` is display-only metadata for sibling apps; the engine treats statuses as opaque `EffectFlag` tokens. A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ.
+- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`, `statuses`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). `statuses` is display-only metadata for sibling apps; the engine treats statuses as opaque `EffectFlag` tokens. A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ. **Authoring guide:** the wire shape of every catalog entry is specified in [`docs/reference-authoring.md`](../docs/reference-authoring.md).
 - `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured)
 
 ## Key Design Decisions
@@ -199,7 +199,7 @@ See `docs/roadmap.md` for the full phased work plan. Quick reference:
 | 7     | Sibling project integration      | Not started |
 | 8     | Polish & beyond MVP              | Not started |
 
-\* _Server-side tests complete (607 as of 2026-05-09). Engine + client-side test suites run alongside Phases 6 and 8 respectively. Phase 6 is mid-flight: Chunks A–F shipped (per-slot combat, typed effects, quality registry, bulk reference normalization); a Chunk-F post-pass amendment is closing remaining engine items — see [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md) and [`.github/plans/phase6-chunkF-postpass-amendment.md`](../.github/plans/phase6-chunkF-postpass-amendment.md)._
+\* _Server-side tests complete (607 as of 2026-05-09). Engine + client-side test suites run alongside Phases 6 and 8 respectively. Phase 6 is mid-flight: Chunks A–F shipped (per-slot combat, typed effects, quality registry, bulk reference normalization); a Chunk-F post-pass amendment is closing remaining engine items — see [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md) and [`.github/plans/done/phase6-chunkF-postpass-amendment.md`](../.github/plans/done/phase6-chunkF-postpass-amendment.md)._
 
 ## Sibling Projects
 

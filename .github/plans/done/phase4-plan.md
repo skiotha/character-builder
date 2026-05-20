@@ -1,11 +1,11 @@
 # Phase 4 — Testing: Multi-Session Plan
 
-> Detailed implementation plan for [Phase 4](../../docs/roadmap.md#phase-4--testing).
+> Detailed implementation plan for [Phase 4](../../../docs/roadmap.md#phase-4--testing).
 > Each session leaves the test suite in a runnable state. Pure utilities first,
 > then domain logic, then storage, then integration. RPG engine tests deferred
 > to Phase 6 for real coverage.
 >
-> **Basis:** [roadmap.md § Phase 4](../../docs/roadmap.md), project conventions from
+> **Basis:** [roadmap.md § Phase 4](../../../docs/roadmap.md), project conventions from
 > `../../.github/copilot-instructions.md`, malizia test patterns.
 
 ---
@@ -203,7 +203,7 @@ removed `= true` default param). Regression test added to `test/traversal.test.m
 - `validateCharacterUpdate` push/traits XP check — unreachable dead code (type mismatch blocks it)
 - `validateCharacterUpdate` push/traits XP check — reads wrong cost (`cost[0]` always, no tier awareness)
 - `validateCharacterUpdate` increment/traits — commented-out code referencing non-existent `calculateXPForNextRank()`
-- All tracked in [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening)
+- All tracked in [roadmap Phase 5](../../../docs/roadmap.md#phase-5--bug-fixes--hardening)
 
 **Plan deviations:**
 - `push` on `traits` XP tests rewritten to document actual buggy behavior instead of testing
@@ -258,7 +258,7 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - All attributes at default 5 (total 40) → pass (under budget is OK)
   **⚠ BUG DOCUMENTED** — under-budget creation should be rejected. No RPG
   reason to allow unused attribute points. `validateRPGRules` only checks
-  `> 80`, not `!== 80`. See [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening).
+  `> 80`, not `!== 80`. See [roadmap Phase 5](../../../docs/roadmap.md#phase-5--bug-fixes--hardening).
 - Single attribute at max 15, others compensate to total 80 → pass
 - Negative `experience.unspent` in merged data → `BUSINESS_RULE` error
 - Output: `validatedData` has `playerId`, `player`, `created`, `lastModified`
@@ -279,7 +279,7 @@ and `src/models/character.mts` — all pure, no filesystem side effects.
 - `push` on `traits` with insufficient XP → `INSUFFICIENT_XP`
   **⚠ UNREACHABLE** — `validateFieldValue` rejects the push value before the
   XP check runs (type mismatch: object vs `"array"`). Test documents the
-  actual bug behavior instead. See [roadmap Phase 5](../../docs/roadmap.md#phase-5--bug-fixes--hardening).
+  actual bug behavior instead. See [roadmap Phase 5](../../../docs/roadmap.md#phase-5--bug-fixes--hardening).
 - `push` on `traits` with sufficient XP → allowed
   **⚠ UNREACHABLE** — same type mismatch prevents reaching XP check.
 

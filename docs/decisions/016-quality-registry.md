@@ -222,3 +222,5 @@ narrow. Promote only when a real case emerges.
 - [phase6-chunkF-prereqs-plan.md](../../.github/plans/done/phase6-chunkF-prereqs-plan.md)
 - [ADR-014](014-per-slot-combat-special-attacks.md)
 - [ADR-015](015-typed-effect-targets-final.md)
+
+See also: [docs/reference-authoring.md](../reference-authoring.md) for the practical authoring guide that consumes this decision.

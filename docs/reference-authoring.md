@@ -1,11 +1,11 @@
-# Authoring Spec — Reference Catalog Effects (Phase 6 / Chunk F)
+# Reference Catalog Authoring Spec
 
-> Status: **active**. Companion to [data-contracts.md §1.1](data-contracts.md#L146)
-> and [ADR-015](decisions/015-typed-effect-targets-final.md).
-> Drives the Chunk F bulk authoring pass over `reference/*.{en,ru}.json`.
+> Companion to [data-contracts.md §1.1](data-contracts.md#L173) and the
+> ADRs that lock the wire vocabulary: ADR-014 (per-slot combat), ADR-015
+> (typed effect targets), ADR-016 (quality registry).
 
 This document is the single source of truth for **how to fill in an entry**
-in any of the eight reference files:
+in any of the nine reference files:
 
 ```
 reference/abilities.{en,ru}.json
@@ -16,6 +16,7 @@ reference/rituals.{en,ru}.json
 reference/weapons.{en,ru}.json
 reference/armor.{en,ru}.json
 reference/qualities.{en,ru}.json
+reference/statuses.{en,ru}.json
 ```
 
 It assumes you've read ADR-014 (per-slot combat) and ADR-015 (typed effect
@@ -90,7 +91,11 @@ These belong in narrative / sibling apps, **never** in `target`/`modifier`:
 - Character-state preconditions: rage, no-armor, low-health, prone, surprised.
 - Per-scene / per-adventure / per-day resource counts.
 - Action-economy rules ("as a reaction", "once per turn", "instead of moving").
-- **Reactions of any kind.** "As a reaction, X" is always Tier C — the engine has no notion of action economy, so reaction-gated effects don't fire automatically. The `Reaction` derived collection (Q3 below) is a separate, deferred concern.
+- **Action-economy-gated reactions.** Reactions framed around the action
+  economy ("as a reaction, X") are Tier C — the engine has no notion of
+  action economy, so they don't fire automatically. Engine-resolvable
+  reactions — the typed `Reaction` collection — are a different thing:
+  they're `Action`s with a non-`manual` trigger and are specified in §11.
 - Costs payable in experience, corruption, gold.
 - Concentration / maintained spells.
 - Anything requiring a check the player rolls (Cunning check, Resolute check, etc.) — encode the *result* via flags if the engine cares, never the check itself.
@@ -103,6 +108,14 @@ mechanic in `description` and let the GM / sibling app handle it.
 **Engine code MUST NOT branch on `name`, `description`, or `tags`.** If you
 find yourself wanting to encode mechanics in a description string, stop and
 add a real `target`/`modifier`. Descriptions are for humans only.
+
+### 0.7 The opaque-status rule
+
+Mirror of §0.6 for statuses. **Engine code MUST NOT branch on
+`Status.name` or `Status.description`.** Statuses are looked up by id
+only; their text is display data for humans and sibling apps. If the
+engine needs to react to a status, model it as a `flag` target, not as
+string-matching on a status row (ADR-016).
 
 ---
 
@@ -139,7 +152,7 @@ add a real `target`/`modifier`. Descriptions are for humans only.
 }
 ```
 
-The eight `EffectTarget` kinds and worked examples are in §8.
+The eight `EffectTarget` kinds and worked examples are in §9.
 
 ### Tier-A worked example — flat secondary bonus
 
@@ -238,22 +251,21 @@ target's optional `slot` field; default `body`).
 Flag names are **shared global vocabulary**. Before inventing a new flag,
 check [`EffectFlag` in src/rpg-types.mts](../src/rpg-types.mts) for the
 existing set. If you add a new one, append it to that union in the same
-commit. (The current set is a placeholder; Chunk F is expected to expand
-it.)
+commit that authors the catalog entry consuming it.
 
 ### Tier-A worked example — special attack promotion
 
-A `SpecialAttack` is just an `Action` whose `trigger === "manual"`. They
-are derived collections, not raw effects, so they live alongside `effects`
-on the tier — but in their own array. **Schema TBD pending the cross-topic
-question in §10.** Until then, encode special attacks as Tier C narrative
-descriptions; we'll back-fill them in a follow-up pass once the wire shape
-is locked.
+A `SpecialAttack` is an `Action` whose `trigger === "manual"`. The wire
+shape on tier objects is fully specified in §11; the short version is:
+author the entry under the appropriate tier's `specialAttacks[]` array,
+repeat the same `id` at a higher tier to override (Backstab pattern),
+or use a new id to add a brand-new entry at that tier.
 
 ### Tier-A worked example — reaction promotion
 
-Same as above; `Reaction` is `Action` with any non-`manual` trigger. Same
-deferral.
+Same as above; a `Reaction` is an `Action` with any non-`manual`
+trigger, authored under the tier's `reactions[]` array. See §11 for the
+canonical fields and inheritance defaults.
 
 ### Tier-C worked example
 
@@ -325,14 +337,7 @@ no `effects[]` at all. The engine resolves any that *are* declared
 through the same `collectAllEffects` pipeline as traits (looked up via
 `registry.lookupTalent(id, level)`).
 
-### Opportunistic engine effects (post-Chunk-F amendment, Item 7)
-
-> Status: **shipped** (2026-05-19). Engine path wired and tested
-> (`test/rules/effects.test.mts`); audit lint accepts top-level
-> `effects[]` on boons/sins; production registry's `lookupTalent`
-> stub in [`src/app.mts`](../src/app.mts) returns `null` until the
-> Chunk G real loader lands, so authored effects round-trip but don't
-> mutate derived state in production yet.
+### Opportunistic engine effects
 
 **Author engine effects on a boon *only when* it produces a typed
 observable consequence:**
@@ -399,7 +404,7 @@ would consume.)
 {
   "id": "two_handed_sword",                 // stable, snake_case
   "name": "Two-Handed Sword",               // localized
-  "description": "Optional flavour text.",   // NEW in Chunk F, localized, optional
+  "description": "Optional flavour text.",   // localized, optional
   "type": "heavy",                          // weapon type — see "Canonical vocabularies" in data-contracts.md
   "damage": 10,
   "cost": 50,                               // display-only; engine ignores. Sibling apps may surface it.
@@ -414,7 +419,7 @@ would consume.)
 {
   "id": "embroidered_silk",
   "name": "Embroidered Silk",
-  "description": "Optional flavour text.",   // NEW, localized, optional
+  "description": "Optional flavour text.",   // localized, optional
   "slot": "body" | "plug",
   "armor": 4,                                // mitigation — feeds secondary.armor
   "cost": 10,                                // display-only; engine ignores.
@@ -423,21 +428,20 @@ would consume.)
 }
 ```
 
-There is **no** `tags` field on weapons or armor (per Chunk F decision —
-items aren't searched in isolation from what equips them).
+There is **no** `tags` field on weapons or armor (items aren't searched
+in isolation from what equips them).
 
 ### 6.1 Item-level `effects[]` — bespoke only
 
-After the quality registry lands (Chunk F.0), **standard mechanical
-effects must live in [qualities.{en,ru}.json](#L0)**, not on items. The
-`effects[]` field on a weapon or armor entry is reserved for genuinely
-unique magic items — e.g. "the Sword of Smiting Dragons grants +5 damage
-specifically against `dragon`-type creatures", which can't be expressed as
-a reusable quality.
+**Standard mechanical effects live in
+[qualities.{en,ru}.json](#L0)**, not on items. The `effects[]` field on
+a weapon or armor entry is reserved for genuinely unique magic items —
+e.g. "the Sword of Smiting Dragons grants +5 damage specifically against
+`dragon`-type creatures", which can't be expressed as a reusable quality.
 
-For the bulk pass: leave `effects: []` on every weapon and armor entry
-unless you're explicitly authoring a one-of-a-kind magic item. All
-mechanical contribution from `qualities[]` happens through the registry.
+Leave `effects: []` on every weapon and armor entry unless you're
+explicitly authoring a one-of-a-kind magic item. All mechanical
+contribution from `qualities[]` flows through the registry.
 
 ---
 
@@ -536,7 +540,44 @@ Two entries; the magnitude is part of the id.
 
 ---
 
-## 8. `EffectTarget` kinds — quick reference
+## 8. Statuses (`statuses.{en,ru}.json`) — display-only registry
+
+Statuses are the named conditions an `Action.inflicts[]` array can put
+on a target (`bleeding`, `dazed`, `prone`, `stunned`, …). They are
+**opaque display tokens**: the engine never branches on their text, and
+the catalog never carries effects.
+
+### Entry shape
+
+```jsonc
+{
+  "id":          "bleeding",                  // stable, snake_case, globally unique
+  "name":        "Bleeding",                  // localized
+  "description": "The target takes 1 damage at the start of each of their turns until healed."  // localized
+}
+```
+
+### Authoring rules
+
+- `id` is globally unique across the registry and locale-independent.
+- `name` and `description` are the only fields that may differ between
+  locales. The locale-drift lint enforces parallel ordering and the same
+  id set across `statuses.en.json` and `statuses.ru.json`.
+- There is **no** `effects[]`, no `tier`, no `appliesTo`. Statuses are
+  not effects — they are labels the engine attaches to targets so
+  sibling apps can resolve duration, stacking, and saves.
+- `Action.inflicts[]` (§11) carries status ids. Every id mentioned by
+  any `inflicts[]` must resolve here; the audit script flags unknowns.
+- The engine treats statuses as opaque tokens (ADR-016 / §0.7). If you
+  want the engine itself to *react* to a status — e.g. grant `evasion`
+  while `prone` — author that as a `flag` target, not as a status row.
+- New status: append to **both** `statuses.{en,ru}.json` in the same
+  commit that authors the action inflicting it. Same lockstep discipline
+  as every other catalog.
+
+---
+
+## 9. `EffectTarget` kinds — quick reference
 
 Each kind with the minimum required shape and a real-data example. See
 [`src/rpg-types.mts`](../src/rpg-types.mts) for the canonical TypeScript.
@@ -641,7 +682,7 @@ a new one.
 
 `appliesTo: WeaponPredicate[]` is **allowed** on flag targets but the
 engine treats it as documentary metadata for sibling apps — see
-[§8.5 Roll-time modifier passthrough](#85-roll-time-modifier-passthrough).
+[§9.5 Roll-time modifier passthrough](#95-roll-time-modifier-passthrough).
 The engine still adds the flag name to the global character set
 unconditionally; sibling apps consume the predicate to decide when the
 roll-time bonus actually fires.
@@ -690,7 +731,7 @@ Worked example — *Tactics-novice* (shifts initiative to Cunning):
 
 ---
 
-## 8.5 Roll-time modifier passthrough
+## 9.5 Roll-time modifier passthrough
 
 The engine derives **static character state** (attributes, secondary stats,
 per-slot combat values, the set of active flags and weapon/armor qualities).
@@ -713,7 +754,7 @@ weapon-scoped modifiers). Document the magnitude in the entry's
 
 ---
 
-## 9. `WeaponPredicate` — quick reference
+## 10. `WeaponPredicate` — quick reference
 
 `appliesTo` is an **AND-composed** array of predicates. Within a single
 predicate, `values[]` is **OR-composed**.
@@ -740,15 +781,15 @@ If `appliesTo` is omitted or `[]`, the effect applies to every slot.
 
 `appliesTo` is engine-evaluated for `combat` and `weaponQuality` targets
 (per-slot fanout), and preserved as documentary metadata for `flag`
-targets (siblings consume it — see [§8.5](#85-roll-time-modifier-passthrough)).
+targets (siblings consume it — see [§9.5](#95-roll-time-modifier-passthrough)).
 The parser strips it with a warn for `secondary`, `armorQuality`, and any
 future kinds.
 
 ---
 
-## 9.5 `condition` — character-level effect gating
+## 10.5 `condition` — character-level effect gating
 
-`appliesTo` (§9) gates **per-slot combat** effects. For everything else —
+`appliesTo` (§10) gates **per-slot combat** effects. For everything else —
 `secondary` stats and armor-side `armorQuality` add/remove — use the
 optional `condition` field instead. ADR-015 §3f.
 
@@ -823,12 +864,7 @@ piece's quality never bleeds onto the plug.
 
 ---
 
-## 10. `SpecialAttack` / `Reaction` wire shape on tier objects
-
-> Status: **shipped** (post-Chunk-F amendment Items 1, 6, 8, 12 —
-> 2026-05-19). Engine consumes the declarative fields verbatim;
-> per-slot inheritance resolution at recalc time is the remaining
-> Item 1 engine work, scheduled against Chunk G.
+## 11. `SpecialAttack` / `Reaction` wire shape on tier objects
 
 ADR-014 says these are derived collections distinguished by
 `trigger === "manual"`. The wire shape on tier objects is:
@@ -867,13 +903,13 @@ ADR-014 says these are derived collections distinguished by
 }
 ```
 
-**`id` is required and is the rewrite key (ADR-014, Item 9):** when the
+**`id` is required and is the rewrite key (ADR-014):** when the
 same `id` appears at two tiers of the same parent ability/spell, the
 higher tier replaces the lower. Different ids coexist. So to "upgrade"
 a novice special attack at the master tier, repeat the same `id` and
 edit the other fields:
 
-**Inheritance defaults (Item 1).** Omit `damage` / `attackAttribute`
+**Inheritance defaults.** Omit `damage` / `attackAttribute`
 when the action should fire with the carrying weapon's own values
 (Backstab, Stab, off-hand strikes). Set them only for bespoke actions
 that don't care which weapon you carry (Cheap Shot, magic attacks).
@@ -881,26 +917,26 @@ Use `damageBonus` for the Backstab pattern (inherit base, add a flat
 bonus); the audit lint requires a non-empty `appliesTo` whenever
 `damageBonus` is present to scope which slots earn the bonus.
 
-**Status infliction (Item 6).** `inflicts[]` declares what statuses
+**Status infliction.** `inflicts[]` declares what statuses
 the action applies to its **target** on a successful hit. Values must
 resolve against `reference/statuses.{en,ru}.json` (the audit script
 flags unknown ids). Engine declares only — sibling combat resolvers
 own duration, stacking, and saves. Same lifecycle policy as
 `EffectFlag` (which describes the *character*, not the *target*).
 
-**Free attacks (Item 8).** `isFree: true` marks special attacks that
+**Free attacks.** `isFree: true` marks special attacks that
 don't consume the action economy (Two Weapons off-hand, Stab, Quick
 Reload). Accepted on `trigger: "manual"` only — reactions are already
 out-of-band and the flag would be meaningless. **No derived
 `combat.freeAttacks` counter** is computed; sibling apps sum free
 attacks themselves (typically one per turn, ability-modified).
 
-**Armor-ignoring damage (Item 1).** `ignoresArmor: true` on `manual`
+**Armor-ignoring damage.** `ignoresArmor: true` on `manual`
 actions only. Useful for Strangling, Riposte armor-ignoring d6, and
 similar bespoke armor-bypassing strikes.
 
-**Predicate scoping (Item 12).** `appliesTo` on actions uses the same
-`WeaponPredicate[]` vocabulary as effects (§9). `[{ "kind": "any" }]`
+**Predicate scoping.** `appliesTo` on actions uses the same
+`WeaponPredicate[]` vocabulary as effects (§10). `[{ "kind": "any" }]`
 is the canonical "any carried weapon" form for slot-bound actions;
 omit on innate / monster attacks that don't depend on what's carried.
 
@@ -955,16 +991,17 @@ entry). To add a brand-new entry at a higher tier, give it a new id:
   (`collectActions`); talents and equipment do **not** contribute
   actions today (artifact authoring is YAGNI).
 
-### `EffectFlag` cleanup
+### `EffectFlag` extension
 
-The current union in [`src/rpg-types.mts`](../src/rpg-types.mts) is a
-placeholder. Authors extend it as they go (one flag per commit, paired
-with the catalog change that needs it). After the bulk pass, audit the
-final set and consolidate near-duplicates.
+The `EffectFlag` union in [`src/rpg-types.mts`](../src/rpg-types.mts)
+is the live engine vocabulary. Authors extend it as they go — one flag
+per commit, paired with the catalog entry that needs it. Engine
+consumers of a new flag must be wired in the same change (or be
+explicitly noted as a sibling-only concern).
 
 ---
 
-## 11. Authoring workflow checklist
+## 12. Authoring workflow checklist
 
 For each entry you author or update:
 
@@ -972,7 +1009,7 @@ For each entry you author or update:
    [`rpg/{en,ru}/03-reference/`](../rpg/) for ground truth.
 2. Pick the right tier marker (`A` / `B` / `C`) for each effect.
 3. For Tier A/B effects: pick the right `target.kind`. Cross-check the
-   modifier verb is allowed on that target (§7 / §8).
+   modifier verb is allowed on that target (§8 / §9).
 4. For combat / weaponQuality effects: write `appliesTo` predicates that
    match the prose ("with polearms" → `{ kind: "type", values: ["polearm"] }`).
 5. Mirror the change in the **other** locale file in the same commit.
@@ -983,9 +1020,29 @@ For each entry you author or update:
 
 ---
 
-## 12. Things this spec does **not** cover (yet)
+## 13. Out of scope
 
-- The `EffectFlag` set will expand during F. Today's union is placeholder; cleanup tracked in §10.
-- `SpecialAttack` / `Reaction` wire shape on tier objects (§10).
-- Validators that resolve registry references at load time — Chunk G.
-- Catalog-driven UI pickers — Chunk I.
+Things deliberately not covered here:
+
+- **Per-character runtime state.** This spec is about authored
+  reference data. Character JSON, derived state, and SSE broadcast
+  shapes live in [data-contracts.md](data-contracts.md).
+- **Registry loader internals.** `src/models/reference.mts` and
+  `src/rules/registry.mts` own how files are loaded, merged across
+  locales, and validated. Authors only need to know the on-disk
+  shape, which is what this doc covers.
+- **Catalog-driven UI pickers.** A future client-side pass may surface
+  authored catalogs in the character builder UI. Out of scope here —
+  this doc only specifies the wire data those pickers would read.
+
+---
+
+## See also
+
+- [ADR-010 — Effect resolution pipeline](decisions/010-effect-resolution-pipeline.md)
+- [ADR-014 — Per-slot combat, special attacks & reactions](decisions/014-per-slot-combat-special-attacks.md)
+- [ADR-015 — Typed effect targets, final vocabulary](decisions/015-typed-effect-targets-final.md)
+- [ADR-016 — Quality registry](decisions/016-quality-registry.md)
+- [docs/architecture.md §3.11 — Reference Catalog](architecture.md#311-reference-catalog)
+- [docs/data-contracts.md §1.1 — Effect Object](data-contracts.md#11-effect-object)
+- [`rpg/` vault](../rpg/) — prose source of truth for rules content
