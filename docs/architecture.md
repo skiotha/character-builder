@@ -205,7 +205,8 @@ when authoring or revising mechanics.
 - **Structure:** `rpg/{locale}/{section}/{topic}.md` — locale-first, numbered sections for reading order
 - **Sections:** `01-core/` (mechanics), `02-lore/` (world lore), `03-reference/` (exhaustive galleries)
 - **Metadata:** `rpg/_meta/` holds the changelog; `rpg/.obsidian/` is gitignored
-- **Localizations:** `rpg/ru/` is the canonical authoring language. `rpg/en/` is pending translation.
+- **Localizations:** `rpg/en/` and `rpg/ru/` are both first-class and must end up with the same content and structure. `ru/` is currently populated; `en/` carries only an `index.md` stub pending the pre-release translation pass.
+- **Conventions:** see [`../rpg/README.md`](../rpg/README.md) for frontmatter, wikilink rules, the locale-parity policy, and the authoring workflow.
 
 ### 3.11 Reference Catalog
 

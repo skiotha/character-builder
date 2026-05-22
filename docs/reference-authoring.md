@@ -1045,4 +1045,4 @@ Things deliberately not covered here:
 - [ADR-016 — Quality registry](decisions/016-quality-registry.md)
 - [docs/architecture.md §3.11 — Reference Catalog](architecture.md#311-reference-catalog)
 - [docs/data-contracts.md §1.1 — Effect Object](data-contracts.md#11-effect-object)
-- [`rpg/` vault](../rpg/) — prose source of truth for rules content
+- [`rpg/` vault](../rpg/README.md) — prose source of truth for rules content (vault conventions, frontmatter, authoring workflow)

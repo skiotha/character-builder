@@ -357,7 +357,7 @@ If this work spans multiple sessions, the next session should:
 
 - [x] Pass A — archive completed plans (2026-05-19; plan saved; 4 files moved; inbound links updated in `phase6-plan.md`, `copilot-instructions.md`, `docs/roadmap.md`; outbound links in moved files rewritten `../../` → `../../../`; 625 tests green)
 - [x] Pass B — rewrite `docs/reference-authoring.md` (2026-05-19; renamed from `authoring-effects.md`; H1 + lead-in detoxified; nine-catalog list incl. statuses; §0.7 opaque-status rule added; §0.5 reaction overstatement softened; EffectFlag placeholder remark fixed; §1 special-attack / reaction TBD stubs rewritten to point at §11; §3 shipped banner stripped; §6 Chunk-F temporal markers removed; new §8 Statuses inserted; §8–§12 renumbered to §9–§13; §11 shipped banner + Item-N parentheticals stripped; §13 stale bullets removed; See-also footer added; inbound links wired from architecture.md / data-contracts.md / copilot-instructions.md / ADRs 014/015/016; phase6-plan + engine-weak-points §-refs updated; 625 tests green)
-- [ ] Pass C — wire `rpg/` vault
+- [x] Pass C — wire `rpg/` vault (2026-05-22; `rpg/README.md` fleshed out with Purpose / Layout / Locales / Frontmatter / Wikilinks / Relationship to `reference/` / Authoring workflow / See also; EN+RU framed as co-equal locales with structural-parity rule and a "ru-first during WIP" carve-out; inbound links wired from `docs/architecture.md` §3.10 (also corrected stale "ru canonical" framing), `docs/reference-authoring.md` See-also footer, and `.github/copilot-instructions.md` `rpg/` bullet; 625/625 tests green)
 - [ ] Pass D — code-comment delooping
   - [ ] D1 — `src/rpg-types.mts` + `src/app.mts`
   - [ ] D2 — `src/rules/*`
