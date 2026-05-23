@@ -318,6 +318,57 @@ the split is in the survey notes below the table.
   anchor list (file in session memory or appended to this plan) that
   D2b and Pass E consume.
 
+- **D1.5 — Orphan-TODO sweep across `src/` + `scripts/`.** One-shot
+  pre-D2a audit. **Why this exists:** D1 surfaced two
+  capability-gap TODOs in a single file (`TODO(rawEffect-removal)`,
+  and the prose gap re: Weapon/ArmorPiece runtime structural
+  validation) that were not tracked in any plan, bug tracker, or ADR.
+  Both were filed in 2026-05-23 as bug entries (#34, #35) and ADR-016
+  §7a was extended to record the deliberate "not yet validated"
+  stance. The pattern — code comments stating "this is broken" or
+  "this is a known gap" with no tracker / plan / ADR cite — is almost
+  certainly present in other files too. D2a–D4b will rewrite many of
+  these comments mechanically; if we don't audit *before* rewriting,
+  we lose the chance to file orphans (the new comment text won't
+  preserve "this needs filing" framing).
+  - **Scope:** `src/**/*.mts` and `scripts/**/*.mts`. **Skip `test/`** —
+    test TODOs are typically "add coverage for X" and rarely orphan
+    capability gaps. **Skip `public/`** for now — client-side TODOs
+    are Phase 8 territory and have their own audit window.
+  - **Grep targets (case-insensitive):** `TODO\(`, `FIXME\(`,
+    `// TODO\b`, `// FIXME\b`, `// XXX\b`, `// HACK\b`, `// NOTE:`
+    (NOTE only when it documents a known gap, not a benign
+    explanation), and standalone `@deprecated` blocks.
+  - **For each hit, classify:**
+    1. **Tracked** — cite present (`Tracked in .github/plans/...`,
+       `See .github/bugs/...#N`, `ADR-NNN §...`). No action.
+    2. **Pass D in-scope** — describes plan/chunk wording that D2a–D4b
+       will rewrite. No action *yet*; D-sub-pass will handle it.
+    3. **Orphan capability gap** — describes a real missing feature or
+       known bug with no tracker / plan / ADR cite. **File it now**:
+         - Engine bugs / design weaknesses → `engine-weak-points.md`
+           (HIGH/MEDIUM/LOW/DEFERRED per severity rubric).
+         - API / HTTP / validation / infra → `api-infra-bugs.md`.
+         - "Decision deliberately not made yet" → consider extending
+           the relevant ADR (precedent: ADR-016 §7a for catalog
+           validation scope).
+         - After filing, update the in-code comment to cite the new
+           tracker entry (`TODO(<scope>): … Tracked in
+           .github/bugs/<file>.md #N.`).
+    4. **Stale / no longer applicable** — TODO references work that
+       has since been done. Delete the comment.
+  - **Rubric for "is this an orphan?":** if you can't grep for the
+    underlying issue and find it written down somewhere stable
+    (`docs/`, `.github/bugs/`, ADR, active plan), it's an orphan.
+    Plan citations alone count only if the plan is still active
+    (not yet archived to `done/`).
+  - **Output:** updated bug trackers, updated in-code comments
+    citing them, optional ADR extensions. Record findings inline in
+    `/memories/session/plan.md` so D2a–D4b can revisit any item that
+    fell through the grep here for any reason.
+  - **Done when:** the grep set above returns only entries that fit
+    categories 1 or 2.
+
 - **D2a — Registry surface.** `src/app.mts`, `src/rules/registry.mts`,
   `src/rules/registry-types.mts`, `test/helpers/registry.mts`. All
   share one throughline ("Chunk G ships the production loader").
@@ -549,7 +600,8 @@ If this work spans multiple sessions, the next session should:
 - [x] Pass B — rewrite `docs/reference-authoring.md` (2026-05-19; renamed from `authoring-effects.md`; H1 + lead-in detoxified; nine-catalog list incl. statuses; §0.7 opaque-status rule added; §0.5 reaction overstatement softened; EffectFlag placeholder remark fixed; §1 special-attack / reaction TBD stubs rewritten to point at §11; §3 shipped banner stripped; §6 Chunk-F temporal markers removed; new §8 Statuses inserted; §8–§12 renumbered to §9–§13; §11 shipped banner + Item-N parentheticals stripped; §13 stale bullets removed; See-also footer added; inbound links wired from architecture.md / data-contracts.md / copilot-instructions.md / ADRs 014/015/016; phase6-plan + engine-weak-points §-refs updated; 625 tests green)
 - [x] Pass C — wire `rpg/` vault (2026-05-22; `rpg/README.md` fleshed out with Purpose / Layout / Locales / Frontmatter / Wikilinks / Relationship to `reference/` / Authoring workflow / See also; EN+RU framed as co-equal locales with structural-parity rule and a "ru-first during WIP" carve-out; inbound links wired from `docs/architecture.md` §3.10 (also corrected stale "ru canonical" framing), `docs/reference-authoring.md` See-also footer, and `.github/copilot-instructions.md` `rpg/` bullet; 625/625 tests green)
 - [ ] Pass D — code-comment delooping
-  - [ ] D1 — `src/rpg-types.mts` (also produces draft anchor list for Pass E)
+  - [x] D1 — `src/rpg-types.mts` (2026-05-23; 9 cite blocks rewritten; `(ADR-014, Item 9)` → `§action-rewrite`; amendment §1.1/§1.2/"rest of Item 1" → `§inheritance-fields` with shared `TODO(weapon-inheritance)` tracking phase6-plan; amendment §6 → `§inflicts`; amendment §8 → `§is-free`; Combat header "stubbed in Chunk C / lands in Chunk E" restated as current per-slot fanout; Weapon/ArmorPiece preamble reality-checked against `src/models/reference.mts` and rewritten to current state with quality-registry-only validation note; `RawEffect` removal converted to `TODO(rawEffect-removal)` with no plan cite; draft anchor list saved to `/memories/session/plan.md`; 625/625 tests green)
+  - [ ] D1.5 — Orphan-TODO sweep across `src/` + `scripts/` (pre-D2a; file capability-gap TODOs into bug trackers before mechanical rewrites lose them; partial credit already earned 2026-05-23: filed #34 `Weapon/ArmorPiece runtime structural validation` in `api-infra-bugs.md` DEFERRED, filed #35 `RawEffect wire shape leak` in `engine-weak-points.md` DEFERRED, extended ADR-016 §7a, updated `src/rpg-types.mts` comments to cite both)
   - [ ] D2a — Registry surface (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`, `test/helpers/registry.mts`); reality-check vs `src/models/reference.mts` first
   - [ ] D2b — Engine pipeline (`src/rules/{effects,derived,applicator,attributes}.mts`)
   - [ ] D3 — `scripts/audit-reference.mts` (bucket rename + header rewrite + comment cleanup)

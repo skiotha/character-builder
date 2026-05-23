@@ -156,6 +156,57 @@ Load-time validators ("every quality id mentioned by any weapon/armor entry
 resolves in the registry"; "every registry effect target is structurally sane")
 land in Chunk G alongside the trait/talent/ritual registry validators.
 
+### 7a. Out of scope: full structural validation of reference catalog entries
+
+The strictness rule above (§7) covers two narrow checks: quality-id
+*membership* (every id referenced from a weapon/armor entry exists in the
+registry) and registry-side *effect-target shape* (every `ResolvedEffect`
+inside the registry parses). It deliberately does **not** cover full
+structural validation of the surrounding catalog entries — i.e. asserting at
+load time that every entry in `reference/weapons.*.json`,
+`reference/armor.*.json`, `reference/abilities.*.json`, etc. conforms to the
+typed shape declared in `src/rpg-types.mts` (required fields present,
+optional fields the right type, no stray keys, no shape errors inside
+authored `effects[]` arrays on items themselves).
+
+Rationale:
+
+- **Reference catalogs are author-controlled JSON, not user input.** A
+  malformed catalog is an authoring bug, not an attack surface. The trusted-
+  userbase assumption from [ADR-003](003-self-asserted-player-identity.md)
+  applies here too: catalog authors are a small known set.
+- **The audit lint covers the most painful drift cases already.** Locale-
+  drift (`{en,ru}` structural parity), action-id uniqueness across tiers and
+  parents, quality-id membership, and (post-Chunk-G) trait/spell/ritual id
+  resolvability are all enforced by `scripts/audit-reference.mts` and
+  `test/reference-locale-drift.test.mts`. These are the failure modes that
+  have actually bitten authors.
+- **ADR-001 forbids runtime schema-validation dependencies.** Full structural
+  validation means hand-rolled validators per top-level shape (`Weapon`,
+  `ArmorPiece`, ability tier, spell tier, ritual entry, status). That is real
+  code to write and maintain. Until the catalog is large enough or the
+  authoring pipeline is loose enough that typos-in-prod become a recurring
+  problem, the cost outweighs the benefit.
+
+Consequence: a typo like `damge: 3` in a weapon entry loads silently. The
+weapon's `damage` reads as `undefined`, downstream recalc produces wrong
+numbers or throws far from the cause, and the author discovers it in a
+sibling-app render rather than a load-time error.
+
+**When to revisit.** Promote this from deferred to scoped work when *any* of:
+
+- A catalog-authoring typo reaches production and causes a player-visible bug.
+- The catalog grows past the point where author code-review reliably catches
+  shape errors (rule of thumb: more than one new entry per week, sustained).
+- Phase 7 sibling integration introduces a programmatic catalog-write path
+  (e.g. the addon writes home-brew weapons back to the website) — at that
+  point catalog entries *are* user input and §7a no longer holds.
+
+This deferred capability is tracked as
+[#34 in `.github/bugs/api-infra-bugs.md`](../../.github/bugs/api-infra-bugs.md).
+The in-code anchor is the Weapon/ArmorPiece preamble comment in
+`src/rpg-types.mts`.
+
 ### 8. `/api/v1/qualities` endpoint
 
 Sixth case in the [src/app.mts](../../src/app.mts) handleApi switch, parallel

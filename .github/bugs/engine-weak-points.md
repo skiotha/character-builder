@@ -199,3 +199,11 @@ _Items #15, #16, #17 moved to [`api-infra-bugs.md`](api-infra-bugs.md)._
 
 
 _Items #24, #25, #26, #27, #28, #29 moved to [`api-infra-bugs.md`](api-infra-bugs.md)._
+
+## DEFERRED — Track for later, not currently scoped
+
+### 35. `RawEffect` wire shape still leaks into the engine via `character.effects[]`
+- **Where:** `src/rpg-types.mts` — `RawEffect` / `RawEffectModifier` interfaces, `Character.effects: RawEffect[]`. Normalization boundary: `src/rules/effects.mts#normalizeRawEffect`. Reference catalogs (weapons, armor, abilities, spells, qualities) were migrated to author `ResolvedEffect[]` directly during Chunk F; `Character.effects[]` (player- / DM-authored persistent overrides) is the last consumer.
+- **Impact:** Two parallel effect shapes still exist. New contributors mis-author by copying the wrong one; the normalization layer is dead weight everywhere except the in-character path; the `duration` and `priority` fields on `RawEffect` are silently ignored (documented but easy to miss). Cleanup risk is also non-trivial because in-character `effects[]` is the one place where the legacy shape might carry real player data.
+- **Fix when scoped:** (a) Decide the migration path for in-character `effects[]` — either author as `ResolvedEffect` directly (simplest; loses the `duration` hint sibling apps may want) or define a thin typed wrapper that carries `effect: ResolvedEffect` + sibling-app metadata. (b) Migrate any persisted `character.effects[]` entries (storage rewrite + schema bump). (c) Delete `RawEffect` / `RawEffectModifier` / `normalizeRawEffect` and inline the resolved shape everywhere. The `TODO(rawEffect-removal)` comment in `src/rpg-types.mts` is the in-code anchor.
+- **Status:** ⏸️ Deferred — not breaking anything; pure cleanup. Revisit once the addon/bot integration in Phase 7 has clarified what (if any) lifecycle metadata sibling apps need on persistent overrides.

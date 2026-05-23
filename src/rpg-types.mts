@@ -58,8 +58,12 @@ export interface CharacterAttributes {
 // own temporary state. The `duration` field is ignored at normalization
 // time. `priority` is likewise ignored (phase ordering replaces it).
 //
-// Scheduled for removal in Phase 6 / Chunk H once the reference catalog
-// is fully normalized to the new vocabulary (Chunk F).
+// The reference catalog is now authored directly as `ResolvedEffect[]`;
+// `RawEffect` survives only for in-character `effects[]` (player /
+// DM-authored persistent overrides) and is normalized at the boundary.
+// TODO(rawEffect-removal): drop once all in-character effects[] migrate
+// to ResolvedEffect. Tracked in .github/bugs/engine-weak-points.md #35
+// (DEFERRED).
 
 /** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
 export interface RawEffectModifier {
@@ -218,7 +222,7 @@ export interface Action {
    * REQUIRED stable identifier. Locale-independent. Used for
    * rewrite-group dedupe in the engine: when two actions share the
    * same `id`, the one granted at the higher ability rank
-   * (master > adept > novice) replaces the lower (ADR-014, Item 9).
+   * (master > adept > novice) replaces the lower (ADR-014 §action-rewrite).
    *
    * Authoring convention: prefix with the parent ability/spell id,
    * e.g. `intrigues-backstab`, `sulfur-cascade-scorch`. The lint in
@@ -239,36 +243,40 @@ export interface Action {
   damage?: number;
   /**
    * Per-weapon damage bonus added on top of the carrying slot's base
-   * damage when the action inherits from a weapon (Item 1 authoring
-   * shape, amendment §1.1). Requires `appliesTo` to scope which weapons
-   * the bonus applies to. Engine runtime resolution is deferred (see
-   * amendment "Item 1 engine" status).
+   * damage when the action inherits from a weapon (ADR-014
+   * §inheritance-fields). Requires `appliesTo` to scope which weapons
+   * the bonus applies to.
+   *
+   * TODO(weapon-inheritance): runtime resolution pending — authoring
+   * shape is locked but the engine does not yet apply `damageBonus` /
+   * `ignoresArmor` / `appliesTo` during combat fanout. Tracked in
+   * .github/plans/phase6-plan.md.
    */
   damageBonus?: number;
   /**
    * Marks the action as bypassing armor. Display-only today; engine
-   * runtime wiring deferred with the rest of Item 1.
+   * runtime wiring deferred — see `damageBonus` TODO.
    */
   ignoresArmor?: boolean;
   /**
-   * Status ids inflicted on the target on resolution (amendment §6).
+   * Status ids inflicted on the target on resolution (ADR-014 §inflicts).
    * Each entry must match an id in `reference/statuses.{en,ru}.json`;
    * the audit-reference lint enforces this. Engine treats statuses as
    * opaque tokens — sibling apps render the rich description.
    */
   inflicts?: string[];
   /**
-   * Per-slot narrowing for actions that inherit from a weapon (Item 1
-   * authoring shape, amendment §1.2). When present on a manual /
-   * triggered action, the action only fires for slots whose weapon
-   * matches every predicate (AND-list; OR within `values[]`). Engine
-   * runtime resolution is deferred.
+   * Per-slot narrowing for actions that inherit from a weapon (ADR-014
+   * §inheritance-fields). When present on a manual / triggered action,
+   * the action only fires for slots whose weapon matches every
+   * predicate (AND-list; OR within `values[]`). Engine runtime
+   * resolution is deferred — see `damageBonus` TODO.
    */
   appliesTo?: WeaponPredicate[];
   /**
    * If `true`, the action does not consume the actor's action economy
-   * (amendment §8). Authoring lint forbids `isFree: true` on anything
-   * other than `trigger: "manual"`.
+   * (ADR-014 §is-free). Authoring lint forbids `isFree: true` on
+   * anything other than `trigger: "manual"`.
    */
   isFree?: boolean;
   effects?: ResolvedEffect[];
@@ -313,8 +321,8 @@ export interface LearnedTalent {
 //                            must reference a weapon with the `own` quality
 //
 // All `CombatSlot` fields except `weaponIndex` are server-derived. The
-// combat phase is stubbed in Chunk C; per-slot fanout and weapon
-// predicates land in Chunk E.
+// combat phase fans out per slot, narrowing weapon-targeted effects via
+// `WeaponPredicate` (`appliesTo`) so each slot resolves independently.
 
 export interface CombatSlot {
   weaponIndex: number;
@@ -333,10 +341,13 @@ export interface Combat {
 //
 // `Weapon` / `ArmorPiece` model an *instance* the character carries.
 // Reference catalog entries (`reference/weapons.*.json`,
-// `reference/armor.*.json`) currently use a structurally compatible shape
-// but are loaded as plain JSON; the registry deserializer (Chunk G) will
-// validate them against this shape. Effects on equipment are typed
-// `ResolvedEffect[]` — Chunk F authoring produces this shape directly.
+// `reference/armor.*.json`) use a structurally compatible shape and are
+// loaded through `src/models/reference.mts`. Effects on equipment are
+// authored directly as `ResolvedEffect[]`. Quality ids are validated
+// against the quality registry (ADR-016); full structural validation of
+// catalog entries against the `Weapon` / `ArmorPiece` shape below is
+// deliberately out of scope (see ADR-016 §7a). Tracked in
+// .github/bugs/api-infra-bugs.md #34 (DEFERRED).
 
 export interface Weapon {
   id: string;
