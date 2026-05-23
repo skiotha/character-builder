@@ -244,38 +244,138 @@ ignored.)
 | `ADR-NNN`                                     | Keep                                               |
 | `ADR-NNN §named-anchor`                       | Keep (newly stable per pass E)                     |
 
-**Sub-passes (by directory; agent may resplit/combine as needed):**
+### What counts as a stale cite
 
-- D1 — `src/rpg-types.mts` + `src/app.mts`
-  - `src/rpg-types.mts` has ~6 references (RawEffect deprecation,
-    combat slot comments, Action amendment fields, weapon comment).
-  - `src/app.mts` has `TODO(phase6-chunk-G)` for the registry stub.
-- D2 — `src/rules/*` (every module header + many inline)
-  - `derived.mts`, `applicator.mts`, `effects.mts`, `attributes.mts`,
-    `registry.mts`, `registry-types.mts`.
-- D3 — `scripts/audit-reference.mts`
-  - Full sweep: rename internal finding buckets to rule names
-    (`placement`, `inflicts`, `isFree`, `inheritance`, …); rewrite
-    numbered report headers to descriptive form (e.g.
-    `"8. Action ids (… Item 9)"` → `"8. Action ids — rewrite group dedupe"`).
-  - Functionality and readability must not regress.
-- D4 — `test/**/*.test.mts` + `test/helpers/*`
-  - Test file headers (`// (Phase 6 / Chunk E)` etc.) and inline
-    citations (`// (Item N)`, `// Chunk J widening`, `// Chunk-C
-    regression`).
-  - Direct plan-file references in `test/reference-locale-drift.test.mts`
-    and `test/validation.test.mts`.
+A comment / `it()` title / JSDoc cite is **stale** and must be rewritten when it:
 
-**Verification per sub-pass:**
+1. Names a phase (`Phase 6`), a chunk letter (`Chunk E`, `Chunk J.3`,
+   `F.0c`), an amendment section (`amendment §6`), or a numbered Item
+   (`Item 11`, `post-pass Item 9`) — even just decoratively in a
+   `describe`/`it` title.
+2. Points at any file under `.github/plans/` (top-level or `done/`)
+   from a non-`TODO` comment, *or* points at a path that has since
+   moved under `done/` (broken link). Example: the JSDoc cite of
+   `phase6-chunkF-prereqs-plan.md` in
+   `test/reference-locale-drift.test.mts` is now a broken link — the
+   plan was archived to `done/` on 2026-04-27.
+3. Describes the future in temporal terms (`Chunk G ships X`, `Chunk J
+   widened Y`, `lands in Chunk E`, `scheduled for removal in Chunk H`).
+   Restate as current behaviour or as a conditional (`if/when X is
+   added, this becomes Y`) without naming the plan that adds it.
+4. Cites a sibling project's internal phase (`bot Phase 2`, `addon
+   Phase 1`) from a non-`TODO` comment. Sibling-project phases are as
+   temporal as ours; cite the sibling's stable doc instead
+   (`bot-integration.md §N`, `addon-integration.md §N` — those are
+   stable surfaces).
+
+**Allowed exceptions (do NOT rewrite):**
+
+- `TODO(<scope>): … Tracked in .github/plans/<file>.md` — the implementer
+  removes both together when the plan ships. See the TODO convention
+  below.
+- `Bug #N` and `.github/bugs/*` references — bug trackers are stable.
+- `ADR-NNN` and `ADR-NNN §named-anchor` — stable per Pass E.
+- Historical comments that genuinely add value (`// Removed in Chunk
+  C: <list of removed cases>`) **only** if they're rewritten without
+  the chunk label (`// The legacy <name> suite was removed when <X>
+  replaced it; see git log for the migration.`).
+
+### Comment-tag convention
+
+Codifying terminology so the executing agent and future readers agree:
+
+| Tag                            | Meaning                                              | May cite open plan? |
+| ------------------------------ | ---------------------------------------------------- | ------------------- |
+| `TODO(<scope>): …`             | Missing capability; `<scope>` names the capability   | Yes — append `Tracked in .github/plans/<file>.md` |
+| `FIXME(<scope>): …`            | Known-broken code path                               | Cite `.github/bugs/<file>.md` entry if one exists |
+| `TODO(cleanup-on-<planname>):` | Non-capability comment that cites an open plan and should be revisited when that plan ships | Yes — by definition |
+| `NOTE:` / plain `//` comment   | Stable explanatory prose                             | No — cite ADR / authoring doc / architecture |
+
+The `cleanup-on-<planname>` form is new; introduce it only if Pass D
+actually needs it. Bias toward rewriting the comment to a stable cite
+when possible — it's the lowest-rot option.
+
+**Reciprocal obligation on open plans (Pass E to codify):** every
+active plan under `.github/plans/` should carry a "References to
+sweep on completion" subsection at its end, listing the
+`TODO(cleanup-on-<planname>)` / `TODO(<scope>)` sites that must be
+visited when the plan ships. Empty list is fine and explicit. This
+shifts the cleanup obligation from "remember to grep" to "follow the
+plan's checklist".
+
+### Sub-passes (revised after D-survey, 2026-05-23)
+
+Six sub-passes. Each is one sit-down's worth of work. Rationale for
+the split is in the survey notes below the table.
+
+- **D1 — `src/rpg-types.mts` (typings module).** ~11 cites: 6
+  `(Item N)` / `(amendment §N)` on Action fields, a Combat header
+  ("stubbed in Chunk C, lands in Chunk E"), a `RawEffect` deprecation
+  block ("Scheduled for removal in Phase 6 / Chunk H"), a weapon
+  comment, and an Action ordering ADR-014 §9 cite. **Doubles as Pass E
+  anchor scout**: the `(Item N)` cites here are the source list for
+  ADR-014's "Stable anchors" appendix. Deliverable includes a draft
+  anchor list (file in session memory or appended to this plan) that
+  D2b and Pass E consume.
+
+- **D2a — Registry surface.** `src/app.mts`, `src/rules/registry.mts`,
+  `src/rules/registry-types.mts`, `test/helpers/registry.mts`. All
+  share one throughline ("Chunk G ships the production loader").
+  **Reality-check first**: `src/models/reference.mts` already exists
+  and is wired in `app.mts`; the "Chunk G future" framing may already
+  be partly or fully false. Restate to match what actually ships
+  today, or `TODO(<scope>):` what's still missing.
+
+- **D2b — Engine pipeline.** `src/rules/effects.mts`,
+  `src/rules/derived.mts`, `src/rules/applicator.mts`,
+  `src/rules/attributes.mts`. ~26 cites. Mostly module-header rewrites
+  (`(Phase 6 / Chunk X)` → one-liner role) + inline `Item N` →
+  `ADR-014 §named-anchor` using D1's anchor list. Two judgment
+  calls: (a) `effects.mts`'s "Chunk G's reference-lint promotes this
+  to a hard failure" appears 4×; collapse the language to a
+  conditional that doesn't name the plan, (b) `attributes.mts`'s
+  header describes a **live** `defense` fallback awaiting a rename —
+  restate the live behaviour without chunk framing.
+
+- **D3 — `scripts/audit-reference.mts` (full sweep, single file).**
+  ~30+ cites + the `amendmentBlockers` bucket key (4 sites) + 6
+  numbered report headers. Per the locked decision, rename buckets to
+  rule names (`placement`, `inflicts`, `isFree`, `inheritance`, …),
+  rewrite headers to descriptive form, drop `Item N`/`Chunk J.3`
+  language from comments. Functionality and readability must not
+  regress; bucket names must still be greppable from the report
+  output.
+
+- **D4a — Engine test suites.** Everything under `test/rules/*.mts`
+  (~9 files, ~17 cites). Includes `it()` titles containing `(Item N)`
+  / `(Chunk J)` — those show in test output and matter to readers.
+  Title rewrites should describe the behaviour being asserted, not
+  the plan item that motivated it. File-header `(Phase 6 / Chunk X)`
+  banners go.
+
+- **D4b — Top-level test + helpers + broken-link fix.**
+  `test/data-contracts.test.mts`, `test/validation.test.mts`,
+  `test/reference-locale-drift.test.mts`. **Includes the broken-link
+  fix** on `reference-locale-drift.test.mts:26`: rewrite the JSDoc
+  cite of `phase6-chunkF-prereqs-plan.md` (now archived) to point at
+  ADR-016 only — that ADR is already cited in the same JSDoc.
+  Sibling-project Phase cites in `data-contracts.test.mts` get
+  rewritten to cite `bot-integration.md §N` (stable surface) instead
+  of "bot Phase 2".
+
+### Verification per sub-pass
+
 1. `npm run typecheck` clean.
 2. `npm test` green.
-3. Grep regression check on touched directory:
-   `grep -rE 'Phase [0-9]|Chunk [A-Z]|amendment §|Item [0-9]+|\.github/plans/' <dir>`
-   returns only intentional in-flight `TODO(...)` references.
+3. Grep regression check on touched files:
+   `grep -rE 'Phase [0-9]|Chunk [A-Z]|amendment §|Item [0-9]+|\.github/plans/' <files>`
+   returns only intentional `TODO(...)` references with their plan
+   citations.
 
-**Done when:** the grep above is empty across `src/`, `scripts/`, `test/`
-modulo in-flight TODOs whose plan still exists at the top level of
-`.github/plans/`.
+**Done when:** the grep above is empty across `src/`, `scripts/`,
+`test/` modulo `TODO(<scope>): … Tracked in .github/plans/<file>.md`
+references whose target plan still exists at the top level of
+`.github/plans/` (i.e. not yet archived to `done/`).
 
 ## Pass E — Codify in copilot-instructions and ADRs
 
@@ -290,6 +390,25 @@ modulo in-flight TODOs whose plan still exists at the top level of
 > The only allowed plan reference is inside a `TODO(...)` whose lifetime
 > matches the plan's; the implementer removes the TODO and the citation
 > together when the plan ships.
+>
+> **Comment-tag convention.**
+> - `TODO(<scope>): …` — missing capability; `<scope>` names the
+>   capability (not the plan). May append `Tracked in
+>   .github/plans/<file>.md`.
+> - `FIXME(<scope>): …` — known-broken path; cite `.github/bugs/*` if
+>   tracked there.
+> - `TODO(cleanup-on-<planname>): …` — non-capability comment that
+>   nevertheless cites an open plan and must be revisited on the
+>   plan's archival. Prefer rewriting to a stable cite when possible.
+> - Plain `//` / `NOTE:` — stable explanatory prose; no plan cites.
+>
+> **Reciprocal plan obligation.** Every active plan under
+> `.github/plans/` carries a "References to sweep on completion"
+> subsection listing the code-side cites
+> (`TODO(<scope>)` / `TODO(cleanup-on-<planname>)`) that must be
+> visited when the plan ships. Empty list is fine and explicit. The
+> plan's own "Done when" checklist gains a
+> `grep -rn TODO(<scope>) src test scripts` step.
 >
 > **ADR sub-citations.** When citing inside an ADR, use the ADR's
 > "Stable anchors" appendix (`ADR-NNN §named-anchor`). Plain heading
@@ -327,6 +446,77 @@ Concrete anchors expected from current code:
 ADR-015 each carry a Stable anchors appendix; `npm test` green
 including the new lint.
 
+## Pass F — extract conventions into instruction files (brainstorm-first)
+
+**Status:** deferred. Do **not** start until Pass E ships. This entry
+exists only to preserve the conventions we've accumulated so they
+don't get lost.
+
+**Why a separate pass.** Passes A–E have, as a side effect, codified
+several conventions that currently live only inside this plan and the
+Pass E copilot-instructions snippet:
+
+1. **Comment-tag taxonomy** — `TODO(<scope>)` / `FIXME(<scope>)` /
+   `TODO(cleanup-on-<planname>)` / plain `NOTE:` (Pass D rubric).
+2. **Plan bookkeeping** — every active plan under `.github/plans/`
+   carries a "References to sweep on completion" subsection, empty
+   at plan creation, filled as `TODO(...)` cites accrue, and folded
+   into the plan's "Done when" checklist (Pass D reciprocal-obligation
+   note + Pass E copilot-instructions snippet).
+3. **Stable-vs-mutable doc graph** — ADRs / `docs/*.md` / `.github/bugs/*`
+   are stable cite targets; `.github/plans/*` are not (Pass D
+   "What counts as a stale cite" rubric).
+4. **ADR stable-anchor discipline** — `ADR-NNN §named-anchor` over
+   numbered headings; Stable anchors appendix; `test/adr-anchors.test.mts`
+   lint (Pass E).
+5. **Code-doc scale ladder** — module header / function JSDoc / inline
+   `//` (already in `.github/copilot-instructions.md`; cross-referenced
+   from per-language instructions in this pass).
+
+**Brainstorm questions to answer before splitting work:**
+
+- New `.github/instructions/bookkeeping.instructions.md` (no `applyTo`,
+  always loaded) for items 1–3 — or fold into
+  `.github/copilot-instructions.md` (Pass E already adds a subsection
+  there)? Risk of duplication if both.
+- Per-language instruction files (`hypertext.instructions.md`,
+  `styling.instructions.md`, `typesctipt.instructions.md` — sic
+  typo) currently say nothing about comment style. Move the JSDoc-in-
+  `.mjs` requirement and the module-header rule out of
+  `copilot-instructions.md` into the matching `applyTo`-scoped files?
+  Pro: shorter root file, rules co-located with the code they govern.
+  Con: rules then load only when the matching file is touched, so they
+  miss "create new module" scenarios from scratch.
+- Does any of this rise to an ADR? Probably not — ADRs record **design
+  decisions about the product**, not about how we document the
+  codebase. But "stable-vs-mutable doc graph" arguably *is* a design
+  decision (it shapes how every future contribution cites prior art).
+  Defer the ADR/no-ADR call to the brainstorm.
+- Plan template: should `.github/plans/` get a `TEMPLATE.md` that
+  pre-seeds the "References to sweep on completion" subsection so new
+  plans start correct-by-construction? Tiny file, high payoff.
+
+**Deliverables (tentative, refine in brainstorm):**
+
+- One or more files under `.github/instructions/` covering the
+  bookkeeping conventions above, with `applyTo` patterns chosen per
+  brainstorm.
+- Updates to existing per-language instruction files for any
+  comment-related rules that belong there.
+- Optional `.github/plans/TEMPLATE.md`.
+- Optional ADR if the brainstorm concludes one is warranted.
+- Update `.github/copilot-instructions.md` to point at the new
+  instruction files instead of duplicating their content.
+
+**Sequencing:** brainstorm first (one Plan-mode session, output is a
+written split), then execute in one or two passes. Do not start until
+Pass D and Pass E are both `[x]`.
+
+**Done when:** the conventions enumerated above each have exactly one
+canonical home in `.github/`; `.github/copilot-instructions.md` no
+longer duplicates rules that belong in `instructions/`; new plans can
+be scaffolded from a template (if one is chosen); 625+ tests green.
+
 ## Risks & open questions
 
 - **Pass D scope.** Sub-pass split is by directory but the executing
@@ -359,8 +549,11 @@ If this work spans multiple sessions, the next session should:
 - [x] Pass B — rewrite `docs/reference-authoring.md` (2026-05-19; renamed from `authoring-effects.md`; H1 + lead-in detoxified; nine-catalog list incl. statuses; §0.7 opaque-status rule added; §0.5 reaction overstatement softened; EffectFlag placeholder remark fixed; §1 special-attack / reaction TBD stubs rewritten to point at §11; §3 shipped banner stripped; §6 Chunk-F temporal markers removed; new §8 Statuses inserted; §8–§12 renumbered to §9–§13; §11 shipped banner + Item-N parentheticals stripped; §13 stale bullets removed; See-also footer added; inbound links wired from architecture.md / data-contracts.md / copilot-instructions.md / ADRs 014/015/016; phase6-plan + engine-weak-points §-refs updated; 625 tests green)
 - [x] Pass C — wire `rpg/` vault (2026-05-22; `rpg/README.md` fleshed out with Purpose / Layout / Locales / Frontmatter / Wikilinks / Relationship to `reference/` / Authoring workflow / See also; EN+RU framed as co-equal locales with structural-parity rule and a "ru-first during WIP" carve-out; inbound links wired from `docs/architecture.md` §3.10 (also corrected stale "ru canonical" framing), `docs/reference-authoring.md` See-also footer, and `.github/copilot-instructions.md` `rpg/` bullet; 625/625 tests green)
 - [ ] Pass D — code-comment delooping
-  - [ ] D1 — `src/rpg-types.mts` + `src/app.mts`
-  - [ ] D2 — `src/rules/*`
-  - [ ] D3 — `scripts/audit-reference.mts`
-  - [ ] D4 — `test/**/*.test.mts` + `test/helpers/*`
+  - [ ] D1 — `src/rpg-types.mts` (also produces draft anchor list for Pass E)
+  - [ ] D2a — Registry surface (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`, `test/helpers/registry.mts`); reality-check vs `src/models/reference.mts` first
+  - [ ] D2b — Engine pipeline (`src/rules/{effects,derived,applicator,attributes}.mts`)
+  - [ ] D3 — `scripts/audit-reference.mts` (bucket rename + header rewrite + comment cleanup)
+  - [ ] D4a — Engine test suites (`test/rules/*.mts`) including `it()` titles
+  - [ ] D4b — Top-level test + helpers (`test/{data-contracts,validation,reference-locale-drift}.test.mts`) + fix broken-link cite of archived `phase6-chunkF-prereqs-plan.md`
 - [ ] Pass E — copilot-instructions + ADR anchors + `test/adr-anchors.test.mts`
+- [ ] Pass F — extract accumulated conventions into instruction files (brainstorm-first, see §Pass F below)
