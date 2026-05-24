@@ -1,6 +1,8 @@
 // In-memory registry stub for tests. Production code never imports this.
-// See `src/rules/registry-types.mts` for interface contract and Chunk G
-// for the real loader.
+// See `src/rules/registry-types.mts` for the interface contract; a
+// production loader for traits/talents is tracked under
+// `TODO(trait-talent-registry)` in `src/app.mts` /
+// `.github/plans/phase6-plan.md`.
 
 import type {
   AbilityTier,
@@ -28,7 +30,7 @@ export interface InMemoryRegistryConfig {
   talents?: Record<string, { effects?: ResolvedEffect[] }>;
   /**
    * Keyed by quality id. Unmapped ids return `null` and the engine
-   * throws (mirrors production strictness, ADR-016 / F.0e).
+   * throws (mirrors production strictness per ADR-016).
    *
    * The test default fixture (`makeTypedCharacter`) seeds slot 2 with a
    * weapon carrying the `own` quality; tests that touch combat MUST
@@ -96,7 +98,7 @@ export function createInMemoryRegistry(
  * trait/talent effects but do touch the recalc pipeline. Traits and
  * talents return null (warn-and-skip in `effects.mts`); qualities
  * resolve only for `BASE_QUALITIES` (currently just `own`). Any other
- * quality id triggers the F.0e strict-throw — which is the *right*
+ * quality id triggers the strict-throw (ADR-016) — which is the *right*
  * production behaviour. Use `createInMemoryRegistry({ qualities: ... })`
  * when the test fixture carries additional quality ids.
  */

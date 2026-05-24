@@ -1,4 +1,4 @@
-// ── Effect application (Phase 6 / Chunk E) ─────────────────────────
+// ── Effect application ────────────────────────────────────────────
 //
 // Phase-keyed handlers consuming typed `ResolvedEffect`s. Each handler is
 // total over the relevant target kinds for its phase; cross-phase calls
@@ -186,7 +186,7 @@ export function applyAddFlat(
         break;
       case "primary":
         // Bucketed into `primary` phase by groupByPhase, applied by
-        // `derivePrimaryAttributes` in derived.mts (Item 10).
+        // `derivePrimaryAttributes` in derived.mts (ADR-015 §primary-bucketing).
         break;
       case "magicAttribute":
       case "initiativeAttribute":
@@ -235,7 +235,7 @@ export function applyMultiply(
         // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "primary":
-        // Bucketed into `primary` phase (Item 10); also `multiply` is
+        // Bucketed into `primary` phase (ADR-015 §primary-bucketing); also `multiply` is
         // parser-rejected for primary targets so this is doubly unreachable.
         break;
       case "magicAttribute":
@@ -287,7 +287,7 @@ export function applyCap(
         // Per-slot — handled by `deriveCombatSlots`.
         break;
       case "primary":
-        // Bucketed into `primary` phase (Item 10).
+        // Bucketed into `primary` phase (ADR-015 §primary-bucketing).
         break;
       case "magicAttribute":
       case "initiativeAttribute":

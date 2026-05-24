@@ -49,12 +49,14 @@ const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
-// TODO(phase6-chunk-G): replace with createRegistry() loading from
-// REFERENCE_DIR. Chunk C ships an empty stub for traits/talents so
-// `character.traits[]` resolves to no effects (warn-and-skip on miss).
-// F.0e wires the quality catalog: `lookupQuality` reads
-// `reference/qualities.<DEFAULT_LOCALE>.json` once at startup and serves
-// from an in-memory map. Unknown ids are a hard error per ADR-016.
+// Stub registry used at startup. `lookupQuality` is fully populated from
+// `reference/qualities.<DEFAULT_LOCALE>.json` per ADR-016 (unknown ids
+// throw). `lookupTrait` / `lookupTalent` are no-op stubs — callers warn
+// and skip on miss.
+//
+// TODO(trait-talent-registry): replace with a registry that loads
+// abilities/spells/boons/sins via `src/models/reference.mts`. Tracked
+// in `.github/plans/phase6-plan.md`.
 const qualityIndex = await loadQualityIndex();
 
 const emptyRegistry: Registry = {

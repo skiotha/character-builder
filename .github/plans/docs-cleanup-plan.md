@@ -379,7 +379,10 @@ the split is in the survey notes below the table.
 
 - **D2b — Engine pipeline.** `src/rules/effects.mts`,
   `src/rules/derived.mts`, `src/rules/applicator.mts`,
-  `src/rules/attributes.mts`. ~26 cites. Mostly module-header rewrites
+  `src/rules/attributes.mts`, **`src/rules/setbase.mts`** (added
+  2026-05-24 after addendum sweep — was missed in the original
+  scoping). ~26 cites + 2 in setbase/derived caught by the broadened
+  pattern. Mostly module-header rewrites
   (`(Phase 6 / Chunk X)` → one-liner role) + inline `Item N` →
   `ADR-014 §named-anchor` using D1's anchor list. Two judgment
   calls: (a) `effects.mts`'s "Chunk G's reference-lint promotes this
@@ -406,22 +409,33 @@ the split is in the survey notes below the table.
 
 - **D4b — Top-level test + helpers + broken-link fix.**
   `test/data-contracts.test.mts`, `test/validation.test.mts`,
-  `test/reference-locale-drift.test.mts`. **Includes the broken-link
-  fix** on `reference-locale-drift.test.mts:26`: rewrite the JSDoc
-  cite of `phase6-chunkF-prereqs-plan.md` (now archived) to point at
-  ADR-016 only — that ADR is already cited in the same JSDoc.
-  Sibling-project Phase cites in `data-contracts.test.mts` get
-  rewritten to cite `bot-integration.md §N` (stable surface) instead
-  of "bot Phase 2".
+  `test/reference-locale-drift.test.mts`, **`test/helpers/http.mts`**
+  (added 2026-05-24 — missed in original scoping; carries one
+  `post-F.0e the engine throws` mile-marker cite). **Includes the
+  broken-link fix** on `reference-locale-drift.test.mts:26`: rewrite
+  the JSDoc cite of `phase6-chunkF-prereqs-plan.md` (now archived) to
+  point at ADR-016 only — that ADR is already cited in the same
+  JSDoc. Sibling-project Phase cites in `data-contracts.test.mts`
+  get rewritten to cite `bot-integration.md §N` (stable surface)
+  instead of "bot Phase 2" — restate, don't strip; these are
+  cross-repo context, not stale-in-tree plan-cites.
 
 ### Verification per sub-pass
 
 1. `npm run typecheck` clean.
 2. `npm test` green.
-3. Grep regression check on touched files:
-   `grep -rE 'Phase [0-9]|Chunk [A-Z]|amendment §|Item [0-9]+|\.github/plans/' <files>`
+3. Grep regression check on touched files using the **broadened
+   pattern** (locked 2026-05-24 after D2b addendum surfaced missed
+   work-package mile-markers; see closure log):
+   ```
+   Phase [0-9]|Chunk [A-Z]|amendment §|Item [0-9]+|\.github/plans/|phase6-|chunk[A-Z]|\bG2\.[A-Z]\b|\bF\.[0-9][a-z]?\b|\bJ\.[0-9][a-z]?\b
+   ```
    returns only intentional `TODO(...)` references with their plan
-   citations.
+   citations. The originally-scoped pattern (without the last three
+   alternatives) missed `G2.[A-Z]` work-package labels, `F.0[a-z]`
+   mile-markers, and `J.[0-9][a-z]?` post-sweep sub-items — all of
+   which appear in test files (D4a) and were silently introduced into
+   `setbase.mts` (D2b scope addition).
 
 **Done when:** the grep above is empty across `src/`, `scripts/`,
 `test/` modulo `TODO(<scope>): … Tracked in .github/plans/<file>.md`
@@ -496,6 +510,85 @@ Concrete anchors expected from current code:
 **Done when:** copilot-instructions has the new subsection; ADR-014 and
 ADR-015 each carry a Stable anchors appendix; `npm test` green
 including the new lint.
+
+## Pass E.5 — Bug-tracking conventions (brainstorm-first)
+
+**Status:** deferred. Do **not** start until Pass E ships. Motivated
+by JC-A in Pass D2b (2026-05-24): I tried to rewrite a `Bug #34` cite
+in `src/rules/effects.mts` as stale, conflating
+`engine-weak-points.md #34` with `api-infra-bugs.md #34`. User caught
+it: numbering is **per-file** across the two trackers, so bare
+`Bug #N` cites are ambiguous and the file must be spelled out. The
+fix in D2b was disambiguation only; this Pass codifies the convention
+properly across the codebase and decides whether the trackers stay
+split at all.
+
+**Why brainstorm-first:** the two questions — "how should bug
+tracker files be named / composed?" and "per-file or global
+numbering?" — are tightly coupled. Composition decides whether the
+numbering question even has two answers. We commit to a layout
+first, then the numbering rule falls out.
+
+### Composition ideas (pick one before scoping the rest of the pass)
+
+1. **Status quo, disambiguated.** Keep `engine-weak-points.md` and
+   `api-infra-bugs.md` as separate trackers; mandate that every
+   in-code cite spells the file (`engine-weak-points.md #34`, never
+   bare `#34`). Numbering stays per-file. Minimal disruption; lowest
+   ceremony; risk that the next contributor still writes `Bug #N`.
+2. **Single merged `bugs.md`.** Collapse both trackers into one file
+   with global numbering. The numbering question becomes moot.
+   Trade-off: loses the engine-vs-infra split that currently makes
+   triage cheap (the two domains have different reviewers and
+   different fix shapes).
+3. **Subfolder layout `bugs/{engine,infra}.md`.** Same content split
+   as today, but the path itself forces full-file cites
+   (`bugs/engine.md #34`). Cleans up the cite ambiguity without
+   merging domains. Cheap rename + grep sweep.
+4. **By severity / urgency** (`bugs/critical.md`, `bugs/deferred.md`).
+   Optimizes for "what should I work on next." Trade-off: a bug's
+   severity often changes as scope is understood, so entries would
+   migrate between files; that breaks stable cite ids by design.
+   Probably wrong shape.
+5. **By lifecycle** (`bugs/open.md`, `bugs/resolved.md`,
+   `bugs/wontfix.md`). Mirrors a kanban board. Same migration
+   problem as #4 — closed bugs would change file, invalidating every
+   in-code cite pointing at history. Wrong shape for our cite
+   pattern (we cite bugs from comments precisely to preserve
+   "why" across fixes).
+
+Leading candidates are (1) and (3). (1) costs only a convention doc +
+sweep; (3) additionally costs a rename. (2) is on the table if we
+decide the domain split isn't carrying its weight — worth a quick
+look at how often a bug is mis-filed across the two before committing.
+
+### Scope (once a composition is chosen)
+
+- **Reality check first** — grep `Bug #\d+` across `src/`,
+  `scripts/`, `test/`, and the ADR set; classify every hit as
+  unambiguous (already spells the file), ambiguous, or wrong-file.
+  Numbers from this drive the rest of the scope.
+- **Cite convention.** Document the chosen form in
+  `copilot-instructions.md` near the existing Bug Trackers section.
+  Mirror the ADR-anchor convention: "never bare; always
+  `<file>.md #N`" or "never bare; always `<path>#N`".
+- **Backfill sweep.** Rewrite every ambiguous in-code cite to the
+  canonical form. Touch ADRs and the trackers themselves (entries
+  cross-reference each other today with the bare form).
+- **Optional lint** — `test/bug-anchors.test.mts` mirroring
+  `test/adr-anchors.test.mts`: grep for `Bug #\d+` patterns in
+  source, assert each one matches the canonical shape. ~30 lines,
+  zero deps. Worth it if the backfill sweep finds >5 hits.
+- **Numbering rule** — falls out of composition. For (1)/(3),
+  document per-file numbering explicitly in each tracker's header.
+  For (2), renumber on merge and document global numbering. For
+  (3), decide whether the rename event is also the renumber event
+  (probably not — keep ids stable so historical cites resolve).
+
+**Done when:** copilot-instructions documents the cite form;
+trackers carry the numbering rule in their headers; every in-code
+`Bug #N` cite uses the canonical shape; optional lint test green if
+adopted; `npm test` green.
 
 ## Pass F — extract conventions into instruction files (brainstorm-first)
 
@@ -601,11 +694,12 @@ If this work spans multiple sessions, the next session should:
 - [x] Pass C — wire `rpg/` vault (2026-05-22; `rpg/README.md` fleshed out with Purpose / Layout / Locales / Frontmatter / Wikilinks / Relationship to `reference/` / Authoring workflow / See also; EN+RU framed as co-equal locales with structural-parity rule and a "ru-first during WIP" carve-out; inbound links wired from `docs/architecture.md` §3.10 (also corrected stale "ru canonical" framing), `docs/reference-authoring.md` See-also footer, and `.github/copilot-instructions.md` `rpg/` bullet; 625/625 tests green)
 - [ ] Pass D — code-comment delooping
   - [x] D1 — `src/rpg-types.mts` (2026-05-23; 9 cite blocks rewritten; `(ADR-014, Item 9)` → `§action-rewrite`; amendment §1.1/§1.2/"rest of Item 1" → `§inheritance-fields` with shared `TODO(weapon-inheritance)` tracking phase6-plan; amendment §6 → `§inflicts`; amendment §8 → `§is-free`; Combat header "stubbed in Chunk C / lands in Chunk E" restated as current per-slot fanout; Weapon/ArmorPiece preamble reality-checked against `src/models/reference.mts` and rewritten to current state with quality-registry-only validation note; `RawEffect` removal converted to `TODO(rawEffect-removal)` with no plan cite; draft anchor list saved to `/memories/session/plan.md`; 625/625 tests green)
-  - [ ] D1.5 — Orphan-TODO sweep across `src/` + `scripts/` (pre-D2a; file capability-gap TODOs into bug trackers before mechanical rewrites lose them; partial credit already earned 2026-05-23: filed #34 `Weapon/ArmorPiece runtime structural validation` in `api-infra-bugs.md` DEFERRED, filed #35 `RawEffect wire shape leak` in `engine-weak-points.md` DEFERRED, extended ADR-016 §7a, updated `src/rpg-types.mts` comments to cite both)
-  - [ ] D2a — Registry surface (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`, `test/helpers/registry.mts`); reality-check vs `src/models/reference.mts` first
-  - [ ] D2b — Engine pipeline (`src/rules/{effects,derived,applicator,attributes}.mts`)
+  - [x] D1.5 — Orphan-TODO sweep across `src/` + `scripts/` (pre-D2a; file capability-gap TODOs into bug trackers before mechanical rewrites lose them; partial credit earned 2026-05-23: filed #34 `Weapon/ArmorPiece runtime structural validation` in `api-infra-bugs.md` DEFERRED, filed #35 `RawEffect wire shape leak` in `engine-weak-points.md` DEFERRED, extended ADR-016 §7a, updated `src/rpg-types.mts` comments to cite both. Closed 2026-05-24: grep sweep over `src/**/*.mts` + `scripts/**/*.mts` returned 14 hits / 5 real sites; net new orphan = 1, filed #36 `enforceConsistency redundancy` in `engine-weak-points.md` DEFERRED and rewrote `TODO(phase6-chunk-H?)` → `TODO(enforce-consistency-redundancy)` in `src/rules/derived.mts`; other 4 sites flagged in `/memories/session/plan.md` for D2a/D2b mechanical rewrites)
+  - [x] D2a — Registry surface (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`, `test/helpers/registry.mts`); reality-check vs `src/models/reference.mts` first (closed 2026-05-24: renamed `TODO(phase6-chunk-G)` → `TODO(trait-talent-registry)` in `src/app.mts`; rewrote module headers to drop `Phase 6 / Chunk X` banners and stale "lands in Chunk G" framing; dropped `F.0c`/`F.0d`/`F.0e` mile-marker labels in favour of stable ADR-016 cites; rewrote `ADR-014, Item 9` → `ADR-014 §action-rewrite`; dropped dangling `TODO(phase6-post-G)` cross-ref; **discovered + corrected stale-at-original-write JSDoc claim** that `lookupTalent` is "not invoked" — `collectAllEffects` actually walks `character.talents[]` with warn-and-skip symmetric to traits; filed engine-weak-points #37 DEFERRED on `src/rules/registry.mts` re-export shim redundancy as code-organization cleanup; 625/625 tests + typecheck green; regression grep clean — 4 intentional phase6-plan cites all anchored to `TODO(trait-talent-registry)`)
+  - [x] D2b — Engine pipeline (`src/rules/{effects,derived,applicator,attributes,setbase}.mts`) (closed 2026-05-24: 4 files rewritten with ~22 cite edits; dropped `Phase 6 / Chunk C|E` banner suffixes from all 4 module headers; rewrote `(ADR-014, Item 9)` → `(ADR-014 §action-rewrite)` ×3 in `derived.mts`; rewrote `(Item 10)` → `(ADR-015 §primary-bucketing)` ×3 in `applicator.mts`; dropped `(F.0e behaviour)` / `(F.0e flipped this from warn-and-skip)` / `(ADR-016, F.0e)` mile-marker labels in favour of stable `ADR-016 strictness` cites; dropped `Chunk G's reference-lint promotes this to a hard failure.` from two user-visible runtime warn-strings + adjacent comments (still flagged informatively in JSDoc); rewrote `Item 12 placement table (Chunk J, revised 2026-05-19)` block in `effects.mts` to cite `ADR-015 §3 / §placement-table`; **disambiguated bare `Bug #34` → `engine-weak-points.md #34`** per JC-A locked decision (bug cite was correct, only the file needed spelling — see memory note added 2026-05-24); reworked dangling `TODO(phase6-chunk-E)` reference to deferred equipment effects by restating that armor effects ARE handled here and weapon effects fan out per-slot via `deriveCombatSlots`; rewrote `TODO(phase6-chunk-G)` framing on talent walker to `TODO(trait-talent-registry)` block with phase6-plan cite parallel to D2a pattern; **deleted stale-at-original-write `defense`-fallback paragraph** from `attributes.mts` header — claim was fiction, verified L60-67 reads `body.armor ?? 0` with no fallback (`defense` is a separate Quick-based secondary attribute) — replaced with terse "armor sourced from `equipment.armor.body.armor` directly" note; 2 new ADR-015 anchors needed for Pass E (`§placement-table`, `§primary-bucketing`); intentional `TODO(enforce-consistency-redundancy)` block in `derived.mts` preserved untouched (cites `engine-weak-points.md`, not plans); 625/625 tests + typecheck green; regression grep clean — 1 intentional `phase6-plan.md` cite anchored to `TODO(trait-talent-registry)`. **Addendum 2026-05-24:** user spotted `(G2.B / G2.C)` in `src/rules/setbase.mts:19`; full-tree audit with broadened pattern surfaced (i) `setbase.mts` was never assigned to any D-pass (engine-pipeline scope miss), (ii) `derived.mts:282` carried the same `(G2.B / G2.C)` parenthetical that the original D2b pattern missed, (iii) `G2.[A-Z]` work-package labels, `F.0[a-z]` mile-markers, and `J.[0-9][a-z]?` post-sweep sub-items were absent from the original regression grep. Both parentheticals dropped (function names beside them convey the role; cite was pure redundancy). Verification grep pattern broadened in §"Verification per sub-pass"; D2b scope retroactively expanded to include `setbase.mts`; D4b scope expanded to include `test/helpers/http.mts` (`post-F.0e the engine throws` cite); D4a flagged for Pass-E.5 overlap (`Bug #34, Chunk J` in `test/rules/effects.test.mts:122` needs disambiguation in the same sweep). 625/625 still green post-addendum.)
   - [ ] D3 — `scripts/audit-reference.mts` (bucket rename + header rewrite + comment cleanup)
   - [ ] D4a — Engine test suites (`test/rules/*.mts`) including `it()` titles
   - [ ] D4b — Top-level test + helpers (`test/{data-contracts,validation,reference-locale-drift}.test.mts`) + fix broken-link cite of archived `phase6-chunkF-prereqs-plan.md`
 - [ ] Pass E — copilot-instructions + ADR anchors + `test/adr-anchors.test.mts`
+- [ ] Pass E.5 — Bug-tracking conventions (brainstorm-first, see §Pass E.5 below)
 - [ ] Pass F — extract accumulated conventions into instruction files (brainstorm-first, see §Pass F below)

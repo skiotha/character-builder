@@ -1,24 +1,26 @@
-// ── Effect collection & normalization (Phase 6 / Chunk C) ──────────
+// ── Effect collection & normalization ──────────────────────────────
 //
 // Single boundary between the legacy `RawEffect` wire shape and the
 // engine's typed `ResolvedEffect`. No code under `src/rules/` other than
 // this module should consume `RawEffect` directly.
 //
-// What this module does in Chunk C:
-//   * Walks `character.traits[]`, calling the registry to resolve each
-//     trait into its tier-flattened effect set. Missing entries are
-//     skipped with a warning (Chunk G's reference-lint promotes this to
-//     a hard failure).
+// What this module does:
+//   * Walks `character.traits[]` and `character.talents[]`, calling the
+//     registry to resolve each into its tier/level-flattened effect set.
+//     Missing entries are skipped with a warning today; the reference-
+//     lint test will promote misses to a hard failure once it ships.
 //   * Walks `character.effects[]` (manual / persistent overrides) and
 //     normalizes each `RawEffect` into a `ResolvedEffect`. Lifecycle is
 //     ignored — `duration` is dropped at the boundary.
 //   * Walks nested `effects[]` arrays inside any RawEffect (Bug #22).
+//   * Collects armor-mounted effects (body / plug `.effects[]`) and
+//     resolves armor `qualities[]` against the quality registry
+//     (ADR-016 strictness — unknown ids throw).
 //   * Groups results by `EffectPhase` for the ordered pipeline.
 //
-// What this module does NOT do (deferred):
-//   * Equipment effects (`equipment.weapons[*].effects`,
-//     `equipment.armor.*`, `equipment.runes[*]`) — TODO(phase6-chunk-E),
-//     handled by per-slot combat fanout.
+// Weapon-mounted effects and weapon `qualities[]` are NOT collected
+// here — they enter per-slot in `deriveCombatSlots` with implicit
+// `appliesTo` = the carrying weapon.
 
 import type {
   AbilityTier,
@@ -101,7 +103,7 @@ export function normalizeRawEffect(
     // Silently ignored — phase ordering replaces priority (ADR-015 §4).
   }
   if (raw.duration !== undefined) {
-    // Silently ignored — engine has no lifecycle (ADR-015 / Chunk C plan).
+    // Silently ignored — engine has no lifecycle (ADR-015).
   }
 
   const target = parseTarget(raw.target, source);
@@ -119,13 +121,13 @@ export function normalizeRawEffect(
   };
 
   if (raw.appliesTo !== undefined) {
-    // Item 12 placement table (Chunk J, revised 2026-05-19). `appliesTo`
+    // Placement matrix (ADR-015 §3 / §placement-table). `appliesTo`
     // is engine-evaluated on `combat` / `weaponQuality` (per-slot fanout
     // in `deriveCombatSlots`), preserved as documentary metadata on
     // `flag` (roll-time, sibling-evaluated; engine still adds the flag
-    // name globally), and ACCEPTED on `secondary` per Chunk J widening
-    // (engine has no slot-aware secondary path yet — see Bug #34 — so
-    // the predicate is currently a documentary no-op at runtime).
+    // name globally), and accepted on `secondary` (engine has no slot-
+    // aware secondary path; predicate is documentary at runtime — see
+    // engine-weak-points.md #34).
     // Any other target kind is a parser-reject: misplaced authoring,
     // not a silent strip.
     if (
@@ -154,7 +156,7 @@ export function normalizeRawEffect(
     // either character-global (flag, magicAttribute, initiativeAttribute),
     // per-slot (combat, weaponQuality), pre-pipeline (primary), or set-
     // membership without a meaningful gate use case. Misplacement is a
-    // parser-reject (J.4b), not a silent strip.
+    // parser-reject, not a silent strip.
     if (target.kind !== "secondary" && target.kind !== "armorQuality") {
       console.warn(
         `[effects] Rejecting effect: condition not accepted on target ` +
@@ -201,8 +203,7 @@ export function collectAllEffects(
     const result = registry.lookupTrait(trait.id, trait.tier as AbilityTier);
     if (!result) {
       console.warn(
-        `[effects] Unknown trait ${trait.id}:${trait.tier} — skipped. ` +
-          `Chunk G's reference-lint promotes this to a hard failure.`,
+        `[effects] Unknown trait ${trait.id}:${trait.tier} — skipped.`,
       );
       continue;
     }
@@ -210,16 +211,16 @@ export function collectAllEffects(
   }
 
   // Talents (boons / sins) → registry lookup. Same warn-and-skip
-  // policy as traits; Chunk G's reference-lint promotes the miss to a
-  // hard failure. The registry returns null for stubbed talents in
-  // production (`emptyRegistry` in `app.mts`) until the real loader
-  // lands.
+  // policy as traits. The reference-lint test will promote misses to a
+  // hard failure once it ships. The production registry returns null
+  // for stubbed talents (`emptyRegistry` in `app.mts`) until the real
+  // loader lands (TODO(trait-talent-registry), tracked in
+  // .github/plans/phase6-plan.md).
   for (const talent of character.talents ?? []) {
     const result = registry.lookupTalent(talent.id, talent.level);
     if (!result) {
       console.warn(
-        `[effects] Unknown talent ${talent.id}:${talent.level} — skipped. ` +
-          `Chunk G's reference-lint promotes this to a hard failure.`,
+        `[effects] Unknown talent ${talent.id}:${talent.level} — skipped.`,
       );
       continue;
     }
@@ -232,7 +233,7 @@ export function collectAllEffects(
   }
 
   // Armor-mounted effects (typed pass-through; reference catalog feeds
-  // ResolvedEffect[] directly via the registry deserializer in Chunk G).
+  // ResolvedEffect[] directly via the registry deserializer).
   // Weapon effects are NOT collected here — they enter per-slot in
   // `deriveCombatSlots` with implicit `appliesTo` = the carrying weapon.
   const armor = character.equipment?.armor;
@@ -245,7 +246,7 @@ export function collectAllEffects(
 
   // Registry-resolved armor quality effects (ADR-016): walk both armor
   // pieces' `qualities[]` and append the registry's effects globally.
-  // Unknown ids throw with the offending piece + id (F.0e behaviour).
+  // Unknown ids throw with the offending piece + id (ADR-016 strictness).
   if (armor?.body && Array.isArray(armor.body.qualities)) {
     appendArmorQualityEffects(
       armor.body.qualities,

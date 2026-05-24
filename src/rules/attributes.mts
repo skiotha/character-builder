@@ -1,14 +1,9 @@
-// ── Secondary attribute formulas (Phase 6 / Chunk C) ───────────────
+// ── Secondary attribute formulas ────────────────────────────────
 //
 // Typed re-implementation of the secondary attribute base/formula table.
 // `setBase` overrides are applied by `derived.recalculate` before this
-// table runs; the override map is passed in here.
-//
-// Armor is sourced from `equipment.armor.body.armor` with a legacy
-// `defense` fallback. The fallback is scheduled for removal once Chunk D
-// finishes the rename. Storage was wiped in Chunk C / Phase 1, so the
-// fallback should already be dead — but the canonical lint lives in
-// Chunk D.
+// table runs; the override map is passed in here. Armor is sourced from
+// `equipment.armor.body.armor` directly.
 
 import type {
   Character,

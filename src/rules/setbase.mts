@@ -16,7 +16,7 @@
 //   - `applySetBase` consumers in `derived.recalculate` (secondary
 //     attribute formula phase).
 //   - per-slot `applySlotPhases` for `combat.attackAttribute`.
-//   - `deriveMagicAttribute` / `deriveInitiativeAttribute` (G2.B / G2.C).
+//   - `deriveMagicAttribute` / `deriveInitiativeAttribute`.
 //
 // Does NOT roll dice, read flags, or consider effect tier — pure
 // best-of-pool by primary value.

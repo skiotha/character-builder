@@ -1,13 +1,13 @@
-// ── Registry interface (Phase 6 / Chunk C) ─────────────────────────
+// ── Registry interface ─────────────────────────────────────────────
 //
 // Reference data lookup boundary. The engine queries this at recalc time
 // to resolve character traits / talents into `ResolvedEffect`s and
 // triggered actions.
 //
-// Chunk C ships only the interface and an inline empty stub in `app.mts`.
-// The real loader (reading `reference/{abilities,spells,...}.{en,ru}.json`)
-// lands in Chunk G. The in-memory test stub lives at
-// `test/helpers/registry.mts`.
+// Production wiring lives in `src/app.mts` (inline stub + quality-catalog
+// loader); the in-memory test stub lives at `test/helpers/registry.mts`.
+// A production loader for traits/talents is tracked under
+// `TODO(trait-talent-registry)` in `src/app.mts` / `.github/plans/phase6-plan.md`.
 //
 // Tier stacking is registry-internal: `lookupTrait(id, "master")` returns
 // the union of `novice` + `adept` + `master` effects (additive, ADR-014).
@@ -25,13 +25,13 @@ export interface TraitLookupResult {
   /**
    * Special attacks granted by this trait at the queried tier.
    *
-   * **Ordering contract (ADR-014, Item 9):** entries MUST appear in
-   * tier-ascending order — `novice` first, then `adept`, then `master`.
-   * The engine collection step (`collectActions` in `derived.mts`)
-   * relies on this order for last-write-wins dedupe by `Action.id`,
-   * so a master-tier rewrite of a same-id entry replaces the lower
-   * tier's version. The reference loader (Chunk G) and the in-memory
-   * test stub both produce arrays in this order; do not re-sort.
+   * **Ordering contract (ADR-014 §action-rewrite):** entries MUST
+   * appear in tier-ascending order — `novice` first, then `adept`,
+   * then `master`. The engine collection step (`collectActions` in
+   * `derived.mts`) relies on this order for last-write-wins dedupe by
+   * `Action.id`, so a master-tier rewrite of a same-id entry replaces
+   * the lower tier's version. The in-memory test stub and the future
+   * production loader both produce arrays in this order; do not re-sort.
    */
   specialAttacks: SpecialAttack[];
   /** Reactions granted at the queried tier. Same ordering contract as `specialAttacks`. */
@@ -46,15 +46,18 @@ export interface Registry {
   /**
    * Resolve a learned trait (ability or spell) to its tier-flattened
    * effect set. Returns `null` when the id/tier combination is unknown;
-   * `collectAllEffects` warns and skips on miss in Chunk C, and Chunk G's
-   * reference-lint test promotes this to a hard failure.
+   * `collectAllEffects` currently warns and skips on miss. The
+   * reference-lint test will promote this to a hard failure once it
+   * ships (see `TODO(trait-talent-registry)`).
    */
   lookupTrait(id: string, tier: AbilityTier): TraitLookupResult | null;
 
   /**
-   * Resolve a learned talent (boon or sin) to its effect set. Declared
-   * for forward compatibility with Chunk G; **not invoked** in Chunk C
-   * (see `TODO(phase6-post-G)` in `effects.mts`).
+   * Resolve a learned talent (boon or sin) to its effect set. Returns
+   * `null` when the id/level combination is unknown; `collectAllEffects`
+   * warns and skips on miss (symmetric to `lookupTrait`). Stubbed in
+   * production until the loader lands \u2014 see
+   * `TODO(trait-talent-registry)` in `src/app.mts`.
    */
   lookupTalent(id: string, level: number): TalentLookupResult | null;
 
@@ -65,8 +68,7 @@ export interface Registry {
    *   * weapon qualities → scoped to the carrying weapon (`buildSlot`)
    *   * armor qualities → applied globally (`collectAllEffects`)
    *
-   * F.0c–F.0d: callers warn-once-per-id and skip on miss. F.0e flips
-   * this to throw once the registry is populated.
+   * Unknown ids throw (ADR-016 strictness).
    */
   lookupQuality(id: string): Quality | null;
 }

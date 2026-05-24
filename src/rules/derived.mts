@@ -1,4 +1,4 @@
-// ── Derived field recalculation (Phase 6 / Chunk E) ────────────────
+// ── Derived field recalculation ──────────────────────────────────
 //
 // Single entry point invoked by `models/index.mts` on every save. The
 // pipeline is phase-keyed (ADR-010 / ADR-015) and consumes typed
@@ -26,7 +26,7 @@
 //   10a. collectActions   — repopulate `specialAttacks` / `reactions`
 //                           from the registry, deduped by `Action.id`
 //                           with last-write-wins (master rewrites
-//                           adept rewrites novice; ADR-014, Item 9).
+//                           adept rewrites novice; ADR-014 §action-rewrite).
 //   11. enforceConsistency (XP guard + equipment defaulting only).
 
 import type {
@@ -142,12 +142,13 @@ export function recalculate(
   // ── 8. deriveCombatSlots ─────────────────────────────────────────
   deriveCombatSlots(result, effects, registry, primaryEffective);
 
-  // ── 8a. collectActions (ADR-014, Item 9) ─────────────────────────
+  // ── 8a. collectActions (ADR-014 §action-rewrite) ─────────────────────────
   // Repopulate the engine-owned `specialAttacks` / `reactions`
   // arrays from the registry. Same-id entries from a higher tier
   // (master > adept > novice) replace lower-tier versions. Talents
   // and equipment intentionally do NOT contribute actions today
-  // (artifact authoring is YAGNI; revisit alongside Chunk G+).
+  // (artifact authoring is YAGNI; revisit if a future ability authors
+  // per-equipment actions).
   collectActions(result, registry);
 
   // ── 9. enforceConsistency (trimmed) ──────────────────────────────
@@ -165,7 +166,7 @@ export function recalculate(
  * (novice → adept → master, see `registry-types.mts`), so iterating in
  * order and writing into a `Map` keyed by id naturally lets a
  * master-tier rewrite replace its lower-tier counterpart while
- * different-id entries from any tier coexist (ADR-014, Item 9).
+ * different-id entries from any tier coexist (ADR-014 §action-rewrite).
  *
  * Unknown trait ids are warned-and-skipped, mirroring
  * `collectAllEffects`. The Bug #31 reset at the top of `recalculate`
@@ -278,7 +279,7 @@ function derivePrimaryAttributes(
   }
 }
 
-// ── magicAttribute / initiativeAttribute (G2.B / G2.C) ─────────────
+// ── magicAttribute / initiativeAttribute ──────────────────────────
 //
 // Both are reset-on-recalc to their schema default, then resolved via
 // `resolveSetBase` against any `kind: "magicAttribute"` /
@@ -419,7 +420,7 @@ function buildSlot(
   // `weapon.qualities` looks up a `Quality` entry and contributes its
   // `effects[]` to this slot. Implicit `appliesTo = this weapon`.
   // Unknown ids are a hard error — every weapon quality must be
-  // registered (F.0e flipped this from warn-and-skip).
+  // registered (ADR-016 strictness).
   for (const qualityId of weapon.qualities) {
     const quality = registry.lookupQuality(qualityId);
     if (!quality) {
@@ -515,24 +516,20 @@ function applyNumericSlotField(
 
 // ── Consistency guards (trimmed) ───────────────────────────────────
 //
-// Removed in Chunk C:
-//   * Expired-effect prune — engine has no lifecycle.
-//   * Toughness clamp — `clampValues` is now the only site.
-//
 // Retained:
 //   * XP non-negativity guard.
 //   * Equipment defaulting (so downstream code never trips on undefined).
 //
-// TODO(phase6-chunk-H?): reassess — much of this defaulting is also done
-// at the schema/storage boundary. Once Chunk H lands, we may remove
-// `enforceConsistency` entirely.
+// TODO(enforce-consistency-redundancy): both responsibilities here are
+// also enforced at the schema/storage boundary on every write. This
+// function may be deletable in full once that's audited end-to-end.
+// See .github/bugs/engine-weak-points.md #36 (DEFERRED).
 
-// ── Quality registry strict lookup (ADR-016, F.0e) ─────────────────
+// ── Quality registry strict lookup (ADR-016) ──────────────────────
 //
 // Unknown quality ids are a hard error. The registry is loaded from
 // `reference/qualities.<locale>.json`; every id appearing on a weapon
-// or armor piece must resolve. F.0c–F.0d ran in warn-and-skip mode;
-// F.0e flipped this to throw now that the registry is populated.
+// or armor piece must resolve. Unknown ids throw (ADR-016 strictness).
 
 function unknownWeaponQualityError(
   id: string,
