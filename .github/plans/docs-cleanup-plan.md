@@ -392,13 +392,61 @@ the split is in the survey notes below the table.
   restate the live behaviour without chunk framing.
 
 - **D3 — `scripts/audit-reference.mts` (full sweep, single file).**
-  ~30+ cites + the `amendmentBlockers` bucket key (4 sites) + 6
-  numbered report headers. Per the locked decision, rename buckets to
-  rule names (`placement`, `inflicts`, `isFree`, `inheritance`, …),
-  rewrite headers to descriptive form, drop `Item N`/`Chunk J.3`
-  language from comments. Functionality and readability must not
-  regress; bucket names must still be greppable from the report
-  output.
+  ~30+ cites + the `amendmentBlockers` bucket key (4 sites) + the
+  report's 12 sections (6 of whose header strings carry `Item N` /
+  `amendment` cites). Per the locked decision, rename finding buckets
+  to rule names, rewrite header cites to stable form, drop
+  `Item N`/`Chunk J.3`/`bug #34` language from comments. Section
+  **numbers** 1–12 stay — only the parenthetical cites inside the
+  header strings change. Reality-checked end-to-end 2026-06-07; five
+  judgment calls / hazards surfaced:
+
+  - **(a) `amendmentBlockers` rename is semantic, not just lexical.**
+    The amendment shipped (now in `done/`); this bucket detects
+    authoring shapes the amendment *forbade*, and its detail strings
+    are written in **future tense about completed work** ("Item 1
+    *will* inherit-by-default", "Item 2 *strips* per-spell"). Rename
+    the bucket to `legacyShapes` / `forbiddenShapes` **and** flip the
+    detail wording to present tense ("hardcoded damage/attackAttribute
+    — forbidden; engine inherits from the carrying weapon"). Same
+    fiction-detox pattern as D2a's "lookupTalent not invoked" and
+    D2b's defense-fallback. (The `addFinding(bucket: keyof typeof
+    findings, …)` signature makes the bucket-key rename type-checked —
+    a missed call site is a compile error.)
+  - **(b) HAZARD — runtime coupling on `/Item (\d+)/`.** Report
+    section 6 groups `amendmentBlockers` findings by **regex-scraping
+    the literal text "Item N" out of each finding's `detail` string**
+    (`f.detail.match(/Item (\d+)/)`). The detail strings it parses are
+    exactly the ones (a) rewrites. Strip the `Item N` tokens without
+    fixing the grouper and **every finding collapses into the "Other"
+    bucket** — a silent functional regression that neither typecheck
+    nor `npm test` catches. Fix: add a structured discriminator (e.g.
+    a `rule: string` field on `Finding`) and group on that instead of
+    re-parsing prose. This also kills a pre-existing lexicographic-sort
+    bug ("Item 1" < "Item 11" < "Item 2"). In-scope under the "free
+    hand" remit — it's what makes the comment cleanup safe.
+  - **(c) reality-check L472 before rewriting.** The comment "the
+    parser strip-warns today and will hard-reject after J.4b" is
+    **factually false now** — Item 12 already flipped strip-with-warn
+    → reject-null (phase6-plan Item 12 ✅). Restate to current
+    behaviour, verified against `src/rules/effects.mts` first.
+  - **(d) `bug #34` ×2 (L61 file-qualified, L471 bare, both
+    lowercase).** Disambiguate both to `engine-weak-points.md #34`
+    and normalize casing — Pass-E.5 overlap, same as the D4a flag.
+  - **(e) Item 2 anchor home.** Cite the per-spell `attackAttribute`
+    strip (L896) as `ADR-015 §spell-tier-actions` (moved from ADR-014
+    per 2026-06-07 decision — it's a `magicAttribute` migration,
+    ADR-015 §3c), not an ADR-014 action anchor.
+
+  Anchors D3 consumes: `§action-rewrite` / `§inheritance-fields` /
+  `§inflicts` / `§is-free` (ADR-014, from D1), `§toughness-write`
+  (ADR-014, Item 11), `§opportunistic-effects` (ADR-014, Item 7),
+  `§placement-table` (ADR-015, per D2b), `§spell-tier-actions`
+  (ADR-015, per (e)). Coins no new anchors. The parser-mirroring
+  constant `Set`s (`KNOWN_*`) are legit stable source-file cites and
+  **stay**. Wiring this script into `npm test` is **out of scope** —
+  phase6-plan already names it the precursor to a Chunk G+
+  reference-lint, tracked there.
 
 - **D4a — Engine test suites.** Everything under `test/rules/*.mts`
   (~9 files, ~17 cites). Includes `it()` titles containing `(Item N)`
@@ -436,6 +484,28 @@ the split is in the survey notes below the table.
    mile-markers, and `J.[0-9][a-z]?` post-sweep sub-items — all of
    which appear in test files (D4a) and were silently introduced into
    `setbase.mts` (D2b scope addition).
+
+**D3 additionally** — the script has **zero test coverage** (`npm
+test` exercises none of its runtime logic; it is a manual one-shot,
+not in `package.json` scripts or CI). Typecheck *does* cover it
+(`scripts/**` is in `tsconfig`), and the `findings` map is now typed
+with `satisfies Record<string, Finding[]>` (was a plain annotation
+that collapsed `keyof typeof findings` to `string`), so the
+`amendmentBlockers` → `forbiddenShapes` bucket-key rename is genuinely
+compile-checked. But the prose-coupled grouping hazard (D3 item b) is
+invisible to both typecheck and tests. So: capture the **committed**
+script's stdout as a baseline (`git show HEAD:scripts/audit-reference.mts`
+→ temp file → run), apply the rewrite, run the working-tree version,
+and diff. The diff is **NOT empty by design** — expect exactly: the 6
+renamed section headers (6, 8, 9, 10, 11, 12) plus section-6 body
+relabel/detox if findings exist. **Structural invariant:** no
+section's finding *count* changes, no `(none)`↔findings flip, and no
+`"other"` group appears in section 6. (The catalog is clean per
+phase6-plan, so section 6 reads `(none)` and only its header line
+diffs.) Then **empirically** exercise the grouping fix: temporarily
+inject one forbidden shape into a `reference/*.json` file, run the
+audit, confirm section 6 lists it under a *rule name* (not `"other"`),
+then `git checkout -- reference/<file>` and confirm `git status` clean.
 
 **Done when:** the grep above is empty across `src/`, `scripts/`,
 `test/` modulo `TODO(<scope>): … Tracked in .github/plans/<file>.md`
@@ -491,14 +561,19 @@ explicit anchors, e.g.:
 
 Concrete anchors expected from current code:
 - ADR-014: `§action-rewrite` (Item 9), `§toughness-write` (Item 11),
-  `§slot-2-invariants`, `§spell-tier-actions`, `§inheritance-fields`
-  (post-Chunk-F Item 1), `§placement-table` (Item 12),
+  `§slot-2-invariants`, `§inheritance-fields` (post-Chunk-F Item 1),
   `§inflicts` (Item 6), `§is-free` (Item 8), `§opportunistic-effects`
   (amendment Item 7).
 - ADR-015: `§3a-set-membership`, `§3b-attack-attr-setbase-only`,
-  `§3f-armor-conditions`, `§5-trigger-vocabulary`. (Letter/section
-  identifiers already stable; documenting them in the appendix freezes
-  them.)
+  `§3f-armor-conditions`, `§5-trigger-vocabulary`,
+  `§placement-table` (Item 12 — moved here from ADR-014 to match the
+  cite D2b already wrote in `effects.mts`; the `appliesTo`/`condition`
+  accept-lists are ADR-015 §3 vocabulary, not an ADR-014 combat rule),
+  `§primary-bucketing` (Item 10, ADR-015 §3 primary target kind),
+  `§spell-tier-actions` (Item 2 — moved here 2026-06-07; the per-spell
+  `attackAttribute` strip is a `magicAttribute` migration, ADR-015
+  §3c). (Letter/section identifiers already stable; documenting them
+  in the appendix freezes them.)
 
 **Anchor lint** — add `test/adr-anchors.test.mts`:
 - Scan files under `src/`, `scripts/`, `test/` for
@@ -697,7 +772,7 @@ If this work spans multiple sessions, the next session should:
   - [x] D1.5 — Orphan-TODO sweep across `src/` + `scripts/` (pre-D2a; file capability-gap TODOs into bug trackers before mechanical rewrites lose them; partial credit earned 2026-05-23: filed #34 `Weapon/ArmorPiece runtime structural validation` in `api-infra-bugs.md` DEFERRED, filed #35 `RawEffect wire shape leak` in `engine-weak-points.md` DEFERRED, extended ADR-016 §7a, updated `src/rpg-types.mts` comments to cite both. Closed 2026-05-24: grep sweep over `src/**/*.mts` + `scripts/**/*.mts` returned 14 hits / 5 real sites; net new orphan = 1, filed #36 `enforceConsistency redundancy` in `engine-weak-points.md` DEFERRED and rewrote `TODO(phase6-chunk-H?)` → `TODO(enforce-consistency-redundancy)` in `src/rules/derived.mts`; other 4 sites flagged in `/memories/session/plan.md` for D2a/D2b mechanical rewrites)
   - [x] D2a — Registry surface (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`, `test/helpers/registry.mts`); reality-check vs `src/models/reference.mts` first (closed 2026-05-24: renamed `TODO(phase6-chunk-G)` → `TODO(trait-talent-registry)` in `src/app.mts`; rewrote module headers to drop `Phase 6 / Chunk X` banners and stale "lands in Chunk G" framing; dropped `F.0c`/`F.0d`/`F.0e` mile-marker labels in favour of stable ADR-016 cites; rewrote `ADR-014, Item 9` → `ADR-014 §action-rewrite`; dropped dangling `TODO(phase6-post-G)` cross-ref; **discovered + corrected stale-at-original-write JSDoc claim** that `lookupTalent` is "not invoked" — `collectAllEffects` actually walks `character.talents[]` with warn-and-skip symmetric to traits; filed engine-weak-points #37 DEFERRED on `src/rules/registry.mts` re-export shim redundancy as code-organization cleanup; 625/625 tests + typecheck green; regression grep clean — 4 intentional phase6-plan cites all anchored to `TODO(trait-talent-registry)`)
   - [x] D2b — Engine pipeline (`src/rules/{effects,derived,applicator,attributes,setbase}.mts`) (closed 2026-05-24: 4 files rewritten with ~22 cite edits; dropped `Phase 6 / Chunk C|E` banner suffixes from all 4 module headers; rewrote `(ADR-014, Item 9)` → `(ADR-014 §action-rewrite)` ×3 in `derived.mts`; rewrote `(Item 10)` → `(ADR-015 §primary-bucketing)` ×3 in `applicator.mts`; dropped `(F.0e behaviour)` / `(F.0e flipped this from warn-and-skip)` / `(ADR-016, F.0e)` mile-marker labels in favour of stable `ADR-016 strictness` cites; dropped `Chunk G's reference-lint promotes this to a hard failure.` from two user-visible runtime warn-strings + adjacent comments (still flagged informatively in JSDoc); rewrote `Item 12 placement table (Chunk J, revised 2026-05-19)` block in `effects.mts` to cite `ADR-015 §3 / §placement-table`; **disambiguated bare `Bug #34` → `engine-weak-points.md #34`** per JC-A locked decision (bug cite was correct, only the file needed spelling — see memory note added 2026-05-24); reworked dangling `TODO(phase6-chunk-E)` reference to deferred equipment effects by restating that armor effects ARE handled here and weapon effects fan out per-slot via `deriveCombatSlots`; rewrote `TODO(phase6-chunk-G)` framing on talent walker to `TODO(trait-talent-registry)` block with phase6-plan cite parallel to D2a pattern; **deleted stale-at-original-write `defense`-fallback paragraph** from `attributes.mts` header — claim was fiction, verified L60-67 reads `body.armor ?? 0` with no fallback (`defense` is a separate Quick-based secondary attribute) — replaced with terse "armor sourced from `equipment.armor.body.armor` directly" note; 2 new ADR-015 anchors needed for Pass E (`§placement-table`, `§primary-bucketing`); intentional `TODO(enforce-consistency-redundancy)` block in `derived.mts` preserved untouched (cites `engine-weak-points.md`, not plans); 625/625 tests + typecheck green; regression grep clean — 1 intentional `phase6-plan.md` cite anchored to `TODO(trait-talent-registry)`. **Addendum 2026-05-24:** user spotted `(G2.B / G2.C)` in `src/rules/setbase.mts:19`; full-tree audit with broadened pattern surfaced (i) `setbase.mts` was never assigned to any D-pass (engine-pipeline scope miss), (ii) `derived.mts:282` carried the same `(G2.B / G2.C)` parenthetical that the original D2b pattern missed, (iii) `G2.[A-Z]` work-package labels, `F.0[a-z]` mile-markers, and `J.[0-9][a-z]?` post-sweep sub-items were absent from the original regression grep. Both parentheticals dropped (function names beside them convey the role; cite was pure redundancy). Verification grep pattern broadened in §"Verification per sub-pass"; D2b scope retroactively expanded to include `setbase.mts`; D4b scope expanded to include `test/helpers/http.mts` (`post-F.0e the engine throws` cite); D4a flagged for Pass-E.5 overlap (`Bug #34, Chunk J` in `test/rules/effects.test.mts:122` needs disambiguation in the same sweep). 625/625 still green post-addendum.)
-  - [ ] D3 — `scripts/audit-reference.mts` (bucket rename + header rewrite + comment cleanup)
+  - [x] D3 — `scripts/audit-reference.mts` (bucket rename + header rewrite + comment cleanup) (closed 2026-06-07: ~26 cite edits across one file. **Phase 1 (hazard fix):** added `rule?: string` to `Finding`; replaced report section-6's `f.detail.match(/Item (\d+)/)` prose-scraping with grouping by `f.rule` (kills the collapse-to-"Other" hazard AND a latent lexicographic Item-sort bug); introduced explicit `type FindingBucket` union (not `Record<string,…>`) so a mistyped/renamed bucket key in `addFinding` is now a genuine compile error — the original plan assumed `keyof typeof findings` was already literal but the annotation was `Record<string, Finding[]>` which collapsed it to `string`. **Phase 2-3 (cites + detox):** `(ADR-014, Item 9)`→`§action-rewrite`, amendment `§1`/`§1.1`→`§inheritance-fields`, `Item 6`→`§inflicts`, `Item 8`→`§is-free`, `Item 11`→`§toughness-write`, `Item 12`→ADR-015 `§placement-table`, `Item 2`→ADR-015 `§spell-tier-actions`, `Item 7`→`§opportunistic-effects`; dropped all `Chunk J`/`J.3`/`J.4b` framing; L468 reality-checked vs `effects.mts` (parser already reject-nulls, comment said "strip-warns today" — fixed); `bug #34`→`engine-weak-points.md #34` ×2. **MID-PASS COURSE-CORRECTION:** initially renamed the bucket `amendmentBlockers`→`forbiddenShapes` and reworded details to "forbidden", but reality-check against the amendment ([Item 1](done/phase6-chunkF-postpass-amendment.md) L44-48) + [`reference-authoring.md`](../../docs/reference-authoring.md#L293) proved this a **fiction**: section 6 is a *review signal*, not a violations list — innate/bespoke attacks (Cheap Shot, Strangling, Riposte, poisoner/hunter reactions) **legitimately** keep hardcoded damage, and spell-tier `attackAttribute` is a **valid optional field**. Walked back to `reviewShapes` + neutral "flagged for review" wording across all 8 sites. **Verification:** typecheck clean; empirical grouping test (inject spell-tier `attackAttribute` → confirmed grouped under `spell-tier-actions: 1`, NOT `other`, then reverted clean); before/after stdout diff showed only the intended header/label/detox changes with all 63 finding counts unchanged; 625/625 tests; regression grep + `forbidden` residue both zero. **Section numbers 1-12 unchanged; `KNOWN_*` mirror-Sets kept.** Surfaced + filed a separate audit-logic finding (`engine-weak-points.md #38`, DEFERRED): the spell-tier `attackAttribute` audit check contradicts `reference-authoring.md` which lists it as a valid field — latent (zero live data triggers it), resolution is a small docs+lint edit, OUT of D3 (cite-cleanup) scope. **Reference-data verdict (investigated 2026-06-07 at user request):** the catalog is **healthy** — slot-bound attacks (`intrigues-backstab`, `knife-mastery-stab`) are correctly re-authored to inherit via `damageBonus`/`appliesTo`/`isFree`; the 63 `inheritance-fields` review findings are all legitimately-bespoke innate attacks (Cheap Shot, Riposte, Strangling alchemical attacks, poisoner/hunter/skirmish reactions) the amendment explicitly says keep hardcoded damage. Section 6 is a review signal working as intended, not a violation list.)
   - [ ] D4a — Engine test suites (`test/rules/*.mts`) including `it()` titles
   - [ ] D4b — Top-level test + helpers (`test/{data-contracts,validation,reference-locale-drift}.test.mts`) + fix broken-link cite of archived `phase6-chunkF-prereqs-plan.md`
 - [ ] Pass E — copilot-instructions + ADR anchors + `test/adr-anchors.test.mts`

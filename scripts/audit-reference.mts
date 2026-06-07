@@ -57,9 +57,9 @@ const KNOWN_CONDITION_KINDS = new Set([
 ]);
 const KNOWN_ARMOR_SLOTS = new Set(["body", "plug"]);
 const CONDITION_ACCEPTING_TARGETS = new Set(["secondary", "armorQuality"]);
-// Item 12 placement table (Chunk J, revised 2026-05-19). `appliesTo` widened
-// to include "secondary" per user-locked policy (b) — see bug #34 in
-// `.github/bugs/engine-weak-points.md` for the engine-gap follow-up.
+// Placement table (ADR-015 §placement-table). `appliesTo` is accepted on
+// {combat, weaponQuality, flag, secondary}; on `secondary` the engine
+// ignores the predicate (documentary only — engine-weak-points.md #34).
 const APPLIES_TO_ACCEPTING_TARGETS = new Set([
   "combat",
   "weaponQuality",
@@ -75,8 +75,8 @@ const KNOWN_MODIFIER_TYPES = new Set([
   "remove",
 ]);
 // EffectFlag vocabulary — kept in sync with `src/rpg-types.mts` `EffectFlag`.
-// Used by Item 6 (`inflicts[]` are NOT flags; statuses) and as a sanity
-// check on `target.kind="flag"` names.
+// Used by the inflicts[] lint (statuses are NOT flags — ADR-014 §inflicts)
+// and as a sanity check on `target.kind="flag"` names.
 const KNOWN_EFFECT_FLAGS = new Set([
   "evasion",
   "advantage",
@@ -108,20 +108,48 @@ const KNOWN_EFFECT_FLAGS = new Set([
 
 // ── Findings buckets ──
 
-type Finding = { file: string; entryId: string; tier?: string; detail: string };
-const findings: Record<string, Finding[]> = {
+type Finding = {
+  file: string;
+  entryId: string;
+  tier?: string;
+  detail: string;
+  // Stable grouping discriminator for the section-6 report
+  // (`reviewShapes`). Set at the finding site to an ADR-anchor rule
+  // name so the report groups by rule instead of scraping `detail`.
+  rule?: string;
+};
+// Explicit key union (not `Record<string, …>`) so a mistyped or renamed
+// bucket name in `addFinding` is a compile error, not a silent runtime
+// `undefined`. Adding/removing a bucket is compiler-synced both ways.
+type FindingBucket =
+  | "tierMarkers"
+  | "parserRejections"
+  | "predicateHygiene"
+  | "qualityResolution"
+  | "reviewShapes"
+  | "rogueFields"
+  | "actionIds"
+  | "placement"
+  | "inflicts"
+  | "isFree"
+  | "inheritance";
+const findings: Record<FindingBucket, Finding[]> = {
   tierMarkers: [],
   parserRejections: [],
   predicateHygiene: [],
   qualityResolution: [],
-  amendmentBlockers: [],
+  // Amendment-relevant authoring shapes surfaced for author review — NOT
+  // a violations list. E.g. innate/bespoke attacks legitimately keep
+  // hardcoded damage (ADR-014 §inheritance-fields) and spell-tier
+  // attackAttribute is a valid optional field. Grouped by `rule`.
+  reviewShapes: [],
   rogueFields: [],
   actionIds: [],
-  // J.3 buckets (Chunk J post-sweep):
-  //   placement   — Item 12, appliesTo/condition placement discipline
-  //   inflicts    — Item 6, status-id resolution on actions
-  //   isFree      — Item 8, trigger="manual" gate
-  //   inheritance — Item 1, optional inheritance-shape fields on actions
+  // Per-action shape buckets:
+  //   placement   — ADR-015 §placement-table (appliesTo/condition discipline)
+  //   inflicts    — ADR-014 §inflicts (status-id resolution on actions)
+  //   isFree      — ADR-014 §is-free (trigger="manual" gate)
+  //   inheritance — ADR-014 §inheritance-fields (optional inherit fields)
   placement: [],
   inflicts: [],
   isFree: [],
@@ -134,8 +162,8 @@ const qualityRefs = new Map<
   string,
   { file: string; entryId: string; via: string }[]
 >();
-// Status registry + outgoing inflicts[] references (J.3, Item 6). Same
-// resolution pattern as qualities: registry populated by walking
+// Status registry + outgoing inflicts[] references (ADR-014 §inflicts).
+// Same resolution pattern as qualities: registry populated by walking
 // reference/statuses.*.json; refs accumulated from action.inflicts[].
 const statusIds = new Set<string>();
 const statusRefs = new Map<
@@ -143,7 +171,7 @@ const statusRefs = new Map<
   { file: string; entryId: string; via: string }[]
 >();
 
-// Cross-parent action-id accumulator (ADR-014, Item 9). Same-id entries
+// Cross-parent action-id accumulator (ADR-014 §action-rewrite). Same-id entries
 // belonging to the SAME parent (ability/spell) are the documented
 // rewrite-by-id pattern; same-id across DIFFERENT parents is undefined
 // behaviour (engine ordering would decide which one wins, last-trait-
@@ -268,11 +296,12 @@ function inspectEffect(
               detail: `${context}: secondary.stat missing/non-string`,
             });
           } else if (stat === "toughness.max") {
-            addFinding("amendmentBlockers", {
+            addFinding("reviewShapes", {
               file,
               entryId,
               tier,
-              detail: `${context}: secondary.stat="toughness.max" — must be plain "toughness" (Item 11)`,
+              rule: "toughness-write",
+              detail: `${context}: secondary.stat="toughness.max" — write plain "toughness" instead (ADR-014 §toughness-write)`,
             });
           } else if (!KNOWN_SECONDARY.has(stat)) {
             addFinding("parserRejections", {
@@ -465,11 +494,11 @@ function inspectEffect(
   // appliesTo hygiene.
   if (effect.appliesTo !== undefined) {
     const targetKind = target?.kind;
-    // Item 12 placement table (J.3): `appliesTo` allowed on
-    // {combat, weaponQuality, flag, secondary}. `secondary` is the
-    // 2026-05-19 widening (policy b) — engine still ignores the predicate
-    // there; see bug #34. Anywhere else the parser strip-warns today and
-    // will hard-reject after J.4b.
+    // Placement table (ADR-015 §placement-table): `appliesTo` accepted on
+    // {combat, weaponQuality, flag, secondary}. On `secondary` it is
+    // documentary only — the engine ignores the predicate there
+    // (engine-weak-points.md #34). Anywhere else the parser rejects the
+    // whole effect (reject-null).
     if (
       typeof targetKind === "string" &&
       !APPLIES_TO_ACCEPTING_TARGETS.has(targetKind)
@@ -619,7 +648,7 @@ function inspectEffect(
 
 /**
  * Lints for nested action ids on specialAttacks / reactions
- * (ADR-014, Item 9):
+ * (ADR-014 §action-rewrite):
  *
  *   1. Each entry must carry a non-empty string `id`.
  *   2. Within a single tier's array, ids must be unique. The engine's
@@ -651,7 +680,7 @@ function inspectActionIds(
         file,
         entryId: parentId,
         tier,
-        detail: `${path}: missing or empty 'id' (required since ADR-014 Item 9)`,
+        detail: `${path}: missing or empty 'id' (required since ADR-014 §action-rewrite)`,
       });
       return;
     }
@@ -682,15 +711,15 @@ function inspectActionIds(
 }
 
 /**
- * J.3 per-action shape lint covering three amendment items at once:
+ * Per-action shape lint covering three ADR-014 action rules at once:
  *
- *   Item 1 (inheritance) — optional `damageBonus`/`ignoresArmor`/
+ *   §inheritance-fields — optional `damageBonus`/`ignoresArmor`/
  *     `appliesTo` fields must be well-typed. Today these are display-
  *     only (engine runtime resolution deferred), so the lint is the
  *     only thing keeping the catalog honest.
- *   Item 6 (`inflicts[]`) — must be an array of string ids that each
- *     resolve in the global status registry (see Section 11 report).
- *   Item 8 (`isFree`) — must be a boolean and may only be `true` on
+ *   §inflicts (`inflicts[]`) — must be an array of string ids that each
+ *     resolve in the global status registry (see Section 10 report).
+ *   §is-free (`isFree`) — must be a boolean and may only be `true` on
  *     actions with `trigger: "manual"` (free reactions are nonsensical;
  *     reactions are out-of-turn by definition).
  */
@@ -706,7 +735,7 @@ function inspectAction(
   const path = `${parentId}.tiers.${tier}.${field}s[${i}]`;
   const trigger = action.trigger;
 
-  // Item 8: isFree.
+  // isFree (ADR-014 §is-free).
   if (action.isFree !== undefined) {
     if (typeof action.isFree !== "boolean") {
       addFinding("isFree", {
@@ -725,7 +754,7 @@ function inspectAction(
     }
   }
 
-  // Item 6: inflicts[].
+  // inflicts[] (ADR-014 §inflicts).
   if (action.inflicts !== undefined) {
     if (!Array.isArray(action.inflicts)) {
       addFinding("inflicts", {
@@ -750,7 +779,7 @@ function inspectAction(
     }
   }
 
-  // Item 1: inheritance-shape optional fields.
+  // inheritance-shape optional fields (ADR-014 §inheritance-fields).
   if (action.damageBonus !== undefined) {
     if (
       typeof action.damageBonus !== "number" ||
@@ -767,7 +796,8 @@ function inspectAction(
       action.appliesTo.length === 0
     ) {
       // damageBonus without appliesTo would apply to every carrying slot —
-      // certainly not authoring intent. Amendment §1.1 ties them together.
+      // certainly not authoring intent. ADR-014 §inheritance-fields ties
+      // them together.
       addFinding("inheritance", {
         file,
         entryId: parentId,
@@ -823,7 +853,8 @@ function inspectAction(
 
   // Walk inner action.effects[] (already handled at tier level for
   // tier.effects; action.effects is the per-action variant from
-  // amendment §1). Reuse inspectEffect for full target/modifier coverage.
+  // ADR-014 §inheritance-fields). Reuse inspectEffect for full
+  // target/modifier coverage.
   if (Array.isArray(action.effects)) {
     action.effects.forEach((eff: any, j: number) =>
       inspectEffect(eff, file, parentId, `${path}.effects[${j}]`),
@@ -844,7 +875,8 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
           inspectEffect(eff, file, id, `${id}.tiers.${tierKey}.effects[${i}]`),
         );
       }
-      // Check for hardcoded special-attack/reaction shapes (Item 1).
+      // Check for hardcoded special-attack/reaction shapes
+      // (ADR-014 §inheritance-fields).
       const specialAttacks = (tierVal as any).specialAttacks;
       if (Array.isArray(specialAttacks)) {
         inspectActionIds(file, id, tierKey, "specialAttack", specialAttacks);
@@ -857,11 +889,12 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
             typeof sa === "object" &&
             (sa.damage !== undefined || sa.attackAttribute !== undefined)
           ) {
-            addFinding("amendmentBlockers", {
+            addFinding("reviewShapes", {
               file,
               entryId: id,
               tier: tierKey,
-              detail: `${id}.tiers.${tierKey}.specialAttacks[${i}]: hardcoded damage/attackAttribute — Item 1 will inherit-by-default`,
+              rule: "inheritance-fields",
+              detail: `${id}.tiers.${tierKey}.specialAttacks[${i}]: hardcoded damage/attackAttribute — review: slot-bound attacks should inherit via damageBonus+appliesTo; innate/bespoke attacks may keep these (ADR-014 §inheritance-fields)`,
             });
           }
         });
@@ -878,22 +911,26 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
             typeof r === "object" &&
             (r.damage !== undefined || r.attackAttribute !== undefined)
           ) {
-            addFinding("amendmentBlockers", {
+            addFinding("reviewShapes", {
               file,
               entryId: id,
               tier: tierKey,
-              detail: `${id}.tiers.${tierKey}.reactions[${i}]: hardcoded damage/attackAttribute — Item 1 will inherit-by-default`,
+              rule: "inheritance-fields",
+              detail: `${id}.tiers.${tierKey}.reactions[${i}]: hardcoded damage/attackAttribute — review: slot-bound attacks should inherit via damageBonus+appliesTo; innate/bespoke attacks may keep these (ADR-014 §inheritance-fields)`,
             });
           }
         });
       }
-      // Spell-tier per-spell attackAttribute (Item 2 will strip).
+      // Spell-tier attackAttribute is a valid optional field (ADR-015
+      // §spell-tier-actions); surfaced for review because sibling apps
+      // also read character.magicAttribute as the spell attack attribute.
       if ((tierVal as any).attackAttribute !== undefined) {
-        addFinding("amendmentBlockers", {
+        addFinding("reviewShapes", {
           file,
           entryId: id,
           tier: tierKey,
-          detail: `${id}.tiers.${tierKey}.attackAttribute=${JSON.stringify((tierVal as any).attackAttribute)} — Item 2 strips per-spell, replaced by character.magicAttribute`,
+          rule: "spell-tier-actions",
+          detail: `${id}.tiers.${tierKey}.attackAttribute=${JSON.stringify((tierVal as any).attackAttribute)} — review: spell-tier attack attribute; sibling apps also read character.magicAttribute (ADR-015 §spell-tier-actions)`,
         });
       }
     }
@@ -901,7 +938,7 @@ function walkAbilitiesOrSpells(file: string, data: any[]): void {
 }
 
 function walkBoonsSinsRituals(file: string, data: any[]): void {
-  // Boons/sins MAY carry top-level effects[] per amendment Item 7.
+  // Boons/sins MAY carry top-level effects[] (ADR-014 §opportunistic-effects).
   // Rituals remain flat (no effects[]) until further notice.
   const isRitual = file.startsWith("rituals.");
   for (const entry of data) {
@@ -1087,23 +1124,21 @@ for (const f of sortedFlags) {
   console.log(`    - ${f}  (${flagOccurrences[f]}x)`);
 }
 
-header(
-  "6. Amendment blockers (data uses features that require amendment items)",
-);
-const amendFindings = dedupe(findings.amendmentBlockers!);
-if (amendFindings.length === 0) {
-  console.log("  (none — all amendment-blocked patterns absent)");
+header("6. Authoring shapes flagged for review (amendment-relevant)");
+const reviewFindings = dedupe(findings.reviewShapes!);
+if (reviewFindings.length === 0) {
+  console.log("  (none)");
 } else {
-  // Group by which Item.
-  const byItem = new Map<string, Finding[]>();
-  for (const f of amendFindings) {
-    const m = f.detail.match(/Item (\d+)/);
-    const key = m ? `Item ${m[1]}` : "Other";
-    if (!byItem.has(key)) byItem.set(key, []);
-    byItem.get(key)!.push(f);
+  // Group by `rule` (stable discriminator set at the finding site), not
+  // by scraping the detail prose.
+  const byRule = new Map<string, Finding[]>();
+  for (const f of reviewFindings) {
+    const key = f.rule ?? "other";
+    if (!byRule.has(key)) byRule.set(key, []);
+    byRule.get(key)!.push(f);
   }
-  for (const [item, list] of [...byItem.entries()].sort()) {
-    console.log(`  ${item}: ${list.length} occurrence(s)`);
+  for (const [rule, list] of [...byRule.entries()].sort()) {
+    console.log(`  ${rule}: ${list.length} occurrence(s)`);
     list.slice(0, 10).forEach((f) => console.log(`    - ${f.detail}`));
     if (list.length > 10) console.log(`    ... and ${list.length - 10} more`);
   }
@@ -1114,17 +1149,19 @@ const rogueFindings = dedupe(findings.rogueFields!);
 if (rogueFindings.length === 0) console.log("  (none)");
 else rogueFindings.forEach((f) => console.log(`  [${f.file}] ${f.detail}`));
 
-header("8. Action ids (specialAttacks / reactions, ADR-014 Item 9)");
+header("8. Action ids (specialAttacks / reactions, ADR-014 §action-rewrite)");
 const actionIdFindings = dedupe(findings.actionIds!);
 if (actionIdFindings.length === 0) console.log("  (none)");
 else actionIdFindings.forEach((f) => console.log(`  ${f.detail}`));
 
-header("9. Placement discipline (Item 12 — appliesTo / condition)");
+header(
+  "9. Placement discipline (ADR-015 §placement-table — appliesTo / condition)",
+);
 const placementFindings = dedupe(findings.placement!);
 if (placementFindings.length === 0) console.log("  (none)");
 else placementFindings.forEach((f) => console.log(`  ${f.detail}`));
 
-header("10. Action inflicts[] (Item 6 — status-id resolution)");
+header("10. Action inflicts[] (ADR-014 §inflicts — status-id resolution)");
 const inflictsFindings = dedupe(findings.inflicts!);
 if (inflictsFindings.length === 0 && statusRefs.size === 0) {
   console.log("  (no inflicts[] in catalog)");
@@ -1153,13 +1190,13 @@ if (inflictsFindings.length === 0 && statusRefs.size === 0) {
   }
 }
 
-header("11. Action isFree (Item 8 — manual-only gate)");
+header("11. Action isFree (ADR-014 §is-free — manual-only gate)");
 const isFreeFindings = dedupe(findings.isFree!);
 if (isFreeFindings.length === 0) console.log("  (none)");
 else isFreeFindings.forEach((f) => console.log(`  ${f.detail}`));
 
 header(
-  "12. Action inheritance shape (Item 1 — damageBonus/ignoresArmor/appliesTo)",
+  "12. Action inheritance shape (ADR-014 §inheritance-fields — damageBonus/ignoresArmor/appliesTo)",
 );
 const inheritanceFindings = dedupe(findings.inheritance!);
 if (inheritanceFindings.length === 0) console.log("  (none)");
