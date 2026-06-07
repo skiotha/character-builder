@@ -303,6 +303,29 @@ visited when the plan ships. Empty list is fine and explicit. This
 shifts the cleanup obligation from "remember to grep" to "follow the
 plan's checklist".
 
+### Cite-rewrite discipline (don't smuggle in semantics)
+
+Mechanical cite-cleanup rewrites **citations**, not **meaning**. When
+replacing a plan-cite, do not introduce new semantic claims —
+words like "forbidden", "required", "deprecated", "invalid",
+"must" — unless the claim is verified against the authoritative
+source (the ADR + `docs/reference-authoring.md`). Reword to match the
+*disposition the authority actually states*, not the name of the
+plan-item you're removing.
+
+Worked failure (D3, 2026-06-07): an audit finding bucket named
+`amendmentBlockers` was renamed `forbiddenShapes` and its detail
+strings reworded to "forbidden — engine inherits…". Reality-check
+against [ADR-014 §inheritance-fields](done/phase6-chunkF-postpass-amendment.md)
+and `reference-authoring.md` proved the opposite: innate/bespoke
+attacks (Cheap Shot, Riposte, the Strangling alchemical attacks,
+poisoner/hunter/skirmish reactions) **legitimately** keep hardcoded
+`damage`/`attackAttribute`; only slot-bound attacks should inherit.
+The section is a *review signal*, not a violations list. Corrected to
+`reviewShapes` + "flagged for review". Lesson: if a rewrite makes a
+catalog/codebase claim that wasn't in the original comment, stop and
+verify before writing it.
+
 ### Sub-passes (revised after D-survey, 2026-05-23)
 
 Six sub-passes. Each is one sit-down's worth of work. Rationale for
