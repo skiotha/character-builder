@@ -9,13 +9,15 @@ import {
   makeTypedCharacter,
 } from "../helpers/fixtures.mts";
 
-// Removed in Chunk C (vs the legacy `recalculateDerivedFields` suite):
+// Dropped when the typed pipeline replaced the legacy
+// `recalculateDerivedFields` suite (see git history):
 //   * "effect expiry" — engine has no lifecycle; `duration` is dropped.
 //   * "rules. prefix" — typed `EffectTarget` replaces dotted-path strings.
 //   * "priority ordering" — phase ordering replaces `priority`.
 //   * "prunes expired effects" — engine never mutates `character.effects`.
 //
-// Combat tests are stubbed-shape only; per-slot fanout lands in Chunk E.
+// Combat tests here are stubbed-shape only; full per-slot fanout is
+// covered in `combat.test.mts`.
 
 // ── recalculate ─────────────────────────────────────────────────
 
@@ -333,7 +335,7 @@ describe("recalculate", () => {
 
   // ── deriveCombat (stubbed shape) ─────────────────────────────
 
-  describe("deriveCombat (stubbed for Chunk C)", () => {
+  describe("deriveCombat (stubbed shape)", () => {
     it("produces a 3-slot carried tuple", () => {
       const result = recalculate(makeTypedCharacter(), emptyRegistry);
       assert.ok(Array.isArray(result.combat.carried));

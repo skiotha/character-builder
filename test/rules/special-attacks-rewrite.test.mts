@@ -1,5 +1,5 @@
 // Same-id rewrite semantics for special attacks and reactions
-// (ADR-014, Phase 6 / Chunk F post-pass Item 9).
+// (ADR-014 §action-rewrite).
 //
 // The engine's `collectActions` step (in `src/rules/derived.mts`) walks
 // `character.traits[]`, calls `registry.lookupTrait(id, tier)`, and
@@ -10,8 +10,8 @@
 // tier one. Different-id entries from any tier coexist.
 //
 // These tests use the in-memory registry stub directly to author
-// tier-ascending arrays; the production loader (Chunk G) is expected
-// to honour the same ordering contract.
+// tier-ascending arrays; the production trait/talent loader (when it
+// ships) is expected to honour the same ordering contract.
 
 import { describe, it, mock } from "node:test";
 import assert from "node:assert/strict";

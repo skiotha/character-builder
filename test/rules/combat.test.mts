@@ -1,8 +1,8 @@
-// Per-slot combat fanout tests (Phase 6 / Chunk E).
+// Per-slot combat fanout tests.
 //
 // Exercises `deriveCombatSlots` end-to-end through `recalculate`, plus
 // `matchesPredicates` directly. Synthetic test data only — real catalog
-// integration lands in Chunk G.
+// integration is exercised once the production trait/talent loader ships.
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";

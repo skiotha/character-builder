@@ -100,8 +100,8 @@ describe("normalizeRawEffect", () => {
     }
   });
 
-  it("rejects appliesTo on non-accepting targets with a warn (J.4b)", () => {
-    // Allow-list (Item 12, widened Chunk J): combat / weaponQuality / flag /
+  it("rejects appliesTo on non-accepting targets with a warn", () => {
+    // Allow-list (ADR-015 §placement-table): combat / weaponQuality / flag /
     // secondary. `primary` is character-global and pre-pipeline; appliesTo
     // there is misplaced authoring.
     const warnMock = mock.method(console, "warn", () => {});
@@ -119,10 +119,10 @@ describe("normalizeRawEffect", () => {
     }
   });
 
-  it("accepts appliesTo on secondary targets as documentary metadata (Bug #34, Chunk J)", () => {
-    // Chunk J widening: secondary accepts appliesTo at the parser, but the
-    // engine has no slot-aware secondary path yet — the predicate is a
-    // documentary no-op at runtime (Bug #34, deferred).
+  it("accepts appliesTo on secondary targets as documentary metadata", () => {
+    // secondary accepts appliesTo at the parser, but the engine has no
+    // slot-aware secondary path yet — the predicate is a documentary
+    // no-op at runtime (engine-weak-points.md #34, deferred).
     const raw: RawEffect = {
       target: { kind: "secondary", stat: "defense" },
       modifier: { type: "addFlat", value: 1 },
@@ -144,7 +144,7 @@ describe("normalizeRawEffect", () => {
     assert.deepEqual(resolved.appliesTo, [{ kind: "type", values: ["sword"] }]);
   });
 
-  it("preserves appliesTo on flag targets as documentary metadata (Item 13)", () => {
+  it("preserves appliesTo on flag targets as documentary metadata", () => {
     // The engine adds the flag to the global set regardless of `appliesTo`;
     // siblings consume the predicate to scope roll-time modifiers (e.g. advantage
     // only when attacking with short weapons).
@@ -240,7 +240,7 @@ describe("collectAllEffects", () => {
     }
   });
 
-  it("collects talents via registry.lookupTalent (Chunk J / J.4a)", () => {
+  it("collects talents via registry.lookupTalent", () => {
     const registry = createInMemoryRegistry({
       talents: {
         "noctis:1": {
@@ -281,7 +281,7 @@ describe("collectAllEffects", () => {
     }
   });
 
-  it("does NOT collect equipment effects (Chunk C / Chunk-E TODO regression guard)", () => {
+  it("does NOT collect equipment effects (equipment fans out per-slot)", () => {
     const registry = createInMemoryRegistry();
     // Equipment effects on weapons are *not* gathered by collectAllEffects.
     const collected = collectAllEffects(

@@ -1,4 +1,4 @@
-// Quality registry wiring (Phase 6 / Chunk F.0c–F.0e, ADR-016).
+// Quality registry wiring (ADR-016).
 //
 // Exercises `recalculate` end-to-end with an in-memory registry whose
 // `lookupQuality` is populated. Verifies:
@@ -7,7 +7,7 @@
 //     their bare counterpart (`fortified`)
 //   * unknown ids THROW with a citing message that names the offending
 //     weapon (id + slot index) or armor piece (body|plug + id)
-//   * the F.0e strict path is the default — the test stub no longer
+//   * the strict path is the default (ADR-016) — the test stub no longer
 //     silently absorbs unmapped ids; tests must register every quality
 //     they reference (using `BASE_QUALITIES` for the slot-2 anchor).
 
@@ -176,7 +176,7 @@ describe("quality registry: parametric ids resolve independently", () => {
   });
 });
 
-describe("quality registry: unknown ids throw (ADR-016, F.0e strict)", () => {
+describe("quality registry: unknown ids throw (ADR-016 strict)", () => {
   it("unknown weapon quality throws with weapon id + slot index", () => {
     const polearm = weapon("halberd", "polearm", 6, ["never_registered"]);
     const char = makeTypedCharacter({

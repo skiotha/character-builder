@@ -127,7 +127,7 @@ describe("magicAttribute", () => {
     }
   });
 
-  it("rejects appliesTo on magicAttribute targets with a warn (J.4b)", () => {
+  it("rejects appliesTo on magicAttribute targets with a warn", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw: RawEffect = {

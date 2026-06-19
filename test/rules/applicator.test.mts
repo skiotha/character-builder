@@ -43,7 +43,7 @@ describe("applySetBase", () => {
   });
 
   it("collects every candidate per stat for resolveSetBase to pick from", () => {
-    // G2.A: applySetBase no longer picks a winner. The formula phase
+    // applySetBase no longer picks a winner. The formula phase
     // calls resolveSetBase against the post-effect primary snapshot to
     // resolve max-by-primary with the default included.
     const effects: ResolvedEffect[] = [
@@ -92,7 +92,7 @@ describe("applyAddFlat", () => {
     assert.equal(char.attributes.secondary.toughness.max, 15);
   });
 
-  it("addFlat on toughness leaves `.current` untouched (Item 11)", () => {
+  it("addFlat on toughness leaves `.current` untouched", () => {
     const char = asChar();
     char.attributes.secondary.toughness.max = 10;
     char.attributes.secondary.toughness.current = 7;
@@ -150,7 +150,7 @@ describe("applyMultiply", () => {
     assert.equal(char.attributes.secondary.toughness.max, 20);
   });
 
-  it("multiply on toughness leaves `.current` untouched (Item 11)", () => {
+  it("multiply on toughness leaves `.current` untouched", () => {
     const char = asChar();
     char.attributes.secondary.toughness.max = 10;
     char.attributes.secondary.toughness.current = 4;
@@ -195,7 +195,7 @@ describe("applyCap", () => {
     assert.equal(char.attributes.secondary.defense, 5);
   });
 
-  it("caps toughness.max and leaves `.current` untouched (Item 11)", () => {
+  it("caps toughness.max and leaves `.current` untouched", () => {
     const char = asChar();
     char.attributes.secondary.toughness.max = 100;
     char.attributes.secondary.toughness.current = 60;

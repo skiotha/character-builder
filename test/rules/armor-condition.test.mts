@@ -13,7 +13,7 @@ import type {
 } from "../../src/rpg-types.mts";
 import { makeTypedCharacter } from "../helpers/fixtures.mts";
 
-// ── Item 3 / ADR-015 §3f: character-level effect gating via `condition`.
+// ── ADR-015 §3f: character-level effect gating via `condition`.
 
 function makeArmor(id: string, qualities: string[] = []): ArmorPiece {
   return {

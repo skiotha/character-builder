@@ -1,4 +1,4 @@
-// Phase 6 G1 / Item 10 — `target.kind: "primary"` effects.
+// `target.kind: "primary"` effects (ADR-015 §primary-bucketing).
 //
 // `derivePrimaryAttributes` is the engine's pre-pipeline stage that
 // snapshots effective primary attributes into
@@ -321,7 +321,7 @@ describe("normalizeRawEffect — primary target", () => {
     }
   });
 
-  it("rejects appliesTo with a warn (character-level, not slot-level) (J.4b)", () => {
+  it("rejects appliesTo with a warn (character-level, not slot-level)", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw: RawEffect = {
