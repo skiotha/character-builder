@@ -771,7 +771,8 @@ one-off).
 comments / test titles use the *names*, not the numbers ("'slot 2' is
 ambiguous so don't write it"). The codebase drifts from its own
 convention: `slot[ -]?[012]\b` over `src/`, `scripts/`, `test/` returns
-~29 hits across 8 files.
+~29 hits across 8 files, plus a docs instance — ADR-014's own
+`### 8. Slot 2 invariants` heading.
 
 **Scope — two classes, only the first is in-scope:**
 - **Prose — rewrite** (~15–20 sites): comments + `it()`/`describe()`
@@ -784,12 +785,21 @@ convention: `slot[ -]?[012]\b` over `src/`, `scripts/`, `test/` returns
   `carried[2]` indexing): the convention targets prose, not identifiers,
   and the numeric tuple is the documented implementation detail.
   Renaming locals is optional churn; default to leaving them.
+- **`docs/decisions/` prose — in scope, with a carve-out.** Fix section
+  **headings** and gratuitous "slot N" references (concrete target:
+  ADR-014 `### 8. Slot 2 invariants` → `### 8. Own-slot invariants`; the
+  section number stays `8`, so any `§8` cite still resolves). **Exempt:**
+  ADR-014's *definitional* prose that establishes the tuple (§1 three-slot
+  model, the index↔role mapping) legitimately references indices — leave
+  those.
 
 **Files (prose sites):** `src/models/character.mts`,
 `src/rules/derived.mts`, `test/data-contracts.test.mts`,
 `test/helpers/{fixtures,http,registry}.mts`,
-`test/rules/{combat,quality-registry}.test.mts`. Re-grep
-`slot[ -]?[012]\b` at execution time and subtract the pure-identifier
+`test/rules/{combat,quality-registry}.test.mts`, and
+`docs/decisions/014-per-slot-combat-special-attacks.md` (§8 heading).
+Re-grep `slot[ -]?[012]\b` at execution time (now including
+`docs/decisions/`) and subtract the pure-identifier and definitional
 hits to get the live worklist.
 
 **Verification.** Behaviour-neutral if locals are left alone
@@ -798,9 +808,44 @@ and a re-grep showing remaining `slot[ -]?[012]` hits are only code
 identifiers / `carried[N]` indexing. Watch for `describe`/`it` title
 collisions after rewrites (none expected).
 
-**Done when:** no prose comment or test title under `src/`/`scripts/`/
-`test/` writes a bare numeric slot; ADR-014 role names are used instead;
+**Done when:** no prose comment, test title, or ADR **heading** under
+`src/`/`scripts/`/`test/`/`docs/decisions/` writes a bare numeric slot
+(definitional ADR prose exempt); ADR-014 role names are used instead;
 tests green.
+
+## Pass H — Deferred-items reconciliation (final gate)
+
+**Status:** the closeout. Runs **last**, after Passes A–G are all `[x]`.
+Exists because this effort has repeatedly deferred items, and a deferral
+with no durable home silently rots (the Pass G "phantom sweep" was a
+near-miss). This pass makes "nothing forgotten" a checked invariant.
+
+**Procedure (all four must pass):**
+1. **In-code deferral sweep.** grep `TODO\(|FIXME\(|deferred` across
+   `src/`, `scripts/`, `test/`. Every hit must either cite a bug tracker
+   (`.github/bugs/<file>.md #N`) or be a `TODO(<scope>)` naming an
+   **active** top-level plan. No bare "deferred" / "later" / "TBD"
+   without a home.
+2. **Reciprocal-obligation check.** Every active plan named by a code
+   `TODO(<scope>)` carries that site in its "References to sweep on
+   completion" subsection (added per Pass E). Today: `phase6-plan.md`
+   must list the `trait-talent-registry` (×6) and `weapon-inheritance`
+   (×1) sites.
+3. **Plan-state check.** Passes A–G all `[x]`, each with a closure log.
+4. **Lint + tests green.** `test/adr-anchors.test.mts` passes (no
+   dangling `ADR-NNN §anchor`); `npm test` green.
+
+**Ledger of weak deferrals re-homed during planning (the sweep confirms
+each is closed):**
+- `TODO(trait-talent-registry)` ×6 + `TODO(weapon-inheritance)` ×1 →
+  pending `phase6-plan.md` sweep-list (Pass E step 1).
+- natural_weapon schema-default drift → `api-infra-bugs.md #35` ✅ (2026-06-21).
+- ADR-014 `### 8` heading "Slot 2 invariants" → Pass G (docs scope) ✅ when G runs.
+- "Fold post-Chunk-F amendment into ADR-014 body" → **decided WONTFIX**:
+  the Pass E stable-anchor *registry* homes the amendment anchors without
+  re-deriving the rules; no body-fold needed.
+
+**Done when:** steps 1–4 pass; the whole `docs-cleanup-plan` is complete.
 
 ## Risks & open questions
 
@@ -845,3 +890,4 @@ If this work spans multiple sessions, the next session should:
 - [ ] Pass E.5 — Bug-tracking conventions (brainstorm-first, see §Pass E.5 below)
 - [ ] Pass F — extract accumulated conventions into instruction files (brainstorm-first, see §Pass F below)
 - [ ] Pass G — ADR-014 slot-naming prose sweep (independent; see §Pass G below)
+- [ ] Pass H — Deferred-items reconciliation (final gate; see §Pass H below)

@@ -758,7 +758,7 @@ describe("generateDefaultCharacter", () => {
   // If the reference catalog's `natural_weapon` entry drifts, this test
   // does NOT auto-update — the goal is to catch silent drift between the
   // schema default and the canonical record. This test is the guard for
-  // that drift; a longer-term single-source fix remains deferred.
+  // that drift; the single-source fix is tracked in api-infra-bugs.md #35.
   it("schema default for equipment.weapons[0] is the natural_weapon seed", () => {
     const d = generateDefaultCharacter("pid");
     const equipment = d.equipment as Record<string, unknown>;
