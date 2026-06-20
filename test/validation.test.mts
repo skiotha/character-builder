@@ -443,12 +443,11 @@ describe("validateCharacterUpdate", () => {
     assert.equal(result.errors[0]!.code, "FORBIDDEN");
   });
 
-  // NOTE: push on traits with a single trait object fails type validation
-  // before reaching the XP check. validateFieldValue("traits", {object})
-  // rejects because the schema says type: "array" but the value is an object.
-  // The XP check at lines 182-195 in validation.mts is effectively dead code.
-  // This documents current behavior — the XP check should probably bypass
-  // type validation for push operations. Tracked for Phase 5.
+  // NOTE: push of a single trait *object* (not an array) is rejected by
+  // validateFieldValue — the schema types `traits` as an array, so the
+  // object value is a type mismatch and the push is rejected before any
+  // business-rule checks. (The legacy XP-cost check that once sat in this
+  // path was removed; see api-infra-bugs.md #15.)
 
   it("push on traits rejects single object due to type:array mismatch", async () => {
     const char = makeCharacter({ experience: { total: 50, unspent: 50 } });
@@ -463,7 +462,7 @@ describe("validateCharacterUpdate", () => {
       char,
       "dm",
     );
-    // Type validation catches the mismatch before XP check runs
+    // Type validation rejects the object-vs-array mismatch.
     assert.equal(result.errors.length, 1);
     assert.equal(result.errors[0]!.code, "VALIDATION");
     assert.equal(result.validUpdates.length, 0);
@@ -471,8 +470,9 @@ describe("validateCharacterUpdate", () => {
 
   it("push on traits with array value passes validation", async () => {
     // Previously this crashed in the XP check (reading .cost from array → TypeError).
-    // XP logic removed in Phase 5 Session 1 — push operations now pass through
-    // gated only by isFieldWritable. XP validation will be rebuilt in Phase 6.
+    // The XP logic was removed; push operations now pass through the standard
+    // writability + field-type checks. XP validation is not yet reimplemented
+    // (the rpgValidators are currently stubs).
     const char = makeCharacter({ experience: { total: 50, unspent: 0 } });
     const result = await validateCharacterUpdate(
       [
@@ -757,8 +757,8 @@ describe("generateDefaultCharacter", () => {
   // Invariant: schema's seed natural_weapon must match the snapshot below.
   // If the reference catalog's `natural_weapon` entry drifts, this test
   // does NOT auto-update — the goal is to catch silent drift between the
-  // schema default and the canonical record. Resolution path is logged
-  // in `.github/plans/phase6-plan.md` Chunk F audit (deferred).
+  // schema default and the canonical record. This test is the guard for
+  // that drift; a longer-term single-source fix remains deferred.
   it("schema default for equipment.weapons[0] is the natural_weapon seed", () => {
     const d = generateDefaultCharacter("pid");
     const equipment = d.equipment as Record<string, unknown>;

@@ -23,7 +23,7 @@ import { REFERENCE_DIR } from "#config";
  * Failure mode: throws with the JSON path of the first mismatch and
  * both values.
  *
- * See ADR-016 and `.github/plans/phase6-chunkF-prereqs-plan.md` Task 1.
+ * See ADR-016.
  */
 
 const TOPICS = [
@@ -166,7 +166,7 @@ describe("reference locale drift", () => {
   // must agree across en and ru. The deep-equals pass above already
   // enforces this transitively, but this sub-test makes the contract
   // unmistakeable so a future addition of nested locale-allowlist
-  // fields cannot silently relax it (ADR-014, Item 9).
+  // fields cannot silently relax it (ADR-014 §action-rewrite).
   describe("nested action id parity (abilities + spells)", () => {
     for (const topic of ["abilities", "spells"] as const) {
       it(`${topic}: nested specialAttack/reaction ids agree between en and ru`, async () => {

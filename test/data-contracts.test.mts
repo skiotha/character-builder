@@ -259,7 +259,7 @@ describe("index entry shape", () => {
   // @NOTE: bot-integration.md §3 specifies a planned `discordId` field
   // that should be included in index.json byId entries. This field does
   // not yet exist in the character schema. It is needed before the bot's
-  // Phase 2 (Identity & Write Operations). See bot-integration.md §3.4.
+  // write-operations work (bot-integration.md §3.4).
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -317,7 +317,7 @@ describe("planned fields (not yet implemented)", () => {
 
   it("discordId is not yet in CHARACTER_SCHEMA", () => {
     // bot-integration.md §3: discordId (string, optional) for Discord user mapping.
-    // Needed before bot Phase 2 (Identity & Write Operations).
+    // Needed before the bot's write-operations work (bot-integration.md §3.4).
     // When added: update CHARACTER_SCHEMA, Character interface, index entry,
     // makeCharacter fixture, and convert this to a positive assertion.
     assert.ok(

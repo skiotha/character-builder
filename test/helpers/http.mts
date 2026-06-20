@@ -23,8 +23,8 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
   // Seed reference catalog so /api/v1/traits and friends don't 500.
   // abilities + spells are merged into /traits; boons + sins into /talents;
   // rituals/weapons/armor/qualities are single-source.
-  // qualities: post-F.0e the engine throws on unknown weapon/armor
-  // qualities, so we seed the full id set used by the default fixture
+  // qualities: the engine throws on unknown weapon/armor qualities
+  // (ADR-016), so we seed the full id set used by the default fixture
   // weapons (most importantly `own` for slot 2).
   const qualityIds = [
     "area",
