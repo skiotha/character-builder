@@ -264,6 +264,25 @@ The engine **validates only that a value is one of the known set**. It attaches 
 
 The enum is expected to evolve as Chunk F surfaces new patterns; adding or removing a value is a one-line change.
 
+## Stable anchors
+
+Code cites these with `ADR-015 §<anchor>`. `test/adr-anchors.test.mts`
+asserts every such citation resolves to a row below. Both named anchors
+and the frozen section numbers are listed; renaming or renumbering a
+listed anchor is a breaking change for those citations.
+
+| Anchor | Rule |
+| --- | --- |
+| `§3` | the eight-kind `EffectTarget` union and per-phase `EffectModifier` shaping (sub-points §3a–§3f). |
+| `§3a` | set-membership convention — `weaponQuality` / `armorQuality` / `flag` use `addFlat` to add, `remove` to remove; numeric value ignored. |
+| `§3e` | `primary` target kind: `addFlat` / `cap` only, runs in its own pre-pipeline phase writing `attributes.primaryEffective`. |
+| `§3f` | character-level effect gating via `condition: ArmorCondition[]` (valid on `secondary` and `armorQuality` targets). |
+| `§4` | no `priority` field — ordering is by phase (ADR-010); any legacy `priority` is ignored. |
+| `§5` | `TriggerKind` enum; the engine validates membership only and attaches semantics solely to `"manual"`. |
+| `§placement-table` | the `appliesTo` / `condition` accept-list matrix per target kind (engine-evaluated on `combat` / `weaponQuality`; documentary elsewhere). |
+| `§primary-bucketing` | the `primary` pre-pipeline phase and its `primaryEffective` snapshot (see §3e). |
+| `§spell-tier-actions` | per-spell `attackAttribute` is superseded by character-level `magicAttribute` (§3c); sibling apps read `character.magicAttribute`. |
+
 ## Consequences
 
 **Positive**

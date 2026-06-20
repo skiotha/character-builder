@@ -197,6 +197,21 @@ collection step must preserve the rewrite-by-id semantic.
 deliberately limited to `character.traits[]`. Artifact actions are
 YAGNI until a concrete authoring need lands.
 
+## Stable anchors
+
+Code cites these with `ADR-014 §<anchor>`. `test/adr-anchors.test.mts`
+asserts every such citation resolves to a row below. Renaming or
+renumbering a listed anchor is a breaking change for those citations.
+
+| Anchor | Rule |
+| --- | --- |
+| `§action-rewrite` | §9 — same-`id` actions dedupe last-write-wins across tiers (master > adept > novice); cross-parent id collisions are an authoring error. |
+| `§inheritance-fields` | `Action` optional `damageBonus` / `ignoresArmor` / `appliesTo` for per-weapon inheritance (authoring shape locked; engine runtime pending — `TODO(weapon-inheritance)`). |
+| `§inflicts` | `Action.inflicts[]` is a `string[]` of status ids; statuses are opaque tokens to the engine, resolved against `reference/statuses.*`. |
+| `§is-free` | `Action.isFree` is a boolean and may be `true` only on `trigger: "manual"` actions. |
+| `§toughness-write` | `secondary.toughness` effects write the single `.max` value (stat is plain `"toughness"`, never `"toughness.max"`). |
+| `§opportunistic-effects` | boons / sins may carry a top-level `effects[]` array, applied via `collectAllEffects` → `lookupTalent`. |
+
 ## Consequences
 
 **Positive**

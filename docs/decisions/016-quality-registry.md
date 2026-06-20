@@ -215,6 +215,15 @@ follows the same convention: `?locale=` query → first matching primary subtag
 in `Accept-Language` → `DEFAULT_LOCALE`. Unknown locale → 400. Sibling projects
 (Discord bot, WoW addon) may consume it for tooltip rendering.
 
+## Stable anchors
+
+Code cites these with `ADR-016 §<anchor>`. `test/adr-anchors.test.mts`
+asserts every such citation resolves to a row below.
+
+| Anchor | Rule |
+| --- | --- |
+| `§7a` | full structural validation of reference-catalog entries against their typed shapes is deliberately out of scope (author-controlled data); tracked as `api-infra-bugs.md #34`. |
+
 ## Consequences
 
 ### Positive

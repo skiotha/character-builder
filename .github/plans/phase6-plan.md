@@ -1252,3 +1252,20 @@ sequences between F and G — its 11 implementation steps add the engine
 features the bulk authoring pass surfaced (`magicAttribute`,
 `initiativeAttribute`, primary-attribute target, `setBase` conflict
 policy, etc.). Treat it as Chunk F+ rather than a separate chunk number.
+
+## References to sweep on completion
+
+Code-side `TODO(<scope>)` cites that name this plan and must be removed
+(with their citations) when the corresponding work ships. Added per the
+docs-cleanup-plan Pass E reciprocal-obligation convention; the
+docs-cleanup Pass H reconciliation gate checks this list.
+
+- **`TODO(trait-talent-registry)`** — the production trait/talent loader
+  (Chunk G). Sites: `src/app.mts`, `src/rules/registry.mts`,
+  `src/rules/registry-types.mts`, `src/rules/effects.mts`,
+  `test/helpers/registry.mts`. Remove when Chunk G's real loader replaces
+  the stub.
+- **`TODO(weapon-inheritance)`** — per-weapon `Action` inheritance runtime
+  (`damageBonus` / `ignoresArmor` / `appliesTo`); authoring shape locked,
+  engine runtime deferred. Site: `src/rpg-types.mts`. Remove when the
+  per-slot inheritance resolver ships.

@@ -144,6 +144,13 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - `.github/bugs/api-infra-bugs.md` — API, HTTP, security, validation infrastructure bugs (also lists Phase 5-deferred ops items: `x-forwarded-for` parsing, persistent rate-limit state, generalizing the limiter)
 - These are **mutable trackers**, not stable repo facts — edit them as bugs are opened/closed. Do **not** put new bug trackers under `/memories/repo/`; that scope is `create`-only and unsuitable for living docs.
 
+### Documentation discipline
+
+- **Stable cite targets** for code comments / JSDoc / test titles: ADRs (`ADR-NNN`, or `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md`, and `.github/bugs/*.md #N` (spell the file — numbering is per-tracker). **Never** cite `.github/plans/*`, phase names, chunk letters, or numbered amendment items from code; plans are short-lived and archived to `done/` once shipped.
+- **The one allowed plan reference** is inside a `TODO(<scope>)` whose lifetime matches the plan's — remove the TODO and its cite together when the plan ships.
+- **Comment tags:** `TODO(<scope>)` (missing capability; may append `Tracked in .github/plans/<file>.md`); `FIXME(<scope>)` (known-broken path; cite `.github/bugs/*`); plain `//` / `NOTE:` (stable prose, no plan cites).
+- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table. Every active plan under `.github/plans/` carries a "References to sweep on completion" list of the `TODO(<scope>)` sites to revisit when it ships.
+
 ### Domain Layer (ADR-013)
 
 - `src/models/index.mts` is **the** entry point for character mutations and reads
