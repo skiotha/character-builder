@@ -886,7 +886,7 @@ shape is firm. Until then the three copies are accepted as a known debt.
    - **Slot-2 `own` registry sanity:** assert `reference/qualities.*.json`
      contains an `own` entry. The schema validator checks that slot-2
      weapons carry `"own"` in their `qualities[]`; this asserts the
-     symmetric registry side. Tracks engine-weak-points.md #19.
+     symmetric registry side. Tracks NB-39.
    - Reports **all** anomalies in one run (don't bail on first failure).
 7. End-to-end test: character with Behemoth (master, slot 0 = heavy weapon),
    Polearm (novice, slot 0 = polearm — different character), Marksmanship

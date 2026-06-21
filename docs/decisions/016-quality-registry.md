@@ -203,7 +203,7 @@ sibling-app render rather than a load-time error.
   point catalog entries *are* user input and §7a no longer holds.
 
 This deferred capability is tracked as
-[#34 in `.github/bugs/api-infra-bugs.md`](../../.github/bugs/api-infra-bugs.md).
+[NB-43 in `.github/bugs/infra.md`](../../.github/bugs/infra.md).
 The in-code anchor is the Weapon/ArmorPiece preamble comment in
 `src/rpg-types.mts`.
 
@@ -222,7 +222,7 @@ asserts every such citation resolves to a row below.
 
 | Anchor | Rule |
 | --- | --- |
-| `§7a` | full structural validation of reference-catalog entries against their typed shapes is deliberately out of scope (author-controlled data); tracked as `api-infra-bugs.md #34`. |
+| `§7a` | full structural validation of reference-catalog entries against their typed shapes is deliberately out of scope (author-controlled data); tracked as `NB-43`. |
 
 ## Consequences
 

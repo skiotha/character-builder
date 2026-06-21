@@ -122,7 +122,7 @@ describe("normalizeRawEffect", () => {
   it("accepts appliesTo on secondary targets as documentary metadata", () => {
     // secondary accepts appliesTo at the parser, but the engine has no
     // slot-aware secondary path yet — the predicate is a documentary
-    // no-op at runtime (engine-weak-points.md #34, deferred).
+    // no-op at runtime (NB-34, deferred).
     const raw: RawEffect = {
       target: { kind: "secondary", stat: "defense" },
       modifier: { type: "addFlat", value: 1 },

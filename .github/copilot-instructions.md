@@ -80,7 +80,7 @@ Written code carries explanatory comments at three scales. Pick the right one fo
 
 - **Top-of-file module header** — use for any non-trivial `.mts` module (rules engine, models, multi-step routes). Document the module's purpose, where it sits in the larger flow, and any cross-cutting invariants. The header in [`src/rules/derived.mts`](../src/rules/derived.mts) (numbered pipeline overview) is the reference shape. Keep it current when the pipeline changes.
 - **Function-level JSDoc block** — use above any exported function whose contract isn't obvious from the signature, and above any non-exported function with non-trivial semantics. In `.mts` write a `/** ... */` block describing **what the function guarantees** (not what it does line-by-line) and any preconditions / phase ordering it relies on. In **client `.mjs` files use JSDoc descriptions consistently** — they're the only type signal and the existing client code (e.g. [`public/api.mjs`](../public/api.mjs)) is fully annotated; new client functions should match.
-- **Inline `//` comments** — use for non-obvious branches, phase markers (`// ── N. addFlat ─────`), and for citing the ADR / Bug / weak-points entry that explains *why* the code does what it does. Prefer `// Bug #31.` or `// ADR-015 §3f` over restating the rule.
+- **Inline `//` comments** — use for non-obvious branches, phase markers (`// ── N. addFlat ─────`), and for citing the ADR / bug entry that explains *why* the code does what it does. Prefer `// NB-31` or `// ADR-015 §3f` over restating the rule.
 
 Don't comment trivial mechanics (variable names speak for themselves). Do comment: invariants the engine depends on, non-obvious resets / orderings, gotchas that already burned someone (the mock-before-import gotcha below is the model).
 
@@ -140,16 +140,17 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 
 ### Bug Trackers
 
-- `.github/bugs/engine-weak-points.md` — RPG engine bugs and design weaknesses
-- `.github/bugs/api-infra-bugs.md` — API, HTTP, security, validation infrastructure bugs (also lists Phase 5-deferred ops items: `x-forwarded-for` parsing, persistent rate-limit state, generalizing the limiter)
-- These are **mutable trackers**, not stable repo facts — edit them as bugs are opened/closed. Do **not** put new bug trackers under `/memories/repo/`; that scope is `create`-only and unsuitable for living docs.
+- [`.github/bugs/`](bugs/README.md) holds the trackers. Open bugs live in domain-named markdown files there (currently `engine.md` and `infra.md`); resolved bugs are archived in `resolved.md`. See [`bugs/README.md`](bugs/README.md) for the full scheme.
+- **Bug ids are global and permanent: `NB-<n>`.** Cite a bug from code as a bare `NB-<n>` (e.g. `// NB-31`) — never a filename, never `#`. Moving a bug (open → resolved, or re-triaging its severity) never changes its id, so cites keep resolving. Allocate the next id from `bugs/README.md` and bump the counter.
+- On fixing a bug, mark it `✅ Resolved` and **move the entry to `resolved.md`** in the same commit. Resolved entries are archived, not deleted, so `NB-<n>` cites to closed bugs still resolve.
+- These are **mutable trackers**, not stable repo facts. Do **not** put new bug trackers under `/memories/repo/`; that scope is `create`-only and unsuitable for living docs.
 
 ### Documentation discipline
 
-- **Stable cite targets** for code comments / JSDoc / test titles: ADRs (`ADR-NNN`, or `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md`, and `.github/bugs/*.md #N` (spell the file — numbering is per-tracker). **Never** cite `.github/plans/*`, phase names, chunk letters, or numbered amendment items from code; plans are short-lived and archived to `done/` once shipped.
+- **Stable cite targets** for code comments / JSDoc / test titles: ADRs (`ADR-NNN`, or `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md`, and bug ids (`NB-N` — global and permanent; see Bug Trackers above). **Never** cite `.github/plans/*`, phase names, chunk letters, or numbered amendment items from code; plans are short-lived and archived to `done/` once shipped.
 - **The one allowed plan reference** is inside a `TODO(<scope>)` whose lifetime matches the plan's — remove the TODO and its cite together when the plan ships.
-- **Comment tags:** `TODO(<scope>)` (missing capability; may append `Tracked in .github/plans/<file>.md`); `FIXME(<scope>)` (known-broken path; cite `.github/bugs/*`); plain `//` / `NOTE:` (stable prose, no plan cites).
-- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table. Every active plan under `.github/plans/` carries a "References to sweep on completion" list of the `TODO(<scope>)` sites to revisit when it ships.
+- **Comment tags:** `TODO(<scope>)` (missing capability; may append `Tracked in .github/plans/<file>.md`); `FIXME(<scope>)` (known-broken path; cite the relevant `NB-N`); plain `//` / `NOTE:` (stable prose, no plan cites).
+- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. Every active plan under `.github/plans/` carries a "References to sweep on completion" list of the `TODO(<scope>)` sites to revisit when it ships.
 
 ### Domain Layer (ADR-013)
 

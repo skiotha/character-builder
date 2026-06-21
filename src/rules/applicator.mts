@@ -364,7 +364,7 @@ function applyArmorQuality(character: Character, effect: ResolvedEffect): void {
     // Engine writes the overlay to `qualitiesEffective`, never to the
     // authored `qualities` array. `recalculate()` resets
     // `qualitiesEffective` from `qualities` at the top of each pass
-    // (Bug #31), so removals/additions don't accumulate across recalcs.
+    // (NB-31), so removals/additions don't accumulate across recalcs.
     const current = piece.qualitiesEffective ?? piece.qualities ?? [];
     if (effect.modifier.type === "remove") {
       piece.qualitiesEffective = current.filter((q) => q !== quality);

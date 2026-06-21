@@ -84,9 +84,9 @@ type EffectModifier =
   | { type: "remove" };
 ```
 
-- `setBase` always carries a primary-attribute *name* (string), never a number. Closes weak-point bug #19.
+- `setBase` always carries a primary-attribute *name* (string), never a number. Closes NB-19.
 - `remove` carries no value — semantics are determined by the target kind (`weaponQuality` / `armorQuality` / `flag`).
-- The verb names are canonical. `add` / `mul` / `set` are not accepted. Closes weak-point bug #6.
+- The verb names are canonical. `add` / `mul` / `set` are not accepted. Closes NB-6.
 
 **Why `remove` is safe under the additive-only pipeline:** in the authoring vocabulary, *negative* qualities (e.g. `hampering`, `unwieldy`, `cumbersome`) are **only ever removed**, and *positive* qualities are **only ever added**. There is no case where two effects fight over the presence of the same quality. This is documented as an authoring invariant in the data-contracts vocabulary section.
 
@@ -213,7 +213,7 @@ Worked example — *Demiurge Hands Master* (remove `hampering_2`, but only from 
 }
 ```
 
-Implementation note — armor overlay: the engine writes per-piece add/remove results to `ArmorPiece.qualitiesEffective` (an optional, server-controlled overlay) and resets it from `qualities` at the top of every recalc. Authored `qualities` is never mutated. Quality-registry synthesis (§3a) for a piece's own qualities is auto-stamped with `condition: [{ kind: "armorSlot", values: [<piece>] }]` so a body piece's quality can never bleed onto the plug. Closes weak-point bug #31's remaining caveat (armor overlay) and the "armor-side `appliesTo` ignored" gap.
+Implementation note — armor overlay: the engine writes per-piece add/remove results to `ArmorPiece.qualitiesEffective` (an optional, server-controlled overlay) and resets it from `qualities` at the top of every recalc. Authored `qualities` is never mutated. Quality-registry synthesis (§3a) for a piece's own qualities is auto-stamped with `condition: [{ kind: "armorSlot", values: [<piece>] }]` so a body piece's quality can never bleed onto the plug. Closes NB-31's remaining caveat (armor overlay) and the "armor-side `appliesTo` ignored" gap.
 
 ### 4. No `priority` field
 
@@ -223,7 +223,7 @@ Effect ordering is determined by the phase the modifier belongs to, in the fixed
 setBase → formula → addFlat → multiply → cap → flag/remove
 ```
 
-Reference data may not carry a `priority` field; if present in legacy data, the engine ignores it. Closes weak-point bug #2.
+Reference data may not carry a `priority` field; if present in legacy data, the engine ignores it. Closes NB-2.
 
 ### 4a. Universal `setBase` resolution (max-by-primary, default-inclusive)
 

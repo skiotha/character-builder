@@ -528,15 +528,15 @@ describe("armorQuality: body and plug", () => {
     assert.deepEqual(result.equipment.armor.plug!.qualitiesEffective, [
       "reinforced",
     ]);
-    // Authored qualities never mutated (Bug #31).
+    // Authored qualities never mutated (NB-31).
     assert.deepEqual(result.equipment.armor.body!.qualities, []);
     assert.deepEqual(result.equipment.armor.plug!.qualities, []);
   });
 });
 
-// ── flags reset between recalcs (Bug #31) ──────────────────────────
+// ── flags reset between recalcs (NB-31) ──────────────────────────
 
-describe("Bug #31: derived collections reset between recalcs", () => {
+describe("NB-31: derived collections reset between recalcs", () => {
   it("character.flags from a prior recalc is wiped before the next pass", () => {
     const char = makeTypedCharacter() as Character;
     // Simulate stale state from a previous recalc.

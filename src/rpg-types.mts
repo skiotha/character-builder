@@ -62,8 +62,7 @@ export interface CharacterAttributes {
 // `RawEffect` survives only for in-character `effects[]` (player /
 // DM-authored persistent overrides) and is normalized at the boundary.
 // TODO(rawEffect-removal): drop once all in-character effects[] migrate
-// to ResolvedEffect. Tracked in .github/bugs/engine-weak-points.md #35
-// (DEFERRED).
+// to ResolvedEffect. Tracked in NB-35 (DEFERRED).
 
 /** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
 export interface RawEffectModifier {
@@ -347,7 +346,7 @@ export interface Combat {
 // against the quality registry (ADR-016); full structural validation of
 // catalog entries against the `Weapon` / `ArmorPiece` shape below is
 // deliberately out of scope (see ADR-016 §7a). Tracked in
-// .github/bugs/api-infra-bugs.md #34 (DEFERRED).
+// NB-43 (DEFERRED).
 
 export interface Weapon {
   id: string;
@@ -377,7 +376,7 @@ export interface ArmorPiece {
    * `primary` / `primaryEffective`. Optional in the type so existing
    * on-disk fixtures load cleanly; engine populates it on every recalc
    * (when `recalculate()` runs, the field is reset from `qualities`
-   * before any `armorQuality` effect applies — Bug #31 reset pattern).
+   * before any `armorQuality` effect applies — NB-31 reset pattern).
    */
   qualitiesEffective?: string[];
   cost?: number | string;

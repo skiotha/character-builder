@@ -447,7 +447,7 @@ describe("validateCharacterUpdate", () => {
   // validateFieldValue — the schema types `traits` as an array, so the
   // object value is a type mismatch and the push is rejected before any
   // business-rule checks. (The legacy XP-cost check that once sat in this
-  // path was removed; see api-infra-bugs.md #15.)
+  // path was removed; see NB-15.)
 
   it("push on traits rejects single object due to type:array mismatch", async () => {
     const char = makeCharacter({ experience: { total: 50, unspent: 50 } });
@@ -758,7 +758,7 @@ describe("generateDefaultCharacter", () => {
   // If the reference catalog's `natural_weapon` entry drifts, this test
   // does NOT auto-update — the goal is to catch silent drift between the
   // schema default and the canonical record. This test is the guard for
-  // that drift; the single-source fix is tracked in api-infra-bugs.md #35.
+  // that drift; the single-source fix is tracked in NB-45.
   it("schema default for equipment.weapons[0] is the natural_weapon seed", () => {
     const d = generateDefaultCharacter("pid");
     const equipment = d.equipment as Record<string, unknown>;

@@ -8,7 +8,7 @@
 // Pipeline order:
 //   1. clone the input character; reset derived collections
 //      (`flags`, `specialAttacks`, `reactions`) to empty so previously
-//      written values can never leak across recalcs (closes Bug #31).
+//      written values can never leak across recalcs (closes NB-31).
 //   2. collect + group effects by phase
 //   3. setBase  → build SecondaryAttribute → PrimaryAttribute override map
 //   4. formula  → SECONDARY_FORMULAS, using the override map
@@ -61,7 +61,7 @@ export function recalculate(
   const result = structuredClone(character);
 
   // Always reset engine-owned collections so prior recalc output never
-  // leaks into the next pass. Bug #31.
+  // leaks into the next pass. NB-31.
   result.flags = [];
   result.specialAttacks = [];
   result.reactions = [];
@@ -69,7 +69,7 @@ export function recalculate(
   // `qualities` set. The applicator writes to `qualitiesEffective` only;
   // `qualities` is the player-authored base and is never mutated by the
   // engine. Mirrors the `primary` / `primaryEffective` reset pattern in
-  // `derivePrimaryAttributes`. Closes the second half of Bug #31.
+  // `derivePrimaryAttributes`. Closes the second half of NB-31.
   const armor = result.equipment?.armor;
   if (armor?.body)
     armor.body.qualitiesEffective = [...(armor.body.qualities ?? [])];
@@ -169,7 +169,7 @@ export function recalculate(
  * different-id entries from any tier coexist (ADR-014 §action-rewrite).
  *
  * Unknown trait ids are warned-and-skipped, mirroring
- * `collectAllEffects`. The Bug #31 reset at the top of `recalculate`
+ * `collectAllEffects`. The NB-31 reset at the top of `recalculate`
  * already guarantees the destination arrays are empty before we run.
  */
 function collectActions(
@@ -250,7 +250,7 @@ function derivePrimaryAttributes(
   >;
 
   // Always reset: rebuild the effective snapshot from the base on every
-  // recalc. This closes the same class of accumulation bug as Bug #31
+  // recalc. This closes the same class of accumulation bug as NB-31
   // (top-level flags / specialAttacks / reactions).
   const effective: Record<PrimaryAttributeName, number> = { ...base };
   character.attributes.primaryEffective =
@@ -523,7 +523,7 @@ function applyNumericSlotField(
 // TODO(enforce-consistency-redundancy): both responsibilities here are
 // also enforced at the schema/storage boundary on every write. This
 // function may be deletable in full once that's audited end-to-end.
-// See .github/bugs/engine-weak-points.md #36 (DEFERRED).
+// See NB-36 (DEFERRED).
 
 // ── Quality registry strict lookup (ADR-016) ──────────────────────
 //

@@ -14,7 +14,7 @@ The current `Combat` shape on `Character` has three problems that block the Phas
 2. **No place for special attacks or reactions.** Many abilities and spells grant new actions — invocable strikes (e.g. *Berserk*'s rage attack) and triggered responses (e.g. *Iron Fist*'s parry). Today these live as free-text descriptions on traits with no machine-readable home.
 3. **`combat.active` is a presentation concern.** The website does not schedule combat turns; sibling apps do. Tracking which weapon is "currently active" inside the canonical character record forces every consumer to agree on a state machine the website cannot enforce.
 
-Bug tracker items #7, #8, #9, #23 in [`.github/bugs/engine-weak-points.md`](../../.github/bugs/engine-weak-points.md) all point at the same root cause: combat derivation cannot express per-weapon results.
+Bug tracker items NB-7, NB-8, NB-9, NB-23 (now resolved — archived in [`.github/bugs/resolved.md`](../../.github/bugs/resolved.md)) all point at the same root cause: combat derivation cannot express per-weapon results.
 
 ## Decision
 

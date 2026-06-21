@@ -12,7 +12,7 @@
 //   * Walks `character.effects[]` (manual / persistent overrides) and
 //     normalizes each `RawEffect` into a `ResolvedEffect`. Lifecycle is
 //     ignored — `duration` is dropped at the boundary.
-//   * Walks nested `effects[]` arrays inside any RawEffect (Bug #22).
+//   * Walks nested `effects[]` arrays inside any RawEffect (NB-22).
 //   * Collects armor-mounted effects (body / plug `.effects[]`) and
 //     resolves armor `qualities[]` against the quality registry
 //     (ADR-016 strictness — unknown ids throw).
@@ -127,7 +127,7 @@ export function normalizeRawEffect(
     // `flag` (roll-time, sibling-evaluated; engine still adds the flag
     // name globally), and accepted on `secondary` (engine has no slot-
     // aware secondary path; predicate is documentary at runtime — see
-    // engine-weak-points.md #34).
+    // NB-34).
     // Any other target kind is a parser-reject: misplaced authoring,
     // not a silent strip.
     if (

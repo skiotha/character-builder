@@ -9,7 +9,7 @@ import {
 } from "../helpers/registry.mts";
 import { makeTypedCharacter } from "../helpers/fixtures.mts";
 
-// ── Bug #31 (armor overlay): `applyArmorQuality` previously mutated
+// ── NB-31 (armor overlay): `applyArmorQuality` previously mutated
 //    `armor.body.qualities` / `armor.plug.qualities` in-place, so
 //    add/remove operations compounded across recalcs and registry
 //    quality effects bled across pieces. The engine now writes overlays
@@ -37,7 +37,7 @@ function withArmor(
   return c;
 }
 
-describe("Bug #31 — armor overlay reset", () => {
+describe("NB-31 — armor overlay reset", () => {
   it("authored `qualities` is never mutated by repeated recalcs", () => {
     const c = withArmor(makeArmor("plate", ["hampering_2"]), null);
     c.effects = [

@@ -59,7 +59,7 @@ const KNOWN_ARMOR_SLOTS = new Set(["body", "plug"]);
 const CONDITION_ACCEPTING_TARGETS = new Set(["secondary", "armorQuality"]);
 // Placement table (ADR-015 §placement-table). `appliesTo` is accepted on
 // {combat, weaponQuality, flag, secondary}; on `secondary` the engine
-// ignores the predicate (documentary only — engine-weak-points.md #34).
+// ignores the predicate (documentary only — NB-34).
 const APPLIES_TO_ACCEPTING_TARGETS = new Set([
   "combat",
   "weaponQuality",
@@ -497,7 +497,7 @@ function inspectEffect(
     // Placement table (ADR-015 §placement-table): `appliesTo` accepted on
     // {combat, weaponQuality, flag, secondary}. On `secondary` it is
     // documentary only — the engine ignores the predicate there
-    // (engine-weak-points.md #34). Anywhere else the parser rejects the
+    // (NB-34). Anywhere else the parser rejects the
     // whole effect (reject-null).
     if (
       typeof targetKind === "string" &&

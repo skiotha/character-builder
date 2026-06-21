@@ -155,7 +155,7 @@ describe("collectActions — same-id rewrite", () => {
     }
   });
 
-  it("repeated recalc does not accumulate (Bug #31 reset still applies)", () => {
+  it("repeated recalc does not accumulate (NB-31 reset still applies)", () => {
     const registry = createInMemoryRegistry({
       traits: {
         "intrigues:master": {
