@@ -47,18 +47,36 @@ in [`docs/decisions/README.md`](../docs/decisions/README.md). Key ones:
 - **ADR-001:** Zero external dependencies. No npm runtime deps.
 - **ADR-002:** File-based JSON storage. One file per character.
 - **ADR-003:** Self-asserted player identity via `x-player-id` header. Intentional for the small trusted userbase — not a security gap.
-- **ADR-004:** ~~Hybrid SPA with server-rendered HTML fragments.~~ Superseded by ADR-009.
 - **ADR-009:** Schema-driven client rendering. Schema with UI metadata served once; client renders forms from `(schema, data, role)`.
 - **ADR-005:** SSE for real-time updates (not WebSockets).
 - **ADR-007:** Strict CORS with explicit origin whitelist.
 - **ADR-008:** TypeScript via Node.js strip-types (no build step).
 - **ADR-010:** Effect resolution pipeline — explicit phases (`setBase` → formulas → `addFlat` → `multiply` → `cap` → flags), typed `Character` state, unified effect collection from all sources.
-- **ADR-011:** ~~Typed effect targets — initial discriminated-union design.~~ Superseded by ADR-015.
 - **ADR-012:** Standards-first HTML, CSS & Web Platform conventions. Semantic markup, `@layer`/`@scope`/native nesting, native widgets over custom JS, modern CSS and Web APIs preferred.
 - **ADR-013:** Domain layer as the mutation gate. `src/models/index.mts` is the single entry point for character mutations; storage is internal. Handlers and middleware import from `#models`, never `#models/storage` (carve-outs: `src/lib/backup.mts` and code inside `src/models/` itself).
 - **ADR-014:** Per-slot combat, special attacks & reactions. `combat.carried` is `[Slot|null, Slot|null, Slot]`; index 2 is required and must reference a weapon with the `own` quality (default `natural_weapon`). Combat phase fans out per slot. `SpecialAttack[]` / `Reaction[]` are derived collections distinguished by `trigger === "manual"`. Tier stacking is additive. **Slot naming convention** — use names, not numbers, in prose / UI / commit messages: index 0 = **main-hand**, index 1 = **off-hand**, index 2 = **own**. The numeric tuple is an implementation detail; "slot 2" is ambiguous so don't write it.
-- **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). 8-kind discriminated union (`secondary | combat | weaponQuality | armorQuality | flag | primary | magicAttribute | initiativeAttribute`), `WeaponPredicate` (`any | type | quality | id`, AND-composed via `appliesTo` for per-slot weapon narrowing), `ArmorCondition` (`armorQuality | armorId | armorSlot | noArmor`, AND-composed via `condition` for character-level / per-armor-piece gating on `secondary` and `armorQuality` targets, §3f), per-phase `EffectModifier` shapes including `remove`, no `priority` field.
+- **ADR-015:** Typed effect targets, final vocabulary (supersedes ADR-011). `EffectTarget` is an 8-kind discriminated union; ordering is by pipeline phase, with **no `priority` field**. Per-kind predicate/condition support and valid modifiers:
+
+  | Kind | Predicate / condition | Composition | Valid modifiers |
+  | --- | --- | --- | --- |
+  | `primary` | — | — | `addFlat`, `cap` (own pre-pipeline phase → `primaryEffective`) |
+  | `secondary` | `condition: ArmorCondition[]` | AND across entries; OR within `values[]` | `setBase`, `addFlat`, `multiply`, `cap` |
+  | `combat` | `appliesTo: WeaponPredicate[]` (per slot) | AND across entries; OR within `values[]` | `addFlat`, `multiply`, `cap`; `attackAttribute` → `setBase` only |
+  | `weaponQuality` | — | — | `addFlat` (add), `remove` |
+  | `armorQuality` | `condition: ArmorCondition[]` (per piece) | AND across entries; OR within `values[]` | `addFlat` (add), `remove` |
+  | `flag` | — | — | `addFlat` (add), `remove` |
+  | `magicAttribute` | — | — | `setBase` only |
+  | `initiativeAttribute` | — | — | `setBase` only |
+
+  - **Predicate/condition vocabulary & `§` pointers:** `WeaponPredicate` kinds are `any | type | quality | id` (narrows `combat` effects per weapon slot); `ArmorCondition` kinds are `armorQuality | armorId | armorSlot | noArmor` (gates `secondary` / `armorQuality` targets, §3f). The `remove` modifier is set-membership only — valid on `weaponQuality` / `armorQuality` / `flag` targets (§3a).
 - **ADR-016:** Quality registry. `reference/qualities.{en,ru}.json` is the engine-canonical source of effects for weapon/armor qualities (single namespace, parametric ids via `_N` suffix, EN authoritative, locale-drift lint enforces structural alignment). Engine throws on unknown ids; production registry is loaded once at startup via `loadQualityIndex()` in `src/app.mts`.
+
+### Retired Decisions (do not apply)
+
+Do not apply any decision listed here. They are kept for historical context only; the superseding ADR is the sole authority.
+
+- **ADR-004:** ~~Hybrid SPA with server-rendered HTML fragments.~~ Superseded by **ADR-009** (schema-driven client rendering).
+- **ADR-011:** ~~Typed effect targets — initial discriminated-union design.~~ Superseded by **ADR-015** (final vocabulary).
 
 ## Coding Guidelines
 
@@ -76,7 +94,7 @@ highest-priority item (functions > constants).
 
 ### Code Documentation
 
-Written code carries explanatory comments at three scales. Pick the right one for the change you're making:
+Written code carries explanatory comments at three scales. **Default to the smallest scope that fully documents the contract:** use a module header only when the change affects the module's stated invariants, a JSDoc block when an exported function's contract changes, and inline `//` comments for every other non-obvious change. The three scales:
 
 - **Top-of-file module header** — use for any non-trivial `.mts` module (rules engine, models, multi-step routes). Document the module's purpose, where it sits in the larger flow, and any cross-cutting invariants. The header in [`src/rules/derived.mts`](../src/rules/derived.mts) (numbered pipeline overview) is the reference shape. Keep it current when the pipeline changes.
 - **Function-level JSDoc block** — use above any exported function whose contract isn't obvious from the signature, and above any non-exported function with non-trivial semantics. In `.mts` write a `/** ... */` block describing **what the function guarantees** (not what it does line-by-line) and any preconditions / phase ordering it relies on. In **client `.mjs` files use JSDoc descriptions consistently** — they're the only type signal and the existing client code (e.g. [`public/api.mjs`](../public/api.mjs)) is fully annotated; new client functions should match.
@@ -86,12 +104,19 @@ Don't comment trivial mechanics (variable names speak for themselves). Do commen
 
 When you change a behaviour the comments describe, update the comments in the same edit. Stale doc-comments are worse than missing ones.
 
+### Client JS (`public/**/*.mjs`)
+
+- Plain JavaScript with native ES modules — **no TypeScript syntax** (no `import type`, no type annotations).
+- Follow the same import-ordering categories as server code, minus the absent `node:` tier: functions first, then constants, separated by blank lines.
+- Every exported function carries a JSDoc block with `@param` / `@returns` — these are the only type signals (see [`public/api.mjs`](../public/api.mjs) for the reference shape).
+- Follow ADR-012 for the DOM: prefer native widgets and modern CSS over custom JS.
+
 ### Commands
 
 ```bash
 npm run start:dev        # Dev server with file watcher
 npm run typecheck        # TypeScript type-check (tsc --noEmit)
-npm test                 # Run all tests: node --test test/**/*.test.mts
+npm test                 # Run all tests: node --experimental-test-module-mocks --test test/**/*.test.mts
 node --experimental-test-module-mocks --test test/foo.test.mts  # Run a single test file
 ```
 
@@ -103,7 +128,7 @@ node --experimental-test-module-mocks --test test/foo.test.mts  # Run a single t
 - Tests run via: `node --experimental-test-module-mocks --test test/**/*.test.mts`
 - `noUncheckedIndexedAccess` is enabled — array/index accesses return `T | undefined`. Use `!` non-null assertion on values you know exist (e.g. `mock.calls[0]!`) rather than adding unnecessary guards in test code.
 - To mock subpath imports (e.g. `#config`, `#sse`), use `mock.module("#config", { namedExports: { ... } })` — this requires the `--experimental-test-module-mocks` flag (already in `npm test` and the single-test command above).
-- **Mock-before-import gotcha:** A static `import { handleX } from "./foo.mts"` at the top of a test file evaluates `foo.mts` (and its transitive imports of `#config`, `#auth`, etc.) **before** any `mock.module(...)` call inside `before()` runs. The handler then closes over the real module and your mocks have no effect. Fix: import the handler dynamically *after* the mock is installed — `const { handleX } = await import("./foo.mts")` inside the `before()` hook (same pattern `startTestServer` uses). Symptom: auth/permission tests pass with real values but fail with mocked ones.
+- **Mock-before-import gotcha — always import handlers dynamically inside `before()` after installing mocks:** `const { handleX } = await import("./foo.mts")` (same pattern `startTestServer` uses). A static top-level `import { handleX } from "./foo.mts"` evaluates `foo.mts` (and its transitive imports of `#config`, `#auth`, etc.) **before** any `mock.module(...)` call inside `before()` runs, so the handler closes over the real module and your mocks have no effect. Symptom: auth/permission tests pass with real values but fail with mocked ones.
 - Shared test helpers live in `test/helpers/`: `fixtures.mts` (character factories), `temp-dir.mts` (isolated `DATA_DIR`), `http.mts` (test server), `mock-response.mts` (response spy). Use them rather than recreating test infrastructure.
 
 ### Static File Serving & URL Mapping
@@ -116,7 +141,7 @@ The server maps URLs to the filesystem as follows:
 | `/uploads/portraits/**` | `data/uploads/portraits/` | Character portrait images. |
 | `/**` (everything else) | `public/` | SPA client files (`.html`, `.mjs`, `.css`). Falls back to `index.html` for client-side routing. |
 
-> Note: `reference/` is **not** served as static files. Its contents are exposed only through `/api/v1/{traits,talents,rituals,weapons,armor,qualities}` (which apply locale resolution and merging).
+> Note: `reference/` is **not** served as static files. Its contents are exposed only through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (which apply locale resolution and merging).
 
 When rewriting or moving static file references, update both the HTML/CSS/JS `href`/`src` attributes **and** ensure the files exist at the corresponding filesystem path.
 
@@ -136,12 +161,12 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
 - Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`, `remove` (the last is set-membership only — `weaponQuality` / `armorQuality` / `flag` targets, ADR-015 §3a)
-- Canonical RPG rules reference (attributes, formulas, effect tiers, combat) is kept as a Copilot repo memory (`nagara-rpg-rules.md`). Surface it explicitly when working on Phase 6 / engine code.
+- Canonical RPG rules reference (attributes, formulas, effect tiers, combat) is kept as a Copilot repo memory (`nagara-rpg-rules.md`). When working on Phase 6 or rules-engine code, retrieve and cite the relevant section of `nagara-rpg-rules.md` in your response before proposing changes.
 
 ### Bug Trackers
 
 - [`.github/bugs/`](bugs/README.md) holds the trackers. Open bugs live in domain-named markdown files there (currently `engine.md` and `infra.md`); resolved bugs are archived in `resolved.md`. See [`bugs/README.md`](bugs/README.md) for the full scheme.
-- **Bug ids are global and permanent: `NB-<n>`.** Cite a bug from code as a bare `NB-<n>` (e.g. `// NB-31`) — never a filename, never `#`. Moving a bug (open → resolved, or re-triaging its severity) never changes its id, so cites keep resolving. Allocate the next id from `bugs/README.md` and bump the counter.
+- **Bug ids are global and permanent: `NB-<n>`.** Cite a bug from code as a bare `NB-<n>` (e.g. `// NB-31`) — never a filename, never `#`. Moving a bug (open → resolved, or re-triaging its severity) never changes its id, so cites keep resolving. Allocate the next id from `bugs/README.md` and bump the counter. If `bugs/README.md` is not available in context, do not guess or invent a bug id — ask the user for the current highest `NB-<n>` value before proceeding.
 - On fixing a bug, mark it `✅ Resolved` and **move the entry to `resolved.md`** in the same commit. Resolved entries are archived, not deleted, so `NB-<n>` cites to closed bugs still resolve.
 - These are **mutable trackers**, not stable repo facts. Do **not** put new bug trackers under `/memories/repo/`; that scope is `create`-only and unsuitable for living docs.
 
@@ -218,3 +243,5 @@ When making changes that affect the character data model or API, check:
 - `docs/data-contracts.md` — canonical schema and API contract
 - [nagara-addon/docs/data-contracts.md](https://github.com/skiotha/nagara-addon/blob/main/docs/data-contracts.md) — addon-side contract
 - [malizia/docs/data-contracts.md](https://github.com/skiotha/malizia/blob/main/docs/data-contracts.md) — bot-side contract
+
+If a proposed change is incompatible with a sibling contract, do not silently proceed. State the incompatibility explicitly, label it a **breaking change**, and propose either (a) a backwards-compatible alternative or (b) the minimum coordinated update needed across all three projects before the change can land.
