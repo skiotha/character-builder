@@ -688,11 +688,13 @@ trackers carry the numbering rule in their headers; every in-code
 `Bug #N` cite uses the canonical shape; optional lint test green if
 adopted; `npm test` green.
 
-## Pass F — extract conventions into instruction files (brainstorm-first)
+## Pass F — extract conventions into instruction files
 
-**Status:** deferred. Do **not** start until Pass E ships. This entry
-exists only to preserve the conventions we've accumulated so they
-don't get lost.
+**Status:** active. Brainstorm resolved 2026-06-22 (Ask-mode Q&A); Pass E
+has shipped, so Pass F proceeds. Split into four iterations, each its own
+commit + confirmation stop. Cross-repo propagation to the siblings is
+decoupled into Step 4 (its own deferred plan,
+`cross-repo-conventions-plan.md`).
 
 **Why a separate pass.** Passes A–E have, as a side effect, codified
 several conventions that currently live only inside this plan and the
@@ -715,53 +717,97 @@ Pass E copilot-instructions snippet:
    `//` (already in `.github/copilot-instructions.md`; cross-referenced
    from per-language instructions in this pass).
 
-**Brainstorm questions to answer before splitting work:**
+### Locked decisions (2026-06-22)
 
-- New `.github/instructions/bookkeeping.instructions.md` (no `applyTo`,
-  always loaded) for items 1–3 — or fold into
-  `.github/copilot-instructions.md` (Pass E already adds a subsection
-  there)? Risk of duplication if both.
-- Per-language instruction files (`hypertext.instructions.md`,
-  `styling.instructions.md`, `typesctipt.instructions.md` — sic
-  typo) currently say nothing about comment style. Move the JSDoc-in-
-  `.mjs` requirement and the module-header rule out of
-  `copilot-instructions.md` into the matching `applyTo`-scoped files?
-  Pro: shorter root file, rules co-located with the code they govern.
-  Con: rules then load only when the matching file is touched, so they
-  miss "create new module" scenarios from scratch.
-- Does any of this rise to an ADR? Probably not — ADRs record **design
-  decisions about the product**, not about how we document the
-  codebase. But "stable-vs-mutable doc graph" arguably *is* a design
-  decision (it shapes how every future contribution cites prior art).
-  Defer the ADR/no-ADR call to the brainstorm.
-- Plan template: should `.github/plans/` get a `TEMPLATE.md` that
-  pre-seeds the "References to sweep on completion" subsection so new
-  plans start correct-by-construction? Tiny file, high payoff.
-- copilot-instructions bloat: the root file keeps growing. Beyond
-  relocating rules into `instructions/`, decide at execution time
-  whether it warrants a structural slim-down or rewrite — don't
-  pre-design that here.
+- **Audience.** The conventions apply to character-builder **and the
+  siblings** (addon, malizia) — ideally all our projects later. So the
+  shared bundle is written **project-agnostic** (zero
+  nagara/character-builder-specific tokens).
+- **In-repo visibility is required.** CI and non-local agents must see
+  the conventions → committed copies; user-level VS Code instructions are
+  ruled out as the canonical home.
+- **Intra-repo and cross-repo work are decoupled.** Propagating the bundle
+  to the siblings spins out into its own deferred plan (Step 4 /
+  `cross-repo-conventions-plan.md`); the siblings are barely scaffolded,
+  have no `bugs/` trackers yet, and may adopt only a subset initially, so
+  it waits until they stabilize.
+- **`applyTo` is required frontmatter.** "Always-aware" = `applyTo: '**'`.
+  A `'**'` file loads on every request (same context cost as
+  `copilot-instructions.md`), so extracting rules into one is net-neutral
+  on context — the win is modularity + shareability. Keep the always-on
+  set tight (one bundle).
+- **Rationale home.** A brief rationale preamble lives **inside the
+  portable bundle**, so the "why" travels with the rules to every repo.
+  No separate meta-ADR.
+- **Scope guard.** Move only the five conventions above + the two named
+  rules (module-header, JSDoc-in-`.mjs`) + the coherent "Client JS" block.
+  Relocating *all* coding rules (no-`any`, server import ordering, …) is a
+  separate, larger instruction refactor — out of scope here.
 
-**Deliverables (tentative, refine in brainstorm):**
+### Allocation (what lands where, F2)
 
-- One or more files under `.github/instructions/` covering the
-  bookkeeping conventions above, with `applyTo` patterns chosen per
-  brainstorm.
-- Updates to existing per-language instruction files for any
-  comment-related rules that belong there.
-- Optional `.github/plans/TEMPLATE.md`.
-- Optional ADR if the brainstorm concludes one is warranted.
-- Update `.github/copilot-instructions.md` to point at the new
-  instruction files instead of duplicating their content.
+- **`.github/instructions/conventions.instructions.md`** — NEW portable
+  bundle, `applyTo: '**'`, project-agnostic. Holds the comment-tag
+  taxonomy, the plan-bookkeeping rule, the doc-graph principle, the
+  ADR-anchor discipline (stated generically), the general three-scale
+  code-doc ladder philosophy, and a short rationale preamble. Uses generic
+  targets ("stable docs — ADRs, design docs, data contracts, bug
+  trackers" vs "ephemeral plans"); **no concrete filenames**.
+- **`.github/copilot-instructions.md`** — keeps project orientation plus
+  the **concrete bindings** (which ADRs, `docs/reference-authoring.md`,
+  the `.github/bugs/{engine,infra,resolved,README}.md` NB layout, the two
+  lint tests) and a one-line pointer to the bundle. The now-duplicated
+  normative rules are removed; the stale inlined roadmap "Quick reference"
+  table is replaced with a pointer to `docs/roadmap.md` (Q5 slim-down).
+- **`.github/instructions/typescript.instructions.md`** (renamed from the
+  `typesctipt` typo) — gains the `.mts` module-header rule (`derived.mts`
+  as the reference shape).
+- **`.github/instructions/javascript.instructions.md`** — NEW,
+  `applyTo: "public/**/*.mjs"`. Seeded from the `copilot-instructions`
+  "Client JS" block (no TypeScript syntax, import ordering, JSDoc
+  `@param`/`@returns` on exported functions) **minus** the "follow ADR-012
+  for the DOM" bullet, which stays with hypertext.
+- **`.github/instructions/hypertext.instructions.md`** — unchanged (HTML
+  semantics, DOM/widgets, ADR-012, the DOM-facing Web-API bullet).
 
-**Sequencing:** brainstorm first (one Plan-mode session, output is a
-written split), then execute in one or two passes. Do not start until
-Pass D and Pass E are both `[x]`.
+### The four steps (each its own commit + confirmation stop)
 
-**Done when:** the conventions enumerated above each have exactly one
-canonical home in `.github/`; `.github/copilot-instructions.md` no
-longer duplicates rules that belong in `instructions/`; new plans can
-be scaffolded from a template (if one is chosen); 625+ tests green.
+- **F1 — Trivial cleanups (intra-repo).** Rename
+  `typesctipt.instructions.md` → `typescript.instructions.md` (zero code
+  refs; VS Code re-discovers by folder scan). Delete the stale, redundant
+  `.github/ROADMAP.md` — it cites retired ADR-011, 385/444 tests vs the
+  current 653, and "Phase 6 not started" — and drop its one inbound link
+  at `docs/roadmap.md:7`. **Done when:** `npm test` green; a `ROADMAP\.md`
+  grep shows no dangling all-caps reference.
+- **F2 — The factoring (the meat).** Build the portable bundle per the
+  allocation above; relocate the module-header rule into the TS file;
+  create the JS instruction file from the "Client JS" block; move the
+  ladder philosophy into the bundle; strip the moved rules from
+  `copilot-instructions` and leave one-line pointers; slim the roadmap
+  table (Q5). **Done when:** `npm test` + typecheck green; grepping the
+  bundle for repo-specific tokens
+  (`nagara|character-builder|reference-authoring|ADR-0\d\d|\.github/bugs`)
+  returns zero (the portability proof); opening a `.mts` and a `.mjs`
+  applies the right files; the bundle appears in the loaded instruction
+  context.
+- **F3 — Plan template.** Add `.github/plans/TEMPLATE.md` seeding the
+  standard skeleton — Status / Owner / Trigger, Goals, Non-goals, Steps,
+  Verification, an empty-and-explicit "References to sweep on completion",
+  Progress / Done-when — marked `Status: template` so Pass-H plan-greps
+  skip it. The two anchor lints scan `src`/`scripts`/`test`, never
+  `.github`, so the template is invisible to them — no exclusion code
+  needed. **Done when:** the template reads as a valid skeleton; lints
+  stay green.
+- **Step 4 — Cross-repo sharing (spun out, deferred).** A thin
+  `cross-repo-conventions-plan.md` capturing the locked decisions and the
+  open mechanism choice (vendored copies + sync script + drift-guard
+  *or* git submodule), to be designed once the siblings stabilize. **No
+  sibling-repo edits in this effort.**
+
+**Done when:** F1–F3 are each `[x]` with a closure log; the conventions
+have exactly one canonical home in `.github/`; `copilot-instructions.md`
+no longer duplicates relocated rules; the cross-repo plan stub exists;
+653+ tests green.
 
 ## Pass G — ADR-014 slot-naming prose sweep
 
@@ -892,6 +938,10 @@ If this work spans multiple sessions, the next session should:
   - [x] D4b — Top-level test + helpers (`test/{data-contracts,validation,reference-locale-drift}.test.mts` + `test/helpers/http.mts`) + fix broken-link cite of archived `phase6-chunkF-prereqs-plan.md` (closed 2026-06-20: 9 edits / 4 files. **REALITY-CHECK headline:** the `validation.test.mts:451` "dead XP check at lines 182-195" was **fiction** — reading `src/models/validation.mts` confirmed `validateCharacterUpdate` has no XP check; it was removed Phase 5 Session 1 (`api-infra-bugs.md #15`, ✅ Resolved). User's survey-time steer to "add a TODO for the dead code" was **voided before writing** — no dead code exists. Rewrote :451 + the stale inline `:465` "before XP check runs" to the current truth (single trait *object* push fails type validation: schema types `traits` as array; brief historical pointer to #15). `:475` restated (dropped `Phase 5 Session 1`/`Phase 6` labels → "XP validation not yet reimplemented; rpgValidators are stubs"). `:761` restated (dropped active-plan `phase6-plan Chunk F audit` cite → the test is its own drift-guard; long-term single-source fix noted as deferred). **Broken-link fix:** `reference-locale-drift.test.mts:26` dropped the archived `phase6-chunkF-prereqs-plan.md` link — ADR-016 was already cited in the same JSDoc. `:169` `(ADR-014, Item 9)` → `§action-rewrite`. `http.mts:26` `post-F.0e` → `(ADR-016)` (left `slot 2` for Pass G). **Sibling-bot cites:** `data-contracts.test.mts` ×2 `bot Phase 2 (Identity & Write Operations)` → `the bot's write-operations work (bot-integration.md §3.4)` — verified §3.4 ("Timing") is the right stable anchor; restate-don't-strip per the rubric (the bot's phase number lives in *its* doc, not our tree). `test/helpers/registry.mts:5` confirmed the **intentional** `TODO(trait-talent-registry)` cite (D2a), left untouched. Lowest-risk D-pass — all comments, no `it()` titles. 625/625 tests + typecheck green; regression grep over `test/*.mts` + `test/helpers/*.mts` = 1 (the intentional registry TODO).)
 - [x] Pass E — copilot-instructions + ADR anchors + `test/adr-anchors.test.mts` (closed 2026-06-21: **survey corrected the plan's predicted anchor list to ground-truth** via an `ADR-\d+ §…` grep — 16 distinct cited anchors, not the prediction. **Lint:** new `test/adr-anchors.test.mts` (~85 lines, zero deps) walks `src/scripts/test` for `ADR-NNN §anchor` tokens and asserts each resolves to a row in that ADR's `## Stable anchors` table (row-membership match); 16 distinct anchors + 1 sanity = 17 tests. **Appendices:** lean registry tables added to ADR-014 (6 named: action-rewrite/inheritance-fields/inflicts/is-free/toughness-write/opportunistic-effects), ADR-015 (9: numbered §3/§3a/§3e/§3f/§4/§5 + named placement-table/primary-bucketing/spell-tier-actions), ADR-016 (1: §7a). Self-contained one-liners — amendment-derived ADR-014 anchors are **registry-only**, no body-fold (Pass H WONTFIX). Ground-truth deltas vs prediction: `§slot-2-invariants` never cited (not created); `§3e` was cited but unpredicted (added); code uses bare `§3a`/`§5` not the hyphenated forms; ADR-016 `§7a` was unplanned (own 1-row appendix). **copilot-instructions:** terse "Documentation discipline" subsection added after Bug Trackers (normative rules only — stable-vs-plans cite rule, comment-tag tags, anchor-lint + sweep-list enforcement; rationale stays in this plan for Pass F to harvest). **LOOSE-END FIX (the big one):** added a "References to sweep on completion" section to `phase6-plan.md` listing the `TODO(trait-talent-registry)` (5 sites) + `TODO(weapon-inheritance)` (1 site) — closes the orphan-on-archive risk; the Pass H gate checks it. typecheck clean; 642/642 tests, +17 from the lint.)
 - [x] Pass E.5 — Bug-tracking conventions → global `NB-N` migration (closed 2026-06-21: adopted global never-reused `NB-<n>` ids decoupled from file/severity. **Renamed** `engine-weak-points.md`→`engine.md`, `api-infra-bugs.md`→`infra.md` (git mv); **created** `resolved.md` (19 closed bugs, NB-ordered, domain-tagged) + `README.md` (scheme, next-id `NB-47`, file map, move-on-close procedure). Policy (b): 38 keepers retain their digit + `NB-` prefix; the 6 colliding numbers + the *unflagged* internal `#19` dup + the triple-`#35` resolved by bumping 7 losers + `25a` → `NB-39…NB-46` (most-cited keeps the low number). **Swept** 23 in-code cites + 5 ADR cites to bare `NB-N`; fixed the one genuinely-wrong active-plan loser-cite (phase6-plan slot-2 `#19` → `NB-39`) and the two stable-ADR broken links (ADR-014 → resolved.md, ADR-016 §7a + body → infra.md/`NB-43`). **Lint:** new `test/bug-anchors.test.mts` (zero deps) resolves every `NB-N` cite against the trackers, asserts id-uniqueness, hard-fails on leftover `Bug #N` / old filenames. copilot-instructions Bug-Trackers + Documentation-discipline subsections rewritten for the NB scheme. No README old→NB table (git history decodes the 8 changed ids, per user). Frozen docs left as-is. typecheck clean; 653/653 tests, +11 from the lint.)
-- [ ] Pass F — extract accumulated conventions into instruction files (brainstorm-first, see §Pass F below)
+- [ ] Pass F — extract accumulated conventions into instruction files (brainstorm resolved 2026-06-22; four steps, see §Pass F)
+  - [x] F1 — trivial cleanups (2026-06-22; `git mv` renamed `typesctipt.instructions.md` → `typescript.instructions.md`; `git rm` deleted the stale+redundant `.github/ROADMAP.md` and dropped its See-also link at `docs/roadmap.md:7`; 653/653 tests green; rename confirmed in `.github/instructions/`. **Flagged, not edited:** a second non-link mention survives at `docs/roadmap.md:29` — the Phase-0 deliverable checklist item `- [x] `.github/ROADMAP.md` — summary` — left for the user to decide annotate-as-removed vs delete, since it's a historical completion record.)
+  - [ ] F2 — factor the portable bundle + relocate the module-header / Client-JS rules + slim copilot-instructions
+  - [ ] F3 — plan `TEMPLATE.md`
+  - [ ] Step 4 — cross-repo sharing (spun out → `cross-repo-conventions-plan.md`, deferred until siblings stabilize)
 - [ ] Pass G — ADR-014 slot-naming prose sweep (independent; see §Pass G below)
 - [ ] Pass H — Deferred-items reconciliation (final gate; see §Pass H below)

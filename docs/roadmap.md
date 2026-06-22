@@ -3,8 +3,6 @@
 > Multi-session work plan. Each phase is self-contained and leaves the project
 > in a working state. Phases can span multiple sessions but should not be
 > left half-finished.
->
-> See also: [.github/ROADMAP.md](../.github/ROADMAP.md) for the summary.
 
 ---
 
