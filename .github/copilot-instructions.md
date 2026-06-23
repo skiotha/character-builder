@@ -92,24 +92,13 @@ Imports are ordered by category, separated by blank lines:
 If an import line contains both functions and constants, order it by the
 highest-priority item (functions > constants).
 
-### Code Documentation
+### Code & documentation conventions
 
-Written code carries explanatory comments at three scales. **Default to the smallest scope that fully documents the contract:** use a module header only when the change affects the module's stated invariants, a JSDoc block when an exported function's contract changes, and inline `//` comments for every other non-obvious change. The three scales:
+The project-agnostic three-scale comment ladder (module header → function doc-comment → inline `//`), the what-to-comment guidance, and the keep-comments-current rule live in [`instructions/conventions.instructions.md`](instructions/conventions.instructions.md) (always loaded). Language specifics live in the matching instruction files:
 
-- **Top-of-file module header** — use for any non-trivial `.mts` module (rules engine, models, multi-step routes). Document the module's purpose, where it sits in the larger flow, and any cross-cutting invariants. The header in [`src/rules/derived.mts`](../src/rules/derived.mts) (numbered pipeline overview) is the reference shape. Keep it current when the pipeline changes.
-- **Function-level JSDoc block** — use above any exported function whose contract isn't obvious from the signature, and above any non-exported function with non-trivial semantics. In `.mts` write a `/** ... */` block describing **what the function guarantees** (not what it does line-by-line) and any preconditions / phase ordering it relies on. In **client `.mjs` files use JSDoc descriptions consistently** — they're the only type signal and the existing client code (e.g. [`public/api.mjs`](../public/api.mjs)) is fully annotated; new client functions should match.
-- **Inline `//` comments** — use for non-obvious branches, phase markers (`// ── N. addFlat ─────`), and for citing the ADR / bug entry that explains *why* the code does what it does. Prefer `// NB-31` or `// ADR-015 §3f` over restating the rule.
-
-Don't comment trivial mechanics (variable names speak for themselves). Do comment: invariants the engine depends on, non-obvious resets / orderings, gotchas that already burned someone (the mock-before-import gotcha below is the model).
-
-When you change a behaviour the comments describe, update the comments in the same edit. Stale doc-comments are worse than missing ones.
-
-### Client JS (`public/**/*.mjs`)
-
-- Plain JavaScript with native ES modules — **no TypeScript syntax** (no `import type`, no type annotations).
-- Follow the same import-ordering categories as server code, minus the absent `node:` tier: functions first, then constants, separated by blank lines.
-- Every exported function carries a JSDoc block with `@param` / `@returns` — these are the only type signals (see [`public/api.mjs`](../public/api.mjs) for the reference shape).
-- Follow ADR-012 for the DOM: prefer native widgets and modern CSS over custom JS.
+- **Server `.mts`** — the non-trivial-module header rule: [`instructions/typescript.instructions.md`](instructions/typescript.instructions.md). [`src/rules/derived.mts`](../src/rules/derived.mts) is the reference shape.
+- **Client `.mjs`** — no TypeScript syntax, client import ordering, and the `@param`/`@returns` JSDoc requirement: [`instructions/javascript.instructions.md`](instructions/javascript.instructions.md). [`public/api.mjs`](../public/api.mjs) is the reference shape.
+- **DOM / CSS** — ADR-012 widget & modern-CSS preferences: [`instructions/hypertext.instructions.md`](instructions/hypertext.instructions.md), [`instructions/styling.instructions.md`](instructions/styling.instructions.md).
 
 ### Commands
 
@@ -172,10 +161,10 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 
 ### Documentation discipline
 
-- **Stable cite targets** for code comments / JSDoc / test titles: ADRs (`ADR-NNN`, or `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md`, and bug ids (`NB-N` — global and permanent; see Bug Trackers above). **Never** cite `.github/plans/*`, phase names, chunk letters, or numbered amendment items from code; plans are short-lived and archived to `done/` once shipped.
-- **The one allowed plan reference** is inside a `TODO(<scope>)` whose lifetime matches the plan's — remove the TODO and its cite together when the plan ships.
-- **Comment tags:** `TODO(<scope>)` (missing capability; may append `Tracked in .github/plans/<file>.md`); `FIXME(<scope>)` (known-broken path; cite the relevant `NB-N`); plain `//` / `NOTE:` (stable prose, no plan cites).
-- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. Every active plan under `.github/plans/` carries a "References to sweep on completion" list of the `TODO(<scope>)` sites to revisit when it ships.
+The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<scope>)` / `FIXME(<scope>)` / `NOTE:` comment-tag taxonomy, the plan "References to sweep on completion" bookkeeping, and the ADR stable-anchor rule — live in [`instructions/conventions.instructions.md`](instructions/conventions.instructions.md) (always loaded). The character-builder bindings:
+
+- **Stable cite targets here:** ADRs in `docs/decisions/` (cite `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md` (incl. [`docs/reference-authoring.md`](../docs/reference-authoring.md)), and the `.github/bugs/` NB trackers (`NB-N`; see Bug Trackers above). Plans, phase/chunk names, and numbered amendment items are **never** cite targets.
+- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. Every active plan under `.github/plans/` carries a "References to sweep on completion" list.
 
 ### Domain Layer (ADR-013)
 
@@ -218,21 +207,7 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 
 ## Roadmap
 
-See `docs/roadmap.md` for the full phased work plan. Quick reference:
-
-| Phase | Focus                            | Status      |
-| ----- | -------------------------------- | ----------- |
-| 0     | Documentation & decisions        | ✅ Done     |
-| 1     | Project restructure              | ✅ Done     |
-| 2     | TypeScript migration             | ✅ Done     |
-| 3     | Schema-driven rendering          | ✅ Done     |
-| 4     | Testing                          | ✅ Done\*   |
-| 5     | Bug fixes & hardening            | ✅ Done     |
-| 6     | RPG Engine                       | In progress |
-| 7     | Sibling project integration      | Not started |
-| 8     | Polish & beyond MVP              | Not started |
-
-\* _Server-side tests complete (607 as of 2026-05-09). Engine + client-side test suites run alongside Phases 6 and 8 respectively. Phase 6 is mid-flight: Chunks A–F shipped (per-slot combat, typed effects, quality registry, bulk reference normalization); a Chunk-F post-pass amendment is closing remaining engine items — see [`.github/plans/phase6-plan.md`](../.github/plans/phase6-plan.md) and [`.github/plans/done/phase6-chunkF-postpass-amendment.md`](../.github/plans/done/phase6-chunkF-postpass-amendment.md)._
+See [`docs/roadmap.md`](../docs/roadmap.md) for the full phased work plan and current status.
 
 ## Sibling Projects
 
