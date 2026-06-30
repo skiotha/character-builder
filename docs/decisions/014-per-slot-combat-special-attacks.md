@@ -27,9 +27,16 @@ combat.carried: [Slot | null, Slot | null, Slot]
 //                ^slot 0       ^slot 1       ^slot 2 (required)
 ```
 
-- **Slot 0** — primary carried weapon. Nullable.
-- **Slot 1** — secondary carried weapon. Nullable.
-- **Slot 2** — *non-disarmable* weapon. **Required.** Must reference a weapon whose `qualities[]` contains `"own"` (natural weapons, body-mounted weapons). On character creation, defaults to `natural_weapon`.
+- **Slot 0 — the main-hand.** Primary carried weapon. Nullable.
+- **Slot 1 — the off-hand.** Secondary carried weapon. Nullable.
+- **Slot 2 — the own slot.** *Non-disarmable* weapon. **Required.** Must reference a weapon whose `qualities[]` contains `"own"` (natural weapons, body-mounted weapons). On character creation, defaults to `natural_weapon`.
+
+**Slot naming convention.** Refer to the slots by their role names —
+**main-hand** (index 0), **off-hand** (index 1), **own** (index 2) — in
+prose, UI labels, comments, and commit messages. The numeric tuple is an
+implementation detail; a bare "slot 2" is ambiguous, so prefer the role
+name. Code that indexes the tuple (`carried[2]`) legitimately uses the
+index.
 
 Each `Slot` references a weapon by index into `equipment.weapons[]`:
 
@@ -55,7 +62,7 @@ The canonical character record describes what a character *carries*, not what th
 The rules engine's combat phase runs once per non-empty slot. The slot's weapon is matched against each combat-targeted effect's `appliesTo` predicate (see [ADR-015](015-typed-effect-targets-final.md)). Effects that match contribute to that slot's derived fields; non-matching effects are
 ignored for that slot.
 
-This makes "Polearm grants +d6 to polearm-typed weapons" naturally expressible: the predicate is `{ kind: "type", values: ["polearm"] }`, slot 0 matches if it holds a polearm, slot 1 matches independently.
+This makes "Polearm grants +d6 to polearm-typed weapons" naturally expressible: the predicate is `{ kind: "type", values: ["polearm"] }`, the main-hand matches if it holds a polearm, the off-hand matches independently.
 
 ### 4. Derived `SpecialAttack[]` and `Reaction[]`
 
@@ -157,7 +164,7 @@ The engine has no mechanism to cancel an effect granted by a lower tier. This fo
 - *Berserk-novice's* "Defense cap 5 during rage" is **re-tiered as Tier C narrative.** Rage is a temporary toggle anyway, not a permanent character modification; sibling apps can apply the cap when rage is active. *Berserk-novice's* `+d6` melee `bonusDamage` stays Tier A.
 - This eliminates the only known cancellation case in the catalog and keeps the engine purely additive.
 
-### 8. Slot 2 invariants
+### 8. Own-slot invariants
 
 The validator enforces:
 
@@ -218,14 +225,14 @@ renumbering a listed anchor is a breaking change for those citations.
 
 - Per-weapon derived stats become first-class. Polearm-vs-Marksmanship-vs-Behemoth interactions stop being a `combat.bonusDamage` concatenation hack.
 - `SpecialAttack[]` / `Reaction[]` give sibling apps a stable contract for rendering invocable abilities — no string parsing of trait descriptions.
-- Slot 2 + the `"own"` quality guarantee every character has a fallback weapon that cannot be disarmed.
+- The own slot + the `"own"` quality guarantee every character has a fallback weapon that cannot be disarmed.
 - Removing `combat.active` removes a source of cross-project drift.
 - Additive-only stacking is simple to reason about and removes the only case where data shape would otherwise need a "cancellation" mechanism.
 
 **Negative**
 
 - Schema migration is breaking. `combat.weapons[]` and the scalar `attackAttribute` / `baseDamage` / `bonusDamage` fields go away. Existing characters in `data/characters/` are wiped during Chunk D — no migration code path.
-- Sibling integration docs need updates (no `combat.active`, new derived collections, slot-2 contract). Tracked in Chunk H.
+- Sibling integration docs need updates (no `combat.active`, new derived collections, own-slot contract).
 
 **Acceptable**
 

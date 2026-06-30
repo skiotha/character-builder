@@ -23,8 +23,8 @@ const rpgValidators = {
 //
 // Enforces the 3-slot shape on input. The only writable inner field is
 // `weaponIndex`; everything else is recalc output and any other key in
-// the slot object is rejected. Slot 2 is required and must point at a
-// weapon that has the `own` quality (the `natural_weapon` seed satisfies
+// the slot object is rejected. The own slot is required and must point at
+// a weapon that has the `own` quality (the `natural_weapon` seed satisfies
 // this by default — see deriveCombat in src/rules/derived.mts).
 function validateCombatCarried(
   value: unknown,
@@ -732,7 +732,7 @@ export const CHARACTER_SCHEMA: Record<
     weapons: {
       type: "array",
       permissions: perm_default,
-      // ADR-014: index 0 is the synthetic natural-weapon anchor for slot 2.
+      // ADR-014: index 0 is the synthetic natural-weapon anchor for the own slot.
       default: [
         {
           id: "natural_weapon",

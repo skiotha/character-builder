@@ -108,7 +108,7 @@ describe("combat contract", () => {
     assert.equal((combat.carried as unknown[]).length, 3);
   });
 
-  it("slot 2 references a weapon by index", () => {
+  it("own slot references a weapon by index", () => {
     const slot2 = (combat.carried as unknown[])[2] as Record<string, unknown>;
     assert.equal(typeof slot2.weaponIndex, "number");
   });

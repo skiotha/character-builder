@@ -112,7 +112,7 @@ function makeCharacter(
     equipment: {
       money: 5,
       weapons: [
-        // Slot 2 anchor: synthetic natural_weapon (own quality, ADR-014).
+        // Own-slot anchor: synthetic natural_weapon (own quality, ADR-014).
         {
           id: "natural_weapon",
           name: "natural_weapon",

@@ -41,8 +41,8 @@ function weapon(
 
 /**
  * Build a typed character carrying the given weapons. `equipment.weapons`
- * is the array; `combat.carried` references entries by index. Slot 2 is
- * always pinned to the natural_weapon synthesized at index 0 of the
+ * is the array; `combat.carried` references entries by index. The own slot
+ * is always pinned to the natural_weapon synthesized at index 0 of the
  * fixture's default equipment unless an `own`-qualified weapon is added
  * to `weapons`.
  */
@@ -234,7 +234,7 @@ describe("deriveCombatSlots: predicate routing", () => {
 // ── deriveCombatSlots — slot defaults & enforcement ────────────────
 
 describe("deriveCombatSlots: slot shape", () => {
-  it("empty slot 0/1 stays null; slot 2 always present", () => {
+  it("empty main-hand/off-hand stay null; own slot always present", () => {
     const result = recalculate(
       makeTypedCharacter() as Character,
       emptyRegistry,
@@ -255,9 +255,9 @@ describe("deriveCombatSlots: slot shape", () => {
     assert.deepEqual(result.combat.carried[0]!.flags, []);
   });
 
-  it("slot 2 own-quality enforced — natural_weapon synthesized when missing", () => {
+  it("own slot enforces the own quality — natural_weapon synthesized when missing", () => {
     // Construct a character whose equipment.weapons has no `own` weapon.
-    // The synthesis logic must add one and pin slot 2 to it.
+    // The synthesis logic must add one and pin the own slot to it.
     const char = makeTypedCharacter({
       equipment: { weapons: [weapon("longsword", "main", 4)] },
       combat: { carried: [null, null, { weaponIndex: 0 }] },
@@ -466,7 +466,7 @@ describe("deriveCombatSlots: weaponQuality add/remove", () => {
 
   it("registry-resolved weapon quality (ADR-016): effects scope to the carrying weapon", () => {
     // `fortified` quality registry entry adds +2 baseDamage. It is
-    // listed on the polearm only, so the sword in slot 0 is unaffected
+    // listed on the polearm only, so the sword in the main-hand is unaffected
     // even though the same id could appear elsewhere.
     const sword = weapon("longsword", "main", 4);
     const polearm = weapon("halberd", "polearm", 6, ["fortified"]);

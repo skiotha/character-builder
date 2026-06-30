@@ -25,7 +25,7 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
   // rituals/weapons/armor/qualities are single-source.
   // qualities: the engine throws on unknown weapon/armor qualities
   // (ADR-016), so we seed the full id set used by the default fixture
-  // weapons (most importantly `own` for slot 2).
+  // weapons (most importantly the `own` quality the own slot requires).
   const qualityIds = [
     "area",
     "balanced",

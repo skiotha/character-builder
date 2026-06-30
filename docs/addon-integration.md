@@ -104,7 +104,7 @@ For clarity, the exported object should contain exactly:
   "traditions":      [],
 
   "combat": {
-    "carried": [Slot|null, Slot|null, Slot]   // ADR-014; Slot = { weaponIndex }; slot 2 required (own quality)
+    "carried": [Slot|null, Slot|null, Slot]   // ADR-014; Slot = { weaponIndex }; own slot (index 2) required (own quality)
   },
 
   "equipment": {

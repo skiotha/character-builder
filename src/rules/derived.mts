@@ -202,8 +202,8 @@ function collectActions(
 //
 // For each non-null carried slot:
 //   1. Resolve the weapon by index. If missing or malformed, the slot
-//      is left null (slots 0/1) or replaced with the synthesized
-//      natural_weapon (slot 2 — required, ADR-014).
+//      is left null (main-hand/off-hand) or replaced with the synthesized
+//      natural_weapon (own slot — required, ADR-014).
 //   2. Reset derived per-slot state from the weapon (qualities cloned,
 //      flags empty, attackAttribute = "accurate", baseDamage =
 //      weapon.damage, bonusDamage = 0).
@@ -336,7 +336,7 @@ function deriveCombatSlots(
   const equipment = character.equipment;
   const weapons = (equipment?.weapons ?? []) as Weapon[];
 
-  // Locate or synthesize the `own` weapon (slot 2 anchor).
+  // Locate or synthesize the `own` weapon (own-slot anchor).
   let ownIndex = weapons.findIndex(
     (w) => Array.isArray(w?.qualities) && w.qualities.includes("own"),
   );

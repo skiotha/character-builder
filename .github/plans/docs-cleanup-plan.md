@@ -8,6 +8,7 @@ This plan replaces those references with citations to stable documents and
 codifies the discipline going forward.
 
 ## Goals
+**(Amended 2026-06-30 by Pass G.5: stripping ephemeral plan-coordinate scaffolding — chunk/phase/Item cites, the Implementation-chunks tables, `.github/plans/*` links — from ADRs is now in scope. The decisions, rationale, and consequences stay verbatim; only the dead plan-coordinate framing is cut.)**
 
 1. Archive completed plans; keep only in-progress plans at the top level.
 2. Rename and detoxify `docs/authoring-effects.md` into a stable standalone
@@ -801,7 +802,7 @@ Pass E copilot-instructions snippet:
   `cross-repo-conventions-plan.md` capturing the locked decisions and the
   open mechanism choice (vendored copies + sync script + drift-guard
   *or* git submodule), to be designed once the siblings stabilize. **No
-  sibling-repo edits in this effort.**
+  sibling-repo edits in this effort.** the Pass G.5 docs plan-cite grep is clean (modulo exempt roadmap.md + any confirmed deferred-tasks.md carve-out)
 
 **Done when:** F1–F3 are each `[x]` with a closure log; the conventions
 have exactly one canonical home in `.github/`; `copilot-instructions.md`
@@ -842,6 +843,25 @@ convention: `slot[ -]?[012]\b` over `src/`, `scripts/`, `test/` returns
   model, the index↔role mapping) legitimately references indices — leave
   those.
 
+**Locked additions (2026-06-30, blessed pre-execution).** Survey found the
+convention is *asserted* (copilot-instructions, `rpg-types.mts` JSDoc, the
+`weapon-slots.mjs` UI labels) but **absent from ADR-014 itself**, which used
+a divergent vocabulary (primary / secondary / non-disarmable). So Pass G
+widens beyond the §8 heading:
+- **ADR-014 §1 (keystone)** — fold the role names into the slot definitions
+  and add an explicit "Slot naming convention" note (reconciles
+  primary↔main-hand, secondary↔off-hand, non-disarmable↔own). Makes the
+  copilot-instructions attribution honest and anchors every positional
+  "slot N" elsewhere.
+- **ADR-014 §3 / Consequences** — light touch to role names; drop the stale
+  "Tracked in Chunk H" cite on the own-slot-contract bullet.
+- **Contract docs** (`data-contracts.md`, `addon-integration.md`) — keep
+  positional wire-array language (the index *is* precise there) but add a
+  one-time role gloss (`index 2 — own`).
+- **Skipped deliberately:** `roadmap.md` (Phase 8 future-UI deliverable) and
+  `deferred-tasks.md` (frozen "Subsumed by ADR-014" blockquote) keep their
+  positional "slot 2" — low-traffic, now anchored by the ADR §1 statement.
+
 **Files (prose sites):** `src/models/character.mts`,
 `src/rules/derived.mts`, `test/data-contracts.test.mts`,
 `test/helpers/{fixtures,http,registry}.mts`,
@@ -862,9 +882,107 @@ collisions after rewrites (none expected).
 (definitional ADR prose exempt); ADR-014 role names are used instead;
 tests green.
 
+## Pass G.5 — Docs plan-cite sweep (chunk/phase/Item rot in stable docs)
+
+**Status:** active follow-on. Runs after Pass G, before the Pass H gate.
+Triggered 2026-06-30 when Pass G's ADR-014 edits surfaced that `docs/` is
+littered with the same plan/chunk/phase/Item rot Pass D cleared from code —
+but Pass D scoped only `src/`/`scripts/`/`test/`, so the docs tree was never
+swept. A reader gains nothing from "Chunk F.0c–F.0d" once the plan ships and
+is archived.
+
+**Problem.** Stable design/contract docs cite ephemeral plan coordinates —
+chunk letters, `Phase N` / `Phase 6 Step N` labels, numbered `Item N` /
+amendment items, and direct `.github/plans/*` links. The referenced plans
+are shipped and archived; the cites are dead scaffolding. This is the Pass D
+"stale cite" rubric applied to the one tree Pass D skipped.
+
+**Scope — in (~6 ADRs + ~5 top-level docs, ~55–60 sites; re-grep at exec):**
+- **ADRs** (`docs/decisions/*.md`) — the meat:
+  - **ADR-016** (~14, densest): "as Chunk E crystallized", "Chunk F's bulk",
+    the strictness mile-markers ("Chunk F.0c–F.0d", "Chunk F.0e", "Chunk C
+    empty-trait"), "land in Chunk G", "post-Chunk-G", "Phase 7 sibling
+    integration", and the `phase6-chunkF-prereqs-plan.md` link ×2.
+  - **ADR-014** (~9): Context "Phase 6 engine rework"; `Item 9` ×2;
+    "Post-Chunk-F amendment / amendment Items 1,6,8,12"; "Item 1 … Chunk G";
+    "wiped during Chunk D"; the **## Implementation chunks** table + its
+    `phase6-plan.md` link.
+  - **ADR-015** (~6): "Phase 6 engine rework"; "registry deserializer
+    (Chunk G)" ×2; "as Chunk F surfaces"; "owned by Chunk F"; its own
+    **## Implementation chunks** section.
+  - **ADR-010** (~6): the "existing Phase 6 roadmap steps" numbered list
+    (Phase 6 Gate / Step 2 / 3 / 4 / 5).
+  - **ADR-012** (1) "Phase 8 (Polish) of the roadmap"; **ADR-006** (1)
+    "added post-Phase 2" in a tree diagram.
+- **Top-level docs:** `data-contracts.md` (Chunk D, post-Chunk-F, amendment
+  Items, Chunk G registry), `architecture.md` ("(Phase 6+)", "Phase 6 Step
+  0", "removed in Phase 3"), `bot-integration.md` / `addon-integration.md`
+  (sibling-phase + our-phase + roadmap-pointer cites).
+
+**Scope — out (exempt):**
+- **`docs/roadmap.md`** — the phase tracker itself (~40 hits). Its phase
+  headings, per-session closure notes, and links to its own archived plans
+  are its legitimate function — the direct analogue of Pass D exempting the
+  `.github/bugs/` trackers. Sweeping it would gut the tracker.
+- **`docs/decisions/` Stable-anchors tables** — already clean (Pass E).
+
+**Key techniques (Pass D rubric + two doc-specific):**
+1. **`Item N` → `§anchor`.** Pass E already minted the stable anchors the old
+   Item numbers map to (`Item 9`→`§action-rewrite`; amendment `Item 1`→
+   `§inheritance-fields`, `6`→`§inflicts`, `8`→`§is-free`, `11`→
+   `§toughness-write`, `7`→`§opportunistic-effects`, `12`→ADR-015
+   `§placement-table`). ADR bodies now cite their **own** anchors instead of
+   dead plan-item numbers — and `test/adr-anchors.test.mts` checks them.
+2. **`## Implementation chunks` tables → one-line breadcrumb.** Collapse the
+   aspect→chunk-letter table + plan link to "Implemented across the Phase 6
+   engine work; see `docs/roadmap.md` for status." Don't delete blind — the
+   pointer has value; the chunk table does not.
+3. **Inline chunk mile-markers → current behaviour.** "(Chunk G)" qualifiers,
+   "Chunk F.0c–F.0e" strictness phases, "as Chunk E crystallized" → state the
+   live rule. **APPLY THE PASS D CITE-REWRITE DISCIPLINE: reality-check every
+   restatement against current code/behaviour — do not smuggle a changed
+   claim** (the D3 `amendmentBlockers`→fiction near-miss is the cautionary
+   tale; the same trap exists here for ADR-016's strictness prose).
+4. **Plan links / sibling-phase cites → stable surfaces.** Drop
+   `phase6-plan.md` / `phase6-chunkF-prereqs-plan.md` links (cite the ADR's
+   own rules, `reference-authoring.md`, or the roadmap). "before the bot's
+   Phase 2" → capability language ("before the bot implements write ops") —
+   the sibling's phase number lives in *its* repo (Pass D rubric §4).
+
+**Open questions (confirm before executing):**
+- **`docs/deferred-tasks.md` (~6 sites)** — stable doc (sweep) or tracker
+  (exempt)? It records deferred work with "Subsumed by Phase 6 Step 0" /
+  "Shipped in Chunk A" *resolution annotations* — tracker behaviour. **Lean:
+  treat like the roadmap** — keep resolution annotations, sweep only
+  genuinely-dead forward-looking refs.
+- **Roadmap-pointer phase numbers** (ADR-012 "Phase 8 of the roadmap",
+  architecture "roadmap Phase 7", ADR-010's "Phase 6 roadmap steps") — keep
+  the "see the roadmap" pointer but drop the specific phase number (phases
+  renumber), or leave as-is? **Lean: drop the number, keep the pointer.**
+
+**Verification.**
+1. `npm run typecheck` + `npm test` green (incl. `test/adr-anchors.test.mts`
+   — the `Item N`→`§anchor` rewrites must resolve to real anchor rows).
+2. Grep `Chunk[ -]?[A-Z0-9]|Phase [0-9]|\.github/plans|amendment|Item [0-9]+`
+   over `docs/` **minus `roadmap.md`** (and minus `deferred-tasks.md` if
+   exempted) → only legitimate residue (lowercase engine "combat phase" /
+   "pipeline phase"; any intentionally-kept generic roadmap pointers).
+3. No `.github/plans/*` link survives in any ADR or top-level contract doc.
+4. Reality-check pass: each restated rule still matches current behaviour
+   (no smuggled semantics).
+
+**References to sweep on completion.** None — this pass *removes* plan cites
+from docs; it adds no code-side `TODO(<scope>)`.
+
+**Done when:** the verification grep is clean across `docs/` (modulo the
+exempt `roadmap.md` + any confirmed `deferred-tasks.md` carve-out); ADR
+bodies cite their own `§anchor`s instead of `Item N`; no Implementation-
+chunks-table plan links remain; the decisions/rationale/consequences are
+unchanged; tests green.
+
 ## Pass H — Deferred-items reconciliation (final gate)
 
-**Status:** the closeout. Runs **last**, after Passes A–G are all `[x]`.
+**Status:** the closeout. Runs **last**, after Passes A–G.5 are all `[x]`.
 Exists because this effort has repeatedly deferred items, and a deferral
 with no durable home silently rots (the Pass G "phantom sweep" was a
 near-miss). This pass makes "nothing forgotten" a checked invariant.
@@ -889,7 +1007,7 @@ each is closed):**
 - `TODO(trait-talent-registry)` ×6 + `TODO(weapon-inheritance)` ×1 →
   pending `phase6-plan.md` sweep-list (Pass E step 1).
 - natural_weapon schema-default drift → `NB-45` (`infra.md`) ✅ (2026-06-21).
-- ADR-014 `### 8` heading "Slot 2 invariants" → Pass G (docs scope) ✅ when G runs.
+- ADR-014 `### 8` heading "Slot 2 invariants" → Pass G (docs scope) ✅ (2026-06-30, G shipped).
 - "Fold post-Chunk-F amendment into ADR-014 body" → **decided WONTFIX**:
   the Pass E stable-anchor *registry* homes the amendment anchors without
   re-deriving the rules; no body-fold needed.
@@ -942,5 +1060,6 @@ If this work spans multiple sessions, the next session should:
   - [x] F2 — factor the portable bundle + relocate rules + slim copilot-instructions (2026-06-23; created `.github/instructions/conventions.instructions.md` (`applyTo: '**'`, project-agnostic bundle: why-preamble + stable-vs-ephemeral cite discipline + comment-tag taxonomy + plan-bookkeeping + decision-record anchors + three-scale code-doc ladder) and `javascript.instructions.md` (`applyTo: "public/**/*.mjs"`: no-TS-syntax, client import order, `@param`/`@returns` JSDoc — seeded from the old "Client JS" block minus the ADR-012/DOM bullet, already covered by hypertext); added the `.mts` module-header rule to `typescript.instructions.md`; slimmed copilot-instructions — replaced the "Code Documentation" + "Client JS" sections with a pointer, cut "Documentation discipline" down to the character-builder bindings + enforcement (rules now in the bundle), and swapped the stale roadmap "Quick reference" table (cited retired chunks + a 607-tests-as-of date) for a one-line pointer to `docs/roadmap.md`. Portability grep on the bundle (`nagara|character-builder|reference-authoring|ADR-0\d\d|.github/bugs|NB-\d|docs/decisions|test/*.test.mts`) = zero; typecheck clean; 653/653 tests green. Scope guard held — general coding rules (import ordering, no-`any`) left in place. Next-turn check: confirm the bundle appears in the loaded instruction-context block.)
   - [x] F3 — plan `TEMPLATE.md` (2026-06-23; created `.github/plans/TEMPLATE.md` — Status/Owner/Trigger header + Goals + Non-goals + Steps-with-"Done when" + Verification + an empty-and-explicit "References to sweep on completion" + Progress; marked `Status: template` so plan-greps skip it. Anchor lints scan `src`/`scripts`/`test` only, so the template is invisible to them; typecheck clean; 653/653 tests green.)
   - ⤳ Step 4 — cross-repo sharing: **spun out** to `cross-repo-conventions-plan.md`, deferred until active sibling work resumes. **Not** a completion gate for this plan (which may be retired first).
-- [ ] Pass G — ADR-014 slot-naming prose sweep (independent; see §Pass G below)
+- [x] Pass G — ADR-014 slot-naming prose sweep + docs convention statement (closed 2026-06-30; 26 edits / 11 files; behaviour-neutral, 653/653 tests + typecheck green). **Scope widened pre-execution (user-blessed):** survey found the slot-naming convention (index 0 main-hand / 1 off-hand / 2 own) was asserted in `copilot-instructions.md`, `src/rpg-types.mts` JSDoc, and the `weapon-slots.mjs` UI labels but **absent from ADR-014**, which used a divergent vocabulary (primary/secondary/non-disarmable). **Keystone fix:** ADR-014 §1 now folds the role names into the slot definitions + carries an explicit "Slot naming convention" note (reconciles primary↔main-hand, secondary↔off-hand, non-disarmable↔own), making the copilot-instructions attribution honest. **ADR-014 also:** §8 heading "Slot 2 invariants" → "Own-slot invariants" (number stays `8`, anchor-lint-safe — nothing cites §8); §3 polearm example + a Consequences bullet reworded to role names; dropped the stale "Tracked in Chunk H" cite on the own-slot-contract bullet (left the adjacent historical "wiped during Chunk D" — out of slot-naming scope, flagged here for any future ADR chunk-cite detox). **Contract docs** (`data-contracts.md` ×3 sites, `addon-integration.md` ×1) kept positional wire-array language but gained a one-time role gloss (`index 2 — own`). **src/test prose sweep:** `character.mts` ×2, `derived.mts` ×2 (comments only; `slot0/1/2` locals + `carried[N]` indexing left per plan), `combat.test.mts` ×4 (incl. 2 `it()` titles — no describe-block collisions), `quality-registry.test.mts` ×3, `registry.mts` ×3, `fixtures.mts` ×1, `http.mts` ×1, `data-contracts.test.mts` ×1 title. **Deliberately skipped:** `roadmap.md:593` (Phase 8 future-UI deliverable) + `deferred-tasks.md:399` (frozen "Subsumed by ADR-014" blockquote) — low-traffic positional usages now anchored by ADR §1. **Verification:** typecheck clean; 653/653 tests; re-grep `slot[ -]?[012]` over src/test/docs returns only `slot0/1/2` locals, `carried[N]` indexing, the ADR §1 definitional bullets/diagram (now role-paired), the convention note's own "bare 'slot 2' is ambiguous" self-quote, and the two deliberate skips. `public/` confirmed already compliant (`SLOT_LABELS = ["Main-hand","Off-hand","Own"]`) — no edits.)
+- [ ] Pass G.5 — Docs plan-cite sweep (chunk/phase/Item rot in ADRs + contract docs; runs after G, before the H gate; see §Pass G.5 below)
 - [ ] Pass H — Deferred-items reconciliation (final gate; see §Pass H below)

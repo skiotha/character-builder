@@ -9,7 +9,7 @@
 //     weapon (id + slot index) or armor piece (body|plug + id)
 //   * the strict path is the default (ADR-016) — the test stub no longer
 //     silently absorbs unmapped ids; tests must register every quality
-//     they reference (using `BASE_QUALITIES` for the slot-2 anchor).
+//     they reference (using `BASE_QUALITIES` for the own-slot anchor).
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
@@ -188,7 +188,7 @@ describe("quality registry: unknown ids throw (ADR-016 strict)", () => {
       },
     }) as Character;
 
-    // `own` registered (slot 2 anchor); `never_registered` is not.
+    // `own` registered (own-slot anchor); `never_registered` is not.
     const strict = createInMemoryRegistry({ qualities: { ...BASE_QUALITIES } });
     assert.throws(
       () => recalculate(char, strict),
@@ -255,10 +255,10 @@ describe("quality registry: unknown ids throw (ADR-016 strict)", () => {
 
 describe("quality registry: BASE_QUALITIES default fixture", () => {
   it("`own` resolves cleanly through the strict path on a default character", () => {
-    // The default fixture seeds slot 2 with a natural_weapon carrying
-    // the `own` quality. Recalc with the bare emptyRegistry must NOT
-    // throw — emptyRegistry pre-registers BASE_QUALITIES so the
-    // slot-2 anchor doesn't blow up. Any *other* quality on a fixture
+    // The default fixture seeds the own slot with a natural_weapon
+    // carrying the `own` quality. Recalc with the bare emptyRegistry must
+    // NOT throw — emptyRegistry pre-registers BASE_QUALITIES so the
+    // own-slot anchor doesn't blow up. Any *other* quality on a fixture
     // weapon/armor would throw, which is the desired strict default.
     const char = makeTypedCharacter() as Character;
     assert.doesNotThrow(() => recalculate(char, emptyRegistry));

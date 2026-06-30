@@ -84,15 +84,16 @@ This is the **source of truth** — all other formats derive from it.
 
   // ── Combat (ADR-014: per-slot) ──
   // The 3-slot `carried` tuple is the ONLY writable combat surface.
-  // Slot 2 is required and must reference a weapon with the `own` quality.
+  // The own slot (index 2) is required and must reference a weapon with
+  // the `own` quality.
   // Per-slot derived fields (attackAttribute / baseDamage / bonusDamage /
   // qualities / flags) plus top-level specialAttacks / reactions are
   // pure recalc output — present in API responses, NOT in PATCH payloads.
   "combat": {
     "carried": [
-      null,                             // slot 0: { "weaponIndex": number } | null
-      null,                             // slot 1: { "weaponIndex": number } | null
-      { "weaponIndex": 0 }              // slot 2: required, references own-quality weapon
+      null,                             // index 0 — main-hand: { "weaponIndex": number } | null
+      null,                             // index 1 — off-hand:  { "weaponIndex": number } | null
+      { "weaponIndex": 0 }              // index 2 — own: required, references own-quality weapon
     ]
   },
 
@@ -241,13 +242,13 @@ Writable storage shape — the only thing PATCH accepts:
 
 ```jsonc
 {
-  "carried": [Slot | null, Slot | null, Slot]   // exactly 3 entries; slot 2 required
+  "carried": [Slot | null, Slot | null, Slot]   // exactly 3 entries; own slot (index 2) required
 }
 ```
 
 Where `Slot = { "weaponIndex": number }` (no other inner keys are accepted).
-Slot 2 must reference a weapon in `equipment.weapons` with the `own` quality
-(default `natural_weapon`, seeded at index 0 on creation).
+The own slot (index 2) must reference a weapon in `equipment.weapons` with
+the `own` quality (default `natural_weapon`, seeded at index 0 on creation).
 
 Derived (recalc-only, present in API responses but rejected on PATCH):
 
