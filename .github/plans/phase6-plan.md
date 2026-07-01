@@ -80,7 +80,7 @@ chunks that resolve them.
 >
 > Live deliverables: ADR-014, ADR-015, ADR-011 (status header updated),
 > `data/armor.{en,ru}.json` rewritten, `docs/data-contracts.md` §1.1 rewritten,
-> `docs/deferred-tasks.md` refreshed, `.github/bugs/engine-weak-points.md`
+> `.github/plans/deferred-tasks.md` refreshed, `.github/bugs/engine-weak-points.md`
 > re-linked to chunks. 445 / 445 tests + typecheck green.
 
 **No engine code changes.** Get all design docs and reference vocabulary
@@ -138,7 +138,7 @@ into a stable state before any code moves.
    - `SpecialAttack` shape.
    - `WeaponPredicate` semantics (AND composition; default `any`).
    - Armor type vocabulary: `light` | `medium` | `heavy` | `plug`.
-6. Update `docs/deferred-tasks.md`:
+6. Update `.github/plans/deferred-tasks.md`:
    - Mark §1 (effect normalization) as in-progress with new shape.
    - Mark §3 (dual-wield) as subsumed by per-slot fanout.
    - Replace Tier-B `specialAttack`/`reaction` flag examples with
@@ -238,7 +238,7 @@ into a stable state before any code moves.
 >   note), `docs/bot-integration.md` (`data/` → `reference/` table; API
 >   marked website-internal), `docs/addon-integration.md` §7 (replaced
 >   `/api/v1/abilities` with the five new endpoints, documented locale
->   resolution), `docs/data-contracts.md` and `docs/deferred-tasks.md`
+>   resolution), `docs/data-contracts.md` and `.github/plans/deferred-tasks.md`
 >   (path updates), `README.md`, `.github/bugs/engine-weak-points.md`,
 >   and `.github/copilot-instructions.md` (URL→fs table now notes
 >   `reference/` is API-only; `reference/` listed as a top-level project
@@ -260,7 +260,7 @@ into a stable state before any code moves.
    over HTTP at all (likely yes, for client locale lookups today done from
    `/data/...`).
 6. Update path references in `docs/{bot,addon}-integration.md`,
-   `docs/data-contracts.md`, `docs/deferred-tasks.md`, `docs/architecture.md`,
+   `docs/data-contracts.md`, `.github/plans/deferred-tasks.md`, `docs/architecture.md`,
    `docs/roadmap.md` Gate.
 7. Repo memory updates (`/memories/repo/nagara-rpg-rules.md`,
    `/memories/repo/character-builder.md`).
@@ -925,7 +925,7 @@ shape is firm. Until then the three copies are accepted as a known debt.
    - Trait/spell ref validity.
 2. Update `docs/data-contracts.md` with final `EffectTarget`,
    `WeaponPredicate`, `SpecialAttack` vocabulary.
-3. Update `docs/deferred-tasks.md` — mark §1, §3 done; remove obsolete items.
+3. Update `.github/plans/deferred-tasks.md` — mark §1, §3 done; remove obsolete items.
 4. Update `.github/bugs/engine-weak-points.md` — mark #1, #2, #4, #5, #6,
    #7, #8, #9, #18, #19, #20, #21, #22, #23 resolved with date and chunk
    reference.

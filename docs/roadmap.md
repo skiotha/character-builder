@@ -473,7 +473,7 @@ Step 0 / Step 5 outline.
 [ADR-014](decisions/014-per-slot-combat-special-attacks.md),
 [ADR-015](decisions/015-typed-effect-targets-final.md)
 (supersedes [ADR-011](decisions/011-typed-effect-targets.md)),
-[deferred-tasks.md](deferred-tasks.md) §1–§3,
+[deferred-tasks.md](../.github/plans/deferred-tasks.md) §1–§3,
 [data-contracts.md](data-contracts.md) §1.1.
 
 > **Why here:** Phases 3–5 work fine with stub combat/effect values. But
@@ -504,7 +504,7 @@ Step 0 / Step 5 outline.
   (`body?.armor ?? body?.defense`) marked `TODO(phase6-chunk-D)`; dropped
   with the character wipe in Chunk D.
 - `docs/data-contracts.md` §1.1 rewritten with the locked vocabulary.
-- `docs/deferred-tasks.md` §1, §2 (armor), §3 refreshed.
+- `.github/plans/deferred-tasks.md` §1, §2 (armor), §3 refreshed.
 - `.github/bugs/engine-weak-points.md` items re-linked to chunks.
 - 445 / 445 tests + typecheck green.
 

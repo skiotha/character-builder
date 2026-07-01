@@ -1,26 +1,60 @@
 # Deferred Tasks — Effect Normalization, Reference Data, Combat
 
-> Tasks identified during the schema review gate (April 2026) and deferred
-> to future sessions. Each section is self-contained and can be tackled
-> independently.
+> **What this is.** A task backlog captured at the April 2026 schema-review
+> gate — *not* an active step-by-step plan. It was authored under `docs/`
+> and relocated to `.github/plans/` on 2026-07-01 because it is a
+> work-tracking document, not stable design truth (the design lives in the
+> ADRs it cites). Most of it shipped during the Phase 6 engine work; it is
+> kept for the handful of items that have not yet found a home. Per-section
+> status is annotated inline; the orphans are collected in the Status
+> summary just below.
 >
-> **Architectural decisions:**
-> - [ADR-010](decisions/010-effect-resolution-pipeline.md) — Effect resolution
+> **Architectural decisions (canonical design):**
+> - [ADR-010](../../docs/decisions/010-effect-resolution-pipeline.md) — Effect resolution
 >   pipeline: explicit phases, typed state, unified effect collection
-> - [ADR-011](decisions/011-typed-effect-targets.md) — Typed effect targets
->   *(superseded; kept for history)*
-> - [ADR-014](decisions/014-per-slot-combat-special-attacks.md) — Per-slot
+> - [ADR-011](../../docs/decisions/011-typed-effect-targets.md) — Typed effect targets
+>   *(superseded by ADR-015; kept for history)*
+> - [ADR-014](../../docs/decisions/014-per-slot-combat-special-attacks.md) — Per-slot
 >   combat, special attacks & reactions (subsumes §3 below)
-> - [ADR-015](decisions/015-typed-effect-targets-final.md) — Typed effect
+> - [ADR-015](../../docs/decisions/015-typed-effect-targets-final.md) — Typed effect
 >   targets, final vocabulary (5-kind union, `WeaponPredicate`, `EffectModifier`
 >   incl. `remove`, no `priority`)
 >
-> These ADRs define the foundation that the tasks below build upon. See
-> roadmap Phase 6 Step 0 for the implementation plan.
+> These ADRs define the foundation the tasks below build upon; see
+> [`docs/roadmap.md`](../../docs/roadmap.md) and [`phase6-plan.md`](phase6-plan.md)
+> for delivery status.
+
+## Status summary (audited 2026-07-01)
+
+| Section | Status | Where it landed / needs to go |
+| --- | --- | --- |
+| **§1 Effect normalization** | ✅ Largely shipped (Phase 6) | Reference catalogs carry canonical typed `effects[]` (`tier` A/B/C, typed `target`/`modifier`, `appliesTo`, promoted `reactions[]`); applicator + resolution pipeline rewritten. **Remaining:** the Tier-B *conditional-effect evaluation engine* (§1 Task 3) is deferred — tracked as **NB-12** in [`.github/bugs/engine.md`](../bugs/engine.md). |
+| **§2 Reference data** | ⚠️ Mostly shipped | `weapons` + `armor` catalogs live under `reference/`. **Orphans:** `runes.*.json` was never built (loosely noted as **NB-14**); the `traditions.*.json` “separate file?” question is unresolved (today `traditions[]` just stores ability ids). |
+| **§3 Combat dual-wield** | ✅ Subsumed | Replaced wholesale by the per-slot model in **ADR-014**. Kept for historical context only; nothing to implement. |
+| ~~§4~~ | ✅ Relocated | Client weapon-pickers moved to the roadmap's later polish phase (see [`docs/roadmap.md`](../../docs/roadmap.md)); no longer in this file. |
+
+> **Orphans still needing a home (2026-07-01):**
+> 1. **`reference/runes.*.json`** — the runic-tattoo catalog (max 3 runes
+>    per character) was never authored; only loosely mentioned by **NB-14**.
+>    If runes are still in scope, give this a roadmap slot or a tracked bug;
+>    if not, delete §2's runes block.
+> 2. **`traditions` as a separate file** — the open §2 micro-decision. The
+>    live schema stores `traditions[]` as ability ids with no separate
+>    catalog, so it is *de facto* “no separate file” — just never formally
+>    closed. Low stakes.
 
 ---
 
 ## 1. Effect Normalization
+
+> ✅ **Status (2026-07-01): largely shipped in the Phase 6 engine work.**
+> The reference catalogs carry canonical typed `effects[]` (`tier` A/B/C,
+> typed `target`/`modifier`, `appliesTo`, promoted `reactions[]` /
+> `specialAttacks`), and the applicator + resolution pipeline were rewritten
+> to consume them. The one still-deferred piece is the Tier-B *conditional-
+> effect evaluation engine* (Task 3) — tracked as **NB-12** in
+> [`.github/bugs/engine.md`](../bugs/engine.md). The tasks below are kept for
+> historical context.
 
 ### Problem
 
@@ -86,13 +120,13 @@ complex for flat modifiers (conditional triggers, multi-step interactions).
   → `{ target: { kind: "weaponQuality", quality: "unwieldy", appliesTo: [{ kind: "id", values: ["heels"] }] }, modifier: { type: "remove" } }`
 
 **Tier B — Structured Flags / Special Attacks / Reactions**.
-Flag effects use the `flag` target kind per [ADR-015](decisions/015-typed-effect-targets-final.md):
+Flag effects use the `flag` target kind per [ADR-015](../../docs/decisions/015-typed-effect-targets-final.md):
 - Advantage/disadvantage on checks → `{ kind: "flag", name: "advantage.attack" }`
 - Immunity to specific effects → `{ kind: "flag", name: "immunity.fire" }`
 
 Special attacks and reactions are **not** flag effects — they are promoted by
 the engine into the derived `SpecialAttack[]` / `Reaction[]` arrays
-(see [ADR-014](decisions/014-per-slot-combat-special-attacks.md)). Their
+(see [ADR-014](../../docs/decisions/014-per-slot-combat-special-attacks.md)). Their
 tier-data shape carries `attackAttribute`, `damage`, and `trigger` directly.
 
 **Tier C — Narrative Only** (description text, not reducible):
@@ -128,13 +162,16 @@ tier-data shape carries `attackAttribute`, `damage`, and `trigger` directly.
    - `src/rules/applicator.mts` currently uses `add`/`mul`/`set`
    - Must change to `setBase`/`addFlat`/`multiply`/`cap`
    - Add handler for `advantage` flag type
-   - **Subsumed by roadmap Phase 6 Step 0 (foundation rework) per
-     [ADR-010](decisions/010-effect-resolution-pipeline.md) and
-     [ADR-011](decisions/011-typed-effect-targets.md)**
+   - ✅ **Done in the Phase 6 engine rewrite** — the applicator switches on
+     the typed `EffectTarget` / `EffectModifier` verbs
+     ([ADR-015](../../docs/decisions/015-typed-effect-targets-final.md)); the
+     original verb-alignment gap was **NB-6**. Pipeline foundations from
+     [ADR-010](../../docs/decisions/010-effect-resolution-pipeline.md).
 
 7. **Wire effect resolution into `deriveCombat` and `recalculateDerivedFields`**
-   - **Pipeline structure comes from Phase 6 Step 0 (`collectAllEffects`,
-     phase-based processing). This task populates it with real data.**
+   - ✅ **Done** — `collectAllEffects` merges every source into one typed
+     array and the per-slot combat phase consumes it; the catalogs are
+     populated with canonical effects.
    - When a character has `traits: [{ id: "twin-attack", tier: "adept", source: "ability" }]`:
      1. Look up `twin-attack` in `abilities.en.json`
      2. Get the `adept` tier's canonical effects
@@ -227,6 +264,12 @@ tier-data shape carries `attackAttribute`, `damage`, and `trigger` directly.
 ---
 
 ## 2. Reference Data Files
+
+> ⚠️ **Status (2026-07-01): mostly shipped; two orphans.** The `weapons` and
+> `armor` catalogs live under `reference/`. **Not done:** `runes.*.json` was
+> never authored (orphan — see the sub-section below), and the `traditions`
+> "separate file?" question is still open. Both are called out in the Status
+> summary at the top.
 
 ### Existing Files
 
@@ -337,6 +380,12 @@ reference these. **Shipped in Chunk A** with the locked vocabulary:
 
 #### `data/runes.en.json`
 
+> ❌ **Orphan (2026-07-01): never built.** No `runes.*.json` exists in
+> `reference/` or `data/`. Loosely noted as **NB-14** in
+> [`.github/bugs/engine.md`](../bugs/engine.md) ("runes still pending").
+> **Needs a home:** give it a roadmap slot / tracked bug, or — if runic
+> tattoos are out of scope — delete this block.
+
 Runic tattoo reference data. Characters can have max 3 runes.
 
 ```jsonc
@@ -384,6 +433,10 @@ learning spells of their school.
 **Decision needed**: Is a separate file worth it, or should `traditions[]` on
 the character just store ability IDs and the UI filters the abilities list?
 
+> ❓ **Open (2026-07-01).** The live schema stores `traditions[]` as ability
+> ids with no separate catalog, so this is *de facto* decided "no separate
+> file" — just never formally closed. Low stakes; close it or scope the file.
+
 ### Russian Localization
 
 Every `.en.json` file has a corresponding `.ru.json` with identical structure
@@ -394,7 +447,7 @@ follow the same pattern: `weapons.en.json` + `weapons.ru.json`, etc.
 
 ## 3. Combat Dual-Wield Refinement
 
-> **Subsumed by [ADR-014](decisions/014-per-slot-combat-special-attacks.md).**
+> ✅ **Subsumed by [ADR-014](../../docs/decisions/014-per-slot-combat-special-attacks.md) — nothing to implement.**
 > The dual-wield problem disappears under the per-slot model: `combat.carried`
 > is `[Slot | null, Slot | null, Slot]` (slot 2 always non-null with an `own`
 > weapon, default `natural_weapon`). The combat phase fans out per slot — each
