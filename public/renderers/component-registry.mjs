@@ -2,8 +2,6 @@
  * Component override registry.
  * Maps component names (from schema ui.component) to render functions.
  * Each function: (path, fieldSchema, value, role, mode) → HTMLElement
- *
- * Session 1: all stubs. Real implementations arrive in Session 2.
  */
 
 import { renderPortrait } from "../components/portrait.mjs";

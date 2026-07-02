@@ -216,13 +216,13 @@ interface ResolvedModifier {
 
 ### Migration Path
 
-This is not a rewrite-everything-at-once change. The migration follows the
-existing Phase 6 roadmap steps:
+This was not a rewrite-everything-at-once change. The migration proceeded as a
+staged sequence:
 
-1. **Phase 6 Gate (architecture assessment):** Adopt this ADR. Define the vocabulary (what targets exist, what flags exist).
-2. **Phase 6 Step 3 (applicator alignment):** Rewrite `applicator.mts` with typed state and phase-based processing. This is the core change.
-3. **Phase 6 Step 4 (effect resolution):** Implement `collectAllEffects` and `lookupEffects` in `effects.mts` / `registry.mts`.
-4. **Phase 6 Step 5 (combat derivation):** Rewrite `deriveCombat` as a separate pipeline stage operating on typed `Character`.
+1. **Architecture assessment (gate):** Adopt this ADR. Define the vocabulary (what targets exist, what flags exist).
+2. **Applicator alignment:** Rewrite `applicator.mts` with typed state and phase-based processing. This is the core change.
+3. **Effect resolution:** Implement `collectAllEffects` and `lookupEffects` in `effects.mts` / `registry.mts`.
+4. **Combat derivation:** Rewrite `deriveCombat` as a separate pipeline stage operating on typed `Character`.
 
 The `SECONDARY_FORMULAS` pattern in `attributes.mts` is retained — it's a good pattern. The formulas just receive typed inputs instead of`Record<string, unknown>`.
 
@@ -245,5 +245,5 @@ The `SECONDARY_FORMULAS` pattern in `attributes.mts` is retained — it's a good
 
 ### Risks
 
-- **Effect normalization dependency.** The pipeline can be built and tested with synthetic effects, but won't do real work until reference data effects are normalized (Phase 6 Step 2). This is already planned and not a new risk.
+- **Effect normalization dependency.** The pipeline can be built and tested with synthetic effects, but won't do real work until reference data effects are normalized. This is already planned and not a new risk.
 - **Condition evaluation deferred.** Conditional effects (Tier B) remain read-only flags until a condition evaluator is built. The pipeline architecture supports this (the `FLAG` phase and `condition` field exist) but the evaluator is out of scope for this ADR.

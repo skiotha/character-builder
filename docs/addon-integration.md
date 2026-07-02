@@ -337,6 +337,6 @@ The addon's `Core/Effects.lua` processes these in priority order using the pipel
 | **P2**   | Static data endpoints (spells, etc.)    | New endpoints  | §7      |
 | **P2**   | `schemaVersion` field in character data | Schema change  | §3      |
 
-P0 = needed before addon Phase 2 (paste-import implementation).
-P1 = needed before addon Phase 11 (website sync).
+P0 = needed before the addon's paste-import implementation.
+P1 = needed before the addon's website-sync feature.
 P2 = nice-to-have, can use static JSON files in the addon repo as interim.

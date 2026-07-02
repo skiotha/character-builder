@@ -1095,6 +1095,57 @@ Implementation-chunks-table or `.github/plans/*` link remains in any ADR or
 contract doc; every touched cross-reference is hand-verified; the
 decisions / rationale / consequences are unchanged; tests green.
 
+## Pass G.6 — Ephemeral session-coordinate sweep (docs + code)
+
+**Status:** active follow-on. Runs after Pass G.5, before the Pass H gate.
+Triggered 2026-07-02 when Pass G.5a surfaced `Session 2.5` in ADR-012 — a
+dev-session coordinate (`Session N` / `Session N.M`), the same ephemeral-in-a-
+stable-surface rot as chunk / phase / `Item` labels, but a category none of the
+prior sweeps targeted (Pass D scoped code for chunk/phase/Item; Pass G.5 scoped
+docs for the same). Same governing principle: a stable document or a source
+comment may cite only long-lived surfaces, never a dev-session coordinate.
+
+**Problem.** Phases 3–5 were organized into numbered work sessions
+(`Session 1` … `Session 5.5`). Those labels leaked into one stable ADR heading
+and one client-module header comment. The sessions are shipped and archived;
+the labels point at nothing a reader can resolve.
+
+**Scope — in (stable docs + code; 2 sites, full-tree `\bSession[ -]?[0-9]` grep
+2026-07-02):**
+
+| File | Site | Fix |
+| --- | --- | --- |
+| `docs/decisions/012-standards-first-html-css.md` | L154 heading `## Addendum: Heading → Element Convention (Session 2.5)` | drop `(Session 2.5)`; the `**Date:** 2026-04-05` line directly below already dates the addendum. The heading is not `§`-anchor-cited, so the rename is safe. |
+| `public/renderers/component-registry.mjs` | L6 module header `Session 1: all stubs. Real implementations arrive in Session 2.` | stale twice over — the registry now imports real renderers (`renderPortrait`, `renderTraitList`, …). Restate to the current role (override renderers keyed by schema `ui.component`), drop the session labels. |
+
+**Scope — out (exempt — the same boundary the chunk / `Item` sweeps used):**
+- **`.github/plans/*` (active + `done/`)** — plans are session-structured by
+  nature; `Session N` is their legitimate organizing unit.
+- **`docs/roadmap.md`** — the phase tracker; its per-session closure notes are
+  its function (exempt throughout this plan).
+- **`.github/bugs/{resolved,engine}.md`** — `Phase 5 Session N` resolution /
+  discovery stamps are dated provenance (each already carries an ISO date) in a
+  mutable tracker, not stable-doc rot. Left as-is for consistency with how the
+  chunk / `Item` sweeps treated the trackers.
+
+**Not in scope — the ordinary word "session".** The `Session [0-9]` pattern
+targets numbered dev-session coordinates only. Legitimate technical uses — SSE
+sessions, `/memories/session/`, the ADR `deciders: … design session` role label
+— carry no number and are untouched.
+
+**Verification.**
+1. `npm run typecheck` + `npm test` green (behaviour-neutral — a doc heading and
+   a code comment; nothing imported changes).
+2. `\bSession[ -]?[0-9]` grep over `docs/` (minus `roadmap.md`), `src/`,
+   `scripts/`, `test/`, `public/` → zero.
+3. The touched heading carries no `§`-anchor cite (hand-checked); the code
+   comment rewrite states current behaviour (real renderers registered).
+
+**References to sweep on completion.** None — this pass removes coordinates; it
+adds no code-side `TODO(<scope>)`.
+
+**Done when:** both sites are rewritten; the scoped grep is zero; tests green.
+
 ## Pass H — Deferred-items reconciliation (final gate)
 
 **Status:** the closeout. Runs **last**, after Passes A–G.5 are all `[x]`.
@@ -1113,7 +1164,7 @@ near-miss). This pass makes "nothing forgotten" a checked invariant.
    completion" subsection (added per Pass E). Today: `phase6-plan.md`
    must list the `trait-talent-registry` (×6) and `weapon-inheritance`
    (×1) sites.
-3. **Plan-state check.** Passes A–G all `[x]`, each with a closure log.
+3. **Plan-state check.** Passes A–G.6 all `[x]`, each with a closure log.
 4. **Lint + tests green.** `test/adr-anchors.test.mts` passes (no
    dangling `ADR-NNN §anchor`); `npm test` green.
 
@@ -1123,6 +1174,7 @@ each is closed):**
   pending `phase6-plan.md` sweep-list (Pass E step 1).
 - natural_weapon schema-default drift → `NB-45` (`infra.md`) ✅ (2026-06-21).
 - ADR-014 `### 8` heading "Slot 2 invariants" → Pass G (docs scope) ✅ (2026-06-30, G shipped).
+- ADR-012 `(Session 2.5)` heading + `component-registry.mjs` session comment → Pass G.6 (session-coordinate sweep) ✅ (2026-07-02).
 - "Fold post-Chunk-F amendment into ADR-014 body" → **decided WONTFIX**:
   the Pass E stable-anchor *registry* homes the amendment anchors without
   re-deriving the rules; no body-fold needed.
@@ -1176,7 +1228,8 @@ If this work spans multiple sessions, the next session should:
   - [x] F3 — plan `TEMPLATE.md` (2026-06-23; created `.github/plans/TEMPLATE.md` — Status/Owner/Trigger header + Goals + Non-goals + Steps-with-"Done when" + Verification + an empty-and-explicit "References to sweep on completion" + Progress; marked `Status: template` so plan-greps skip it. Anchor lints scan `src`/`scripts`/`test` only, so the template is invisible to them; typecheck clean; 653/653 tests green.)
   - ⤳ Step 4 — cross-repo sharing: **spun out** to `cross-repo-conventions-plan.md`, deferred until active sibling work resumes. **Not** a completion gate for this plan (which may be retired first).
 - [x] Pass G — ADR-014 slot-naming prose sweep + docs convention statement (closed 2026-06-30; 26 edits / 11 files; behaviour-neutral, 653/653 tests + typecheck green). **Scope widened pre-execution (user-blessed):** survey found the slot-naming convention (index 0 main-hand / 1 off-hand / 2 own) was asserted in `copilot-instructions.md`, `src/rpg-types.mts` JSDoc, and the `weapon-slots.mjs` UI labels but **absent from ADR-014**, which used a divergent vocabulary (primary/secondary/non-disarmable). **Keystone fix:** ADR-014 §1 now folds the role names into the slot definitions + carries an explicit "Slot naming convention" note (reconciles primary↔main-hand, secondary↔off-hand, non-disarmable↔own), making the copilot-instructions attribution honest. **ADR-014 also:** §8 heading "Slot 2 invariants" → "Own-slot invariants" (number stays `8`, anchor-lint-safe — nothing cites §8); §3 polearm example + a Consequences bullet reworded to role names; dropped the stale "Tracked in Chunk H" cite on the own-slot-contract bullet (left the adjacent historical "wiped during Chunk D" — out of slot-naming scope, flagged here for any future ADR chunk-cite detox). **Contract docs** (`data-contracts.md` ×3 sites, `addon-integration.md` ×1) kept positional wire-array language but gained a one-time role gloss (`index 2 — own`). **src/test prose sweep:** `character.mts` ×2, `derived.mts` ×2 (comments only; `slot0/1/2` locals + `carried[N]` indexing left per plan), `combat.test.mts` ×4 (incl. 2 `it()` titles — no describe-block collisions), `quality-registry.test.mts` ×3, `registry.mts` ×3, `fixtures.mts` ×1, `http.mts` ×1, `data-contracts.test.mts` ×1 title. **Deliberately skipped:** `roadmap.md:593` (Phase 8 future-UI deliverable) + `deferred-tasks.md:399` (frozen "Subsumed by ADR-014" blockquote) — low-traffic positional usages now anchored by ADR §1. **Verification:** typecheck clean; 653/653 tests; re-grep `slot[ -]?[012]` over src/test/docs returns only `slot0/1/2` locals, `carried[N]` indexing, the ADR §1 definitional bullets/diagram (now role-paired), the convention note's own "bare 'slot 2' is ambiguous" self-quote, and the two deliberate skips. `public/` confirmed already compliant (`SLOT_LABELS = ["Main-hand","Off-hand","Own"]`) — no edits.)
-- [ ] Pass G.5 — Docs plan-cite sweep (chunk/phase/Item rot in ADRs + contract docs; surveyed + decisions locked 2026-07-01; split into G.5a/G.5b; see §Pass G.5 below)
-  - [ ] G.5a — ADRs (`016`, `014`, `015`, `010`, `012`, `006`)
-  - [ ] G.5b — Contract docs (`data-contracts`, `architecture`, `bot-integration`, `addon-integration`)
+- [x] Pass G.5 — Docs plan-cite sweep (chunk/phase/Item rot in ADRs + contract docs; both sub-passes shipped 2026-07-02; see G.5a/G.5b logs)
+  - [x] G.5a — ADRs (2026-07-02; 29 edits / 6 files, behaviour-neutral, 653/653 tests + typecheck green). **3 approved decisions applied:** (1) retrospective "Phase 6 engine rework" descriptors stripped numberless ("the engine rework") in ADR-014/015 Context + the two Impl breadcrumbs — reconciled the technique-2 breadcrumb, which had reintroduced "Phase 6", to a numberless "Implemented across the engine rework; see docs/roadmap.md for status and history"; (2) ADR-015 §3a/§3b "registry deserializer (Chunk G) rejects…" reality-checked against the parser — `phaseForEffect` buckets ANY modifier on set-membership targets into the flag phase (no-op, **not** rejected), so §3a was restated to the real behaviour rather than a false "parser rejects" swap; §3b kept its pre-existing runtime-parser attribution and dropped only the deserializer half; (3) ADR-010 Migration Path lightly past-tensed + step-numbers dropped. **HIGH-hazard §7 (ADR-016):** rewrote the two-stage empty/populated framing to the live unconditional-throw rule (verified against engine: `buildSlot` in derived.mts + `collectAllEffects` in effects.mts both throw), kept the deferred load-time-validator note (dropped "Chunk G"). **ADR-014:** Item 9↔§9 collision fixed ("see Item 9 below"→"see §9 below"; §9 heading confirmed present); amendment blockquote detoxed ("Post-Chunk-F amendment, Items 1,6,8,12"→"Declarative action fields (added 2026-05-19)"); "remaining Item 1 engine work … Chunk G"→"remaining engine work, still pending at runtime"; "wiped during Chunk D"→"wiped on migration"; Impl-chunks table + phase6-plan.md link→breadcrumb. **Both plan-links in ADR-016 dropped** (drift-lint cite → `test/reference-locale-drift.test.mts`; References list). **Survey-miss caught:** ADR-016 costs bullet "between F.0c and F.0e" (a bare `F.0` mile-marker the G.5 verification pattern doesn't match) — restated to "transitional window now closed; strictness is unconditional". **Verification:** survey grep + broadened `F.0/G2/J/chunkX/phase6-` grep over `docs/decisions/*.md` both = 0; typecheck clean; 653/653 tests; all touched cross-refs hand-verified (§9 exists, `../roadmap.md` resolves, §7 code-path cites accurate). **FLAGGED for a decision, not touched (out of original G.5 scope):** ADR-012 heading `## Addendum: Heading → Element Convention (Session 2.5)` — a design-session coordinate, the same ephemeral-in-stable-doc problem but a category the plan never surveyed; now homed in Pass G.6 (session-coordinate sweep, added 2026-07-02).
+  - [x] G.5b — Contract docs (2026-07-02; 12 edits / 4 files, behaviour-neutral, 653/653 tests + typecheck green). **Pre-flight cleared two latent hazards:** (i) heading-anchor breakage — grepped every inbound heading-slug link repo-wide; the only ones point at `data-contracts.md#11-effect-object` / `architecture.md#311-reference-catalog`, neither touched, so renaming `#### Combat shape (Chunk D, ADR-014)` → `(ADR-014)` broke nothing; (ii) broadened `F.0/G2/J` + `Session N` grep = 0 across all four files (no ADR-016-style survey miss, no G.6 overlap). **Lockstep (hazards d/e):** data-contracts amendment paragraph rewritten to match G.5a's ADR-014 wording — `post-Chunk-F … amendment Items 1,6,8,12` → `declarative wire additions (added 2026-05-19)`, `remaining Item 1 engine work … Chunk G registry` → `remaining engine work, still pending at runtime`. **3 pre-flagged reality-checks applied (verified, not mechanically dropped):** (1) architecture §3.11 catalog list `and (Phase 6+) weapons, armor, and runes` → `weapons, and armor` — **trimmed `runes`** (no `reference/runes.*.json` exists, file-searched); (2) architecture §3.11 lifecycle `Loaded once at startup by src/rules/registry.mts (Phase 6 Step 0)` was **doubly wrong** (registry.mts is a re-export shim that loads nothing — read it) → corrected to `src/models/reference.mts` (mtime-cached) + quality registry via `loadQualityIndex()` in `src/app.mts`; (3) bot-integration §2.1 `not yet formalized — may change during Phase 6 normalization` (claim had flipped) → `follow the shapes specified in reference-authoring.md`. **4th catch, bigger than the plan predicted:** data-contracts §3.2 was NOT a simple `roadmap Phase 3` drop — the whole `> **Legacy:**` blockquote was **stale fiction** claiming the server *currently exposes* `/view/*` endpoints that *will be removed*; grep confirmed **zero** view handlers in `src/` (removed + replaced by `/api/v1/schema` per ADR-009/roadmap) and it **contradicted** architecture.md L130. Rewrote fiction→fact (past tense, cite ADR-009) and aligned architecture's `were removed in Phase 3` → `were removed` so the two docs agree. **Mechanical drops:** architecture `(Phase 6+)` serve-line + `roadmap Phase 7` → `see the roadmap`; bot Phase 1/2/4 → capability language, our-roadmap Phase 2/6 → numberless pointer; addon Phase 2/11 → capability. **Verification:** survey+broadened+Session grep over all four files = 0; typecheck clean; 653/653; both new cross-refs (ADR-009 link, reference-authoring.md link) hand-verified. **Pass G.5 complete.**
+- [x] Pass G.6 — Ephemeral session-coordinate sweep (closed 2026-07-02; 2 edits / 2 files, behaviour-neutral, 653/653 tests + typecheck green). ADR-012 addendum heading `(Session 2.5)` dropped — the `**Date:** 2026-04-05` line below already dates it, and an anchor-safety grep confirmed nothing cites the heading slug. `public/renderers/component-registry.mjs` module header — dropped the stale `Session 1: all stubs. Real implementations arrive in Session 2.` line (the registry now imports real renderers — `renderPortrait` / `renderTraitList` / `renderTalentList` / `renderCharacterName` / `renderWeaponSlots`; the first three header lines already state the role, so no restatement was needed). **Verification:** `\bSession[ -]?[0-9]` grep over `docs/decisions/*.md` + `public/` = 0 — the two in-scope sites were the only non-exempt hits (plans / roadmap / bug trackers stay session-structured by design); typecheck clean; 653/653.
 - [ ] Pass H — Deferred-items reconciliation (final gate; see §Pass H below)

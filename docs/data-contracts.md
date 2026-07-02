@@ -234,9 +234,9 @@ Sourced from the reference files in `data/`:
 | Armor `slot`    | `body` \| `plug`. **There is no `armor.type` field.**                                                                                                       |
 | Quality `id`    | See `reference/qualities.{locale}.json` (ADR-016). Single namespace shared by weapons and armor; parametric variants use `_N` suffix (e.g. `fortified_2`).      |
 
-The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. The transition fallback for `equipment.armor.body.defense` was removed in Chunk D; existing characters must be re-saved or wiped.
+The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. The transition fallback for `equipment.armor.body.defense` was removed; existing characters must be re-saved or wiped.
 
-#### Combat shape (Chunk D, ADR-014)
+#### Combat shape (ADR-014)
 
 Writable storage shape — the only thing PATCH accepts:
 
@@ -284,12 +284,10 @@ re-dedupe. The `Action` shape is:
 ```
 
 `damageBonus`, `ignoresArmor`, `inflicts`, `isFree`, and `appliesTo`
-are the post-Chunk-F wire additions (amendment Items 1, 6, 8, 12).
-They are **declarative** — the engine carries them through to sibling
-apps verbatim. Inheritance resolution at recalc time (inlining the
-carrying slot's `damage` / `attackAttribute` when omitted) is the
-remaining Item 1 engine work, tracked against the Chunk G registry
-landing.
+are declarative wire additions (added 2026-05-19). The engine carries
+them through to sibling apps verbatim. Inheritance resolution at recalc
+time (inlining the carrying slot's `damage` / `attackAttribute` when
+omitted) is the remaining engine work, still pending at runtime.
 
 `inflicts[]` entries are validated against the canonical status
 registry (`reference/statuses.{en,ru}.json`, served at
@@ -394,10 +392,10 @@ UI rendering metadata (see [ADR-009](decisions/009-schema-driven-rendering.md)).
 The client fetches it once, caches via `ETag` / `If-None-Match`, and uses
 it to render all character-related forms from `(schema, data, role)`.
 
-> **Legacy:** The server currently exposes `/view/*` endpoints that return
-> server-rendered HTML fragments (`/view/initial`, `/view/dashboard`,
-> `/view/creation`, `/view/character/:id`). These will be removed once
-> the schema-driven rendering migration is complete (roadmap Phase 3).
+> **Legacy:** Earlier versions exposed `/view/*` endpoints returning
+> server-rendered HTML fragments. They were removed when schema-driven
+> rendering ([ADR-009](decisions/009-schema-driven-rendering.md)) shipped;
+> the server is now a pure JSON API.
 
 ### 3.3 Reference Catalogs
 

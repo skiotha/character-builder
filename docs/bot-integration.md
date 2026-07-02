@@ -63,7 +63,7 @@ The bot depends on the structure of `index.json` and the character JSON schema. 
 
 - `index.json` must contain a `byId` map where values include at minimum `name` (for name search). Note: the index uses `name`, not `characterName`, as a lightweight abbreviation.
 - Character JSON files must follow the schema defined in [data-contracts.md §1](data-contracts.md).
-- Reference data files (abilities, spells, boons, sins, rituals) must follow their respective schemas. Shape contracts for these files are not yet formalized — they may change during Phase 6 normalization.
+- Reference data files (abilities, spells, boons, sins, rituals) follow the shapes specified in [reference-authoring.md](reference-authoring.md).
 
 ### 2.2 Filesystem Safety
 
@@ -120,9 +120,9 @@ The mechanism is the website's decision. The bot only cares that `discordId` is 
 
 ### 3.4 Timing
 
-This field is needed before the bot's Phase 2 (Identity & Write Operations). Phase 1 (read-only character lookup) works without it.
+This field is needed before the bot implements identity & write operations. Read-only character lookup works without it.
 
-The website's roadmap has a Schema Review gate in Phase 2 and a Sibling Project Integration phase (Phase 6). Either is a natural place for this change.
+The website's roadmap has a natural home for this change in its schema-review and sibling-integration work; see the roadmap.
 
 ---
 
@@ -198,7 +198,7 @@ This migration would only affect the bot's `src/lib/characters.mts` module — t
 
 ### 6.2 Real-Time Updates During Sessions
 
-When the bot runs RP sessions (Phase 4), it holds character data in memory. If the character is simultaneously edited on the website, the bot's state becomes stale. Two potential solutions:
+When the bot runs RP sessions, it holds character data in memory. If the character is simultaneously edited on the website, the bot's state becomes stale. Two potential solutions:
 
 - The bot re-reads the character file from disk before each roll (simple, low-cost for small data).
 - The bot subscribes to the website's SSE stream for active session characters (complex, only needed if stale data causes gameplay issues).

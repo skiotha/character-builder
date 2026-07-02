@@ -10,8 +10,8 @@
 
 Most weapon and armor qualities in the Nagara catalog map to a small fixed effect:
 `fortified` adds `+1` to the wearer's `secondary.armor`; `deep_wounds` adds `+1` to a
-weapon's `baseDamage`; `flexible` toggles a flag; and so on. As Chunk E crystallized
-the engine's per-slot fanout and ADR-015 locked the effect vocabulary, two authoring
+weapon's `baseDamage`; `flexible` toggles a flag; and so on. As the engine's per-slot
+fanout crystallized and ADR-015 locked the effect vocabulary, two authoring
 problems became unavoidable:
 
 1. **Boilerplate duplication.** With no registry, the only place to encode each
@@ -19,7 +19,7 @@ problems became unavoidable:
    that carries `deep_wounds` would copy the same `{ target: { kind: "combat",
    field: "baseDamage" }, modifier: { type: "addFlat", value: 1 } }` block, and that
    block would also need re-translating into `<topic>.ru.json`. The reference catalog
-   already has dozens of weapons and a comparable set of armor; Chunk F's bulk
+   already has dozens of weapons and a comparable set of armor; the bulk
    authoring pass would multiply this by every new entry.
 
 2. **Drift risk.** Any time the canonical mechanic of a quality changes (e.g.
@@ -32,9 +32,8 @@ That direction was abandoned: the only real win was a marginal authoring DX
 improvement, while costs accumulated (loader split, projection helper, migration
 script, sibling-project migration, parametric-quality test paths, locale-key
 collision rule). The narrower drift-prevention goal is met by a tiny CI lint test
-that compares non-localized fields between locales — see
-[phase6-chunkF-prereqs-plan.md](../../.github/plans/done/phase6-chunkF-prereqs-plan.md)
-Task 1. Locale files stay split.
+that compares non-localized fields between locales
+(`test/reference-locale-drift.test.mts`). Locale files stay split.
 
 ## Decision
 
@@ -77,7 +76,7 @@ Two minimal touch points (~20 lines total):
    `weapon.effects[]` loop, walk `weapon.qualities`, look up each id in the
    registry, and append the registry's effects with implicit
    `appliesTo = { kind: "id", values: [weapon.id] }`. This mirrors the per-slot
-   scoping of `weapon.effects[]` from Chunk E.
+   scoping of `weapon.effects[]`.
 
 2. **`collectAllEffects` in `src/rules/effects.mts`** — after the existing armor
    `effects[]` walk, walk `armor.body?.qualities` and `armor.plug?.qualities`,
@@ -107,7 +106,7 @@ After this refactor, item-level `weapon.effects[]` and `armor.effects[]` are
 reserved for genuinely bespoke, one-off magic items — an artifact sword whose
 effect doesn't apply to any other weapon, for instance. Standard mechanical
 effects all live in the quality registry. This is the property that prevents
-the drift problem from recurring during Chunk F authoring.
+the drift problem from recurring during bulk authoring.
 
 A weapon may simultaneously carry both registry-driven qualities and a bespoke
 `effects[]` — both fire. The registry contributes the boilerplate, `effects[]`
@@ -143,18 +142,15 @@ express. Today's catalog has no such case.
 
 ### 7. Strictness
 
-Two-stage runtime behaviour for unknown quality ids referenced from
-`weapon.qualities` / `armor.{body,plug}.qualities`:
-
-- **While the catalog is empty** (Chunk F.0c–F.0d): warn-once-per-id, skip.
-  Engine output stays identical to Chunk E. Mirrors the Chunk C empty-trait-
-  registry pattern.
-- **Once the catalog is populated** (Chunk F.0e onwards): throw on unknown id
-  during recalc. Authoring mistakes fail fast.
+Unknown quality ids referenced from `weapon.qualities` /
+`armor.{body,plug}.qualities` are a hard error: the engine throws on an unknown
+id during recalc, so authoring mistakes fail fast. Weapon-quality lookups throw
+in `buildSlot` (`src/rules/derived.mts`); armor-quality lookups throw in
+`collectAllEffects` (`src/rules/effects.mts`).
 
 Load-time validators ("every quality id mentioned by any weapon/armor entry
 resolves in the registry"; "every registry effect target is structurally sane")
-land in Chunk G alongside the trait/talent/ritual registry validators.
+remain deferred alongside the trait/talent/ritual registry validators.
 
 ### 7a. Out of scope: full structural validation of reference catalog entries
 
@@ -177,9 +173,10 @@ Rationale:
   applies here too: catalog authors are a small known set.
 - **The audit lint covers the most painful drift cases already.** Locale-
   drift (`{en,ru}` structural parity), action-id uniqueness across tiers and
-  parents, quality-id membership, and (post-Chunk-G) trait/spell/ritual id
-  resolvability are all enforced by `scripts/audit-reference.mts` and
-  `test/reference-locale-drift.test.mts`. These are the failure modes that
+  parents, and quality-id membership are all enforced by
+  `scripts/audit-reference.mts` and `test/reference-locale-drift.test.mts`;
+  trait/spell/ritual id resolvability is planned alongside the registry
+  validators. These are the failure modes that
   have actually bitten authors.
 - **ADR-001 forbids runtime schema-validation dependencies.** Full structural
   validation means hand-rolled validators per top-level shape (`Weapon`,
@@ -198,7 +195,7 @@ sibling-app render rather than a load-time error.
 - A catalog-authoring typo reaches production and causes a player-visible bug.
 - The catalog grows past the point where author code-review reliably catches
   shape errors (rule of thumb: more than one new entry per week, sustained).
-- Phase 7 sibling integration introduces a programmatic catalog-write path
+- Sibling integration introduces a programmatic catalog-write path
   (e.g. the addon writes home-brew weapons back to the website) — at that
   point catalog entries *are* user input and §7a no longer holds.
 
@@ -229,7 +226,7 @@ asserts every such citation resolves to a row below.
 ### Positive
 
 - Each quality's mechanic is authored once. Catalog-wide changes are one-line edits.
-- Item-level `effects[]` shrinks to genuinely bespoke entries — Chunk F bulk
+- Item-level `effects[]` shrinks to genuinely bespoke entries — bulk
   authoring stays tractable.
 - Localized quality names and descriptions live in one place, ready for
   client-side and sibling-project tooltips.
@@ -243,8 +240,9 @@ asserts every such citation resolves to a row below.
 - One additional reference catalog to maintain (`qualities.{en,ru}.json`).
 - A new `Registry.lookupQuality` method to keep wired through the engine and
   test fixtures.
-- The two-stage strictness adds a brief asymmetry between F.0c and F.0e where
-  the engine warns rather than fails on unknown ids; clearly time-boxed.
+- Bringing up the registry required a brief transitional window where the
+  engine warned rather than failed on unknown ids; that window is now closed
+  and strictness is unconditional.
 
 ### Neutral
 
@@ -257,7 +255,7 @@ asserts every such citation resolves to a row below.
 ### Inline `effects[]` on every weapon and armor entry
 
 Rejected. This is the pre-ADR baseline. Boilerplate duplication and drift risk
-scale linearly with catalog size; Chunk F would multiply both.
+scale linearly with catalog size; bulk authoring would multiply both.
 
 ### Separate weapon-quality and armor-quality registries
 
@@ -279,7 +277,6 @@ narrow. Promote only when a real case emerges.
 
 ## References
 
-- [phase6-chunkF-prereqs-plan.md](../../.github/plans/done/phase6-chunkF-prereqs-plan.md)
 - [ADR-014](014-per-slot-combat-special-attacks.md)
 - [ADR-015](015-typed-effect-targets-final.md)
 

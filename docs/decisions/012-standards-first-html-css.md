@@ -149,9 +149,9 @@ The same standards-first rationale applies: the user base is on modern browsers,
 
 ## Follow-Up
 
-The existing stylesheets (`public/common/styles.css` and view-specific styles) predate this ADR and were written without a formal conventions guide. They should not be treated as reference implementations of these principles. A thorough audit of the existing HTML and CSS is planned for Phase 8 (Polish) of the roadmap to bring the codebase into alignment with this decision.
+The existing stylesheets (`public/common/styles.css` and view-specific styles) predate this ADR and were written without a formal conventions guide. They should not be treated as reference implementations of these principles. A thorough audit of the existing HTML and CSS is planned for a later polish pass (see the roadmap) to bring the codebase into alignment with this decision.
 
-## Addendum: Heading → Element Convention (Session 2.5)
+## Addendum: Heading → Element Convention
 
 **Date:** 2026-04-05
 

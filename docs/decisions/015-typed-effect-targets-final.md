@@ -16,7 +16,7 @@
 - Effect ordering relied on a numeric `priority` field, restating the problem [ADR-010](010-effect-resolution-pipeline.md) explicitly identified as a category error (math ordering is not a data-driven preference).
 - Triggered actions (special attacks, reactions) had no target type.
 
-The Phase 6 engine rework needs the vocabulary fixed before any code lands.
+The engine rework needs the vocabulary fixed before any code lands.
 
 ## Decision
 
@@ -97,13 +97,13 @@ type EffectModifier =
 - **Add** a value: `{ "type": "addFlat", "value": 1 }`
 - **Remove** a value: `{ "type": "remove" }`
 
-The applicator treats the numeric value of `addFlat` as **ignored** for these three target kinds — only the verb matters. `1` is the canonical literal so authoring stays uniform; other numbers are accepted but produce no different result. `multiply` and `cap` are not meaningful for set-membership targets and the registry deserializer (Chunk G) rejects them.
+The applicator treats the numeric value of `addFlat` as **ignored** for these three target kinds — only the verb matters. `1` is the canonical literal so authoring stays uniform; other numbers are accepted but produce no different result. `multiply` and `cap` are not meaningful here either: set-membership targets always resolve in the `flag` phase regardless of modifier type, so a stray numeric verb is a no-op rather than an arithmetic operation.
 
 This convention keeps the `EffectModifier` union narrow (no separate `add` verb) while letting the applicator reuse the same `addFlat` handler dispatch for both numeric (`secondary`, `combat`) and set-membership targets.
 
 ### 3b. `attackAttribute` accepts `setBase` only
 
-The combat target field `attackAttribute` is non-numeric — it names a primary attribute the slot rolls against (e.g. `"accurate"`, `"strong"`). Only the `setBase` modifier is meaningful for it. The registry deserializer (Chunk G) and the runtime parser (`src/rules/effects.mts`) reject `addFlat`, `multiply`, `cap`, and `remove` on `combat.attackAttribute`.
+The combat target field `attackAttribute` is non-numeric — it names a primary attribute the slot rolls against (e.g. `"accurate"`, `"strong"`). Only the `setBase` modifier is meaningful for it; the runtime parser (`src/rules/effects.mts`) rejects `addFlat`, `multiply`, `cap`, and `remove` on `combat.attackAttribute`.
 
 Per-slot default is `"accurate"` (set in `deriveCombatSlots`); a `setBase` effect overrides it. When multiple `setBase` effects compete on the same slot, resolution follows the universal max-by-primary rule documented in §4a.
 
@@ -262,7 +262,7 @@ type TriggerKind =
 
 The engine **validates only that a value is one of the known set**. It attaches no semantics to any value beyond `"manual"` (which routes the action into `SpecialAttack[]` rather than `Reaction[]`). All other behavior is a sibling-app concern.
 
-The enum is expected to evolve as Chunk F surfaces new patterns; adding or removing a value is a one-line change.
+The enum may evolve as new authoring patterns surface; adding or removing a value is a one-line change.
 
 ## Stable anchors
 
@@ -294,7 +294,7 @@ listed anchor is a breaking change for those citations.
 
 **Negative**
 
-- All reference effect data needs to be rewritten to the new shape. This is the bulk-edit pass owned by Chunk F, gated by an authoring spec.
+- All reference effect data needs to be rewritten to the new shape. This is the bulk-edit pass, gated by an authoring spec.
 - The `armorQuality` kind only services one ability today (*Soldier-adept*). Justified — removing it would force that one effect into `flag` with a bespoke flag name, which is worse.
 
 **Acceptable**
@@ -302,15 +302,8 @@ listed anchor is a breaking change for those citations.
 - `subtype` is dropped on the assumption that future authoring stays within `id` + `type` + `quality`. If a use case for subtypes appears, the union grows by one kind.
 - The trigger enum drift is contained: it is opaque to the engine, so expanding it is non-breaking for engine code.
 
-## Implementation chunks
+## Implementation
 
-| Aspect                                    | Chunk |
-| ----------------------------------------- | ----- |
-| `rpg-types.mts` definitions               | C     |
-| Applicator switch on target kind          | C     |
-| Weapon predicate matcher                  | E     |
-| Effect-data rewrite                       | F     |
-| Registry deserializer (validates targets) | G     |
-| Sibling integration docs                  | H     |
+Implemented across the engine rework; see [docs/roadmap.md](../roadmap.md) for status and history.
 
 See also: [docs/reference-authoring.md](../reference-authoring.md) for the practical authoring guide that consumes this decision.

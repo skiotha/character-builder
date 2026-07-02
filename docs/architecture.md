@@ -84,12 +84,12 @@ Entry point for all HTTP requests. Responsibilities:
 - Route API requests (`/api/v1/...`) to handlers
 - Serve static client files from `public/`
 - Serve uploaded portraits from `data/uploads/`
-- Serve reference catalogues from `reference/` (Phase 6+)
+- Serve reference catalogues from `reference/`
 - CORS headers (see ADR-007)
 - SPA fallback (serve `index.html` for unmatched client routes)
 
 Currently implemented as a single function with an if/else chain in `app.mts`.
-Planned migration to a declarative router pattern (see roadmap Phase 7).
+Planned migration to a declarative router pattern (see the roadmap).
 
 ### 3.2 Handlers
 
@@ -127,7 +127,7 @@ One handler per API action. Each receives `(req, res, ...)` and is responsible f
 > (`test/reference-locale-drift.test.mts`) keeps the `{en,ru}` pairs structurally
 > aligned (same id set + ordering; only `name`, `description`, `tags` may differ).
 
-> **Note:** View endpoints (`/api/v1/view/`) were removed in Phase 3.
+> **Note:** View endpoints (`/api/v1/view/`) were removed.
 > The server is now a pure JSON API. Client renders all views from data
 > via schema-driven rendering (see [ADR-009](decisions/009-schema-driven-rendering.md)).
 
@@ -212,8 +212,8 @@ when authoring or revising mechanics.
 
 Machine-readable JSON catalogues of the rules content the engine consumes
 (`reference/`). This is the **structured** companion to the prose vault:
-abilities, spells, talents (boons/sins), rituals, and (Phase 6+) weapons,
-armor, and runes — each per locale.
+abilities, spells, talents (boons/sins), rituals, weapons, and armor —
+each per locale.
 
 - **Structure:** `reference/{topic}.{locale}.json` — flat, locale-as-suffix
 - **Audience:** the rules engine, the schema-driven client, and the sibling
@@ -222,8 +222,10 @@ armor, and runes — each per locale.
   [`docs/addon-integration.md`](addon-integration.md),
   [`docs/bot-integration.md`](bot-integration.md).
 - **Lifecycle:** authored canon. Committed to the repo, immutable at runtime,
-  identical across deployments. Loaded once at startup by
-  `src/rules/registry.mts` (Phase 6 Step 0).
+  identical across deployments. Reference catalogs are read through
+  `src/models/reference.mts` (mtime-cached, locale-aware); the quality
+  registry (ADR-016) is loaded once at startup via `loadQualityIndex()`
+  in `src/app.mts`.
 - **Distinct from `data/`:** `data/` is runtime, mutable, gitignored,
   per-deployment state (characters, index, backups, uploads). `reference/` is
   authored content that ships with the codebase.

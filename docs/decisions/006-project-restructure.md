@@ -49,7 +49,7 @@ character-builder/
 ├── scripts/                    ← watcher, migrations, utilities
 ├── test/                       ← all tests, mirrors malizia structure
 ├── docs/                       ← architecture, contracts, decisions, roadmap
-├── rpg/                        ← RPG rules vault (added post-Phase 2)
+├── rpg/                        ← RPG rules vault
 │   ├── _meta/                  ← changelog
 │   ├── {locale}/01-core/       ← mechanics rules
 │   ├── {locale}/02-lore/       ← world lore

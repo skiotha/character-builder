@@ -8,7 +8,7 @@
 
 ## Context
 
-The current `Combat` shape on `Character` has three problems that block the Phase 6 engine rework:
+The current `Combat` shape on `Character` has three problems that block the engine rework:
 
 1. **Single-stat fanout.** `combat.attackAttribute`, `combat.baseDamage`, `combat.bonusDamage` are scalars. Real characters wield more than one weapon at a time, and per-weapon abilities (Polearm, Marksmanship, Behemoth, etc.) need per-weapon derived stats.
 2. **No place for special attacks or reactions.** Many abilities and spells grant new actions — invocable strikes (e.g. *Berserk*'s rage attack) and triggered responses (e.g. *Iron Fist*'s parry). Today these live as free-text descriptions on traits with no machine-readable home.
@@ -71,7 +71,7 @@ Two new derived collections on `Character`, populated by the engine and read-onl
 ```ts
 interface Action {
   /**
-   * REQUIRED stable identifier (see Item 9 below). Locale-independent.
+   * REQUIRED stable identifier (see §9 below). Locale-independent.
    * Used as the rewrite key: same id at a higher tier replaces the
    * lower; different ids coexist.
    */
@@ -89,11 +89,11 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 
 > **History note:** the original ADR draft included a structured
 > `source: { kind, id, tier }` field on `Action`. It was never read
-> by the engine and was dropped in Item 9 (2026-05) in favour of the
+> by the engine and was dropped (2026-05) in favour of the
 > required `id` as the dedupe key. Sibling apps that need provenance
 > can recover it from the trait list itself.
 
-> **Post-Chunk-F amendment (2026-05-19, amendment Items 1, 6, 8, 12).**
+> **Declarative action fields (added 2026-05-19).**
 > `Action` gained five optional declarative fields:
 >
 > - `damageBonus?: number` — flat bonus added on top of the carrying
@@ -117,12 +117,11 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 >   actions whose semantics are slot-bound; omit on innate / monster
 >   attacks. Required when `damageBonus` is present.
 >
-> Engine consumption is **declarative-only** in the post-Chunk-F
-> landing: the fields round-trip through the catalog and reach sibling
-> apps verbatim. Per-slot inheritance resolution at recalc time
-> (inlining the matched slot's `damage` / `attackAttribute` when
-> omitted) is the remaining Item 1 engine work, scheduled against the
-> Chunk G production registry landing.
+> Engine consumption is **declarative-only**: the fields round-trip
+> through the catalog and reach sibling apps verbatim. Per-slot
+> inheritance resolution at recalc time (inlining the matched slot's
+> `damage` / `attackAttribute` when omitted) is the remaining engine
+> work, still pending at runtime.
 
 **Distinction is purely semantic** — same shape, two collections:
 
@@ -231,7 +230,7 @@ renumbering a listed anchor is a breaking change for those citations.
 
 **Negative**
 
-- Schema migration is breaking. `combat.weapons[]` and the scalar `attackAttribute` / `baseDamage` / `bonusDamage` fields go away. Existing characters in `data/characters/` are wiped during Chunk D — no migration code path.
+- Schema migration is breaking. `combat.weapons[]` and the scalar `attackAttribute` / `baseDamage` / `bonusDamage` fields go away. Existing characters in `data/characters/` are wiped on migration — no migration code path.
 - Sibling integration docs need updates (no `combat.active`, new derived collections, own-slot contract).
 
 **Acceptable**
@@ -239,19 +238,8 @@ renumbering a listed anchor is a breaking change for those citations.
 - Three slots is fixed by design. If a future weapon style requires four, the tuple grows; no consumer should hard-code "exactly three."
 - `equipment.weapons[]` may legitimately contain more than three entries; inventory and carried are decoupled.
 
-## Implementation chunks
+## Implementation
 
-This ADR is implemented across Phase 6 chunks B–H per
-[`.github/plans/phase6-plan.md`](../../.github/plans/phase6-plan.md):
-
-| Aspect                         | Chunk |
-| ------------------------------ | ----- |
-| Reference relocation           | B     |
-| Typed pipeline foundation      | C     |
-| Schema migration + UI          | D     |
-| Per-slot fanout in engine      | E     |
-| Effect-data normalization      | F     |
-| Registry wiring                | G     |
-| Validators + sibling docs      | H     |
+Implemented across the engine rework; see [docs/roadmap.md](../roadmap.md) for status and history.
 
 See also: [docs/reference-authoring.md](../reference-authoring.md) for the practical authoring guide that consumes this decision.
