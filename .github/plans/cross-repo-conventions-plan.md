@@ -2,7 +2,7 @@
 
 **Status:** deferred (seeded 2026-06-22). Do not execute until the sibling
 projects stabilize. This is the spun-out Step 4 of
-[`docs-cleanup-plan.md`](docs-cleanup-plan.md) Pass F.
+[`docs-cleanup-plan.md`](done/docs-cleanup-plan.md) Pass F.
 **Owner:** project owner + Copilot
 **Trigger:** the documentation/comment conventions codified in Pass F apply
 to character-builder **and** the siblings (addon, malizia) — ideally all our

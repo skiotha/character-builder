@@ -489,9 +489,9 @@ Step 0 / Step 5 outline.
 | C     | Typed pipeline foundation (no combat fanout)                 | ✅ Done (2026-04-24)  |
 | D     | Schema migration: `Combat` + `specialAttacks` / `reactions`  | ✅ Done (2026-04-24)  |
 | E     | Combat phase per-slot fanout + weapon predicates             | ✅ Done (2026-04-25)  |
-| F.0   | Reference layout refactor (locale merge + quality registry)  | Not started (gate)    |
-| F     | Effect normalization (data, collaborative bulk edit)         | Not started           |
-| G     | Wire ability/spell registry into recalc + reference-lint     | Not started           |
+| F.0   | Reference layout refactor (locale merge + quality registry)  | ✅ Done (2026-04-27)  |
+| F     | Effect normalization (data, collaborative bulk edit)         | ✅ Done — inheritance runtime → G |
+| G     | Wire trait/talent registry into recalc + per-weapon inheritance resolver | Not started       |
 | H     | Validators, sibling docs, cleanup (incl. `natural_weapon` unification) | Not started |
 | I     | Catalog-driven client pickers (closes the usability gap)     | Not started           |
 
@@ -522,6 +522,38 @@ are folded into the chunked plan:
   `Combat` shape change).
 - Combat derived fields scalar vs array — settled by **Chunk D** schema
   + **Chunk E** fanout (`bonusDamage` is per-slot scalar).
+
+---
+
+## Documentation Cleanup & Convention Extraction ✓ DONE
+
+**Cross-cutting hygiene effort (2026-05 → 2026-07-03).** Purged ephemeral
+plan / chunk / phase / session coordinates that had leaked into ~100 code
+comments, ADRs, and contract docs, and codified the "cite only stable
+surfaces" discipline so the rot cannot recur.
+
+**Detailed plan:** [docs-cleanup-plan.md](../.github/plans/done/docs-cleanup-plan.md)
+(retired) — Passes A–H.
+
+- [x] Completed plans archived to `.github/plans/done/`; live plans stay top-level
+- [x] Portable convention bundle
+      ([`conventions.instructions.md`](../.github/instructions/conventions.instructions.md),
+      `applyTo: '**'`): comment-tag taxonomy, stable-vs-ephemeral cite
+      discipline, plan-bookkeeping, decision-record anchors, code-doc ladder
+- [x] ADR stable-anchor appendices (014 / 015 / 016) + `test/adr-anchors.test.mts` lint
+- [x] Global `NB-N` bug-tracker scheme (`.github/bugs/`) + `test/bug-anchors.test.mts` lint
+- [x] `docs/` (ADRs + contracts), `src` / `scripts` / `test`, and `public/`
+      swept clean of plan / chunk / phase / session coordinates — this
+      `roadmap.md` is the deliberately-exempt phase tracker
+
+**Deferred follow-on (to the very end):** propagating the convention bundle to
+the sibling repos (addon, malizia) is spun out to
+[cross-repo-conventions-plan.md](../.github/plans/cross-repo-conventions-plan.md),
+deferred until the siblings stabilize. Not a gate for any current phase.
+
+**Deliverable:** ✅ Conventions have a single stable home that auto-loads every
+session; documentation cites only long-lived surfaces; two lint tests keep it
+honest. 653/653 tests green.
 
 ---
 
