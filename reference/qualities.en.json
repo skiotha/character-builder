@@ -233,6 +233,12 @@
     "effects": []
   },
   {
+    "id": "siege",
+    "name": "Siege",
+    "description": "This weapon is designed for siege warfare, capable of dealing massive damage to structures and fortifications.",
+    "effects": []
+  },
+  {
     "id": "short",
     "name": "Short",
     "description": "This weapon is short, making it easier to draw or swap. It costs Free Action to get armed with a short weapon.",

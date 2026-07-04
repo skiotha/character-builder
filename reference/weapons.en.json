@@ -246,7 +246,14 @@
     "type": "exotic",
     "damage": 12,
     "cost": 10,
-    "qualities": ["special", "ranged", "flaming", "area", "catastrophic"],
+    "qualities": [
+      "special",
+      "ranged",
+      "flaming",
+      "area",
+      "catastrophic",
+      "siege"
+    ],
     "effects": []
   },
   {

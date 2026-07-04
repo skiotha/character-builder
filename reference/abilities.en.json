@@ -122,20 +122,7 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "appliesTo": [
-              { "kind": "type", "values": ["short"] },
-              { "kind": "quality", "values": ["precise"] }
-            ]
-          },
-          {
-            "tier": "B",
-            "description": "Any attack with short weapons is made with advantage.",
-            "target": {
-              "kind": "flag",
-              "name": "advantage"
-            },
-            "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "type", "values": ["short"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           },
           {
             "tier": "B",
@@ -145,7 +132,7 @@
               "name": "advantage"
             },
             "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "quality", "values": ["precise"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           }
         ]
       },
@@ -181,10 +168,7 @@
             "description": "Perform a Feint attack.",
             "trigger": "manual",
             "isFree": true,
-            "appliesTo": [
-              { "kind": "type", "values": ["short"] },
-              { "kind": "quality", "values": ["precise"] }
-            ]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           }
         ]
       }
@@ -1222,7 +1206,7 @@
             "description": "All siege weapons used by the Master gain the massive quality if they lacked it.",
             "target": { "kind": "weaponQuality", "quality": "massive" },
             "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "type", "values": ["siege"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["siege"] }]
           }
         ]
       }
@@ -2779,7 +2763,7 @@
             },
             "appliesTo": [
               {
-                "kind": "type",
+                "kind": "quality",
                 "values": ["long"]
               }
             ]
@@ -2842,7 +2826,7 @@
             },
             "appliesTo": [
               {
-                "kind": "type",
+                "kind": "quality",
                 "values": ["long"]
               }
             ]

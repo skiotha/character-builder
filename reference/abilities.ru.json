@@ -122,20 +122,7 @@
               "type": "setBase",
               "value": "discreet"
             },
-            "appliesTo": [
-              { "kind": "type", "values": ["short"] },
-              { "kind": "quality", "values": ["precise"] }
-            ]
-          },
-          {
-            "tier": "B",
-            "description": "Любая атака коротким оружием применяется с преимуществом.",
-            "target": {
-              "kind": "flag",
-              "name": "advantage"
-            },
-            "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "type", "values": ["short"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           },
           {
             "tier": "B",
@@ -145,7 +132,7 @@
               "name": "advantage"
             },
             "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "quality", "values": ["precise"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           }
         ]
       },
@@ -181,10 +168,7 @@
             "description": "Выполнить Финт.",
             "trigger": "manual",
             "isFree": true,
-            "appliesTo": [
-              { "kind": "type", "values": ["short"] },
-              { "kind": "quality", "values": ["precise"] }
-            ]
+            "appliesTo": [{ "kind": "quality", "values": ["precise", "short"] }]
           }
         ]
       }
@@ -1248,7 +1232,7 @@
             "description": "Все используемое мастером военное вооружение получает качество массивного, если не имело его раньше.",
             "target": { "kind": "weaponQuality", "quality": "massive" },
             "modifier": { "type": "addFlat", "value": 1 },
-            "appliesTo": [{ "kind": "type", "values": ["siege"] }]
+            "appliesTo": [{ "kind": "quality", "values": ["siege"] }]
           }
         ]
       }
@@ -2818,7 +2802,7 @@
             },
             "appliesTo": [
               {
-                "kind": "type",
+                "kind": "quality",
                 "values": ["long"]
               }
             ]
@@ -2888,7 +2872,7 @@
             },
             "appliesTo": [
               {
-                "kind": "type",
+                "kind": "quality",
                 "values": ["long"]
               }
             ]
