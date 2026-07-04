@@ -24,6 +24,7 @@
 
 import type {
   AbilityTier,
+  Action,
   ArmorCondition,
   EffectModifier,
   EffectPhase,
@@ -33,6 +34,7 @@ import type {
   PrimaryAttributeName,
   RawEffect,
   ResolvedEffect,
+  TriggerKind,
   WeaponPredicate,
 } from "#rpg-types";
 import type { Registry } from "./registry-types.mts";
@@ -91,6 +93,27 @@ const KNOWN_MODIFIER_TYPES = new Set<string>([
   "multiply",
   "cap",
   "remove",
+]);
+
+// Mirrors the `TriggerKind` union (ADR-015 §5). Runtime membership set
+// for the fail-fast action deserializer; the engine treats every value
+// as opaque (only `"manual"` routes an action into `SpecialAttack[]`).
+const KNOWN_TRIGGERS = new Set<string>([
+  "manual",
+  "onHit",
+  "onMiss",
+  "onContact",
+  "onProne",
+  "onAttacked",
+  "onCheck",
+  "onDodged",
+  "onAdvantage",
+  "onEnemyMovement",
+  "onAllyAttacked",
+  "onResisted",
+  "onSpellCast",
+  "onNewDay",
+  "onDamaged",
 ]);
 
 // ── Public API ─────────────────────────────────────────────────────
@@ -174,6 +197,224 @@ export function normalizeRawEffect(
   return result;
 }
 
+/**
+ * Fail-fast catalog deserializer for a single reference `effects[]`
+ * entry (ADR-015). Sister to `normalizeRawEffect`, which is warn-and-skip
+ * for untrusted runtime `character.effects[]`; the reference catalog is
+ * trusted build data, so a malformed entry is a build error — not a
+ * droppable override.
+ *
+ *   * narrative entry (neither `target` nor `modifier`) → `null` (skip —
+ *     Tier-C prose carries no engine payload).
+ *   * `target` XOR `modifier` present → throw (half-authored effect).
+ *   * both present but unparseable → throw (the preceding `[effects]`
+ *     warning names the specific reject).
+ *
+ * @param raw the reference effect object.
+ * @param source human-readable locator embedded verbatim in thrown errors.
+ * @returns the typed effect, or `null` when the entry is pure narrative.
+ */
+export function deserializeEffect(
+  raw: Partial<RawEffect>,
+  source: string,
+): ResolvedEffect | null {
+  const hasTarget = raw.target !== undefined;
+  const hasModifier = raw.modifier !== undefined;
+  if (!hasTarget && !hasModifier) return null;
+  if (hasTarget !== hasModifier) {
+    throw new Error(
+      `[registry] Malformed effect in ${source}: ` +
+        `${hasTarget ? "target without modifier" : "modifier without target"}. ` +
+        `A mechanical (Tier-A/B) effect needs both; a narrative (Tier-C) ` +
+        `entry needs neither.`,
+    );
+  }
+  const normalized = normalizeRawEffect(raw as RawEffect, source);
+  if (!normalized) {
+    throw new Error(
+      `[registry] Unparseable effect in ${source}: target / modifier / ` +
+        `predicate / condition failed validation (see the preceding ` +
+        `[effects] warning for the specific reject).`,
+    );
+  }
+  return normalized;
+}
+
+/**
+ * Fail-fast catalog deserializer for a single `specialAttacks[]` /
+ * `reactions[]` entry (ADR-014). The engine carries every declarative
+ * field verbatim to sibling apps, which resolve them against the live
+ * weapon at play time — the engine never inlines weapon stats into an
+ * action. This validates the shape and copies it through. Array
+ * placement (special attack vs reaction) is enforced by the caller
+ * against `action.trigger`.
+ *
+ * @param raw the reference action object.
+ * @param source human-readable locator embedded verbatim in thrown errors.
+ * @param statusIds resolvable `inflicts[]` ids (from `reference/statuses`).
+ * @returns the typed action, all declarative fields preserved.
+ */
+export function deserializeAction(
+  raw: unknown,
+  source: string,
+  statusIds: ReadonlySet<string>,
+): Action {
+  if (!isPlainObject(raw)) {
+    throw new Error(`[registry] Malformed action in ${source}: not an object.`);
+  }
+  const id = raw.id;
+  if (typeof id !== "string" || id.length === 0) {
+    throw new Error(
+      `[registry] Action in ${source} is missing a required string 'id'.`,
+    );
+  }
+  const name = raw.name;
+  if (typeof name !== "string" || name.length === 0) {
+    throw new Error(
+      `[registry] Action '${id}' in ${source} is missing a required 'name'.`,
+    );
+  }
+  const trigger = raw.trigger;
+  if (typeof trigger !== "string" || !KNOWN_TRIGGERS.has(trigger)) {
+    throw new Error(
+      `[registry] Action '${id}' in ${source} has unknown trigger ` +
+        `${JSON.stringify(trigger)} (must be a TriggerKind, ADR-015 §5).`,
+    );
+  }
+  const isManual = trigger === "manual";
+
+  const isFree = raw.isFree;
+  if (isFree !== undefined && typeof isFree !== "boolean") {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'isFree' must be a boolean.`,
+    );
+  }
+  if (isFree === true && !isManual) {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'isFree' is only valid on ` +
+        `trigger "manual" (ADR-014 §is-free).`,
+    );
+  }
+
+  const ignoresArmor = raw.ignoresArmor;
+  if (ignoresArmor !== undefined && typeof ignoresArmor !== "boolean") {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'ignoresArmor' must be a boolean.`,
+    );
+  }
+
+  let appliesTo: WeaponPredicate[] | undefined;
+  if (raw.appliesTo !== undefined) {
+    const parsed = parseAppliesTo(raw.appliesTo, `${source} (${id})`);
+    if (!parsed || parsed.length === 0) {
+      throw new Error(
+        `[registry] Action '${id}' in ${source}: invalid 'appliesTo' predicates.`,
+      );
+    }
+    appliesTo = parsed;
+  }
+
+  const damageBonus = raw.damageBonus;
+  if (damageBonus !== undefined) {
+    if (typeof damageBonus !== "number" || !Number.isFinite(damageBonus)) {
+      throw new Error(
+        `[registry] Action '${id}' in ${source}: 'damageBonus' must be a finite number.`,
+      );
+    }
+    if (!appliesTo || appliesTo.length === 0) {
+      throw new Error(
+        `[registry] Action '${id}' in ${source}: 'damageBonus' requires a ` +
+          `non-empty 'appliesTo' (ADR-014 §inheritance-fields).`,
+      );
+    }
+  }
+
+  const damage = raw.damage;
+  if (
+    damage !== undefined &&
+    (typeof damage !== "number" || !Number.isFinite(damage))
+  ) {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'damage' must be a finite number.`,
+    );
+  }
+
+  const attackAttribute = raw.attackAttribute;
+  if (
+    attackAttribute !== undefined &&
+    (typeof attackAttribute !== "string" ||
+      !KNOWN_PRIMARY_ATTRIBUTES.has(attackAttribute as PrimaryAttributeName))
+  ) {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'attackAttribute' ` +
+        `${JSON.stringify(attackAttribute)} is not a primary attribute.`,
+    );
+  }
+
+  let inflicts: string[] | undefined;
+  if (raw.inflicts !== undefined) {
+    if (
+      !Array.isArray(raw.inflicts) ||
+      !raw.inflicts.every((s) => typeof s === "string")
+    ) {
+      throw new Error(
+        `[registry] Action '${id}' in ${source}: 'inflicts' must be a string[].`,
+      );
+    }
+    const list = raw.inflicts as string[];
+    for (const statusId of list) {
+      if (!statusIds.has(statusId)) {
+        throw new Error(
+          `[registry] Action '${id}' in ${source}: 'inflicts' references ` +
+            `unknown status '${statusId}' (not in reference/statuses).`,
+        );
+      }
+    }
+    inflicts = [...list];
+  }
+
+  const description = raw.description;
+  if (description !== undefined && typeof description !== "string") {
+    throw new Error(
+      `[registry] Action '${id}' in ${source}: 'description' must be a string.`,
+    );
+  }
+
+  let effects: ResolvedEffect[] | undefined;
+  if (raw.effects !== undefined) {
+    if (!Array.isArray(raw.effects)) {
+      throw new Error(
+        `[registry] Action '${id}' in ${source}: 'effects' must be an array.`,
+      );
+    }
+    const collected: ResolvedEffect[] = [];
+    raw.effects.forEach((child, i) => {
+      const eff = deserializeEffect(child, `${source} (${id}).effects[${i}]`);
+      if (eff) collected.push(eff);
+    });
+    if (collected.length > 0) effects = collected;
+  }
+
+  // Carry every declarative field verbatim — the engine never inlines
+  // weapon stats into an action; sibling apps resolve at play time.
+  return {
+    id,
+    name,
+    trigger: trigger as TriggerKind,
+    ...(description !== undefined ? { description } : {}),
+    ...(attackAttribute !== undefined
+      ? { attackAttribute: attackAttribute as PrimaryAttributeName }
+      : {}),
+    ...(damage !== undefined ? { damage } : {}),
+    ...(damageBonus !== undefined ? { damageBonus } : {}),
+    ...(ignoresArmor !== undefined ? { ignoresArmor } : {}),
+    ...(inflicts !== undefined ? { inflicts } : {}),
+    ...(appliesTo !== undefined ? { appliesTo } : {}),
+    ...(isFree !== undefined ? { isFree } : {}),
+    ...(effects !== undefined ? { effects } : {}),
+  };
+}
+
 export function collectAllEffects(
   character: {
     traits?: LearnedTrait[];
@@ -210,12 +451,11 @@ export function collectAllEffects(
     collected.push(...result.effects);
   }
 
-  // Talents (boons / sins) → registry lookup. Same warn-and-skip
-  // policy as traits. The reference-lint test will promote misses to a
-  // hard failure once it ships. The production registry returns null
-  // for stubbed talents (`emptyRegistry` in `app.mts`) until the real
-  // loader lands (TODO(trait-talent-registry), tracked in
-  // .github/plans/phase6-plan.md).
+  // Talents (boons / sins) → registry lookup. Same warn-and-skip policy
+  // as traits: an unknown id is an authoring error the reference-lint
+  // test catches at build time, so a runtime miss stays non-fatal here.
+  // Level is passed through but ignored by the loader (talents contribute
+  // flat top-level flags; numeric level-scaling is unimplemented).
   for (const talent of character.talents ?? []) {
     const result = registry.lookupTalent(talent.id, talent.level);
     if (!result) {
@@ -266,7 +506,23 @@ export function collectAllEffects(
     );
   }
 
-  return collected;
+  // NB-34: drop character-level `secondary` effects that carry a weapon
+  // `appliesTo` predicate. The engine has no slot-aware path for secondary
+  // aggregates (defense / toughness / armor / …), so applying such a bonus
+  // unconditionally would bake a sometimes-true value into the derived
+  // stat (e.g. `double-strike.novice` granting +1 defense even bare-
+  // handed). The predicate rides to sibling apps as documentary catalog
+  // data; a UI surface is deferred (roadmap Phase 8). This is distinct
+  // from the legitimate unconditional `secondary` + `setBase` path (e.g.
+  // `smoke-and-mirrors.adept`), which carries no `appliesTo`.
+  return collected.filter(
+    (effect) =>
+      !(
+        effect.target.kind === "secondary" &&
+        effect.appliesTo !== undefined &&
+        effect.appliesTo.length > 0
+      ),
+  );
 }
 
 function appendArmorQualityEffects(

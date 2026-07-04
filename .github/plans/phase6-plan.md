@@ -52,7 +52,7 @@ chunks that resolve them.
 | E | Combat phase per-slot fanout + predicates | medium | — | medium | — | ✅ Done |
 | F.0 | Quality registry + locale-drift lint (prereqs) | medium | — | medium | medium | ✅ Done (2026-04-27) |
 | F | Effect normalization (data, collaborative) + post-pass amendment items 2–13 | small | huge | medium | medium | ✅ Done (Item 1 resolved via Model B in Chunk G — declarative, not an engine resolver) |
-| G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ⏳ Not started |
+| G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ✅ Done (2026-07-04) |
 | G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ⏳ Not started |
 | H | Validators, sibling docs, cleanup | medium | — | medium | large | ⏳ Not started |
 
@@ -885,6 +885,65 @@ shape is firm. Until then the three copies are accepted as a known debt.
 
 ### G.1 — Registry loader + effect/action wiring + reference-lint
 
+> **✅ Completed 2026-07-04.** 672 / 672 tests + typecheck green.
+> Deliverables and divergences from the outline below:
+>
+> - **Loader** — the `src/rules/registry.mts` shim is replaced by
+>   `loadRegistry(): Promise<Registry>`: pre-deserializes traits
+>   (abilities+spells, additive per-tier), talents (boons+sins, flat
+>   top-level, level ignored) and qualities at `DEFAULT_LOCALE`,
+>   fail-fast. Wired into `src/app.mts` in place of `emptyRegistry`
+>   (loads 125 traits / 68 talents / 31 qualities). The `#rules` barrel
+>   exports `loadRegistry`; `recalculate` stays synchronous. Closes
+>   **NB-37**; the slot-2 `own` check (**NB-39**) runs at load and in the
+>   lint.
+> - **Deserializer** — `deserializeEffect` / `deserializeAction`
+>   (throw-mode) added to `src/rules/effects.mts`, reusing
+>   `normalizeRawEffect` / `parseAppliesTo`. Narrative (no `target` and no
+>   `modifier`) → skip; `target` XOR `modifier` → throw; malformed →
+>   throw. Actions carry all declarative fields verbatim (Model B).
+>   **Divergence:** only `isFree` is manual-gated; `ignoresArmor` /
+>   `damageBonus` are **not** (matches the audit lint and real data —
+>   armor-ignoring reactions like `entanglement-choking-tie` / Riposte are
+>   legitimate). The Item 1 note's "forbids `ignoresArmor`/`damageBonus`
+>   on non-`manual`" was imprecise.
+> - **NB-34 skip** — `collectAllEffects` drops `secondary` effects that
+>   carry `appliesTo` (a single guard, DRY over the four secondary apply
+>   paths named in the outline). NB-34 updated: stays open; the
+>   conditional-secondary feature + UI surface are deferred to Phase 8.
+> - **NB-44** — confirmed stale (the mechanism shipped with post-Chunk-F
+>   Item 5's `resolveSetBase`). Corrected the audit's false finding, added
+>   loader + deserializer regression coverage, **closed NB-44**.
+> - **Reference-lint** — new `test/rules/reference-lint.test.mts`
+>   (report-all, both locales) delegates effect/action *shape* to the
+>   deserializers and adds the cross-refs: quality resolution
+>   (`weaponQuality`/`armorQuality` targets, `appliesTo kind:"quality"`,
+>   weapon/armor `qualities[]`), per-file id uniqueness, action placement
+>   (special-attack ⇒ `manual`, reaction ⇒ non-`manual`), slot-2 `own`.
+>   **Divergences:** (a) `appliesTo` `id`/`type` resolution against the
+>   weapon catalog was **dropped** — the authored predicate vocabulary is
+>   looser than the weapon `id`/`type` fields and the old audit never
+>   gated on it (see finding below); (b) `scripts/audit-reference.mts` is
+>   **kept** (its stale NB-44 line corrected) — its deletion and the
+>   repointing of its doc/ADR references move to **G.2** (doc
+>   reconciliation).
+> - **Tests** — new `test/rules/registry.test.mts` (loader real-data +
+>   deserializer units); all five `TODO(trait-talent-registry)` sites
+>   removed.
+>
+> **⚠ Finding for author triage (not fixed here).** 11 `appliesTo`
+> predicates use `kind: "type"` / `kind: "id"` values that don't resolve
+> against the weapon catalog and are therefore **dead at runtime**
+> (`matchesPredicates` matches `weapon.type` / `weapon.id` exactly):
+> `smoke-and-mirrors` (`type: "short"` ×3), `polearm` + `staff-mastery`
+> (`type: "long"`), `naval-warfare-and-artillery` (`type: "siege"`),
+> `quick-hand` (`id: "revolver"`), `axe-patterns` (`id: "axe"` ×4).
+> `short` / `long` are **qualities** (these likely want
+> `kind: "quality"`); `axe` / `revolver` / `siege` map to no weapon
+> `id` / `type`. Resolution is an RPG-authoring decision (re-author the
+> predicates, or extend the weapon taxonomy), out of scope for the
+> engine-wiring chunk.
+
 **Steps**
 
 1. **Loader** — replace the `src/rules/registry.mts` re-export shim
@@ -970,6 +1029,13 @@ shape is firm. Until then the three copies are accepted as a known debt.
 4. **Docs** — reflect the Model B action policy, the conditional-secondary
    skip, and the talent stance in `docs/data-contracts.md` and
    `docs/reference-authoring.md`.
+5. **Retire `scripts/audit-reference.mts`.** Its semantic checks were
+   promoted into `test/rules/reference-lint.test.mts` (Chunk G.1). Delete
+   the script and repoint the references that name it — ADR-014, ADR-016,
+   `docs/data-contracts.md`, `docs/reference-authoring.md`,
+   `src/rpg-types.mts` (Action JSDoc), and `.github/bugs/infra.md` — to
+   the reference-lint test. (Its stale NB-44 finding was already corrected
+   in G.1.)
 
 **Verification**
 
@@ -1357,11 +1423,11 @@ Code-side `TODO(<scope>)` cites that name this plan and must be removed
 docs-cleanup-plan Pass E reciprocal-obligation convention; the
 docs-cleanup Pass H reconciliation gate checks this list.
 
-- **`TODO(trait-talent-registry)`** — the production trait/talent loader
-  (Chunk G.1). Sites: `src/app.mts`, `src/rules/registry.mts`,
-  `src/rules/registry-types.mts`, `src/rules/effects.mts`,
-  `test/helpers/registry.mts`. Remove when Chunk G.1's real loader replaces
-  the stub.
+- ~~**`TODO(trait-talent-registry)`**~~ — ✅ **removed in Chunk G.1**
+  (2026-07-04). The production loader (`loadRegistry` in
+  `src/rules/registry.mts`) replaced the stub; all five sites
+  (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`,
+  `src/rules/effects.mts`, `test/helpers/registry.mts`) are cleared.
 - **`TODO(weapon-inheritance)`** — per-weapon `Action` inheritance runtime
   (`damageBonus` / `ignoresArmor` / `appliesTo`). **Retired by Model B
   (Chunk G, 2026-07-04):** the engine never inlines weapon stats into

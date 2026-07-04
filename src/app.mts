@@ -5,9 +5,8 @@ import { URL } from "node:url";
 
 import { requireDmToken } from "#auth";
 import * as nagara from "#models";
-import * as ref from "#models/reference";
 import * as backup from "./lib/backup.mts";
-import { recalculate } from "#rules";
+import { recalculate, loadRegistry } from "#rules";
 import { broadcastToCharacter, broadcastCharacterDeleted } from "#sse";
 import {
   handleValidateDM,
@@ -36,61 +35,28 @@ import {
   DATA_DIR,
   API_ROUTE,
   LOCAL_ADDRESS,
-  DEFAULT_LOCALE,
 } from "#config";
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NagaraRequest, Character } from "#types";
-import type { Quality, ResolvedEffect } from "#rpg-types";
-import type { Registry } from "#rules";
 
 const getCharacterHandler = createCharacterRoute();
 const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
-// Stub registry used at startup. `lookupQuality` is fully populated from
-// `reference/qualities.<DEFAULT_LOCALE>.json` per ADR-016 (unknown ids
-// throw). `lookupTrait` / `lookupTalent` are no-op stubs — callers warn
-// and skip on miss.
-//
-// TODO(trait-talent-registry): replace with a registry that loads
-// abilities/spells/boons/sins via `src/models/reference.mts`. Tracked
-// in `.github/plans/phase6-plan.md`.
-const qualityIndex = await loadQualityIndex();
-
-const emptyRegistry: Registry = {
-  lookupTrait: () => null,
-  lookupTalent: () => null,
-  lookupQuality: (id) => qualityIndex.get(id) ?? null,
-};
-
-async function loadQualityIndex(): Promise<Map<string, Quality>> {
-  const entries = await ref.getTopic("qualities", DEFAULT_LOCALE);
-  const map = new Map<string, Quality>();
-  for (const entry of entries) {
-    map.set(entry.id, {
-      id: entry.id,
-      ...(typeof entry.name === "string" ? { name: entry.name } : {}),
-      ...(typeof entry.description === "string"
-        ? { description: entry.description }
-        : {}),
-      effects: Array.isArray(entry.effects)
-        ? (entry.effects as ResolvedEffect[])
-        : [],
-    });
-  }
-  console.log(
-    `[quality-registry] Loaded ${map.size} qualities from reference/qualities.${DEFAULT_LOCALE}.json`,
-  );
-  return map;
-}
+// Load the reference-data registry once at startup: the ADR-016 quality
+// catalog plus the ability/spell (trait) and boon/sin (talent) effects
+// and actions, all at DEFAULT_LOCALE. Fail-fast — a malformed catalog
+// entry throws here, before any request can land. `recalculate` stays
+// synchronous; the returned registry's lookups are pure Map reads.
+const registry = await loadRegistry();
 
 // Wire the character service once at startup (ADR-013). Domain mutations
 // throw until this runs, so it must happen at module top-level — before
 // any request can land.
 nagara.initCharacterService({
-  recalc: (character) => recalculate(character, emptyRegistry),
+  recalc: (character) => recalculate(character, registry),
   broadcast: broadcastToCharacter,
   broadcastDeleted: broadcastCharacterDeleted,
 });

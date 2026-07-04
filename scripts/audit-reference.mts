@@ -396,14 +396,8 @@ function inspectEffect(
             detail: `${context}: setBase on combat.${target.field} (only attackAttribute accepts setBase)`,
           });
         }
-        if (targetKind === "secondary") {
-          addFinding("parserRejections", {
-            file,
-            entryId,
-            tier,
-            detail: `${context}: setBase on secondary (rejected by parser)`,
-          });
-        }
+        // NB-44: `secondary` + `setBase` is VALID (resolved via
+        // `resolveSetBase` in the formula phase); no finding here.
         if (
           targetKind === "weaponQuality" ||
           targetKind === "armorQuality" ||

@@ -1,8 +1,6 @@
 // In-memory registry stub for tests. Production code never imports this.
-// See `src/rules/registry-types.mts` for the interface contract; a
-// production loader for traits/talents is tracked under
-// `TODO(trait-talent-registry)` in `src/app.mts` /
-// `.github/plans/phase6-plan.md`.
+// See `src/rules/registry-types.mts` for the interface contract and
+// `src/rules/registry.mts` (`loadRegistry`) for the production loader.
 
 import type {
   AbilityTier,

@@ -4,10 +4,9 @@
 // to resolve character traits / talents into `ResolvedEffect`s and
 // triggered actions.
 //
-// Production wiring lives in `src/app.mts` (inline stub + quality-catalog
-// loader); the in-memory test stub lives at `test/helpers/registry.mts`.
-// A production loader for traits/talents is tracked under
-// `TODO(trait-talent-registry)` in `src/app.mts` / `.github/plans/phase6-plan.md`.
+// Production wiring lives in `src/rules/registry.mts` (`loadRegistry`,
+// wired at startup in `src/app.mts`); the in-memory test stub lives at
+// `test/helpers/registry.mts`.
 //
 // Tier stacking is registry-internal: `lookupTrait(id, "master")` returns
 // the union of `novice` + `adept` + `master` effects (additive, ADR-014).
@@ -45,19 +44,18 @@ export interface TalentLookupResult {
 export interface Registry {
   /**
    * Resolve a learned trait (ability or spell) to its tier-flattened
-   * effect set. Returns `null` when the id/tier combination is unknown;
-   * `collectAllEffects` currently warns and skips on miss. The
-   * reference-lint test will promote this to a hard failure once it
-   * ships (see `TODO(trait-talent-registry)`).
+   * effect set. Returns `null` when the id is unknown; `collectAllEffects`
+   * warns and skips on miss. The reference-lint test catches unknown
+   * authored trait ids at build time.
    */
   lookupTrait(id: string, tier: AbilityTier): TraitLookupResult | null;
 
   /**
    * Resolve a learned talent (boon or sin) to its effect set. Returns
-   * `null` when the id/level combination is unknown; `collectAllEffects`
-   * warns and skips on miss (symmetric to `lookupTrait`). Stubbed in
-   * production until the loader lands \u2014 see
-   * `TODO(trait-talent-registry)` in `src/app.mts`.
+   * `null` when the id is unknown; `collectAllEffects` warns and skips
+   * on miss (symmetric to `lookupTrait`). Level is ignored — talents
+   * contribute set-membership flags; numeric level-scaling is
+   * unimplemented.
    */
   lookupTalent(id: string, level: number): TalentLookupResult | null;
 

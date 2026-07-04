@@ -125,6 +125,27 @@
 - **Fix:** ADR-015 §3f — new `condition?: ArmorCondition[]` field on `ResolvedEffect`. AND-composed entries of kind `armorQuality | armorId | armorSlot | noArmor`. Accepted on `secondary` (character-level read) and `armorQuality` (per-piece read); parser strips with a warn elsewhere. Registry-synthesized `armorQuality` effects (per-piece quality registry expansion) are auto-stamped with `condition: [{ kind: "armorSlot", values: [<piece>] }]` so a body piece's quality can never bleed onto the plug. Audit lint requires `condition` on every non-registry `armorQuality` effect.
 - **Status:** ✅ **Resolved** — Phase 6 Chunk F post-pass Item 3 (2026-05-04). 19 new tests in `test/rules/armor-condition.test.mts` + `test/rules/armor-overlay-leak.test.mts`. Authoring sweep applied to Soldier Adept, Demiurge Hands Novice/Master across `abilities.{en,ru}.json`.
 
+### NB-37. `src/rules/registry.mts` re-export shim may have outlived its purpose
+- **Domain:** engine
+- **Where:** `src/rules/registry.mts`, `src/rules/index.mts` (barrel), `src/app.mts`.
+- **Impact:** The file was a 13-line re-export shim (types only). The `#rules` barrel already surfaced the registry types directly from `registry-types.mts`, so the shim was dead indirection with no functional role.
+- **Fix:** Chunk G.1 landed the real trait/talent/quality loader (`loadRegistry`) inside `registry.mts`, so the file now earns its keep. The barrel exports `loadRegistry`; the vestigial type re-export was dropped from the shim.
+- **Status:** ✅ Resolved — Phase 6 Chunk G.1 (2026-07-04). `registry.mts` holds `loadRegistry()` (fail-fast pre-deserialization at `DEFAULT_LOCALE`), wired into `src/app.mts` in place of the inline `emptyRegistry` stub.
+
+### NB-39. Slot-2 `own` quality has no registry-side check
+- **Domain:** engine
+- **Where:** `src/rules/registry.mts` `loadRegistry`, `test/rules/reference-lint.test.mts`.
+- **Impact:** Schema validation asserted `combat.carried[2]`'s weapon carries `"own"`, but nothing asserted `"own"` is a registered quality id in `reference/qualities.<locale>.json`. Dropping it from the catalog would surface as a late per-recalc throw that looks like a recalc bug instead of a catalog bug.
+- **Fix:** `loadRegistry` throws at startup if the quality registry lacks an `own` entry (NB-39 message); `reference-lint.test.mts` asserts the same at build time.
+- **Status:** ✅ Resolved — Phase 6 Chunk G.1 (2026-07-04).
+
+### NB-44. `secondary` + `setBase` has no primary-substitution mechanism
+- **Domain:** engine
+- **Where:** `src/rules/effects.mts` (`parseModifier`), `src/rules/applicator.mts` (`applySetBase`), `src/rules/derived.mts` (formula phase), `src/rules/setbase.mts` (`resolveSetBase`).
+- **Impact:** The tracker claimed `parseModifier` rejects `setBase` on `secondary`, leaving "compute Defense from Discreet instead of Quick" unexpressible. This was **stale**: the mechanism already shipped with post-Chunk-F Item 5 (`resolveSetBase`, 2026-05-08). `parseModifier` accepts `secondary` + `setBase` (rejecting only `primary` and non-`attackAttribute` `combat`); `applySetBase` buckets secondary `setBase` candidates per stat; the formula phase resolves each via `resolveSetBase` (default-inclusive max-by-primary). The 4 cited entries (`smoke-and-mirrors.adept[0]`, `tactics.adept[0]`, `sixth-sense.adept[0]`, `dancing-weapon.master[1]`) resolve end-to-end once the trait registry feeds them (Chunk G.1).
+- **Fix:** Corrected the record and removed the stale `scripts/audit-reference.mts` "setBase on secondary (rejected by parser)" finding; `test/rules/reference-lint.test.mts` accepts the pattern. Regression coverage: `test/rules/derived.test.mts` ("setBase override (typed)") and `test/rules/registry.test.mts` (real `smoke-and-mirrors.adept` Discreet-for-Defense).
+- **Status:** ✅ Resolved — Phase 6 Chunk G.1 (2026-07-04). Was stale/misfiled; the feature shipped with Item 5.
+
 ### NB-46. No request body size limits on any endpoint
 - **Domain:** infra
 - **Status:** ✅ Resolved — Phase 5 Session 3 (2026-04-18). New `src/lib/body.mts` with `readBody`/`readBodyBuffer` + `BodyTooLargeError`. Applied to all 6 body-reading sites (handleCreate, handleUpdate, multipart/parseImage, recover, backup-create, backup-restore). JSON limit: 1 MB, upload limit: ~21 MB. `BodyTooLargeError` → 413 response.

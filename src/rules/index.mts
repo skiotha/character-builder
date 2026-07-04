@@ -14,6 +14,7 @@ export {
   groupByPhase,
   normalizeRawEffect,
 } from "./effects.mts";
+export { loadRegistry } from "./registry.mts";
 export type {
   Registry,
   TraitLookupResult,
