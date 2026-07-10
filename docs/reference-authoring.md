@@ -253,7 +253,7 @@ check [`EffectFlag` in src/rpg-types.mts](../src/rpg-types.mts) for the
 existing set. If you add a new one, append it to that union in the same
 commit that authors the catalog entry consuming it.
 
-### Tier-A worked example — special attack promotion
+### Tier-A worked example — special attack
 
 A `SpecialAttack` is an `Action` whose `trigger === "manual"`. The wire
 shape on tier objects is fully specified in §11; the short version is:
@@ -261,7 +261,7 @@ author the entry under the appropriate tier's `specialAttacks[]` array,
 repeat the same `id` at a higher tier to override (Backstab pattern),
 or use a new id to add a brand-new entry at that tier.
 
-### Tier-A worked example — reaction promotion
+### Tier-A worked example — reaction
 
 Same as above; a `Reaction` is an `Action` with any non-`manual`
 trigger, authored under the tier's `reactions[]` array. See §11 for the
@@ -290,29 +290,39 @@ Identical to abilities (§1) with two deltas:
 - `category` is `"spell"`.
 - `source` is `"03-reference/spells"`.
 
-### Spell-tier extra fields (when the spell deals damage)
+### Spell-tier actions (when the spell deals damage)
 
-A spell tier may carry **direct combat metadata** (ADR-014 §"Spells"):
+A damaging or triggered spell tier declares its attacks the **same way
+abilities do** — explicit id'd `specialAttacks[]` / `reactions[]` arrays on
+the tier object (§11 is the canonical wire shape):
 
 ```jsonc
 {
   "tiers": {
     "novice": {
       "description": "...",
-      "attackAttribute": "resolute",      // PrimaryAttributeName, optional
-      "damage": 6,                        // number, optional
-      "trigger": "manual",                // TriggerKind, optional
+      "specialAttacks": [
+        { "id": "sulfur-cascade-scorch", "name": "Scorch", "trigger": "manual", "damage": 6 }
+      ],
       "effects": [ /* same shape as abilities */ ]
     }
   }
 }
 ```
 
-These three fields belong on the **spell tier**, not on the spell root,
-and not in any parallel file. There is **no** `cost` field — sibling apps
-compute corruption from `traditions` vs spell tags.
+- **No tier-root `attackAttribute`.** A spell's attack attribute is the
+  character-level `magicAttribute` (default `"resolute"`); sibling apps read
+  `character.magicAttribute`. The engine never reads a per-tier attack
+  attribute, so authoring one has no effect — omit it.
+- **`damage`** is numeric and lives on the individual action entry, not the
+  tier root.
+- **`trigger`** distinguishes a `SpecialAttack` (`"manual"`) from a
+  `Reaction` (any other trigger), per §11.
+- There is **no** `cost` field — sibling apps compute corruption from
+  `traditions` vs spell tags.
 
-If a spell does no damage and has no triggered behaviour, omit all three.
+If a spell does no damage and has no triggered behaviour, omit the
+`specialAttacks[]` / `reactions[]` arrays entirely.
 
 ---
 
@@ -909,17 +919,22 @@ higher tier replaces the lower. Different ids coexist. So to "upgrade"
 a novice special attack at the master tier, repeat the same `id` and
 edit the other fields:
 
-**Inheritance defaults.** Omit `damage` / `attackAttribute`
-when the action should fire with the carrying weapon's own values
-(Backstab, Stab, off-hand strikes). Set them only for bespoke actions
-that don't care which weapon you carry (Cheap Shot, magic attacks).
+**Inheritance defaults (sibling-resolved).** Omit `damage` /
+`attackAttribute` when the action should fire with the carrying weapon's
+own values (Backstab, Stab, off-hand strikes). Set them only for bespoke
+actions that don't care which weapon you carry (Cheap Shot, magic attacks).
 Use `damageBonus` for the Backstab pattern (inherit base, add a flat
-bonus); the audit lint requires a non-empty `appliesTo` whenever
-`damageBonus` is present to scope which slots earn the bonus.
+bonus); the reference-lint requires a non-empty `appliesTo` whenever
+`damageBonus` is present to scope which slots earn the bonus. **The engine
+does not resolve these fields** — it carries `damage`, `attackAttribute`,
+`damageBonus`, `ignoresArmor`, and `appliesTo` to sibling apps verbatim,
+and the sibling resolves the omitted values against the **live** carried
+weapon at play time (weapon swaps are sibling-side, so any value inlined at
+save time would go stale).
 
 **Status infliction.** `inflicts[]` declares what statuses
 the action applies to its **target** on a successful hit. Values must
-resolve against `reference/statuses.{en,ru}.json` (the audit script
+resolve against `reference/statuses.{en,ru}.json` (the reference-lint
 flags unknown ids). Engine declares only — sibling combat resolvers
 own duration, stacking, and saves. Same lifecycle policy as
 `EffectFlag` (which describes the *character*, not the *target*).
@@ -983,7 +998,7 @@ entry). To add a brand-new entry at a higher tier, give it a new id:
 
 - Prefix the id with the parent ability/spell id (kebab-case) so
   cross-parent collisions are nearly impossible: `intrigues-backstab`,
-  `sulfur-cascade-scorch`. The `scripts/audit-reference.mts` lint
+  `sulfur-cascade-scorch`. The `test/rules/reference-lint.test.mts` lint
   flags missing ids, dups within a tier, and cross-parent collisions.
 - `id` is locale-independent — the en/ru locale-drift lint asserts
   parallel entries carry identical ids.

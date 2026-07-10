@@ -132,6 +132,13 @@
 - **Fix:** Chunk G.1 landed the real trait/talent/quality loader (`loadRegistry`) inside `registry.mts`, so the file now earns its keep. The barrel exports `loadRegistry`; the vestigial type re-export was dropped from the shim.
 - **Status:** ✅ Resolved — Phase 6 Chunk G.1 (2026-07-04). `registry.mts` holds `loadRegistry()` (fail-fast pre-deserialization at `DEFAULT_LOCALE`), wired into `src/app.mts` in place of the inline `emptyRegistry` stub.
 
+### NB-38. Spell-tier `attackAttribute`: authoring spec and audit lint disagree
+- **Domain:** engine
+- **Where:** `docs/reference-authoring.md` §"Spell-tier extra fields (when the spell deals damage)" vs `scripts/audit-reference.mts` tier-root `attackAttribute` check. Root concept: the `character.magicAttribute` feature (per-character spell attack attribute, default `"resolute"`).
+- **Impact:** Two canonical sources contradicted on whether a spell **tier** may carry its own `attackAttribute`. The authoring spec documented it as valid; the audit lint flagged it; the engine only ever read `character.magicAttribute`. Latent (zero tier-root `attackAttribute` in live `reference/spells.*`), so the risk was future drift, not a live bug.
+- **Fix:** Chunk G.2 took path (a) — `character.magicAttribute` is authoritative. ADR-014 §5 retired the tier-level spell→action *promotion* entirely (spells declare explicit id'd `specialAttacks[]` / `reactions[]` arrays with numeric `damage`, per `docs/reference-authoring.md` §2 / §11), and the authoring spec's "Spell-tier extra fields" section was rewritten to drop tier-root `attackAttribute` and point at the explicit-array shape. The contradicting `scripts/audit-reference.mts` was retired in the same chunk (its checks now live in `test/rules/reference-lint.test.mts`), so the two sources can no longer disagree.
+- **Status:** ✅ Resolved — Phase 6 Chunk G.2 (2026-07-10).
+
 ### NB-39. Slot-2 `own` quality has no registry-side check
 - **Domain:** engine
 - **Where:** `src/rules/registry.mts` `loadRegistry`, `test/rules/reference-lint.test.mts`.

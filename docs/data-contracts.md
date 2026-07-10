@@ -209,6 +209,16 @@ The legacy dotted-path `target` strings, the `add`/`mul`/`set` modifier verbs, a
 
 `appliesTo: WeaponPredicate[]` is AND-composed; default is a single `{ kind: "any", values: [] }`. Predicate `kind: "subtype"` is **not** part of the vocabulary.
 
+> **Conditional secondaries are skipped.** `appliesTo` narrows per-slot
+> `combat` / `weaponQuality` / `flag` effects. On a character-level
+> `secondary` target the engine has no per-slot context in which to
+> evaluate the predicate, so it **skips** any `secondary` effect that
+> carries an `appliesTo` (applying it unconditionally would bake a
+> sometimes-true bonus into the aggregate — e.g. a "+1 defense while
+> wielding a staff" would otherwise apply bare-handed). The effect and its
+> predicate still ride to sibling apps as documentary data; a UI surface
+> is deferred. Tracked in NB-34.
+
 #### `EffectModifier` (per phase)
 
 | `type`       | Shape                                          | Phase                       |
@@ -284,14 +294,18 @@ re-dedupe. The `Action` shape is:
 ```
 
 `damageBonus`, `ignoresArmor`, `inflicts`, `isFree`, and `appliesTo`
-are declarative wire additions (added 2026-05-19). The engine carries
-them through to sibling apps verbatim. Inheritance resolution at recalc
-time (inlining the carrying slot's `damage` / `attackAttribute` when
-omitted) is the remaining engine work, still pending at runtime.
+are declarative fields. The engine carries them through to sibling apps
+verbatim and **never** inlines weapon stats into an action: sibling apps
+resolve `damageBonus` / `ignoresArmor` / `appliesTo` — and the omitted
+`damage` / `attackAttribute` defaults — against the **live** carried
+weapon at play time. Weapon swaps are sibling-side and not persisted
+per-swap (ADR-014), so any value inlined at save time would go stale on
+the next swap. Passive per-slot weapon stats stay engine-computed
+(`deriveCombatSlots`); actions are declarative.
 
 `inflicts[]` entries are validated against the canonical status
 registry (`reference/statuses.{en,ru}.json`, served at
-`/api/v1/statuses`) by `scripts/audit-reference.mts`. Statuses are
+`/api/v1/statuses`) by `test/rules/reference-lint.test.mts`. Statuses are
 display-only metadata — the engine does not model duration, stacking,
 or saves; sibling combat resolvers own that.
 
@@ -314,6 +328,15 @@ Talents (sins and boons) use a level model with a source discriminator:
 ```jsonc
 { "id": "string", "level": 1, "source": "sin" | "boon" }
 ```
+
+> **Talent engine stance.** Talents contribute only the flat top-level
+> `effects[]` (flags) authored on the boon / sin — the engine applies them
+> via `collectAllEffects` → `lookupTalent`. Numeric `level` is carried for
+> sibling apps but is **not** engine-scaled (no talent currently carries a
+> numeric-target effect; flags ignore their numeric value per ADR-015 §3a).
+> Many check-bonus talents (Actor, Powerful Voice, Deceiver, …) carry no
+> `effects[]` at all, so siblings can only key off "talent present +
+> level." Tracked in NB-47.
 
 Rituals use a level model:
 ```jsonc

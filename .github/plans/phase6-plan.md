@@ -53,7 +53,7 @@ chunks that resolve them.
 | F.0 | Quality registry + locale-drift lint (prereqs) | medium | — | medium | medium | ✅ Done (2026-04-27) |
 | F | Effect normalization (data, collaborative) + post-pass amendment items 2–13 | small | huge | medium | medium | ✅ Done (Item 1 resolved via Model B in Chunk G — declarative, not an engine resolver) |
 | G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ✅ Done (2026-07-04) |
-| G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ⏳ Not started |
+| G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ✅ Done (2026-07-10) |
 | H | Validators, sibling docs, cleanup | medium | — | medium | large | ⏳ Not started |
 
 ---
@@ -726,8 +726,8 @@ back-and-forth.
 >   `ignoresArmor` / `appliesTo`) verbatim and sibling apps resolve them
 >   against the live weapon at play time (weapon swaps are sibling-side, so
 >   any value the engine inlined at save time would go stale). See the
->   reworked Chunk G framing note; `TODO(weapon-inheritance)` is deleted in
->   G.2.
+>   reworked Chunk G framing note; `TODO(weapon-inheritance)` was deleted in
+>   G.2 (2026-07-10).
 > - **`EffectFlag` cleanup pass** — authors extended the union as they
 >   went; consolidate near-duplicates after Chunk G stabilises.
 >
@@ -778,7 +778,7 @@ back-and-forth.
 | —    | Strip per-spell `attackAttribute` from spells.json      | 2026-05-08  | G2.D companion. Removed 25 hard-coded attribute strings from `specialAttacks[]` / `reactions[]` in `reference/spells.{en,ru}.json`. Sibling apps now read `character.magicAttribute`. |
 | 3    | Armor-side `appliesTo` / character-level effect gating  | 2026-05-04  | New optional `condition?: ArmorCondition[]` on `ResolvedEffect` (kinds: `armorQuality`, `armorId`, `armorSlot`, `noArmor`), accepted on `secondary` (character-level) and `armorQuality` (per-piece). Bonus: armor overlay split — engine writes to `ArmorPiece.qualitiesEffective` (reset every recalc), authored `qualities` no longer mutated. Closes weak-point Bug #31's remaining caveat. ADR-015 §3f. Authoring sweep: Soldier Adept, Demiurge Hands Novice/Master across `abilities.{en,ru}.json`. Tracker entry: weak-point #32. |
 | 9    | Special-attack rewrite by id (rank supersedes lower)    | 2026-05-10  | New `collectActions` step in `derived.mts`: walks `traits[]`, dedupes by required `Action.id` via `Map.set` last-write-wins; relies on registry's documented tier-ascending order (`TraitLookupResult` JSDoc) instead of a rank field. **Diverged:** dropped rank-stamping (free with ordered iteration) and **removed** the unused `Action.source` field rather than retaining it. Talents/equipment intentionally don't contribute (YAGNI). 7-test suite + nested-id locale-drift pin + audit lint Section 8 (missing/dup/cross-parent). ADR-014 §9; `data-contracts.md` + `reference-authoring.md` §11 updated. |
-| 1 ⏳ | `Action` inheritance shape (wire + authoring shipped; engine pending) | 2026-05-19 | Added `damageBonus?`, `ignoresArmor?`, `appliesTo?: WeaponPredicate[]` to `Action` (name `appliesTo` chosen over staging's `weaponFilter` to reuse existing scoping vocabulary). Audit lint enforces `damageBonus` ⇒ non-empty `appliesTo` and forbids `ignoresArmor`/`damageBonus` on non-`manual`. **Authoring sweep complete:** `intrigues-backstab` (novice + master) re-authored with `damageBonus` + `appliesTo`; entries that are legitimately bespoke (Cheap Shot, Strangling, Riposte armor-ignoring d6, poisoner/hunter/skirmish reactions) correctly retain hardcoded `damage`/`attackAttribute` per the original Item 1 "Cheap Shot and innate/monster attacks stay as-is" carve-out. **Docs landed:** ADR-014 post-Chunk-F amendment block; `docs/data-contracts.md` Action shape extended; `docs/reference-authoring.md` §11 covers inheritance defaults + `damageBonus` + `ignoresArmor` + `appliesTo`. **Superseded by Model B (2026-07-04):** the engine carries these fields declaratively — no recalc-time inlining; sibling apps resolve against the live weapon (swaps are sibling-side, so inlined values would go stale). `TODO(weapon-inheritance)` is deleted in Chunk G.2, which also flips the staging-file `### Status` block. |
+| 1 ✅ | `Action` inheritance shape (declarative — no engine resolver) | 2026-05-19 | Added `damageBonus?`, `ignoresArmor?`, `appliesTo?: WeaponPredicate[]` to `Action` (name `appliesTo` chosen over staging's `weaponFilter` to reuse existing scoping vocabulary). Audit lint enforces `damageBonus` ⇒ non-empty `appliesTo` and forbids `ignoresArmor`/`damageBonus` on non-`manual`. **Authoring sweep complete:** `intrigues-backstab` (novice + master) re-authored with `damageBonus` + `appliesTo`; entries that are legitimately bespoke (Cheap Shot, Strangling, Riposte armor-ignoring d6, poisoner/hunter/skirmish reactions) correctly retain hardcoded `damage`/`attackAttribute` per the original Item 1 "Cheap Shot and innate/monster attacks stay as-is" carve-out. **Docs landed:** ADR-014 post-Chunk-F amendment block; `docs/data-contracts.md` Action shape extended; `docs/reference-authoring.md` §11 covers inheritance defaults + `damageBonus` + `ignoresArmor` + `appliesTo`. **Superseded by Model B (2026-07-04):** the engine carries these fields declaratively — no recalc-time inlining; sibling apps resolve against the live weapon (swaps are sibling-side, so inlined values would go stale). **Closed in Chunk G.2 (2026-07-10):** `TODO(weapon-inheritance)` deleted, staging-file `### Status` flipped ✅, ADR-014 / data-contracts / reference-authoring reconciled. |
 | 6 ✅ | Status infliction (`inflicts: string[]`)               | 2026-05-19  | Field on `Action` validated against data-driven registry (`reference/statuses.{en,ru}.json` — display-only metadata; engine treats statuses as opaque tokens). Diverged from staging's `StatusKind` TypeScript union to match existing reference-catalog pattern. Added `statuses` topic in `src/models/reference.mts`, `/api/v1/statuses` locale-aware endpoint in `src/app.mts`, audit-reference lint resolves all `inflicts[]` ids, locale-drift test covers the pair. Authoring sweep complete — audit reports 8 distinct status ids referenced, all resolve. Docs landed: ADR-014 amendment + `docs/data-contracts.md` Action shape + `docs/reference-authoring.md` §11 "Status infliction". Sibling apps pick up `inflicts` through the standard ADR-014 Action reference. |
 | 7 ✅ | Boons/sins opportunistic effects (engine path)         | 2026-05-19  | `collectAllEffects` walks `character.talents[]` via `registry.lookupTalent(id, level)` with warn-and-skip on unknown ids (mirrors trait pattern). Audit-reference lint accepts top-level `effects[]` on boon/sin entries. Authoring sweep complete (12 boons + 1 sin currently carry `effects[]`). Docs landed: `docs/reference-authoring.md` §3 and §4 document the opportunistic-effects rule with the rule-of-thumb test and examples. Production registry's `lookupTalent: () => null` stub is intentional and now documented in §3 — real talent effects flow only once Chunk G's loader lands; in-memory test registry exercises the full path. |
 | 8 ✅ | Free-attack flag (`isFree?: boolean`)                  | 2026-05-19  | Field on `Action`; audit lint (section 11) enforces `isFree: true` only on `trigger: "manual"`. Engine remains declarative-only per staging decision — no derived `combat.freeAttacks` counter. Authoring sweep complete (Knife Mastery `stab`, Smoke and Mirrors `feint`, Two Weapons off-hand, Quick Reload, etc.); audit reports zero violations. Docs landed: ADR-014 amendment documents the field + no-engine-count rule; `docs/reference-authoring.md` §11 covers it under "Free attacks (Item 8)". |
@@ -788,9 +788,9 @@ back-and-forth.
 | —    | Bugs #34, #35 filed (engine-weak-points)               | 2026-05-19  | #34: `secondary` + `appliesTo` accepted by parser post-J.4b but engine has no per-slot weighting mechanism for `secondary` targets (documentary today). #35: `secondary` + `setBase` rejected by parser — no primary-substitution mechanism; sibling to #34 with three design options sketched (new modifier verb `useAttribute`, new target kind `secondaryAttribute`, or per-formula primary slots). Both stay open; affects ~4 ability/spell entries (`smoke-and-mirrors.adept[0]`, `tactics.adept[0]`, `sixth-sense.adept[0]`, `dancing-weapon.master[1]`). |
 
 Items 6, 7, 8, and 12 above are now fully closed — their `### Status`
-blocks in the staging file flipped to ✅. Item 1 remains ⏳ (wire +
-authoring shipped; the engine inheritance resolver is **retired under
-Model B** — Chunk G.2 flips the canonical record). See the staging file
+blocks in the staging file flipped to ✅. Item 1 is now **closed** (Chunk
+G.2, 2026-07-10): the engine inheritance resolver is retired — actions are
+declarative and `TODO(weapon-inheritance)` is deleted. See the staging file
 `### Status` blocks for the canonical per-item record.
 
 ### F-side audit: schema defaults that hard-code reference data
@@ -1008,6 +1008,37 @@ shape is firm. Until then the three copies are accepted as a known debt.
 
 ### G.2 — Declarative-action policy, ADR / doc reconciliation & cleanup
 
+> **✅ Completed 2026-07-10.** Pure docs / tracker / comment reconciliation
+> — no engine behavior change; 672 / 672 tests + typecheck green.
+> Deliverables:
+>
+> - **Declarative-action policy landed** across ADR-014 (§4 declarative-only
+>   note, §5 spell-tier promotion retired, `§inheritance-fields` anchor
+>   reworded), `docs/data-contracts.md` (Action shape), and
+>   `docs/reference-authoring.md` §11 (inheritance defaults now
+>   sibling-resolved). The engine never inlines weapon stats; sibling apps
+>   resolve against the live carried weapon at play time. Prose is
+>   substantive (no ephemeral "Model B" label in the shipped docs/code).
+> - **`TODO(weapon-inheritance)` deleted** from `src/rpg-types.mts`; the
+>   `Action` inheritance-field JSDoc reframed declarative. Staging-file
+>   Item 1 `### Status` flipped ✅.
+> - **NB-38 closed** via path (a): ADR-014 §5 + `reference-authoring.md` §2
+>   dropped the tier-root `attackAttribute` promotion (spells declare
+>   explicit id'd arrays; attack attribute is character `magicAttribute`).
+>   Archived to `resolved.md`.
+> - **NB-47 filed** (talent gaps: no level-scaling + many check-bonus
+>   talents carry no flag). Counter bumped to NB-48.
+> - **`scripts/audit-reference.mts` deleted**; every live doc / ADR / code
+>   cite that named it (ADR-014, ADR-016, `data-contracts.md`,
+>   `reference-authoring.md`, `rpg-types.mts`, `infra.md`) repointed to
+>   `test/rules/reference-lint.test.mts`. Remaining mentions are archival
+>   (`resolved.md` NB bodies, `done/` plans).
+> - **Conditional-secondary skip + talent stance** documented in
+>   `docs/data-contracts.md` (NB-34 / NB-47).
+> - **Verification #4 (manual UI) deferred to Chunk I** — no trait picker
+>   exists yet and G.2 changed only docs/comments; folded into Chunk I
+>   step 7.
+
 **Steps**
 
 1. **Amend ADR-014** — the action-shape anchor (`§inheritance-fields`)
@@ -1044,8 +1075,11 @@ shape is firm. Until then the three copies are accepted as a known debt.
    secondaries are skipped (no bare-handed Double Strike defense bump).
 3. Actions round-trip verbatim; master-tier rewrite-by-id holds; no engine
    inlining of weapon stats.
-4. Manual: create a character, add traits via UI, see derived combat
-   values, flags, special attacks, and reactions populate.
+4. ~~Manual: create a character, add traits via UI, see derived combat
+   values, flags, special attacks, and reactions populate.~~ **Deferred to
+   Chunk I** (2026-07-10) — no trait picker exists yet (`trait-list` is
+   read-only) and G.2 changed only docs / comments, so nothing it touched
+   is UI-observable. Folded into Chunk I step 7.
 
 ### Follow-up (post-G): canonical engine-semantics digest
 
@@ -1179,11 +1213,15 @@ weapon-ref validity, trait-ref validity).
 6. **Implement `effect-list`** (DM-only). Free-form editor for the
    `effects[]` array — JSON textarea with structural validation, or
    structured form. Simplest viable shape.
-7. **End-to-end manual test**: create a fresh character via UI,
+7. **End-to-end manual test** (absorbs the manual verification deferred
+   from Chunk G.2): create a fresh character via UI,
    add a weapon to `equipment.weapons[]`, see it appear in the
    slot dropdown, assign it to slot 0, see derived `baseDamage` /
-   `attackAttribute` update, add a trait, see its effects propagate
-   to the slot.
+   `attackAttribute` update, add a trait, and confirm the registry-driven
+   derived outputs populate — per-slot combat values, top-level `flags`,
+   `specialAttacks`, and `reactions`. (Chunk G.1 wired the registry so
+   these compute; Chunk I is the first point they're reachable through
+   the UI.)
 8. Update `.github/copilot-instructions.md` and
    `/memories/repo/character-builder.md` — note that all schema
    stub components are now real; no more stubs in `STUB_COMPONENTS`.
@@ -1428,8 +1466,8 @@ docs-cleanup Pass H reconciliation gate checks this list.
   `src/rules/registry.mts`) replaced the stub; all five sites
   (`src/app.mts`, `src/rules/registry.mts`, `src/rules/registry-types.mts`,
   `src/rules/effects.mts`, `test/helpers/registry.mts`) are cleared.
-- **`TODO(weapon-inheritance)`** — per-weapon `Action` inheritance runtime
-  (`damageBonus` / `ignoresArmor` / `appliesTo`). **Retired by Model B
-  (Chunk G, 2026-07-04):** the engine never inlines weapon stats into
-  actions — the fields ride to sibling apps verbatim. Site:
-  `src/rpg-types.mts`. **Delete** (not implement) in Chunk G.2.
+- ~~**`TODO(weapon-inheritance)`**~~ — ✅ **deleted in Chunk G.2**
+  (2026-07-10). The engine never inlines weapon stats into actions — the
+  declarative fields (`damageBonus` / `ignoresArmor` / `appliesTo`) ride to
+  sibling apps verbatim. Site was `src/rpg-types.mts`; the JSDoc was
+  reframed declarative and the TODO removed.

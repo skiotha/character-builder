@@ -225,7 +225,7 @@ export interface Action {
    *
    * Authoring convention: prefix with the parent ability/spell id,
    * e.g. `intrigues-backstab`, `sulfur-cascade-scorch`. The lint in
-   * `scripts/audit-reference.mts` enforces presence and per-tier /
+   * `test/rules/reference-lint.test.mts` enforces presence and per-tier /
    * cross-parent uniqueness.
    */
   id: string;
@@ -242,34 +242,34 @@ export interface Action {
   damage?: number;
   /**
    * Per-weapon damage bonus added on top of the carrying slot's base
-   * damage when the action inherits from a weapon (ADR-014
-   * §inheritance-fields). Requires `appliesTo` to scope which weapons
-   * the bonus applies to.
+   * damage (Backstab pattern; ADR-014 §inheritance-fields). Requires
+   * `appliesTo` to scope which weapons the bonus applies to.
    *
-   * TODO(weapon-inheritance): runtime resolution pending — authoring
-   * shape is locked but the engine does not yet apply `damageBonus` /
-   * `ignoresArmor` / `appliesTo` during combat fanout. Tracked in
-   * .github/plans/phase6-plan.md.
+   * Declarative: the engine carries this verbatim and never inlines
+   * weapon stats — sibling apps resolve it against the live carried
+   * weapon at play time (weapon swaps are sibling-side).
    */
   damageBonus?: number;
   /**
-   * Marks the action as bypassing armor. Display-only today; engine
-   * runtime wiring deferred — see `damageBonus` TODO.
+   * Marks the action as bypassing target armor (ADR-014
+   * §inheritance-fields). Declarative — the engine carries it verbatim;
+   * sibling combat resolvers apply it at play time.
    */
   ignoresArmor?: boolean;
   /**
    * Status ids inflicted on the target on resolution (ADR-014 §inflicts).
    * Each entry must match an id in `reference/statuses.{en,ru}.json`;
-   * the audit-reference lint enforces this. Engine treats statuses as
+   * the reference-lint enforces this. Engine treats statuses as
    * opaque tokens — sibling apps render the rich description.
    */
   inflicts?: string[];
   /**
-   * Per-slot narrowing for actions that inherit from a weapon (ADR-014
+   * Per-slot narrowing for actions scoped to carried weapons (ADR-014
    * §inheritance-fields). When present on a manual / triggered action,
    * the action only fires for slots whose weapon matches every
-   * predicate (AND-list; OR within `values[]`). Engine runtime
-   * resolution is deferred — see `damageBonus` TODO.
+   * predicate (AND-list; OR within `values[]`). Declarative — the
+   * engine carries it verbatim; sibling apps resolve it against the
+   * live carried weapon at play time.
    */
   appliesTo?: WeaponPredicate[];
   /**

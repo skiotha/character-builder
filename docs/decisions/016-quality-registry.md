@@ -174,7 +174,7 @@ Rationale:
 - **The audit lint covers the most painful drift cases already.** Locale-
   drift (`{en,ru}` structural parity), action-id uniqueness across tiers and
   parents, and quality-id membership are all enforced by
-  `scripts/audit-reference.mts` and `test/reference-locale-drift.test.mts`;
+  `test/rules/reference-lint.test.mts` and `test/reference-locale-drift.test.mts`;
   trait/spell/ritual id resolvability is planned alongside the registry
   validators. These are the failure modes that
   have actually bitten authors.

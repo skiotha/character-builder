@@ -32,31 +32,26 @@ Cross-references:
 
 ### Status
 
-⏳ **Partial — wire shape and authoring shipped; engine runtime
-pending** (2026-05-19). Wire shape locked: `Action` carries
-`damageBonus?`, `ignoresArmor?`, and `appliesTo?: WeaponPredicate[]`
-(the final name chosen instead of the staging-file's `weaponFilter` to
-reuse the existing per-slot scoping vocabulary). Audit-reference lint
-(section 12 — Action inheritance shape coherence) enforces
-`damageBonus` requires non-empty `appliesTo`, and forbids
-`ignoresArmor` / `damageBonus` on non-`manual` triggers. **Authoring
-sweep complete:** entries that *should* inherit (`intrigues-backstab`
-novice & master) re-authored with `damageBonus` + `appliesTo`; entries
-that are *legitimately* bespoke (Cheap Shot, Strangling armor-ignoring
-choke, Riposte armor-ignoring d6, poisoner reactions, hunter/skirmish
-reactions) correctly retain hardcoded `damage` / `attackAttribute` per
-the original Item 1 design ("Cheap Shot and innate / monster attacks
-stay as-is"). Docs shipped: ADR-014 post-Chunk-F amendment block
-(`docs/decisions/014-per-slot-combat-special-attacks.md`),
-`docs/data-contracts.md` Action shape extended,
-`docs/reference-authoring.md` §10 covers inheritance defaults +
-`damageBonus` + `ignoresArmor` + `appliesTo` on actions. **Remaining:**
-engine runtime that resolves per-slot inheritance at recalc time and
-inlines the carrying slot's weapon stats into the resulting
-`SpecialAttack`/`Reaction` — scheduled against the Chunk G production
-talent-registry landing per
-[`.github/plans/phase6-plan.md`](../phase6-plan.md). Item 1 closure flips
-when the engine resolver ships.
+✅ **Closed — declarative-only policy (2026-07-10, Chunk G.2).** Wire
+shape locked 2026-05-19: `Action` carries `damageBonus?`, `ignoresArmor?`,
+and `appliesTo?: WeaponPredicate[]` (the final name chosen instead of the
+staging-file's `weaponFilter` to reuse the existing per-slot scoping
+vocabulary). The reference-lint enforces `damageBonus` requires non-empty
+`appliesTo`. **Authoring sweep complete:** entries that *should* inherit
+(`intrigues-backstab` novice & master) authored with `damageBonus` +
+`appliesTo`; entries that are *legitimately* bespoke (Cheap Shot,
+Strangling armor-ignoring choke, Riposte armor-ignoring d6, poisoner
+reactions, hunter/skirmish reactions) correctly retain hardcoded `damage`
+/ `attackAttribute` per the original Item 1 design ("Cheap Shot and innate
+/ monster attacks stay as-is"). **Resolution — no engine resolver.** The
+once-planned per-slot inheritance resolver (inlining the carrying slot's
+weapon stats at recalc time) is **retired, not shipped**: the engine
+carries the declarative fields verbatim and sibling apps resolve them
+against the live carried weapon at play time (weapon swaps are
+sibling-side and not persisted per-swap, so any inlined value would go
+stale). `TODO(weapon-inheritance)` was **deleted** in Chunk G.2. Docs
+reconciled: ADR-014 §4 / §5 / `§inheritance-fields` anchor,
+`docs/data-contracts.md` Action shape, `docs/reference-authoring.md` §11.
 
 ---
 

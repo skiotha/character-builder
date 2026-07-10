@@ -102,7 +102,7 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 > - `ignoresArmor?: boolean` — bypasses target armor. `manual` triggers
 >   only.
 > - `inflicts?: string[]` — status ids the action applies to its target.
->   Validated by `scripts/audit-reference.mts` against
+>   Validated by `test/rules/reference-lint.test.mts` against
 >   `reference/statuses.{en,ru}.json` (a data-driven registry, *not* a
 >   `StatusKind` TypeScript union). Engine declares; sibling combat
 >   resolvers own duration, stacking, and saves — same lifecycle policy
@@ -117,11 +117,16 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 >   actions whose semantics are slot-bound; omit on innate / monster
 >   attacks. Required when `damageBonus` is present.
 >
-> Engine consumption is **declarative-only**: the fields round-trip
-> through the catalog and reach sibling apps verbatim. Per-slot
-> inheritance resolution at recalc time (inlining the matched slot's
-> `damage` / `attackAttribute` when omitted) is the remaining engine
-> work, still pending at runtime.
+> Engine consumption is **declarative-only**, and this is the **final
+> policy** (revised 2026-07-10): the fields round-trip through the catalog
+> and reach sibling apps verbatim, and the engine **never** inlines weapon
+> stats into an action. Sibling apps resolve `damageBonus` / `ignoresArmor`
+> / `appliesTo` — and the omitted `damage` / `attackAttribute` defaults —
+> against the **live** carried weapon at play time. Weapon swaps happen
+> sibling-side and are not persisted per-swap, so any value inlined at save
+> time would go stale on the next swap. The once-planned per-slot
+> inheritance *resolver* is retired, not pending: `TODO(weapon-inheritance)`
+> was deleted, never implemented.
 
 **Distinction is purely semantic** — same shape, two collections:
 
@@ -130,27 +135,27 @@ type Reaction      = Action & { trigger: Exclude<TriggerKind, "manual"> };
 
 The engine populates both lists from registry lookups; sibling apps render them in their own UI surfaces (action bar vs. reaction list).
 
-### 5. Spell tier shape gains action metadata
+### 5. Spell tier shape declares actions (explicit arrays)
 
-Spell tiers (`novice`, `adept`, `master`) gain optional fields on the tier object directly:
+> **Revised 2026-07-10.** Earlier drafts of this section promoted a spell
+> *tier* to a `SpecialAttack` / `Reaction` whenever it carried loose
+> tier-root `trigger` / `damage` / `attackAttribute` fields. That
+> tier-level promotion is **retired**. Spells declare actions exactly like
+> abilities (§9): explicit id'd `specialAttacks[]` / `reactions[]` arrays
+> on the tier object, `trigger` distinguishing the two collections and a
+> numeric `damage`. A spell's attack attribute is the character-level
+> `magicAttribute` (default `"resolute"`), **not** a tier-root field —
+> sibling apps read `character.magicAttribute`, which is the only source
+> the engine ever consumes. This reconciles the authoring spec, the
+> reference-lint, and the engine (closes NB-38).
+> [`docs/reference-authoring.md`](../../docs/reference-authoring.md) §2 and
+> §11 are the authoritative wire shape.
 
-```jsonc
-{
-  "tiers": {
-    "novice": {
-      "description": "...",
-      "attackAttribute": "cunning",
-      "damage": "1d6",
-      "trigger": "manual",
-      "effects": [ /* ResolvedEffect[] */ ]
-    }
-  }
-}
-```
-
-A spell tier with `trigger` set is promoted to a `SpecialAttack` (or `Reaction`) by the registry. Spells without `trigger` are passive effect sources, like abilities.
-
-**No `cost` field on tiers.** Corruption cost is computed by sibling apps from the character's `traditions` vs. the spell's tags — it is not part of the canonical character schema.
+A spell tier may carry an `effects[]` array (passive effect sources, like
+abilities) and the explicit `specialAttacks[]` / `reactions[]` arrays
+described in §9. **No `cost` field on tiers** — corruption cost is computed
+by sibling apps from the character's `traditions` vs. the spell's tags; it
+is not part of the canonical character schema.
 
 ### 6. Tier stacking is additive
 
@@ -192,7 +197,7 @@ action" pattern (e.g. *Intrigues*'s `intrigues-backstab` going
 `damage: 10 → 12 → 14` across novice/adept/master). Same-id across
 **different** parent abilities/spells is undefined behaviour
 (last-trait-processed wins) and is flagged by the
-`scripts/audit-reference.mts` lint as an authoring error.
+`test/rules/reference-lint.test.mts` lint as an authoring error.
 
 **Engine declares; siblings consume.** Sibling projects (Discord
 bot, WoW addon) read `character.specialAttacks` / `character.reactions`
@@ -212,7 +217,7 @@ renumbering a listed anchor is a breaking change for those citations.
 | Anchor | Rule |
 | --- | --- |
 | `§action-rewrite` | §9 — same-`id` actions dedupe last-write-wins across tiers (master > adept > novice); cross-parent id collisions are an authoring error. |
-| `§inheritance-fields` | `Action` optional `damageBonus` / `ignoresArmor` / `appliesTo` for per-weapon inheritance (authoring shape locked; engine runtime pending — `TODO(weapon-inheritance)`). |
+| `§inheritance-fields` | `Action` optional `damageBonus` / `ignoresArmor` / `appliesTo` are **declarative** — the engine carries them verbatim and never inlines weapon stats; sibling apps resolve them against the live carried weapon at play time. |
 | `§inflicts` | `Action.inflicts[]` is a `string[]` of status ids; statuses are opaque tokens to the engine, resolved against `reference/statuses.*`. |
 | `§is-free` | `Action.isFree` is a boolean and may be `true` only on `trigger: "manual"` actions. |
 | `§toughness-write` | `secondary.toughness` effects write the single `.max` value (stat is plain `"toughness"`, never `"toughness.max"`). |
