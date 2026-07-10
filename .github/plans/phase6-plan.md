@@ -1083,17 +1083,20 @@ shape is firm. Until then the three copies are accepted as a known debt.
 
 ### Follow-up (post-G): canonical engine-semantics digest
 
-> Raised 2026-07-04. Several Chunk-G questions weren't new — the same
-> engine rules (setBase resolution, the declarative-vs-derived boundary,
-> conditional-secondary handling, opaque triggers / statuses, total phase
-> order) keep resurfacing across this plan, the ADRs,
-> `reference-authoring.md`, and the bug trackers. After G lands, open a
-> dedicated discussion on **where a single canonical "engine semantics"
-> digest should live and what shape it takes**, given all three projects
-> (website, addon, bot) consume the same contract. Candidates to weigh: a
-> new top-level doc, a section in `docs/data-contracts.md`, or a cross-repo
-> shared reference. Not scoped here — this placeholder exists so the need
-> is tracked, not lost.
+> Raised 2026-07-04; **evicted to its own scoping plan 2026-07-10** so it can
+> be tackled in isolation (sequenced **before** Chunk H):
+> [`engine-semantics-digest-plan.md`](./engine-semantics-digest-plan.md).
+>
+> The need: a single canonical statement of the RPG-*system* facts the engine
+> must reflect — 8 primaries, secondaries derived from them, abilities
+> re-point those derivations (`setBase`), additive tier stacking, the
+> declarative-vs-derived line, opaque triggers / statuses, and so on —
+> authored **for agents** and kept in **lockstep** with the engine (any
+> breaking engine-semantics change updates it, and vice-versa). The eviction
+> plan collects the problem (incl. the already-stale `nagara-rpg-rules.md`
+> memory as live proof), the home options (git doc / `data-contracts.md`
+> section / cross-repo / **memory** / hybrid), a straw-man structure,
+> ownership, and the enforcement question.
 
 ---
 
