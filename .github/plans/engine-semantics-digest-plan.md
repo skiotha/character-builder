@@ -1,8 +1,10 @@
 # Engine-Semantics Digest — Scoping & Discussion Plan
 
-> **Status:** 🗣️ Discussion — not started. Evicted from
+> **Status:** ✅ Scoping resolved (2026-08-03) — every §10 question is
+> decided; §12 holds the implementation sequence. Authoring the digest is
+> the next work item. Originally evicted from
 > [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G): canonical
-> engine-semantics digest" on 2026-07-10 so it can be tackled in isolation
+> engine-semantics digest" on 2026-07-10 so it could be tackled in isolation
 > after Phase 6 Chunk G, **before** Chunk H.
 >
 > **This is a scoping document, not the digest.** It collects the problem,
@@ -85,6 +87,16 @@ digest is worth little **unless the lockstep obligation is enforced** (§6).
   are set-membership (numeric value ignored); talents contribute flags only,
   no level-scaling (NB-47).
 
+- **Amendment (2026-08-03) — gameplay-loop context is IN:** the digest also
+  carries a **brief "gameplay loop" section** — the d20 core mechanic (roll
+  ≤ attribute), corruption accrual (temporary vs. permanent, learn/cast
+  costs), XP earn/spend, traditions — even though those facts fail the
+  engine-contract inclusion test. The doc's consumers (agents here, sibling
+  repos' agents and devs) employ the rules *around* the engine's numbers;
+  leaving them oblivious to how the outputs are used would bite us. Terse
+  summary with pointers only — the `rpg/` vault stays canonical for rule
+  prose (§6 exemption, §7 structure).
+
 ---
 
 ## 3. Landscape — where it sits (and what it must NOT duplicate)
@@ -161,66 +173,79 @@ work starts. Candidate mechanisms (combine, don't pick one):
 
 ## 6. The lockstep obligation (the hard requirement)
 
-The user's core constraint: *any **breaking** change to the engine must be
-represented in the digest, and vice-versa.* Two halves:
+> **Resolved 2026-08-03.** The original "breaking change" framing is retired
+> — the term was wrong and forced a severity classification nobody could
+> define. The obligation is a **rule-backed correspondence** between the
+> digest and the engine, stated as three invariants.
 
-- **Engine → digest:** a breaking engine-semantics change updates the digest
-  in the **same commit** (mirrors the repo's "update the comment in the same
-  edit" rule).
-- **Digest → engine:** a digest edit that states a new/changed system fact
-  implies an engine change must follow — or the entry is marked as
-  *specified-but-not-yet-built*.
+1. **Membership (iff).** An entry belongs in the digest **iff** it is an
+   engine behavior that exists *because an RPG-system rule requires it*.
+   §2's inclusion test, made bidirectional — the digest is a justification
+   ledger: every major engine operation must name the rule behind it. An
+   engine behavior with no rule is a smell to chase; a rule with no engine
+   behavior is either explicitly out-of-engine (say so) or a tracked gap.
+2. **Doc → reality.** Every behavior the digest states resolves to code
+   **or** to a tracked gap — a `TODO(<scope>)` or `NB-<n>`. The digest may
+   lead the code (spec-first) only while the gap is tracked.
+3. **Reality → doc.** Adding or changing rule-backed engine behavior updates
+   the digest **in the same commit** (mirrors the repo's "update the comment
+   in the same edit" rule).
 
-Prerequisite: **define "breaking engine-semantics change."** Straw-man —
-*breaking* (triggers a digest update): add/remove a primary attribute; change
-a secondary's default source primary or its formula inputs; change the
-`setBase` resolution policy; change tier-stacking; move the
-declarative/derived line; change what's opaque (triggers/statuses); change
-flag or effect-phase semantics; change the per-slot combat model. *Non-breaking*
-(no digest update): internal refactor, rename, perf, added test.
+What falls out for free: refactors, renames, perf work, function names, and
+added tests never trip (2) or (3) — no RPG rule stands behind them — so no
+breaking/non-breaking classification is ever needed.
 
-**Enforcement options** (weigh automatable vs. discipline-only):
+**Exemption:** the gameplay-loop context section (§7) has no code
+counterpart; invariants 1–2 do not apply to it. Its soft obligation is to
+stay aligned with the `rpg/` vault when the designer changes the loop.
 
-1. **Stable-anchor scheme + a lint test**, mirroring `adr-anchors.test.mts` /
-   `bug-anchors.test.mts`: each digest entry gets a named anchor; code/tests/
-   ADRs cite `ES-<anchor>`; a test asserts every cite resolves. Automatable,
-   consistent with existing repo machinery — but only enforces *cite
-   integrity*, not *content freshness*.
-2. **Reciprocal-obligation entry** in a "References to sweep" style list (the
-   docs-cleanup Pass E convention already used in this repo).
-3. **PR / commit checklist** ("touched `src/rules/**` semantics? update the
-   digest").
-4. **Instructions-file discipline** (§5) — soft, agent-facing.
-
-No test can prove the *content* is current (that's the general docs-drift
-problem), so realistically it's (1)+(3)+(4): make cites lint-able, make the
-obligation visible at PR time, and surface it to the agent when a rules file
-is open.
+**Enforcement: discipline-only, by decision** (§10 Q5) — the
+instructions-file signpost (§5) plus the same-commit habit (3). No lint
+test; anchors are citable but unenforced, eyes-open. If a cheap automated
+check is ever wanted later, the useful one is invariant 2 ("every entry
+names a code path or a tracked gap"), not anchor-cite resolution.
 
 ---
 
-## 7. Straw-man structure of the digest itself
+## 7. Structure of the digest (resolved 2026-08-03)
 
-Terse invariants, grouped by domain. Each entry: **the RPG-system fact** →
-**the engine obligation** → **pointer to the ADR/NB that owns the mechanism**
-(so the digest states *what*, the ADR owns *how*). Optional stable anchor.
+Each **contract entry** is a **three-facet record** mirroring §6's
+invariants, so the correspondence is auditable by eye (there is no linter):
 
+- **Rule** — the RPG-system fact that requires the behavior (the *why*;
+  later, the parked link into the `rpg/` vault).
+- **Engine behavior** — what the engine must do (the *what*).
+- **Where** — the code path, or the `TODO(<scope>)` / `NB-<n>` if unbuilt,
+  plus the ADR that owns the mechanism.
+
+Granularity: **one entry per rule-backed behavior, not per function.** Each
+entry gets a stable anchor (§10 Q5).
+
+Sections, in order:
+
+- **Gameplay loop (context — first)** — brief, non-contract orientation for
+  sibling consumers and agents: the d20 core mechanic (roll ≤ attribute,
+  few exceptions), corruption accrual (temporary vs. permanent, learn/cast
+  costs), XP earn/spend and tier costs, traditions. No **Where** facet; §6
+  exemption applies; summary with pointers, `rpg/` vault stays canonical.
 - **Attributes** — the 8 primaries (5–15, budget 80); secondaries and their
   default source-primary; `setBase` re-pointing + highest-wins resolution;
   `magicAttribute` / `initiativeAttribute`.
-- **Effects** — modifier verbs as *semantic operations* (not the type union);
-  additive tier stacking; total phase order as a *system* guarantee;
-  set-membership flags.
-- **Combat** — 3 per-weapon slots, `own` slot; passives are engine-derived.
+- **Pipeline order (first-class)** — the total phase order as a rule-backed
+  *system* guarantee: `setBase` → formulas → `addFlat` → `multiply` → `cap`
+  → flags, then the per-slot combat fanout. An *operation*, not a
+  vocabulary item — the most re-derived fact in Chunk G.
+- **Effects** — modifier verbs as *semantic operations* (not the type
+  union); additive tier stacking; set-membership flags.
+- **Combat** — 3 per-weapon slots (main-hand / off-hand / own); passives
+  are engine-derived.
 - **Actions** — declarative pass-through; siblings resolve against the live
   weapon; rewrite-by-id.
 - **Triggers & statuses** — opaque tokens; engine validates membership only.
 - **Talents** — flags only, no level-scaling (NB-47).
-- **Out of engine** — character-state conditions (Tier C), effect lifecycle
-  (`duration`), corruption cost — all sibling-side.
-
-Format question for the session: flat invariant list vs. the grouped table
-above vs. anchored entries à la ADR "Stable anchors."
+- **Out of engine** — behaviors the engine deliberately does *not* compute,
+  and who owns them instead: character-state conditions (Tier C), effect
+  lifecycle (`duration`), corruption bookkeeping — all sibling-side.
 
 ---
 
@@ -254,40 +279,76 @@ correcting drift as found:
 
 ---
 
-## 10. Open questions for the isolated session
+## 10. Open questions — resolved 2026-08-03
 
-1. **Home:** hybrid git-doc + memory-pointer (recommended §4E), or one of
-   A/B/C/D outright?
-2. **Fate of `nagara-rpg-rules.md` memory:** retire it and replace with a
-   pointer to the git digest? Repurpose it? Split (general rules vs.
-   engine-contract)? It currently conflates "all three projects' rules ref"
-   with "engine contract" — the digest is only the latter.
-3. **Boundary with `data-contracts.md`:** what (if anything) moves out of
-   data-contracts into the digest, what stays, what cross-links? (Digest =
-   system facts; data-contracts = wire shapes — but today data-contracts
-   carries some system prose, e.g. the new conditional-secondary / talent
-   notes from Chunk G.2.)
-4. **Cross-repo sharing:** siblings (addon, bot) are separate repos and can't
-   read this repo's agent memory — does that settle it in favor of a git doc,
-   or do we still want a shared-reference mechanism (Option C)?
-5. **Anchor + lint scheme:** adopt an `ES-<anchor>` + `engine-semantics-
-   anchors.test.mts` (mirroring adr/bug anchors), or keep it lint-free prose?
-6. **"Breaking change" definition:** ratify the §6 straw-man list.
-7. **Naming + location** of the git doc (`docs/engine-semantics.md`?).
-8. **Structure:** which format from §7.
+1. **Home:** ✅ Hybrid (§4E). Git doc is the sole source of truth. The
+   **instructions file is the load-bearing signpost** — repo memory is *not*
+   auto-injected into agent context, so the memory pointer is best-effort
+   backup only.
+2. **Fate of `nagara-rpg-rules.md` memory:** ✅ Harvest fully, then delete.
+   The engine-contract subset is de-staled into contract entries; the
+   non-engine subset (d20 mechanic, corruption, XP, traditions) is **not
+   dropped** — it becomes the brief gameplay-loop context section (§2
+   amendment). The pointer folds into `character-builder.md`'s "Phase 6"
+   block; no dedicated pointer file. Delete only **after** harvest (it is a
+   §9 source).
+3. **Boundary with `data-contracts.md`:** ✅ Digest = system facts (*why*);
+   data-contracts = wire shapes (*what the JSON looks like*); each points at
+   the other. Cross-link now; migrate the stray system prose (the
+   conditional-secondary NB-34 / talent-flags NB-47 notes) into the digest
+   opportunistically — not a gate on shipping.
+4. **Cross-repo sharing:** ✅ Settled by the git doc — siblings add pointer
+   lines to this repo's `docs/rpg-engine-semantics.md` (public on GitHub).
+   Option C retired.
+5. **Anchor + lint scheme:** ✅ Stable anchors per the ADR house convention,
+   cited as `ES §<anchor>`; **no lint test** — citable but unenforced,
+   eyes-open (§6). The parked idea of linking entries to the RPG system
+   stays parked; anchors keep it possible.
+6. **"Breaking change" definition:** ✅ Term retired — replaced by the §6
+   rule-backed correspondence invariants.
+7. **Naming + location:** ✅ `docs/rpg-engine-semantics.md`; signpost
+   `.github/instructions/rpg-engine-semantics.instructions.md`. This plan
+   file keeps its historical name.
+8. **Structure:** ✅ Per §7 — three-facet contract entries, domain sections,
+   first-class pipeline-order section, gameplay-loop context up top.
 
 ---
 
 ## 11. Not in scope here
 
-- Authoring the actual digest content (the follow-on work, once home / shape /
-  ownership are decided).
-- Chunk H (validators/cleanup) and later — this slots **before** H so H's doc
-  updates can target the digest if it exists by then.
+- Chunk H (validators/cleanup) and later — this slots **before** H so H's
+  doc updates can target the digest if it exists by then. (Authoring the
+  digest itself is no longer out of scope — it is the next work item,
+  sequenced in §12.)
+
+## 12. Implementation sequence
+
+One chunk, ordered — steps 1–2 are the substance, 3–5 are wiring:
+
+1. **Author `docs/rpg-engine-semantics.md`.** Harvest per §9; de-stale
+   against ADR-014/015/016 and the NB trackers as §1a found. Structure per
+   §7: gameplay-loop context first, then three-facet contract entries with
+   stable anchors.
+2. **Verification pass (invariant 2).** Walk every entry's **Where** facet:
+   the code path exists (`src/rules/**`, `src/models/**`), or the gap is
+   tracked as `TODO(<scope>)` / `NB-<n>`. An entry that fails becomes a
+   tracked gap or is cut.
+3. **Signposts.** (a) `.github/instructions/rpg-engine-semantics.instructions.md`,
+   `applyTo: src/rules/**` + `src/rpg-types.mts` — consult before
+   engine-semantics work; same-commit rule (§6.3). (b)
+   `copilot-instructions.md`: a line under the rules-engine guidance **and**
+   add the digest + its `ES §<anchor>` cite format to the "Stable cite
+   targets here" binding. (c) Cross-links from ADR-010/014/015/016 headers
+   and `data-contracts.md`.
+4. **Memory.** Fold the pointer into `/memories/repo/character-builder.md`'s
+   "Phase 6" block; delete `/memories/repo/nagara-rpg-rules.md`
+   (post-harvest).
+5. **Siblings + bookkeeping.** Pointer lines in nagara-addon / malizia docs
+   (cross-repo, coordinated separately); collapse the `phase6-plan.md`
+   follow-up pointer; archive this plan to `done/`; sweep the list below.
 
 ## References to sweep on completion
 
 - The [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G): canonical
   engine-semantics digest" section now points here — collapse that pointer
-  (and archive this plan to `done/`) once the digest ships and its home is
-  decided.
+  (and archive this plan to `done/`) once the digest ships (§12 step 5).
