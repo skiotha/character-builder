@@ -4,7 +4,8 @@
 **Date:** 2026-04-27
 **Deciders:** Project owner + Copilot design session
 **Related:** [ADR-014](014-per-slot-combat-special-attacks.md) (Per-Slot Combat),
-[ADR-015](015-typed-effect-targets-final.md) (Typed Effect Targets)
+[ADR-015](015-typed-effect-targets-final.md) (Typed Effect Targets),
+[rpg-engine-semantics.md](../rpg-engine-semantics.md) (the system ↔ engine contract this registry serves)
 
 ## Context
 

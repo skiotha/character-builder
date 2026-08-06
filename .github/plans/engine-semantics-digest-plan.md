@@ -1,11 +1,13 @@
 # Engine-Semantics Digest — Scoping & Discussion Plan
 
-> **Status:** ✅ Scoping resolved (2026-08-03) — every §10 question is
-> decided; §12 holds the implementation sequence. Authoring the digest is
-> the next work item. Originally evicted from
-> [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G): canonical
-> engine-semantics digest" on 2026-07-10 so it could be tackled in isolation
-> after Phase 6 Chunk G, **before** Chunk H.
+> **Status:** 🚧 Implementing (2026-08-06) — scoping resolved 2026-08-03;
+> §12 steps 1–3 are done (digest authored at `docs/rpg-engine-semantics.md`,
+> signposts wired), **pending the user's manual review of the harvest
+> against the actual RPG rules**. Step 4's memory deletion and step 5
+> (siblings, pointer collapse, archive) wait for that sign-off. Originally
+> evicted from [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G):
+> canonical engine-semantics digest" on 2026-07-10 so it could be tackled in
+> isolation after Phase 6 Chunk G, **before** Chunk H.
 >
 > **This is a scoping document, not the digest.** It collects the problem,
 > the options, the tradeoffs, a straw-man structure, the ownership /
@@ -325,27 +327,31 @@ correcting drift as found:
 
 One chunk, ordered — steps 1–2 are the substance, 3–5 are wiring:
 
-1. **Author `docs/rpg-engine-semantics.md`.** Harvest per §9; de-stale
-   against ADR-014/015/016 and the NB trackers as §1a found. Structure per
-   §7: gameplay-loop context first, then three-facet contract entries with
-   stable anchors.
-2. **Verification pass (invariant 2).** Walk every entry's **Where** facet:
-   the code path exists (`src/rules/**`, `src/models/**`), or the gap is
-   tracked as `TODO(<scope>)` / `NB-<n>`. An entry that fails becomes a
-   tracked gap or is cut.
-3. **Signposts.** (a) `.github/instructions/rpg-engine-semantics.instructions.md`,
-   `applyTo: src/rules/**` + `src/rpg-types.mts` — consult before
-   engine-semantics work; same-commit rule (§6.3). (b)
-   `copilot-instructions.md`: a line under the rules-engine guidance **and**
-   add the digest + its `ES §<anchor>` cite format to the "Stable cite
-   targets here" binding. (c) Cross-links from ADR-010/014/015/016 headers
-   and `data-contracts.md`.
-4. **Memory.** Fold the pointer into `/memories/repo/character-builder.md`'s
-   "Phase 6" block; delete `/memories/repo/nagara-rpg-rules.md`
-   (post-harvest).
-5. **Siblings + bookkeeping.** Pointer lines in nagara-addon / malizia docs
-   (cross-repo, coordinated separately); collapse the `phase6-plan.md`
-   follow-up pointer; archive this plan to `done/`; sweep the list below.
+1. ✅ **Author `docs/rpg-engine-semantics.md`.** Done 2026-08-06 — 21 `ES
+   §<anchor>` entries + gameplay-loop context section. De-staling done
+   against live code (notable: memory said *alluring*; canonical is
+   `appealing`). **Awaiting user review against the actual RPG rules.**
+2. ✅ **Verification pass (invariant 2).** Every **Where** facet was
+   verified against live code during authoring (`SECONDARY_FORMULAS`,
+   `resolveSetBase`, `validateCombatCarried`, `collectAllEffects`,
+   `deriveCombatSlots`, `collectActions`, `lookupTalent`, throw sites,
+   `validateRPGRules` budget check); gaps cite NB-33 / NB-34 / NB-47.
+3. ✅ **Signposts.** (a) `.github/instructions/rpg-engine-semantics.instructions.md`
+   shipped (`applyTo: src/rules/**, src/rpg-types.mts`); (b)
+   `copilot-instructions.md` Data-section line rewritten to the git doc
+   (memory mention removed — memory isn't shared, the repo doc is) and the
+   stable-cite-targets binding gained `ES §anchor` (explicitly
+   not-lint-enforced); (c) cross-links added from ADR-010/014/015/016
+   headers and `data-contracts.md`; ADR-015's anchor table gained the
+   previously missing `§4a` row (setBase resolution).
+4. ⏳ **Memory.** `character-builder.md` pointer updated to the digest.
+   Deleting `/memories/repo/nagara-rpg-rules.md` **waits for the user's
+   review sign-off** (it stays available as the harvest cross-check until
+   then).
+5. ⏳ **Siblings + bookkeeping.** Pointer lines in nagara-addon / malizia
+   docs (cross-repo, coordinated separately); collapse the
+   `phase6-plan.md` follow-up pointer; archive this plan to `done/`; sweep
+   the list below.
 
 ## References to sweep on completion
 

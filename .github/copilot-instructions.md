@@ -150,7 +150,7 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
 - Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`, `remove` (the last is set-membership only — `weaponQuality` / `armorQuality` / `flag` targets, ADR-015 §3a)
-- Canonical RPG rules reference (attributes, formulas, effect tiers, combat) is kept as a Copilot repo memory (`nagara-rpg-rules.md`). When working on Phase 6 or rules-engine code, retrieve and cite the relevant section of `nagara-rpg-rules.md` in your response before proposing changes.
+- **Canonical RPG-system facts the engine must honor** (attributes, formulas, setBase resolution, phase order, combat model, the declarative-actions boundary) live in [`docs/rpg-engine-semantics.md`](../docs/rpg-engine-semantics.md). When working on rules-engine code, consult and cite the relevant `ES §<anchor>` entry before proposing changes, and keep the digest in lockstep: any change to rule-backed engine behavior updates it in the same commit.
 
 ### Bug Trackers
 
@@ -163,8 +163,8 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 
 The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<scope>)` / `FIXME(<scope>)` / `NOTE:` comment-tag taxonomy, the plan "References to sweep on completion" bookkeeping, and the ADR stable-anchor rule — live in [`instructions/conventions.instructions.md`](instructions/conventions.instructions.md) (always loaded). The character-builder bindings:
 
-- **Stable cite targets here:** ADRs in `docs/decisions/` (cite `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md` (incl. [`docs/reference-authoring.md`](../docs/reference-authoring.md)), and the `.github/bugs/` NB trackers (`NB-N`; see Bug Trackers above). Plans, phase/chunk names, and numbered amendment items are **never** cite targets.
-- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. Every active plan under `.github/plans/` carries a "References to sweep on completion" list.
+- **Stable cite targets here:** ADRs in `docs/decisions/` (cite `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md` (incl. [`docs/reference-authoring.md`](../docs/reference-authoring.md), and [`docs/rpg-engine-semantics.md`](../docs/rpg-engine-semantics.md) cited as `ES §anchor` from its entry headings), and the `.github/bugs/` NB trackers (`NB-N`; see Bug Trackers above). Plans, phase/chunk names, and numbered amendment items are **never** cite targets.
+- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. `ES §anchor` cites are **not** lint-enforced — keeping them resolving is a discipline obligation (see [`instructions/rpg-engine-semantics.instructions.md`](instructions/rpg-engine-semantics.instructions.md)). Every active plan under `.github/plans/` carries a "References to sweep on completion" list.
 
 ### Domain Layer (ADR-013)
 

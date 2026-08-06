@@ -5,7 +5,8 @@
 **Deciders:** Project owner + Copilot design session
 **Supersedes:** [ADR-011](011-typed-effect-targets.md) (Typed Effect Targets)
 **Related:** [ADR-010](010-effect-resolution-pipeline.md) (Effect Resolution Pipeline),
-[ADR-014](014-per-slot-combat-special-attacks.md) (Per-Slot Combat, Special Attacks & Reactions)
+[ADR-014](014-per-slot-combat-special-attacks.md) (Per-Slot Combat, Special Attacks & Reactions),
+[rpg-engine-semantics.md](../rpg-engine-semantics.md) (the system ↔ engine contract this vocabulary implements)
 
 ## Context
 
@@ -278,6 +279,7 @@ listed anchor is a breaking change for those citations.
 | `§3e` | `primary` target kind: `addFlat` / `cap` only, runs in its own pre-pipeline phase writing `attributes.primaryEffective`. |
 | `§3f` | character-level effect gating via `condition: ArmorCondition[]` (valid on `secondary` and `armorQuality` targets). |
 | `§4` | no `priority` field — ordering is by phase (ADR-010); any legacy `priority` is ignored. |
+| `§4a` | universal `setBase` resolution — default-inclusive max-by-primary against `primaryEffective`, strict `>` so the default wins ties; shared by `secondary`, per-slot `combat.attackAttribute`, `magicAttribute`, `initiativeAttribute`. |
 | `§5` | `TriggerKind` enum; the engine validates membership only and attaches semantics solely to `"manual"`. |
 | `§placement-table` | the `appliesTo` / `condition` accept-list matrix per target kind (engine-evaluated on `combat` / `weaponQuality`; documentary elsewhere). |
 | `§primary-bucketing` | the `primary` pre-pipeline phase and its `primaryEffective` snapshot (see §3e). |

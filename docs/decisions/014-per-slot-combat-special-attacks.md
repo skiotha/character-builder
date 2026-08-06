@@ -4,7 +4,8 @@
 **Date:** 2026-04-22
 **Deciders:** Project owner + Copilot design session
 **Related:** [ADR-010](010-effect-resolution-pipeline.md) (Effect Resolution Pipeline),
-[ADR-015](015-typed-effect-targets-final.md) (Typed Effect Targets — Final Vocabulary)
+[ADR-015](015-typed-effect-targets-final.md) (Typed Effect Targets — Final Vocabulary),
+[rpg-engine-semantics.md](../rpg-engine-semantics.md) (the system ↔ engine contract this decision implements)
 
 ## Context
 

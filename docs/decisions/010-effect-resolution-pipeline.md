@@ -4,7 +4,8 @@
 **Date:** 2026-04-04
 **Deciders:** Project owner + Copilot design session
 **Related:** [ADR-009](009-schema-driven-rendering.md) (Schema-Driven Rendering),
-[ADR-011](011-typed-effect-targets.md) (Typed Effect Targets)
+[ADR-011](011-typed-effect-targets.md) (Typed Effect Targets),
+[rpg-engine-semantics.md](../rpg-engine-semantics.md) (the system ↔ engine contract this pipeline serves)
 
 ## Context
 

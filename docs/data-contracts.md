@@ -4,6 +4,10 @@
 > Cross-project integration details live in
 > [addon-integration.md](addon-integration.md) (addon-authored) and
 > [bot-integration.md](bot-integration.md) (bot-authored).
+> This document owns the **wire shapes**; the RPG-system facts behind them
+> (attribute formulas, setBase resolution, phase order, the
+> declarative-actions boundary) live in
+> [rpg-engine-semantics.md](rpg-engine-semantics.md) — cite `ES §<anchor>`.
 
 ---
 
