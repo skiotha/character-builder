@@ -1,0 +1,25 @@
+---
+applyTo: "public/**/*.css, public/**/*.html, public/**/*.mjs"
+---
+
+# UI browser verification (scaffolding)
+
+When this rule is in scope because of edits under `public/`, do **not** treat “server started” or a home-page load as sufficient verification. Use **Playwright MCP** or IDE Simple Browser to exercise the affected surface.
+
+## What to do
+
+1. Ensure the app is reachable (`npm run start:dev` → `http://127.0.0.1:3000` unless config says otherwise).
+2. Identify the **affected view** from the change (welcome, dashboard, character sheet section, dialog, etc.).
+3. Navigate there with Playwright or built-in browser tools and apply the check that matches the change:
+   - **Styling / templates / layout** — screenshot (or visual snapshot) of the affected region; compare against the intended look; note overlaps, clipping, or broken hierarchy.
+   - **Behaviour / interaction** — drive the real control path (click, type, submit, open/close dialog, navigate) and confirm the observable outcome.
+4. Report what was tried and what was observed. If Playwright MCP was expected to be used but was
+   unavailable, say so and fall back to the IDE browser tools, still targeting the affected view.
+
+## Out of scope (temporarily)
+
+- Automated CI Playwright suites and committed regression baselines.
+- Exhaustive cross-browser / viewport matrices.
+- Replacing `node:test` unit/integration tests.
+
+Refine this scaffold once we settle screenshot discipline, fixture characters for sheet flows (if any), and so on.

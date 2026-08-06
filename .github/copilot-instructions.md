@@ -99,6 +99,7 @@ The project-agnostic three-scale comment ladder (module header → function doc-
 - **Server `.mts`** — the non-trivial-module header rule: [`instructions/typescript.instructions.md`](instructions/typescript.instructions.md). [`src/rules/derived.mts`](../src/rules/derived.mts) is the reference shape.
 - **Client `.mjs`** — no TypeScript syntax, client import ordering, and the `@param`/`@returns` JSDoc requirement: [`instructions/javascript.instructions.md`](instructions/javascript.instructions.md). [`public/api.mjs`](../public/api.mjs) is the reference shape.
 - **DOM / CSS** — ADR-012 widget & modern-CSS preferences: [`instructions/hypertext.instructions.md`](instructions/hypertext.instructions.md), [`instructions/styling.instructions.md`](instructions/styling.instructions.md).
+- **UI verification** — after `public/` CSS/HTML/client JS edits, exercise the affected view in-browser via Playwright MCP: [`instructions/ui-browser-verify.instructions.md`](instructions/ui-browser-verify.instructions.md).
 
 ### Commands
 
