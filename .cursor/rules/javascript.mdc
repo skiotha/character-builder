@@ -1,0 +1,15 @@
+---
+description: Client JavaScript conventions for the no-build SPA under public/ — plain ES modules, import ordering, JSDoc-typed exports.
+globs: public/**/*.mjs
+alwaysApply: false
+---
+
+# Client JavaScript instructions
+
+Plain JavaScript with native ES modules — these files are the client SPA, served as-is with no build step.
+
+- **Import ordering** — functions first, then constants, separated by a blank line (the server's import categories minus the `node:` tier).
+- **Every exported function carries a JSDoc block with `@param` / `@returns`** — these are the only type signals. `public/api.mjs` is the reference shape; new client functions should match.
+- The general three-scale comment ladder and citation discipline live in the **conventions** rule (always applied).
+
+DOM / HTML / CSS concerns (semantic markup, native widgets, ADR-012) live in the **hypertext** and **styling** rules.

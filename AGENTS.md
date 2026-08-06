@@ -1,4 +1,4 @@
-# Nagara Character Builder — Copilot Instructions
+# Nagara Character Builder — Agent Instructions
 
 ## Project Overview
 
@@ -36,13 +36,13 @@ Key layers:
 - `src/sse/` — SSE broadcast channels (per-subscriber sanitized)
 - `public/` — static client files (SPA, styles, assets) — sole rendering layer per ADR-009
 - `data/` — runtime data (outside source tree, gitignored)
-- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`, `statuses`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). `statuses` is display-only metadata for sibling apps; the engine treats statuses as opaque `EffectFlag` tokens. A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ. **Authoring guide:** the wire shape of every catalog entry is specified in [`docs/reference-authoring.md`](../docs/reference-authoring.md).
-- `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured). See [`rpg/README.md`](../rpg/README.md) for vault conventions, frontmatter, and the locale-parity policy.
+- `reference/` — RPG reference catalogs (`abilities`, `spells`, `boons`, `sins`, `rituals`, `weapons`, `armor`, `qualities`, `statuses`), one file per `(topic, locale)`. Loaded via `src/models/reference.mts` and surfaced through `/api/v1/{traits,talents,rituals,weapons,armor,qualities,statuses}` (locale-aware, mtime-cached). **Not** served as static files. `qualities` is the engine-canonical registry from ADR-016 (single namespace shared by weapons and armor; engine throws on unknown ids). `statuses` is display-only metadata for sibling apps; the engine treats statuses as opaque `EffectFlag` tokens. A locale-drift lint test (`test/reference-locale-drift.test.mts`) keeps `{en,ru}` pairs aligned: same id set, same order, only `name`/`description`/`tags` may differ. **Authoring guide:** the wire shape of every catalog entry is specified in [`docs/reference-authoring.md`](docs/reference-authoring.md).
+- `rpg/` — RPG rules vault (Obsidian-authored Markdown, locale-structured). See [`rpg/README.md`](rpg/README.md) for vault conventions, frontmatter, and the locale-parity policy.
 
 ## Key Design Decisions
 
 All decisions are documented as ADRs in `docs/decisions/`. The index also lives
-in [`docs/decisions/README.md`](../docs/decisions/README.md). Key ones:
+in [`docs/decisions/README.md`](docs/decisions/README.md). Key ones:
 
 - **ADR-001:** Zero external dependencies. No npm runtime deps.
 - **ADR-002:** File-based JSON storage. One file per character.
@@ -94,11 +94,14 @@ highest-priority item (functions > constants).
 
 ### Code & documentation conventions
 
-The project-agnostic three-scale comment ladder (module header → function doc-comment → inline `//`), the what-to-comment guidance, and the keep-comments-current rule live in [`instructions/conventions.instructions.md`](instructions/conventions.instructions.md) (always loaded). Language specifics live in the matching instruction files:
+The project-agnostic three-scale comment ladder (module header → function doc-comment → inline `//`), the what-to-comment guidance, and the keep-comments-current rule live in the **conventions** scoped rule (always loaded). Language and domain specifics live in the matching scoped rules:
 
-- **Server `.mts`** — the non-trivial-module header rule: [`instructions/typescript.instructions.md`](instructions/typescript.instructions.md). [`src/rules/derived.mts`](../src/rules/derived.mts) is the reference shape.
-- **Client `.mjs`** — no TypeScript syntax, client import ordering, and the `@param`/`@returns` JSDoc requirement: [`instructions/javascript.instructions.md`](instructions/javascript.instructions.md). [`public/api.mjs`](../public/api.mjs) is the reference shape.
-- **DOM / CSS** — ADR-012 widget & modern-CSS preferences: [`instructions/hypertext.instructions.md`](instructions/hypertext.instructions.md), [`instructions/styling.instructions.md`](instructions/styling.instructions.md).
+- **Server `.mts`** — the non-trivial-module header rule: **typescript**. [`src/rules/derived.mts`](src/rules/derived.mts) is the reference shape.
+- **Client `.mjs`** — no TypeScript syntax, client import ordering, and the `@param`/`@returns` JSDoc requirement: **javascript**. [`public/api.mjs`](public/api.mjs) is the reference shape.
+- **DOM / CSS** — ADR-012 widget & modern-CSS preferences: **hypertext**, **styling**.
+- **Rules engine** — consult-the-contract-first and the digest-lockstep rule for `docs/rpg-engine-semantics.md`: **rpg-engine-semantics**.
+
+Each scoped rule ships as two mirrored copies with identical bodies: `.cursor/rules/<name>.mdc` (Cursor; attached via `globs` / `alwaysApply`) and `.github/instructions/<name>.instructions.md` (GitHub Copilot; attached via `applyTo`). **When editing one mirror, apply the same edit to the other in the same commit.**
 
 ### Commands
 
@@ -150,21 +153,21 @@ When rewriting or moving static file references, update both the HTML/CSS/JS `hr
 - Server-controlled fields (id, backupCode, created, lastModified) must never be settable by clients
 - Derived fields (secondary attributes) are recalculated on every save via the rules engine
 - Effect modifier types: `setBase`, `addFlat`, `multiply`, `cap`, `remove` (the last is set-membership only — `weaponQuality` / `armorQuality` / `flag` targets, ADR-015 §3a)
-- **Canonical RPG-system facts the engine must honor** (attributes, formulas, setBase resolution, phase order, combat model, the declarative-actions boundary) live in [`docs/rpg-engine-semantics.md`](../docs/rpg-engine-semantics.md). When working on rules-engine code, consult and cite the relevant `ES §<anchor>` entry before proposing changes, and keep the digest in lockstep: any change to rule-backed engine behavior updates it in the same commit.
+- **Canonical RPG-system facts the engine must honor** (attributes, formulas, setBase resolution, phase order, combat model, the declarative-actions boundary) live in [`docs/rpg-engine-semantics.md`](docs/rpg-engine-semantics.md). When working on rules-engine code, consult and cite the relevant `ES §<anchor>` entry before proposing changes, and keep the digest in lockstep: any change to rule-backed engine behavior updates it in the same commit.
 
 ### Bug Trackers
 
-- [`.github/bugs/`](bugs/README.md) holds the trackers. Open bugs live in domain-named markdown files there (currently `engine.md` and `infra.md`); resolved bugs are archived in `resolved.md`. See [`bugs/README.md`](bugs/README.md) for the full scheme.
-- **Bug ids are global and permanent: `NB-<n>`.** Cite a bug from code as a bare `NB-<n>` (e.g. `// NB-31`) — never a filename, never `#`. Moving a bug (open → resolved, or re-triaging its severity) never changes its id, so cites keep resolving. Allocate the next id from `bugs/README.md` and bump the counter. If `bugs/README.md` is not available in context, do not guess or invent a bug id — ask the user for the current highest `NB-<n>` value before proceeding.
+- [`.github/bugs/`](.github/bugs/README.md) holds the trackers. Open bugs live in domain-named markdown files there (currently `engine.md` and `infra.md`); resolved bugs are archived in `resolved.md`. See [`bugs/README.md`](.github/bugs/README.md) for the full scheme.
+- **Bug ids are global and permanent: `NB-<n>`.** Cite a bug from code as a bare `NB-<n>` (e.g. `// NB-31`) — never a filename, never `#`. Moving a bug (open → resolved, or re-triaging its severity) never changes its id, so cites keep resolving. Allocate the next id from `.github/bugs/README.md` and bump the counter. If `.github/bugs/README.md` is not available in context, do not guess or invent a bug id — ask the user for the current highest `NB-<n>` value before proceeding.
 - On fixing a bug, mark it `✅ Resolved` and **move the entry to `resolved.md`** in the same commit. Resolved entries are archived, not deleted, so `NB-<n>` cites to closed bugs still resolve.
 - These are **mutable trackers**, not stable repo facts. New trackers belong here as domain-named files in `.github/bugs/`, not in `docs/` or the ADRs — stable docs hold facts that persist; trackers hold state that churns.
 
 ### Documentation discipline
 
-The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<scope>)` / `FIXME(<scope>)` / `NOTE:` comment-tag taxonomy, the plan "References to sweep on completion" bookkeeping, and the ADR stable-anchor rule — live in [`instructions/conventions.instructions.md`](instructions/conventions.instructions.md) (always loaded). The character-builder bindings:
+The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<scope>)` / `FIXME(<scope>)` / `NOTE:` comment-tag taxonomy, the plan "References to sweep on completion" bookkeeping, and the ADR stable-anchor rule — live in the **conventions** scoped rule (always loaded). The character-builder bindings:
 
-- **Stable cite targets here:** ADRs in `docs/decisions/` (cite `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md` (incl. [`docs/reference-authoring.md`](../docs/reference-authoring.md), and [`docs/rpg-engine-semantics.md`](../docs/rpg-engine-semantics.md) cited as `ES §anchor` from its entry headings), and the `.github/bugs/` NB trackers (`NB-N`; see Bug Trackers above). Plans, phase/chunk names, and numbered amendment items are **never** cite targets.
-- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. `ES §anchor` cites are **not** lint-enforced — keeping them resolving is a discipline obligation (see [`instructions/rpg-engine-semantics.instructions.md`](instructions/rpg-engine-semantics.instructions.md)). Every active plan under `.github/plans/` carries a "References to sweep on completion" list.
+- **Stable cite targets here:** ADRs in `docs/decisions/` (cite `ADR-NNN §anchor` from an ADR's "Stable anchors" table), `docs/*.md` (incl. [`docs/reference-authoring.md`](docs/reference-authoring.md), and [`docs/rpg-engine-semantics.md`](docs/rpg-engine-semantics.md) cited as `ES §anchor` from its entry headings), and the `.github/bugs/` NB trackers (`NB-N`; see Bug Trackers above). Plans, phase/chunk names, and numbered amendment items are **never** cite targets.
+- **Enforcement:** `test/adr-anchors.test.mts` asserts every `ADR-NNN §anchor` cite resolves to that ADR's Stable-anchors table; `test/bug-anchors.test.mts` asserts every `NB-N` cite resolves to a tracker entry and that no id is duplicated. `ES §anchor` cites are **not** lint-enforced — keeping them resolving is a discipline obligation (see the **rpg-engine-semantics** scoped rule). Every active plan under `.github/plans/` carries a "References to sweep on completion" list.
 
 ### Domain Layer (ADR-013)
 
@@ -207,7 +210,7 @@ The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<s
 
 ## Roadmap
 
-See [`docs/roadmap.md`](../docs/roadmap.md) for the full phased work plan and current status.
+See [`docs/roadmap.md`](docs/roadmap.md) for the full phased work plan and current status.
 
 ## Sibling Projects
 
