@@ -328,4 +328,4 @@ See [data-contracts.md](data-contracts.md) for the full schema specification.
   - `nagara.team.crt` — certificate
   - Referenced via `SSL_KEY` / `SSL_CERT` env vars
 - **Data persistence:** `data/` directory on the VPS filesystem (outside source tree, backed up)
-- **Process management:** `watcher.mts` for auto-restart on crash; systemd or similar in production
+- **Process management:** `watcher.mts` for file-change restart / capped crash restart / orphan exit in development; systemd or similar in production

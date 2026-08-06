@@ -771,8 +771,9 @@ polish that doesn't affect server correctness.
       `isNavigating` guard not resetting
 - [ ] Verify role-based editability (owner, DM, public) in character view —
       DM login requires local env file for manual testing
-- [ ] Rewrite `watcher.mts` — port mychar pattern: clean exit vs crash
-      detection, `SIGINT`/`SIGTERM` handlers, proper TypeScript types
+- [~] Rewrite `watcher.mts` — clean exit vs crash (capped), file-watch
+      restart, orphan-parent exit, `SIGINT`/`SIGTERM` handlers
+      (dev done, prod still TBD)
 
 ---
 

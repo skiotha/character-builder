@@ -189,7 +189,10 @@ The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<s
 ## Operational Scripts
 
 - `scripts/watcher.mts` — dev runner (`npm run start:dev`); forks
-  `src/server.mts` and restarts on crash.
+  `src/server.mts`, restarts on changes under `src/` / `public/` /
+  `reference/`, caps consecutive crash restarts, and exits if the
+  spawning process tree disappears (orphan guard against ghost
+  servers after terminal quit).
 - `scripts/hard-delete.mts` — manual character cleanup that wraps
   `storage.hardDeleteCharacter` (so the JSON file, the per-character
   `data/uploads/portraits/<id>/` directory, **and** every `data/index.json`

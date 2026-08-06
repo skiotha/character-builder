@@ -53,7 +53,7 @@ New-Item -ItemType File config/nagara.development.env
 # 2. Set at minimum the DM token
 #    Add this line: NAGARA_DM_TOKEN=your-secret-token
 
-# 3. Start in dev mode (auto-restart on crash, loads the env file)
+# 3. Start in dev mode (file-watch restart + orphan guard, loads the env file)
 npm run start:dev
 
 # 4. Open http://localhost:3000
@@ -64,7 +64,7 @@ npm run start:dev
 | Command               | Description                                    |
 | --------------------- | ---------------------------------------------- |
 | `npm start`           | Start the server directly                      |
-| `npm run start:dev`   | Start with watcher + dev env file              |
+| `npm run start:dev`   | Watcher: file-change restart, capped crashes, orphan exit |
 | `npm run typecheck`   | TypeScript type-check (`tsc --noEmit`)         |
 | `npm test`            | Run the test suite                             |
 
