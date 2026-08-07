@@ -42,21 +42,22 @@ describe("normalizeRawEffect", () => {
     );
   });
 
-  it("ignores `priority` (phase ordering replaces it)", () => {
-    const raw: RawEffect = {
+  it("ignores unknown wire keys (e.g. `priority`)", () => {
+    const raw = {
       target: { kind: "secondary", stat: "defense" },
       modifier: { type: "addFlat", value: 3 },
       priority: 5,
-    };
+    } as unknown as RawEffect;
     const resolved = normalizeRawEffect(raw, "test");
     assert.ok(resolved);
+    // Junk keys never ride through onto the typed effect.
     assert.equal(
       (resolved as unknown as Record<string, unknown>).priority,
       undefined,
     );
   });
 
-  it("rejects legacy `add`/`mul`/`set` modifier verbs with a warn", () => {
+  it("rejects unknown modifier verbs with a warn (retired add/mul/set)", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       for (const verb of ["add", "mul", "set"] as const) {
@@ -72,7 +73,7 @@ describe("normalizeRawEffect", () => {
     }
   });
 
-  it("rejects dotted-path string targets with a warn", () => {
+  it("rejects string targets with a warn (typed EffectTarget required)", () => {
     const warnMock = mock.method(console, "warn", () => {});
     try {
       const raw = {

@@ -27,7 +27,10 @@
 //                           from the registry, deduped by `Action.id`
 //                           with last-write-wins (master rewrites
 //                           adept rewrites novice; ADR-014 §action-rewrite).
-//   11. enforceConsistency (XP guard + equipment defaulting only).
+//
+// Recalc is a pure derivation over its input: it never sanitizes
+// player-authored fields (XP, equipment presence, …) — input validity
+// is the schema/storage boundary's job (NB-36).
 
 import type {
   Character,
@@ -150,9 +153,6 @@ export function recalculate(
   // (artifact authoring is YAGNI; revisit if a future ability authors
   // per-equipment actions).
   collectActions(result, registry);
-
-  // ── 9. enforceConsistency (trimmed) ──────────────────────────────
-  enforceConsistency(result);
 
   return result;
 }
@@ -514,17 +514,6 @@ function applyNumericSlotField(
   // attackAttribute is non-numeric — parser rejects arithmetic on it.
 }
 
-// ── Consistency guards (trimmed) ───────────────────────────────────
-//
-// Retained:
-//   * XP non-negativity guard.
-//   * Equipment defaulting (so downstream code never trips on undefined).
-//
-// TODO(enforce-consistency-redundancy): both responsibilities here are
-// also enforced at the schema/storage boundary on every write. This
-// function may be deletable in full once that's audited end-to-end.
-// See NB-36 (DEFERRED).
-
 // ── Quality registry strict lookup (ADR-016) ──────────────────────
 //
 // Unknown quality ids are a hard error. The registry is loaded from
@@ -544,19 +533,3 @@ function unknownWeaponQualityError(
   );
 }
 
-function enforceConsistency(character: Character): void {
-  if (
-    character.experience &&
-    typeof character.experience.unspent === "number" &&
-    character.experience.unspent < 0
-  ) {
-    console.warn(`Negative XP for ${character.id}, resetting to 0`);
-    character.experience.unspent = 0;
-  }
-
-  // Equipment defaulting.
-  const equipment = (character.equipment ?? {}) as Character["equipment"];
-  character.equipment = equipment;
-  if (!Array.isArray(equipment.weapons)) equipment.weapons = [];
-  if (!equipment.armor) equipment.armor = { body: null, plug: null };
-}

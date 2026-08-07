@@ -48,29 +48,38 @@ export interface CharacterAttributes {
 
 // ── Effects (raw / wire shape) ───────────────────────────────────
 //
-// `RawEffect` is the legacy untyped wire shape used by `character.effects[]`,
-// `Weapon.effects[]`, and `ArmorPiece` index-signature metadata. It is
-// translated into `ResolvedEffect` at the boundary by
-// `src/rules/effects.mts#normalizeRawEffect`. No code under `src/rules/`
-// other than `effects.mts` should consume `RawEffect` directly.
+// `RawEffect` is the untrusted wire shape of `character.effects[]`
+// (player- / DM-authored persistent overrides) — the one effect source
+// that arrives from clients rather than from the reference catalog. It
+// is validated and translated into `ResolvedEffect` at the boundary by
+// `src/rules/effects.mts#normalizeRawEffect` (warn-and-skip: untrusted
+// input must never throw mid-recalc). No code under `src/rules/` other
+// than `effects.mts` consumes `RawEffect` directly. The reference
+// catalog and equipment `effects[]` are authored as `ResolvedEffect[]`
+// end-to-end — this shape is not deprecated; it is the sanctioned
+// format for exactly that one field.
 //
-// Lifecycle (`duration`) is **not** modeled by the engine — sibling apps
-// own temporary state. The `duration` field is ignored at normalization
-// time. `priority` is likewise ignored (phase ordering replaces it).
-//
-// The reference catalog is now authored directly as `ResolvedEffect[]`;
-// `RawEffect` survives only for in-character `effects[]` (player /
-// DM-authored persistent overrides) and is normalized at the boundary.
-// TODO(rawEffect-removal): drop once all in-character effects[] migrate
-// to ResolvedEffect. Tracked in NB-35 (DEFERRED).
+// Lifecycle (`duration`) is **not** modeled by the engine — sibling
+// apps own temporary state. The engine neither reads nor strips it:
+// `character.effects[]` persists verbatim; `normalizeRawEffect` simply
+// doesn't carry the field onto `ResolvedEffect`.
+// TODO(rawEffect-removal): drop once in-character effects[] migrate to
+// ResolvedEffect (or a typed wrapper). Tracked in NB-35 (DEFERRED) —
+// blocked on Phase 7 clarifying what lifecycle metadata sibling apps
+// need on persistent overrides.
 
-/** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
+/** Wire-shape modifier for `character.effects[]` entries. Engine code
+ *  uses the typed `EffectModifier`; this is the pre-validation input
+ *  format consumed only by `normalizeRawEffect`. */
 export interface RawEffectModifier {
   type: string;
   value?: unknown;
 }
 
-/** @deprecated Wire shape only. Use `ResolvedEffect` inside the engine. */
+/** Untrusted wire shape for `character.effects[]` entries. Parsed into
+ *  `ResolvedEffect` by `normalizeRawEffect` (warn-and-skip). Engine code
+ *  never consumes this shape directly — see the module note above and
+ *  NB-35 for the eventual migration. */
 export interface RawEffect {
   id?: string;
   source?: string;
@@ -79,10 +88,8 @@ export interface RawEffect {
   target?: unknown;
   modifier: RawEffectModifier;
   appliesTo?: unknown;
-  /** Ignored by the engine — sibling apps own lifecycle. */
+  /** Ignored by the engine — sibling apps own lifecycle (NB-35). */
   duration?: string | null;
-  /** Ignored by the engine — phase ordering replaces priority. */
-  priority?: number;
   /** Nested effects unwound by `collectAllEffects`. */
   effects?: RawEffect[];
 }

@@ -1,16 +1,18 @@
 // ── Effect collection & normalization ──────────────────────────────
 //
-// Single boundary between the legacy `RawEffect` wire shape and the
+// Single boundary between the untrusted `RawEffect` wire shape
+// (`character.effects[]` — player- / DM-authored overrides) and the
 // engine's typed `ResolvedEffect`. No code under `src/rules/` other than
 // this module should consume `RawEffect` directly.
 //
 // What this module does:
 //   * Walks `character.traits[]` and `character.talents[]`, calling the
 //     registry to resolve each into its tier/level-flattened effect set.
-//     Missing entries are skipped with a warning today; the reference-
-//     lint test will promote misses to a hard failure once it ships.
+//     Runtime misses are warned-and-skipped by design; authoring errors
+//     are caught at build time by `test/rules/reference-lint.test.mts`.
 //   * Walks `character.effects[]` (manual / persistent overrides) and
-//     normalizes each `RawEffect` into a `ResolvedEffect`. Lifecycle is
+//     normalizes each `RawEffect` into a `ResolvedEffect` (warn-and-skip
+//     — untrusted input must never throw mid-recalc). Lifecycle is
 //     ignored — `duration` is dropped at the boundary.
 //   * Walks nested `effects[]` arrays inside any RawEffect (NB-22).
 //   * Collects armor-mounted effects (body / plug `.effects[]`) and
@@ -122,13 +124,6 @@ export function normalizeRawEffect(
   raw: RawEffect,
   source: string,
 ): ResolvedEffect | null {
-  if (raw.priority !== undefined) {
-    // Silently ignored — phase ordering replaces priority (ADR-015 §4).
-  }
-  if (raw.duration !== undefined) {
-    // Silently ignored — engine has no lifecycle (ADR-015).
-  }
-
   const target = parseTarget(raw.target, source);
   if (!target) return null;
 
@@ -641,13 +636,6 @@ function phaseOf(effect: ResolvedEffect): EffectPhase {
 }
 
 function parseTarget(value: unknown, source: string): EffectTarget | null {
-  if (typeof value === "string") {
-    console.warn(
-      `[effects] Rejecting legacy dotted-path target "${value}" (source=${source}). ` +
-        `Use the typed EffectTarget union (ADR-015).`,
-    );
-    return null;
-  }
   if (!isPlainObject(value)) {
     console.warn(
       `[effects] Rejecting effect with missing/invalid target (source=${source}).`,
@@ -752,16 +740,9 @@ function parseModifier(
     return null;
   }
   if (!KNOWN_MODIFIER_TYPES.has(type)) {
-    if (type === "add" || type === "mul" || type === "set") {
-      console.warn(
-        `[effects] Rejecting legacy modifier verb "${type}" (source=${source}). ` +
-          `Use addFlat / multiply / setBase per ADR-015.`,
-      );
-    } else {
-      console.warn(
-        `[effects] Rejecting unknown modifier type "${type}" (source=${source}).`,
-      );
-    }
+    console.warn(
+      `[effects] Rejecting unknown modifier type "${type}" (source=${source}).`,
+    );
     return null;
   }
 

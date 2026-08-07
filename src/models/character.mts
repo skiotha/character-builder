@@ -765,8 +765,12 @@ export const CHARACTER_SCHEMA: Record<
       type: "object",
       permissions: perm_default,
 
+      // Armor slots are nullable: `null` = nothing equipped. The
+      // `default: null` seeds `armor: { body: null, plug: null }` at
+      // creation — the schema boundary owns this shape (NB-36).
       body: {
         type: "object",
+        default: null,
         permissions: perm_default,
         ui: {
           section: "information.equipment",
@@ -778,6 +782,7 @@ export const CHARACTER_SCHEMA: Record<
 
       plug: {
         type: "object",
+        default: null,
         permissions: perm_default,
         ui: {
           section: "information.equipment",

@@ -54,7 +54,7 @@ chunks that resolve them.
 | F | Effect normalization (data, collaborative) + post-pass amendment items 2–13 | small | huge | medium | medium | ✅ Done (Item 1 resolved via Model B in Chunk G — declarative, not an engine resolver) |
 | G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ✅ Done (2026-07-04) |
 | G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ✅ Done (2026-07-10) |
-| H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ⏳ Not started |
+| H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ✅ Done (2026-08-07) |
 | H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ⏳ Not started |
 | H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ⏳ Not started |
 | H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ⏳ Not started |
@@ -1219,6 +1219,35 @@ above; executed in Chunk H.3 (NB-45).
 
 ### H.1 — Legacy trim & engine cleanup (code, small)
 
+> **✅ Completed 2026-08-07.** 670 / 670 tests + typecheck green. NB-36
+> closed (entry moved to `resolved.md`). Notes against the outline:
+>
+> - **NB-36 audit took the both-hold branch — full deletion — after
+>   closing one real gap.** (b) held outright: no `EffectTarget` kind can
+>   reach `experience` (applicator write surface verified), and the API
+>   boundary already rejects negative XP (`min: 0` on `unspent`,
+>   `increment` deltas validated against the same bound, creation business
+>   rule in `validateRPGRules`). (a) had a genuine finding: `armor.body` /
+>   `armor.plug` carried **no** schema default, so the on-disk
+>   `armor: { body: null, plug: null }` creation shape was actually
+>   produced by `enforceConsistency`, not the boundary. Both fields gained
+>   `default: null` in `src/models/character.mts`; the schema boundary now
+>   owns the shape and the function + its call site + the
+>   `TODO(enforce-consistency-redundancy)` anchor are deleted.
+> - **Residual caveat scheduled into H.2:** an explicit `null` PATCH on an
+>   object-typed parent (`equipment`, `attributes`, …) passes the `typeof`
+>   type check — a systemic boundary gap `enforceConsistency` neither
+>   prevented nor repaired (it left a dangling own-slot `weaponIndex`).
+>   Added as an H.2 step-4 sub-bullet (object-parent `null` rejection).
+> - **Regression pin added:** `test/rules/derived.test.mts` now asserts
+>   recalc passes out-of-range XP through untouched (recalc is a pure
+>   derivation; the boundary owns validity).
+> - **Adjacent staleness fixed in the same pass:** `attributes.mts`
+>   `clampValues` doc no longer names the deleted function (cites NB-21);
+>   the plan's cross-cutting lifecycle note now says `recalculate` instead
+>   of "the `enforceConsistency` step"; `derived.mts` module header
+>   records the pure-derivation posture.
+
 **Steps**
 
 1. `src/rpg-types.mts` — delete `RawEffect.priority`; keep `duration` with
@@ -1332,6 +1361,12 @@ above; executed in Chunk H.3 (NB-45).
    - `combat.carried` — already enforced by `validateCombatCarried` since
      Chunk D (tuple shape, index range, own-slot rules); no change,
      formally noted as done.
+   - **Object-parent `null` rejection** (H.1 / NB-36 residual): an
+     explicit `null` on an object-typed field passes the `typeof` type
+     check (`typeof null === "object"`), so a PATCH can null out parents
+     like `equipment` or `attributes` wholesale. Reject `null` for
+     object-typed fields unless the schema marks them nullable (the two
+     armor slots, which legitimately clear to `null`).
    - `character.effects[]` — **explicitly out of scope**: the raw
      warn-and-skip boundary is the NB-35 design; no input-shape validation
      is added.
@@ -1764,8 +1799,8 @@ silent snapshot bumps.
   the type vocabulary in Chunk C; the engine never reads it. Temporary /
   expirable state belongs to sibling apps (Discord bot, WoW addon), which
   add and remove `character.effects[]` entries at the appropriate moments
-  and re-call recalc. The `enforceConsistency` step deliberately does not
-  prune effects from the result.
+  and re-call recalc. `recalculate` deliberately never prunes
+  `character.effects[]` from the result.
 - **Trigger enum is opaque to the engine**: engine validates only that a
   trigger value belongs to the known enum. It runs no per-trigger logic.
   Sibling apps decide what each trigger means at gameplay time. Adding a

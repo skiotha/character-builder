@@ -70,8 +70,8 @@ export const SECONDARY_FORMULAS: Record<
 
 /**
  * Clamp `toughness.current` into `[0, toughness.max]`. Called once at the
- * very end of `recalculate` — this is now the **only** site that touches
- * toughness bounds (legacy `enforceConsistency` clamp removed).
+ * very end of `recalculate` — the **only** site that touches toughness
+ * bounds (NB-21).
  */
 export function clampValues(character: Character): void {
   const toughness = character.attributes?.secondary?.toughness;

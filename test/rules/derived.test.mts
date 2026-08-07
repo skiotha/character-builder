@@ -303,23 +303,23 @@ describe("recalculate", () => {
     });
   });
 
-  // ── enforceConsistency (trimmed) ─────────────────────────────
+  // ── boundary vs engine responsibilities ─────────────────────
 
-  describe("enforceConsistency (trimmed)", () => {
-    it("resets negative XP to 0", () => {
-      const warnMock = mock.method(console, "warn", () => {});
-      try {
-        const char = makeTypedCharacter({
-          experience: { total: 50, unspent: -10 },
-        });
-        const result = recalculate(char, emptyRegistry);
-        assert.equal(result.experience.unspent, 0);
-        assert.equal(warnMock.mock.callCount(), 1);
-      } finally {
-        warnMock.mock.restore();
-      }
+  describe("input passthrough (boundary owns validation)", () => {
+    it("does not clamp out-of-range experience (NB-36)", () => {
+      const char = makeTypedCharacter({
+        experience: { total: 50, unspent: -10 },
+      });
+      const result = recalculate(char, emptyRegistry);
+      // Recalc is a pure derivation: XP validity is enforced at the
+      // schema boundary (`min: 0`), never silently "fixed" mid-recalc.
+      assert.equal(result.experience.unspent, -10);
     });
+  });
 
+  // ── clamp phase ──────────────────────────────────────────────
+
+  describe("clamp phase", () => {
     it("clamps toughness.current to max via clampValues", () => {
       const char = makeTypedCharacter({
         attributes: {
