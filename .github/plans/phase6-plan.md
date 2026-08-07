@@ -54,7 +54,11 @@ chunks that resolve them.
 | F | Effect normalization (data, collaborative) + post-pass amendment items 2–13 | small | huge | medium | medium | ✅ Done (Item 1 resolved via Model B in Chunk G — declarative, not an engine resolver) |
 | G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ✅ Done (2026-07-04) |
 | G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ✅ Done (2026-07-10) |
-| H | Validators, sibling docs, cleanup | medium | — | medium | large | ⏳ Not started |
+| H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ⏳ Not started |
+| H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ⏳ Not started |
+| H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ⏳ Not started |
+| H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ⏳ Not started |
+| H.5 | Contract docs: data-contracts & sibling integration | — | — | — | large | ⏳ Not started |
 
 ---
 
@@ -506,7 +510,7 @@ real reference data comes in Chunk F.
 >   `NATURAL_WEAPON` constant in `src/rules/derived.mts` (defensive
 >   fallback when no `own` weapon is present). Audit note in this
 >   plan was updated mid-session to reflect this; final unification
->   moved to **Chunk H step 8** (registry-driven `{ ref: ... }`
+>   moved to **Chunk H.3** (registry-driven `{ ref: ... }`
 >   default once Chunk G's registry exists).
 > - **Bug #31 partially closed.** Top-level `character.flags` and
 >   per-slot `flags` reset between recalcs is fixed; the
@@ -566,8 +570,8 @@ real reference data comes in Chunk F.
 >   #9 (#8 was already resolved earlier), #23, and #31 (with armor
 >   overlay caveat). New gate plan
 >   `done/phase6-chunkF-prereqs-plan.md`. New Chunk I authored. F-side
->   audit note rewritten + Chunk H step 8 added to drive final
->   resolution.
+>   audit note rewritten + Chunk H step 8 (now **Chunk H.3** after the
+>   2026-08-07 split) added to drive final resolution.
 > - **Memory:** repo memory `/memories/repo/character-builder-chunk-e.md`
 >   captures crystallized `Weapon` / `ArmorPiece` shape, shrunk
 >   `CombatSlotField`, the three-copies debt, and the per-slot
@@ -810,6 +814,12 @@ declarative and `TODO(weapon-inheritance)` is deleted. See the staging file
 > default, engine fallback, catalog) and they already disagree on
 > `name` / `damage` / `qualities`. Address in Chunk H per the options
 > below.
+>
+> **Resolution locked (2026-08-07):** the first option — the catalog
+> record is canonical and both the schema default and the engine fallback
+> resolve through the registry. Gameplay-visible (bare hands become d4 +
+> `short`), accepted as the intended shape. Scheduled as **Chunk H.3**;
+> tracked as NB-45.
 
 `src/models/character.mts` currently inlines a copy of the `natural_weapon`
 object as `equipment.weapons.default` (and `combat.carried[2]` points at
@@ -829,8 +839,8 @@ Options to consider once the registry exists (Chunk G):
   constant, and the EN catalog entry all deep-equal each other. Cheap
   lint, no runtime coupling, breaks the build on drift.
 
-Decide between those (or a third option) when F is done and the registry
-shape is firm. Until then the three copies are accepted as a known debt.
+Decided 2026-08-07 — see the resolution note in the status blockquote
+above; executed in Chunk H.3 (NB-45).
 
 ---
 
@@ -1097,64 +1107,399 @@ shape is firm. Until then the three copies are accepted as a known debt.
 > memory as live proof), the home options (git doc / `data-contracts.md`
 > section / cross-repo / **memory** / hybrid), a straw-man structure,
 > ownership, and the enforcement question.
+>
+> **Status (2026-08-07):** the digest is authored
+> (`docs/rpg-engine-semantics.md`) and user-reviewed — content-stable for
+> Chunk H's purposes, with minor issues pending discussion, so it is
+> deliberately **not** marked stable in-file. H proceeds citing `ES §`
+> anchors against the current iteration; the digest plan's remaining steps
+> (memory deletion, sibling pointer lines, archival) stay with that plan.
 
 ---
 
 ## Chunk H — Validators, Sibling Docs, Cleanup
 
+> **Re-scoped and split 2026-08-07** — replaces the original eight-step
+> outline (authored 2026-04-21), which had drifted against decisions taken
+> during Chunks E–G, the 2026-06-21 tracker migration, and the digest plan.
+> Split into **H.1–H.5** so each unit lands independently reviewable
+> (G.1/G.2 precedent). Heading kept verbatim so existing cross-links
+> resolve. Sequence: **H.1 → H.2 → H.3 → H.4 → H.5** — code first, then
+> trackers record what shipped, then contract docs are written against the
+> post-H.3 reality. H.2 and H.3 are technically decoupled (validators use
+> the models-layer reference loader, not the engine registry), but the
+> listed order keeps the validator suite in place to catch H.3's fixture
+> churn.
+>
+> **What changed against the original outline:**
+>
+> - **Old step 0 (delete `RawEffect` / `normalizeRawEffect`) narrowed to a
+>   trim.** Its premise — "the legacy wire shape has no remaining
+>   producers" — is false: DM-writable `character.effects[]` still produces
+>   it, the Chunk-G load-posture decision keeps that boundary
+>   warn-and-skip, and the fail-fast catalog deserializer
+>   (`deserializeEffect`) is built *on top of* `normalizeRawEffect`. Full
+>   removal is NB-35 (deferred until Phase 7 clarifies sibling lifecycle
+>   metadata). → **H.1**.
+> - **Old step 0a** was already preempted by Chunk E.0.7 (recorded there);
+>   nothing remains.
+> - **Old step 1 (validators) hid real scope decisions** — budget
+>   semantics, the three derived-field stubs it never listed, catalog
+>   access from the models layer, and an update-path cross-field mechanism
+>   that doesn't exist yet. Locked below. → **H.2**.
+> - **Old step 4 targeted a file that no longer exists.**
+>   `engine-weak-points.md` became `.github/bugs/engine.md` + `resolved.md`
+>   with permanent `NB-<n>` ids (2026-06-21). The sweep also gains **NB-3**
+>   (present in this plan's own coverage table, omitted from the old
+>   step-4 enumeration by transcription slip) and the factually-stale
+>   NB-10 / NB-12 / NB-13 / NB-14 entries. → **H.4**.
+> - **Old step 6's "mark Phase 6 completed" is impossible** — Chunks I and
+>   J remain open. The roadmap gets an honest "engine-complete" status
+>   instead. → **H.4**.
+> - **Old step 7 is half-superseded.** `nagara-rpg-rules.md` deletion is
+>   owned by the digest plan's pending step 4 (awaiting sign-off); H only
+>   refreshes `character-builder.md`. → **H.4**.
+> - **Old step 8 (`natural_weapon`) needs a `Registry` extension** — the
+>   registry indexes traits / talents / qualities but has **no weapon
+>   lookup** today. → **H.3**.
+> - **NB-36 pulled in** (`enforceConsistency()` redundancy audit — the
+>   tracker nominates it for the H cleanup umbrella). → **H.1**.
+>
+> **Decisions locked (2026-08-07, with the user):**
+>
+> - **Attribute budget is a base-stat invariant.** Base primaries are
+>   creation-locked identity: each 5–15, sum **exactly 80**, for the
+>   character's whole life. Every post-creation change — trait-granted or
+>   DM fiat — is authored as a `kind: "primary"` effect and lands in
+>   `attributes.primaryEffective`, which is **never** validated.
+>   The sum rule is enforced on every write path that can touch base
+>   primaries. `perm_attr` (DM write on base primaries) stays as-is — a
+>   DM rebalance that keeps the sum at 80 remains legal.
+> - **Derived-field validator stubs die.** `defenseValid` /
+>   `painThresholdValid` / `corruptionThresholdValid` validate recalc-owned
+>   output and were never in the original step-1 list; they are deleted
+>   together with the `skipOnCreation` secondary-field creation overrides.
+>   The six secondary derived fields become `serverControlled` so creation
+>   warns-and-ignores client-supplied values (matching `playerId`); updates
+>   already reject via the `derived` denylist. `toughness.current` is NOT
+>   part of the flip (it is real state, seeded at creation) — but note it
+>   is already `derived: true` today, so PATCH rejects health writes for
+>   every role; when health tracking becomes writable is a Phase 7
+>   (sibling-integration) question, out of H's scope.
+> - **Ref-validity is strict catalog membership** (user certainty settled
+>   2026-08-07 — no deferral tracker filed). Reference files are the sole
+>   source of truth: neither the UI nor sibling apps may invent items.
+>   Every id in `equipment.weapons[]` / `equipment.armor.*` / `traits[]` /
+>   `talents[]` / `rituals[]` / `traditions[]` must resolve in its catalog,
+>   and item `qualities[]` must resolve in the quality registry. **No
+>   field-level canonicalization**: validators check id membership and
+>   structure, not that display/numeric fields match the catalog — entries
+>   are authored per-locale by the client, so canonicalizing at
+>   `DEFAULT_LOCALE` would bake EN display strings into characters. Field
+>   tampering stays possible and accepted for the trusted userbase
+>   (ADR-003 posture); revisit alongside Chunk I if the picker wire shape
+>   changes.
+> - **`RawEffect` is sanctioned wire format, not deprecated.** It survives
+>   for `character.effects[]` until NB-35's migration; the `@deprecated`
+>   tags come off in favor of boundary doc-comments. `priority` is deleted
+>   from the interface (ADR-015 removed it from the vocabulary); `duration`
+>   **stays**, documented-as-ignored — it is the field NB-35's Phase-7
+>   decision is actually about.
+> - **`natural_weapon` unifies on the catalog record** — damage 4,
+>   `["own", "short"]`, display name "Natural Weapon". This is a
+>   gameplay-visible change (bare hands deal d4 and gain `short`), accepted
+>   as the intended shape; the stripped damage-0 seed was always marked
+>   transitional. Registry-driven resolution per NB-45.
+> - **Digest interplay.** `docs/rpg-engine-semantics.md` is content-stable
+>   for H's purposes (user-reviewed 2026-08-07; minor issues pending, so it
+>   is deliberately **not** marked stable in-file). H cites `ES §` anchors
+>   against the current iteration. The digest plan's remaining steps
+>   (memory deletion, sibling pointer lines, archival) stay with that plan;
+>   H.5 rewrites sibling contract *content* only and adds no pointer lines.
+
+### H.1 — Legacy trim & engine cleanup (code, small)
+
 **Steps**
 
-0. Delete `RawEffect`, `normalizeRawEffect`, and the translator's
-   warn paths from `src/rpg-types.mts` and `src/rules/effects.mts`.
-   Reference data must be authored in the typed `ResolvedEffect` shape
-   directly by this point (Chunks F + G ensure this); the legacy wire
-   shape has no remaining producers. Equipment effects are already
-   typed `ResolvedEffect[]` end-to-end (crystallized in Chunk E.0.3).
-0a. *(Preempted by Chunk E.0.7.)* `"qualities"` and `"flags"` were
-    dropped from `CombatSlotField` during Chunk E.0 prep — per-slot
-    set-membership flows through `weaponQuality` / `flag` targets with
-    `appliesTo` narrowing, not via a dedicated combat field. The
-    `CombatSlot.flags` array remains as the engine's per-slot output
-    surface (populated by `flag` effects whose `appliesTo` matches the
-    slot's weapon).
-1. Implement real `rpgValidators` (currently all return `true`):
-   - Attribute budget validation.
-   - Health range.
-   - Slot count + slot 2 own-quality + non-null (already in D, formalize here).
-   - Weapon ref validity (id exists in reference).
-   - Trait/spell ref validity.
-2. Update `docs/data-contracts.md` with final `EffectTarget`,
-   `WeaponPredicate`, `SpecialAttack` vocabulary.
-3. Update `.github/plans/deferred-tasks.md` — mark §1, §3 done; remove obsolete items.
-4. Update `.github/bugs/engine-weak-points.md` — mark #1, #2, #4, #5, #6,
-   #7, #8, #9, #18, #19, #20, #21, #22, #23 resolved with date and chunk
-   reference.
-5. Update sibling integration docs:
-   - `docs/addon-integration.md` — 3-slot model, special attacks, no `active`,
-     `appliesTo` predicate semantics, weapon swap is sibling-side concern.
-   - `docs/bot-integration.md` — same.
-6. Update `docs/roadmap.md` Phase 6 — replace Step 0/5 with reference to
-   chunks A–I; mark completed.
-7. Update repo memory (`character-builder.md`, `nagara-rpg-rules.md`).
-8. **Resolve the F-side audit** (three copies of `natural_weapon`):
-   pick one of the two options recorded under Chunk F. Recommended
-   path is the `{ ref: ... }` registry-driven default — by this point
-   the Chunk-G registry exists and `generateDefaultCharacter` can
-   resolve refs at creation time, and `deriveCombatSlots` can
-   synthesize its fallback from the same lookup. Drop the temporary
-   E.0.5 snapshot test once unified.
+1. `src/rpg-types.mts` — delete `RawEffect.priority`; keep `duration` with
+   its ignored-by-engine doc-comment. Replace the `@deprecated` tags on
+   `RawEffect` / `RawEffectModifier` with boundary prose: sanctioned wire
+   shape for `character.effects[]` only, single consumer
+   `src/rules/effects.mts`, migration tracked by NB-35. The
+   `TODO(rawEffect-removal)` + NB-35 cite stay.
+2. `src/rules/effects.mts` — delete the legacy-only reject branches: the
+   dotted-path string special-case in `parseTarget` and the
+   `add` / `mul` / `set` special-case in `parseModifier`. Both inputs
+   still reject through the generic invalid-target / unknown-modifier
+   paths (a warn is still emitted) — only the legacy-flavored messaging
+   goes. Delete the no-op `priority` / `duration` guard blocks in
+   `normalizeRawEffect`.
+3. `src/rules/effects.mts` module header — re-frame "legacy `RawEffect`
+   wire shape" as the *untrusted runtime* wire shape; fix the stale
+   "reference-lint … will promote misses to a hard failure once it ships"
+   sentence (the lint shipped in G.1; runtime misses stay warn-and-skip by
+   design).
+4. **NB-36 audit** (`enforceConsistency()`): (a) confirm every field it
+   defaults is also defaulted at the schema/storage boundary; (b) confirm
+   no typed `EffectTarget` can reach `experience.unspent`; (c) if both
+   hold, delete the function and its `recalculate` call site (if only (a)
+   holds, keep the XP guard as an inline one-liner); (d) update the
+   `derived.mts` module header in the same edit. Close **NB-36** in the
+   same commit (entry moves to `resolved.md`).
+5. Tests — retitle the two legacy-reject tests (assertions unchanged:
+   `null` + warn); rework the `priority`-ignored test into an
+   unknown-junk-keys-ignored test (the field is gone from the interface);
+   drop/adjust `enforceConsistency` coverage in
+   `test/rules/derived.test.mts` per (c)'s outcome.
 
 **Verification**
 
-1. `npm test` green with real validators.
-2. Validator rejects: over-budget attributes, slot 2 with non-`own` weapon,
-   null slot 2, trait referencing nonexistent ability id.
-3. Docs reviewed; no stale references to `combat.active`,
-   `combat.bonusDamage: number[]`, dotted-path effect targets, or
-   `add`/`mul`/`set` modifier verbs.
-4. Only one in-code definition of `natural_weapon` remains (the
-   catalog entry); schema default and engine fallback both resolve
-   through it.
+1. `npm test` + `npm run typecheck` green.
+2. No `add` / `mul` / `set` verb handling remains under `src/rules/`;
+   `priority` is gone from `RawEffect`.
+3. A malformed DM-injected `character.effects[]` entry still
+   warn-and-skips (boundary behavior unchanged).
+
+### H.2 — Real validators (code, the load-bearing sub-chunk)
+
+**Design notes (locked)**
+
+- Catalog access from the models layer goes through
+  `src/models/reference.mts` (`getTopic` / `getMerged` at
+  `DEFAULT_LOCALE`; the locale-drift lint guarantees en/ru id parity, so
+  EN ids are authoritative — mirrors the registry). Same-layer import, no
+  ADR-013 violation; the mtime cache keeps validators fresh without a
+  startup-frozen index.
+- Membership checks are async ⇒ creation validation gains an async step
+  (`validateCharacterCreation` becomes async, or the handler composes a
+  second async pass); `validateCharacterUpdate` is already async. Handler
+  and test churn expected.
+- The update path gains the cross-field/business pass creation already
+  has: after merging updates, run `validateCrossFieldRules` +
+  `validateRPGRules` against the merged character. Today updates validate
+  per-field only, so e.g. the budget rule is unreachable on PATCH.
+- The ADR-016 recalc-time throw on unknown quality ids stays as
+  defense-in-depth for hand-edited on-disk data; validators simply make it
+  unreachable through the API (today it surfaces as an accidental 400
+  carrying a raw `[quality-registry] …` engine message).
+
+**Steps**
+
+1. **Budget** — implement `attributePointsValid` (sum of the eight base
+   primaries === 80, evaluated over merged data) as the **single home**:
+   delete the duplicate inline budget block in `validateRPGRules` (its
+   negative-XP guard stays); update the schema `error` string to the
+   exact-80 phrasing. Enforced at creation (existing cross-field pass) and
+   on any PATCH touching `attributes.primary.*` (new merged-data pass).
+2. **Health** — implement `currentHealthValid`:
+   `0 ≤ toughness.current ≤ toughness.max` against `allData`. At creation
+   `toughness.max` may be absent pre-recalc (server-controlled defaults
+   are skipped after step 3), so the upper bound applies only when `max`
+   is present; the engine clamp remains the backstop. Note: the validator
+   is creation-reachable only today — `toughness.current` is
+   `derived: true`, so PATCH rejects it for every role; flipping health
+   writability is Phase 7 territory and will pick this validator up for
+   free.
+3. **Derived-field stubs** — delete `defenseValid` / `painThresholdValid` /
+   `corruptionThresholdValid` and their schema `validate:` references;
+   remove the six `attributes.secondary.*` entries from `skipOnCreation`'s
+   creation-override list; mark the six secondary derived fields
+   (`toughness.max`, `defense`, `armor`, `painThreshold`,
+   `corruptionThreshold`, `corruptionMax`) `serverControlled: true`.
+   Verify `generateDefaultCharacter` + create-time recalc still produce a
+   complete character (server-controlled fields drop out of the generated
+   defaults; recalc fills all six before first save).
+4. **Catalog-membership validators** (strict; resolved at
+   `DEFAULT_LOCALE`):
+   - `equipment.weapons[]` — structural shape (`id` / `name` / `type` /
+     `damage` / `qualities` with correct types) + `id` resolves in
+     `reference/weapons` + every `qualities[]` id resolves in the quality
+     registry (designed 400 naming the offending id, pre-recalc).
+   - `equipment.armor.body` / `.plug` — `null` allowed; otherwise `id`
+     resolves in `reference/armor`, the entry's `slot` matches its
+     position, `qualities[]` resolve in the registry.
+   - `traits[]` — `id` resolves in merged abilities+spells;
+     `tier ∈ {novice, adept, master}`; `source` consistent with where the
+     id resolved.
+   - `talents[]` — `id` resolves in merged boons+sins; `level` is an
+     integer within `1..levels` from the catalog entry; `source`
+     consistent.
+   - `rituals[]` — `id` resolves in `reference/rituals`; `level` integer
+     ≥ 1.
+   - `traditions[]` — each id resolves in `reference/abilities`
+     (traditions are curated ability ids; the deferred-tasks "separate
+     file?" question stays formally parked).
+   - `combat.carried` — already enforced by `validateCombatCarried` since
+     Chunk D (tuple shape, index range, own-slot rules); no change,
+     formally noted as done.
+   - `character.effects[]` — **explicitly out of scope**: the raw
+     warn-and-skip boundary is the NB-35 design; no input-shape validation
+     is added.
+5. **Tests** — per rule: happy path + rejection naming the offending id;
+   budget at creation and on PATCH (a rebalance keeping 80 passes, 79/81
+   reject); health range; creation payload seeding secondary values →
+   warning + ignored (not 400); regression: PATCH with a bogus quality id
+   → designed 400 pre-recalc (previously reached the engine throw).
+6. **UI verification** (the user's "carefully test" rider + the
+   ui-browser-verify rule): exercise the creation form and an edit
+   round-trip in-browser; confirm the `serverControlled` flip didn't break
+   form rendering, submission, or the SSE round-trip.
+
+**Verification**
+
+1. `npm test` green with the new validator suites; typecheck green.
+2. 400s: over/under-budget (both paths), current > max at creation,
+   unknown weapon / armor / trait / talent / ritual / tradition id,
+   unknown quality id (pre-recalc), non-`own` / null own slot
+   (pre-existing).
+3. Creation with client-supplied secondary values succeeds with warnings;
+   the stored values are recalc-owned.
+4. In-browser creation + edit round-trip verified.
+
+### H.3 — `natural_weapon` unification (code, medium — closes NB-45)
+
+**Steps**
+
+1. **Registry extension** — add `lookupWeapon(id)` to the `Registry`
+   interface (`registry-types.mts`); `loadRegistry` pre-indexes
+   `reference/weapons` at `DEFAULT_LOCALE` and **fail-fasts if
+   `natural_weapon` is absent** (the engine's own-slot synthesis depends
+   on it). Update `test/helpers/registry.mts`: `createInMemoryRegistry` /
+   `emptyRegistry` seed the catalog-shaped `natural_weapon`;
+   `BASE_QUALITIES` gains `short`.
+2. **Schema default via injection** — replace the inlined
+   `equipment.weapons.default[0]` copy: `models/` gets a startup-injected
+   weapon lookup (mirroring `initCharacterService` — models must not
+   import `#rules`), wired from `src/app.mts` after `loadRegistry()`;
+   `generateDefaultCharacter` resolves the seed through it. Test helpers
+   seed the injection.
+3. **Engine fallback** — `deriveCombatSlots` synthesizes the own-slot
+   anchor via `registry.lookupWeapon("natural_weapon")`; delete the
+   `NATURAL_WEAPON` constant.
+4. **Tests** — drop the temporary E.0.5 snapshot test in
+   `test/validation.test.mts`; replace it with an assertion that the
+   creation default deep-equals the catalog record (locks the wiring, not
+   a copy). Update `test/helpers/fixtures.mts` seeds to the catalog shape
+   (damage 4, `["own", "short"]`, "Natural Weapon"); adjust defaults-based
+   assertions (tests that author explicit weapons are unaffected).
+5. **Digest lockstep** — bare-hand damage is rule-backed, gameplay-visible
+   behavior: check the relevant `ES §` entry and update it in the same
+   commit if it states the old value (per the rpg-engine-semantics
+   lockstep rule).
+6. Close **NB-45** (entry moves to `resolved.md`, same commit).
+
+**Verification**
+
+1. `npm test` + typecheck green.
+2. No inlined `natural_weapon` object literal remains under `src/` — the
+   schema default and the engine fallback both resolve through the
+   catalog.
+3. A freshly created character's own slot derives `baseDamage: 4` and
+   `qualities` including `short` end-to-end (creation → recalc → API
+   response).
+
+### H.4 — Tracker & bookkeeping reconciliation (trackers / roadmap / memory)
+
+**Steps**
+
+1. **Close the Chunk-C/E bookkeeping debt** in `.github/bugs/engine.md` →
+   `resolved.md` (entries keep their ids): NB-1, NB-2, NB-3, NB-4, NB-5
+   (Chunk C engine side + G.1 data wiring), NB-6, NB-19, NB-20, NB-21,
+   NB-22 — each with resolution date and chunk reference.
+2. **Reconcile the stale entries:** NB-10 (both files fully implemented —
+   close citing C + G.1); NB-13 (Chunk F shipped the normalization —
+   close); NB-12 (close-by-decision: character-state conditions are
+   deliberately out of engine per the Cross-Cutting Notes / the digest's
+   out-of-engine section; the surviving conditional thread is NB-34's);
+   NB-14 (slim to the runes-only orphan and keep open, pointing at the
+   deferred-tasks orphan note — runes stay formally parked per the
+   2026-08-07 ruling).
+3. **`.github/plans/deferred-tasks.md`** — no section-status work left
+   (the 2026-07-01 audit already marked §1 shipped / §3 subsumed).
+   Annotate the status summary with the 2026-08-07 ruling that the two
+   orphans (runes, traditions file) deliberately stay parked, so the file
+   stops looking actionable.
+4. **`docs/roadmap.md` Phase 6** — fix "8 chunks (A–H)" → A–J; refresh the
+   Chunk Status table (G → G.1/G.2 ✅ with dates, drop the retired
+   "inheritance resolver" framing, F status line updated, H → H.1–H.5
+   rows, I / J rows); record the honest completion posture:
+   **engine-complete at H; Chunks I (usability) and J (real-data suite)
+   outstanding** — Phase 6 is not marked done.
+5. **Repo memory** — refresh `/memories/repo/character-builder.md`
+   (validators real, `natural_weapon` unified, `RawEffect` posture,
+   tracker state). `nagara-rpg-rules.md` is **not** touched here — its
+   deletion belongs to the digest plan's pending step 4.
+
+**Verification**
+
+1. `npm test` green — the `bug-anchors` lint passes (every `NB-<n>` cite
+   resolves; no duplicate ids after the moves).
+2. `engine.md` holds only genuinely-open bugs (NB-33, NB-34, NB-35,
+   NB-47, slimmed NB-14); `resolved.md` gained the archived entries.
+3. The roadmap chunk table matches this plan.
+
+### H.5 — Contract docs: data-contracts & sibling integration (docs)
+
+**Steps**
+
+1. **`docs/data-contracts.md` §1.1 reconciliation** (the Action shape,
+   conditional-secondary, and talent-stance blocks are already current
+   from G.2 — this is a targeted pass, not a rewrite):
+   - `EffectTarget` table: 5-kind → **8-kind** (add `primary`,
+     `magicAttribute`, `initiativeAttribute`), aligned with ADR-015 + its
+     amendment anchors.
+   - `secondary` row: the discriminator key is **`stat`** (not
+     `attribute`); values `toughness | defense | armor | painThreshold |
+     corruptionThreshold | corruptionMax` (drop the nonexistent `pain` /
+     `xpMax` / `toughness.max`).
+   - `armorQuality` row: the gate is `condition?: ArmorCondition[]`
+     (ADR-015 §3f), not `slot?`.
+   - Vocabulary intro: "reference files in `data/`" → `reference/`.
+   - `setBase` value: a primary-attribute name (string) — not
+     `string | number`.
+   - Effect-object framing aligned with H.1's outcome (`priority` gone;
+     `duration` engine-ignored, sibling-owned).
+   - Point at `ES §` anchors where the digest owns the system fact
+     (digest = why, data-contracts = wire shape; don't restate).
+   - Document the H.2 validation contract: strict catalog membership and
+     the 400 vocabulary.
+2. **`docs/addon-integration.md`:**
+   - §8 Effect Object Schema — rewrite: typed `EffectTarget` / per-phase
+     `EffectModifier`, no `priority`, no priority-ordered processing (drop
+     the `Core/Effects.lua` pipeline-ordering instruction — effects arrive
+     engine-resolved; the addon consumes **derived outputs**, not raw
+     pipelines).
+   - §3 vs §2.5 `schemaVersion` contradiction — the current version is
+     **2** everywhere (the server stamps 2).
+   - §2.5 export shape — surface the derived contract: per-slot derived
+     fields (`attackAttribute`, `baseDamage`, `bonusDamage`, `qualities`,
+     `flags`), top-level `flags`, `specialAttacks` / `reactions`,
+     `magicAttribute` / `initiativeAttribute`,
+     `attributes.primaryEffective`.
+   - §9 trait shape — `source` (not `category`); tier/level split per
+     data-contracts §1.2.
+   - 3-slot semantics, no `combat.active`, `appliesTo` predicate
+     semantics, weapon-swap-is-sibling-side, declarative actions (the
+     original step-5 content).
+   - **No digest pointer line** — that insertion belongs to the digest
+     plan's step 5.
+3. **`docs/bot-integration.md`** — same pass: 3-slot model, derived
+   collections, declarative actions, no `combat.active`; bot writes must
+   use catalog ids (H.2's strict membership is now part of the write
+   contract).
+4. **Chunk-closing stale-vocabulary sweep** (absorbs the original
+   verification #3): grep `docs/`, `src/`, `public/` for `combat.active`,
+   `bonusDamage: number[]`, dotted-path effect targets, and
+   `add` / `mul` / `set` verbs — ADRs, `resolved.md`, and `done/` plans
+   are exempt as historical context.
+
+**Verification**
+
+1. `npm test` green (`adr-anchors` lint over the new cites).
+2. Stale-vocabulary grep clean outside historical context.
+3. `schemaVersion` consistent (2) across the addon doc and the server.
+4. Both sibling docs describe the v2 export surface including derived
+   fields; no doc instructs siblings to run effect pipelines.
 
 ---
 
@@ -1437,10 +1782,11 @@ G blocks on E (uses real registry).
 F blocks on A's authoring spec AND on F.0; runs as a long user-owned bulk edit.
 G's reference-lint test (G step 6) blocks on F being complete.
 H blocks on G.
-I blocks on H (validators must exist before pickers can rely on them) but
-can begin the per-component pickers (steps 2–6) opportunistically as soon
-as the matching schema field is stable — `equipment-list` in particular
-can ship right after E since `equipment.weapons[]` is already final.
+I blocks on Chunk H.2 (validators must exist before pickers can rely on
+them) but can begin the per-component pickers (steps 2–6) opportunistically
+as soon as the matching schema field is stable — `equipment-list` in
+particular can ship right after E since `equipment.weapons[]` is already
+final.
 
 Suggested execution: A → B → C → D → E → F.0 → G (registry + tests landing
 first; lint-over-real-data turned on once F finishes) → H → I → J. F runs
