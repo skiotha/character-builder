@@ -7,6 +7,7 @@ import {
 import { BodyTooLargeError, MAX_JSON_BODY, readBody } from "../lib/body.mts";
 import { createCharacter } from "#models";
 import { validateCharacterCreation } from "#models/validation";
+import { validateCatalogRefs } from "#models/reference-validation";
 
 import type { NagaraRequest } from "#types";
 
@@ -39,6 +40,25 @@ export async function handleCreateCharacter(
         JSON.stringify({
           error: "Character validation failed",
           details: validation.errors,
+          warnings: validation.warnings,
+        }),
+      );
+      return true;
+    }
+
+    // Strict catalog-membership pass over the merged result (defaults +
+    // payload). Async because it reads the reference catalogs, so it
+    // composes here rather than inside the sync schema validation; same
+    // 400 surface as a schema failure.
+    const refErrors = await validateCatalogRefs(
+      validation.validatedData as Record<string, unknown>,
+    );
+    if (refErrors.length > 0) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          error: "Character validation failed",
+          details: refErrors,
           warnings: validation.warnings,
         }),
       );

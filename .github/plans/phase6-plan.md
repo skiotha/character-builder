@@ -55,7 +55,7 @@ chunks that resolve them.
 | G.1 | Registry loader + effect/action wiring + reference-lint | medium | — | medium | small | ✅ Done (2026-07-04) |
 | G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ✅ Done (2026-07-10) |
 | H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ✅ Done (2026-08-07) |
-| H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ⏳ Not started |
+| H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ✅ Done (2026-08-08) |
 | H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ⏳ Not started |
 | H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ⏳ Not started |
 | H.5 | Contract docs: data-contracts & sibling integration | — | — | — | large | ⏳ Not started |
@@ -1290,6 +1290,56 @@ above; executed in Chunk H.3 (NB-45).
    warn-and-skips (boundary behavior unchanged).
 
 ### H.2 — Real validators (code, the load-bearing sub-chunk)
+
+> **✅ Completed 2026-08-08.** 697 / 697 tests (+27 net) + typecheck green;
+> in-browser creation + edit round-trip verified via Playwright MCP.
+> Divergences and findings against the outline:
+>
+> - **Creation stayed sync; the handler composes.** Of the two allowed
+>   options, `validateCharacterCreation` keeps its sync signature (schema
+>   layer stays pure, ~30 call sites untouched) and
+>   `handleCreateCharacter` awaits the catalog pass over
+>   `validation.validatedData` with the same 400 surface. The new module
+>   is `src/models/reference-validation.mts` (`validateCatalogRefs`).
+> - **The merged-update pass is scoped to touched subtrees** — a
+>   mid-execution discovery: the cross-field hooks and catalog checks are
+>   INPUT-shape validators, while stored characters legitimately carry
+>   recalc output they would reject (`validateCombatCarried` chokes on a
+>   saved slot's derived fields; a catalog id retired after a character
+>   was saved must not block an unrelated rename). Both re-runs filter by
+>   "does any updated field address this subtree" (`touchesSubtree`);
+>   `validateRPGRules` (XP only) runs unconditionally.
+> - **PATCH validation failures surface as 422** ("Some updates failed",
+>   the handler's existing all-or-nothing convention), not the outline's
+>   shorthand "400"; creation failures are 400 as before. The
+>   previously-crashing unknown-quality PATCH now lands in that designed
+>   422 instead of reaching the ADR-016 recalc throw.
+> - **NB-48 filed** (counter → NB-49): wholesale parent-object PATCH
+>   bypasses leaf-level write permissions (`attributes` is owner-RW while
+>   `attributes.primary.*` is owner-RO). Discovered while wiring the
+>   budget hook; the hook + recalc keep it non-exploitable into invalid
+>   state, so it is deferred rather than fixed here.
+> - **Digest lockstep:** `ES §primaries`' Where facet repointed from
+>   `validateRPGRules` to `rpgValidators.attributePointsValid` + the
+>   merged-update pass — its "enforced on every write" claim is now
+>   literally true.
+> - **Test-seed upgrade was load-bearing:** the test server's seeded
+>   weapons catalog had no `natural_weapon` entry, so every seeded POST
+>   would have 400'd under strict membership. Seeds are now structurally
+>   complete (full natural_weapon, typed test entries, armor slots, boon
+>   `levels`).
+> - **Three API tests were single-primary bumps** (e.g. `strong: 15`
+>   alone) — now correctly rejected by the lifetime budget; rewritten as
+>   budget-preserving rebalances (+5 strong / −5 appealing).
+> - **UI verification (user rider):** creation form renders post-flip
+>   (secondaries display as read-only computed previews), POST → 201,
+>   sheet shows server-computed secondaries + disabled primaries +
+>   derived own-slot fields, edit-in-view PATCH → 200 with SSE live.
+>   Pre-existing quirks observed, none H.2-caused: favicon fetch errors,
+>   one benign SSE reconnect blip, and the `#character-name` element
+>   intercepting pointer events over the Location field (mouse-editing
+>   Location is impossible at common viewport widths — client CSS
+>   layering; flagged for Chunk I's view rework).
 
 **Design notes (locked)**
 

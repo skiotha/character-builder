@@ -128,6 +128,9 @@ export interface SchemaField {
   generated?: boolean;
   immutable?: boolean;
   derived?: boolean;
+  /** Object-typed fields reject `null` unless this is set (armor slots:
+   *  `null` = nothing equipped). See `validateFieldValue`. */
+  nullable?: boolean;
   default?: unknown;
   min?: number;
   max?: number;

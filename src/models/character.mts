@@ -7,16 +7,63 @@
 
 import type { SchemaField, SchemaSection } from "#types";
 
+// ── RPG-rule validators (schema `validate:` hooks) ────────────────
+//
+// Base primaries are creation-locked identity (ES §primaries): each
+// 5–15 (leaf schema `min`/`max`), sum EXACTLY the 80-point budget — for
+// the character's whole life. All post-creation growth (trait grants,
+// DM fiat) is authored as `kind: "primary"` effects and lands in the
+// server-derived `attributes.primaryEffective`, which is never
+// validated. Enforced wherever the cross-field pass runs: character
+// creation and the merged-update pass in `validateCharacterUpdate`.
+
+const ATTRIBUTE_BUDGET = 80;
+
 const rpgValidators = {
-  attributePointsValid: (): boolean => true,
+  attributePointsValid: (
+    value: unknown,
+    _allData: Record<string, unknown>,
+  ): true | string => {
+    const primary = (value as { primary?: unknown } | null | undefined)
+      ?.primary;
+    if (typeof primary !== "object" || primary === null) {
+      return "attributes.primary is required";
+    }
+    // Sum only the canonical eight — junk keys on `attributes.primary`
+    // are rejected as UNKNOWN_FIELD by the schema walk, not counted here.
+    let sum = 0;
+    for (const name of Object.keys(PRIMARY_ATTRIBUTE_ORDER)) {
+      const v = (primary as Record<string, unknown>)[name];
+      if (typeof v !== "number" || !Number.isFinite(v)) {
+        return `attributes.primary.${name} must be a number`;
+      }
+      sum += v;
+    }
+    if (sum !== ATTRIBUTE_BUDGET) {
+      return `Total primary attributes (${sum}) must equal exactly the budget of ${ATTRIBUTE_BUDGET}`;
+    }
+    return true;
+  },
 
-  currentHealthValid: (): boolean => true,
-
-  defenseValid: (): boolean => true,
-
-  painThresholdValid: (): boolean => true,
-
-  corruptionThresholdValid: (): boolean => true,
+  currentHealthValid: (
+    value: unknown,
+    allData: Record<string, unknown>,
+  ): true | string => {
+    if (typeof value !== "number") return "Current health must be a number";
+    // The leaf schema's `min: 0` owns the lower bound. `toughness.max`
+    // is server-controlled and may be absent pre-recalc (it is not part
+    // of the generated creation defaults); when absent, the engine's
+    // clamp is the backstop.
+    const max = (
+      allData as {
+        attributes?: { secondary?: { toughness?: { max?: unknown } } };
+      } | null
+    )?.attributes?.secondary?.toughness?.max;
+    if (typeof max === "number" && value > max) {
+      return `Current health (${value}) cannot exceed maximum health (${max})`;
+    }
+    return true;
+  },
 };
 
 // ── Combat carried-tuple validator (ADR-014) ─────────────────────
@@ -262,7 +309,7 @@ export const CHARACTER_SCHEMA: Record<
     required: true,
     permissions: perm_default,
     validate: rpgValidators.attributePointsValid,
-    error: "Cannot exceed the attributes assign budget of 80",
+    error: "Primary attributes must total exactly the 80-point budget",
 
     primary: {
       type: "object",
@@ -315,6 +362,7 @@ export const CHARACTER_SCHEMA: Record<
           required: true,
           default: 10,
           derived: true,
+          serverControlled: true,
           permissions: perm_default,
           error: "Max toughness can't be lower than 10",
           ui: {
@@ -349,7 +397,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         required: true,
         derived: true,
-        validate: rpgValidators.defenseValid,
+        serverControlled: true,
         permissions: perm_default,
         error: "Defense value is incorrect for this character",
         ui: {
@@ -366,6 +414,7 @@ export const CHARACTER_SCHEMA: Record<
         required: true,
         default: 0,
         derived: true,
+        serverControlled: true,
         permissions: perm_default,
         error: "Armor value is incorrect for this character",
         ui: {
@@ -380,7 +429,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         required: true,
         derived: true,
-        validate: rpgValidators.painThresholdValid,
+        serverControlled: true,
         permissions: perm_default,
         error: "Pain threshold is incorrect for this character",
         ui: {
@@ -396,7 +445,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         required: true,
         derived: true,
-        validate: rpgValidators.corruptionThresholdValid,
+        serverControlled: true,
         permissions: perm_default,
         error: "Corruption threshold is incorrect for this character",
         ui: {
@@ -412,6 +461,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         required: true,
         derived: true,
+        serverControlled: true,
         permissions: perm_default,
         error: "Corruption max is incorrect for this character",
         ui: {
@@ -771,6 +821,7 @@ export const CHARACTER_SCHEMA: Record<
       body: {
         type: "object",
         default: null,
+        nullable: true,
         permissions: perm_default,
         ui: {
           section: "information.equipment",
@@ -783,6 +834,7 @@ export const CHARACTER_SCHEMA: Record<
       plug: {
         type: "object",
         default: null,
+        nullable: true,
         permissions: perm_default,
         ui: {
           section: "information.equipment",

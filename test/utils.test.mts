@@ -118,20 +118,24 @@ describe("filterServerControlledFields", () => {
     assert.deepStrictEqual(portrait.crop, { x: 0 });
   });
 
-  it("strips attributes.primaryEffective (server-controlled engine output)", () => {
+  it("strips attributes.primaryEffective and derived secondaries (server-controlled engine output)", () => {
     const input = {
       characterName: "Hero",
       attributes: {
         primary: { strong: 10 },
         primaryEffective: { strong: 18 },
-        secondary: { defense: 12 },
+        secondary: { defense: 12, toughness: { max: 15, current: 9 } },
       },
     };
     const result = filterServerControlledFields(input);
     const attrs = result.attributes as Record<string, unknown>;
     assert.equal(attrs.primaryEffective, undefined);
     assert.deepStrictEqual(attrs.primary, { strong: 10 });
-    assert.deepStrictEqual(attrs.secondary, { defense: 12 });
+    // Derived secondaries (defense, toughness.max, …) are recalc output
+    // and stripped; toughness.current is real state and survives.
+    assert.deepStrictEqual(attrs.secondary, {
+      toughness: { current: 9 },
+    });
   });
 
   it("preserves user fields", () => {

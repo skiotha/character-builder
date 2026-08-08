@@ -54,14 +54,62 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
     "versatile",
   ];
   const qualitySeed = qualityIds.map((id) => ({ id, effects: [] }));
+  // Seed entries are structurally complete: the strict catalog-membership
+  // pass (`#models/reference-validation`) validates character entries by
+  // id against these files, and the creation default seeds
+  // `natural_weapon` — it MUST resolve here or every POST in tests 400s.
   const seedTopics: Array<[string, unknown]> = [
     ["abilities", [{ id: "test-ability", name: "Test Ability" }]],
     ["spells", [{ id: "test-spell", name: "Test Spell" }]],
-    ["boons", [{ id: "test-boon", name: "Test Boon" }]],
-    ["sins", [{ id: "test-sin", name: "Test Sin" }]],
+    ["boons", [{ id: "test-boon", name: "Test Boon", levels: 3 }]],
+    ["sins", [{ id: "test-sin", name: "Test Sin", levels: 1 }]],
     ["rituals", [{ id: "test-ritual", name: "Test Ritual" }]],
-    ["weapons", [{ id: "test-weapon", name: "Test Weapon" }]],
-    ["armor", [{ id: "test-armor", name: "Test Armor" }]],
+    [
+      "weapons",
+      [
+        {
+          id: "natural_weapon",
+          name: "Natural Weapon",
+          type: "natural",
+          damage: 4,
+          cost: 0,
+          qualities: ["own", "short"],
+          effects: [],
+        },
+        {
+          id: "test-weapon",
+          name: "Test Weapon",
+          type: "melee",
+          damage: 6,
+          cost: 10,
+          qualities: ["balanced"],
+          effects: [],
+        },
+      ],
+    ],
+    [
+      "armor",
+      [
+        {
+          id: "test-armor",
+          name: "Test Armor",
+          slot: "body",
+          armor: 4,
+          cost: 25,
+          qualities: ["hampering"],
+          effects: [],
+        },
+        {
+          id: "test-plug",
+          name: "Test Plug",
+          slot: "plug",
+          armor: 2,
+          cost: 15,
+          qualities: [],
+          effects: [],
+        },
+      ],
+    ],
     ["qualities", qualitySeed],
     [
       "statuses",

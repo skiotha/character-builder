@@ -118,11 +118,36 @@ describe("validateFieldValue", () => {
 
   // ── Custom validate function ──────────────────────────────────
 
-  it("passes when validate function returns true (stub validators)", () => {
-    // attributes.secondary.defense has validate: rpgValidators.defenseValid
-    // which is a stub returning true
-    const result = validateFieldValue("attributes.secondary.defense", 10);
+  it("passes when the validate hook accepts (health within max)", () => {
+    const result = validateFieldValue(
+      "attributes.secondary.toughness.current",
+      10,
+      makeCharacter(),
+    );
     assert.equal(result.valid, true);
+  });
+
+  it("fails when the validate hook rejects (health above max)", () => {
+    const result = validateFieldValue(
+      "attributes.secondary.toughness.current",
+      11,
+      makeCharacter(),
+    );
+    assert.equal(result.valid, false);
+    assert.match(result.error!, /maximum health/i);
+  });
+
+  // ── Null handling ─────────────────────────────────────────────
+
+  it("accepts null for nullable object fields (armor slots)", () => {
+    const result = validateFieldValue("equipment.armor.body", null);
+    assert.equal(result.valid, true);
+  });
+
+  it("rejects null for non-nullable object fields", () => {
+    const result = validateFieldValue("equipment", null);
+    assert.equal(result.valid, false);
+    assert.match(result.error!, /null/i);
   });
 });
 
@@ -236,17 +261,22 @@ describe("validateCharacterCreation", () => {
 
   // ── Attribute budget ──────────────────────────────────────────
 
+  // Budget errors surface from the `attributes` schema hook through the
+  // cross-field pass (single home — validateRPGRules no longer reports
+  // the budget).
+  const findBudgetErr = (errors: ValidationError[]) =>
+    errors.find(
+      (e) => e.code === "CROSS_FIELD_VALIDATION" && e.field === "attributes",
+    );
+
   it("accepts attributes totalling exactly 80", () => {
     const input = minimalCreationInput({
       attributes: { primary: makePrimaryAttributes() },
     });
     // Default makePrimaryAttributes: all 10 → total 80
     const result = validateCharacterCreation(input, "p1", "Player One");
-    const budgetErr = result.errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
-    );
     assert.equal(
-      budgetErr,
+      findBudgetErr(result.errors),
       undefined,
       "should not exceed budget at exactly 80",
     );
@@ -256,9 +286,7 @@ describe("validateCharacterCreation", () => {
     const attrs = makePrimaryAttributes({ accurate: 11 }); // 11+10*7 = 81
     const input = minimalCreationInput({ attributes: { primary: attrs } });
     const result = validateCharacterCreation(input, "p1", "Player One");
-    const budgetErr = result.errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
-    );
+    const budgetErr = findBudgetErr(result.errors);
     assert.ok(budgetErr, "should reject total > 80");
     assert.match(budgetErr!.error, /80/);
   });
@@ -276,9 +304,7 @@ describe("validateCharacterCreation", () => {
     });
     const input = minimalCreationInput({ attributes: { primary: attrs } });
     const result = validateCharacterCreation(input, "p1", "Player One");
-    const budgetErr = result.errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
-    );
+    const budgetErr = findBudgetErr(result.errors);
     assert.ok(budgetErr, "should reject total < 80");
     assert.match(budgetErr!.error, /80/);
   });
@@ -288,14 +314,34 @@ describe("validateCharacterCreation", () => {
     const attrs = makePrimaryAttributes({ accurate: 15, strong: 5 });
     const input = minimalCreationInput({ attributes: { primary: attrs } });
     const result = validateCharacterCreation(input, "p1", "Player One");
-    const budgetErr = result.errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
-    );
     assert.equal(
-      budgetErr,
+      findBudgetErr(result.errors),
       undefined,
       "should accept exactly 80 with max attr",
     );
+  });
+
+  // ── Secondary attributes are server-controlled ────────────────
+
+  it("warns and ignores client-supplied secondary attribute values", () => {
+    // minimalCreationInput seeds defense/painThreshold/… — all
+    // server-controlled recalc output. They warn, never validate, and
+    // never reach validatedData; recalc computes them before first save.
+    const result = validateCharacterCreation(
+      minimalCreationInput(),
+      "p1",
+      "Player One",
+    );
+    assert.equal(result.success, true);
+    const warnFields = result.warnings.map((w) => w.field);
+    assert.ok(warnFields.includes("attributes.secondary.defense"));
+    assert.ok(warnFields.includes("attributes.secondary.toughness.max"));
+    const attrs = result.validatedData!.attributes as {
+      secondary?: { defense?: unknown; toughness?: { current?: unknown } };
+    };
+    assert.equal(attrs.secondary?.defense, undefined);
+    // toughness.current is real state, not derived — it survives.
+    assert.equal(attrs.secondary?.toughness?.current, 10);
   });
 
   // ── RPG rules ─────────────────────────────────────────────────
@@ -468,11 +514,10 @@ describe("validateCharacterUpdate", () => {
     assert.equal(result.validUpdates.length, 0);
   });
 
-  it("push on traits with array value passes validation", async () => {
-    // Previously this crashed in the XP check (reading .cost from array → TypeError).
-    // The XP logic was removed; push operations now pass through the standard
-    // writability + field-type checks. XP validation is not yet reimplemented
-    // (the rpgValidators are currently stubs).
+  it("push on traits passes per-field checks but fails the merged catalog pass", async () => {
+    // Per-field validation only sees "array pushed onto an array field" —
+    // the strict catalog-membership pass over the merged character is
+    // what rejects the malformed entry (no id, not in the catalog).
     const char = makeCharacter({ experience: { total: 50, unspent: 0 } });
     const result = await validateCharacterUpdate(
       [
@@ -484,6 +529,90 @@ describe("validateCharacterUpdate", () => {
       ],
       char,
       "dm",
+    );
+    assert.equal(result.validUpdates.length, 1, "per-field check passes");
+    assert.ok(
+      result.errors.some((e) => e.field.startsWith("traits[")),
+      "merged catalog pass rejects the malformed entry",
+    );
+  });
+
+  // ── Merged-state pass: budget, catalog refs, null parents ──────
+
+  it("rejects a primary-attribute PATCH that breaks the 80 budget", async () => {
+    const result = await validateCharacterUpdate(
+      [{ field: "attributes.primary.strong", value: 11 }],
+      makeCharacter(),
+      "dm",
+    );
+    const budgetErr = result.errors.find(
+      (e) => e.code === "CROSS_FIELD_VALIDATION" && e.field === "attributes",
+    );
+    assert.ok(budgetErr, "merged pass should re-check the budget");
+    assert.match(budgetErr!.error, /81/);
+  });
+
+  it("accepts a rebalancing PATCH that keeps the budget at exactly 80", async () => {
+    const result = await validateCharacterUpdate(
+      [
+        { field: "attributes.primary.strong", value: 11 },
+        { field: "attributes.primary.quick", value: 9 },
+      ],
+      makeCharacter(),
+      "dm",
+    );
+    assert.equal(result.errors.length, 0);
+    assert.equal(result.validUpdates.length, 2);
+  });
+
+  it("rejects a weapons PATCH carrying an unknown quality id (pre-recalc)", async () => {
+    // Regression: this used to sail through validation and blow up as an
+    // ADR-016 `[quality-registry]` throw inside recalc. The catalog pass
+    // now rejects it with a designed error before anything is applied.
+    const result = await validateCharacterUpdate(
+      [
+        {
+          field: "equipment.weapons",
+          value: [
+            {
+              id: "natural_weapon",
+              name: "natural_weapon",
+              type: "natural",
+              damage: 0,
+              qualities: ["own", "never_registered"],
+            },
+          ],
+        },
+      ],
+      makeCharacter(),
+      "owner",
+    );
+    const qualityErr = result.errors.find(
+      (e) => e.code === "UNKNOWN_REFERENCE",
+    );
+    assert.ok(qualityErr, "unknown quality id should be rejected");
+    assert.match(qualityErr!.error, /never_registered/);
+  });
+
+  it("rejects nulling an object-typed parent (equipment)", async () => {
+    const result = await validateCharacterUpdate(
+      [{ field: "equipment", value: null }],
+      makeCharacter(),
+      "owner",
+    );
+    assert.ok(
+      result.errors.some(
+        (e) => e.field === "equipment" && e.code === "VALIDATION",
+      ),
+      "null on a non-nullable object parent is rejected",
+    );
+  });
+
+  it("accepts clearing an armor slot to null via PATCH", async () => {
+    const result = await validateCharacterUpdate(
+      [{ field: "equipment.armor.body", value: null }],
+      makeCharacter(),
+      "owner",
     );
     assert.equal(result.errors.length, 0);
     assert.equal(result.validUpdates.length, 1);
@@ -505,8 +634,12 @@ describe("skipOnCreation", () => {
     assert.equal(skipOnCreation("attributes.primary.accurate", "owner"), true);
   });
 
-  it("returns true for owner + secondary attribute path", () => {
-    assert.equal(skipOnCreation("attributes.secondary.defense", "owner"), true);
+  it("returns false for owner + secondary attribute path (server-controlled)", () => {
+    // Secondary attributes are recalc output — no creation override.
+    assert.equal(
+      skipOnCreation("attributes.secondary.defense", "owner"),
+      false,
+    );
   });
 
   it("returns false for unknown field", () => {
@@ -785,26 +918,18 @@ describe("validateRPGRules", () => {
     assert.ok(xpErr);
   });
 
-  it("returns BUSINESS_RULE error when attribute total exceeds 80", () => {
+  it("does not report the attribute budget (rule lives on the attributes schema hook)", () => {
     const char = makeCharacter({
       attributes: {
         primary: makePrimaryAttributes({ accurate: 11 }), // 81 total
       },
     });
     const errors = validateRPGRules(char);
-    const budgetErr = errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
+    assert.equal(
+      errors.find((e) => e.field === "attributes.primary"),
+      undefined,
+      "budget enforcement moved to rpgValidators.attributePointsValid",
     );
-    assert.ok(budgetErr);
-  });
-
-  it("returns no error for attribute total at exactly 80", () => {
-    const char = makeCharacter();
-    const errors = validateRPGRules(char);
-    const budgetErr = errors.find(
-      (e) => e.code === "BUSINESS_RULE" && e.field === "attributes.primary",
-    );
-    assert.equal(budgetErr, undefined);
   });
 
   it("does not crash with missing attributes or experience", () => {
@@ -817,19 +942,28 @@ describe("validateRPGRules", () => {
 // ── validateCrossFieldRules ───────────────────────────────────────
 
 describe("validateCrossFieldRules", () => {
-  it("returns no errors with correct field list (stubs return true)", () => {
-    // After FIELDS_WITH_VALIDATION fix, the 5 fields with validate fns
-    // all have stub validators that return true
+  it("returns no errors for a valid character with the real validator list", () => {
+    // The fields carrying validate hooks: the attributes budget, the
+    // health range, and the combat carried tuple. makeCharacter satisfies
+    // all three.
     const char = makeCharacter();
     const fieldsWithValidation = [
       "attributes",
       "attributes.secondary.toughness.current",
-      "attributes.secondary.defense",
-      "attributes.secondary.painThreshold",
-      "attributes.secondary.corruptionThreshold",
+      "combat.carried",
     ];
     const errors = validateCrossFieldRules(char, fieldsWithValidation);
     assert.equal(errors.length, 0);
+  });
+
+  it("reports a budget violation through the attributes hook", () => {
+    const char = makeCharacter({
+      attributes: { primary: makePrimaryAttributes({ accurate: 11 }) },
+    });
+    const errors = validateCrossFieldRules(char, ["attributes"]);
+    assert.equal(errors.length, 1);
+    assert.equal(errors[0]!.code, "CROSS_FIELD_VALIDATION");
+    assert.match(errors[0]!.error, /81/);
   });
 
   it("returns no errors with empty field list", () => {

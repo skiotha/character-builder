@@ -89,8 +89,9 @@ when the designer changes the loop.*
   every write. The player-authored base (`attributes.primary`) is **never**
   mutated by the engine.
 - **Where.** Range: `src/models/character.mts`; budget:
-  `validateRPGRules` in `src/models/schema-utils.mts`; base-never-mutated:
-  ADR-015 §3e.
+  `rpgValidators.attributePointsValid` in `src/models/character.mts`,
+  fired through the cross-field pass at creation and on the merged-update
+  pass in `src/models/validation.mts`; base-never-mutated: ADR-015 §3e.
 
 ### ES §primary-effective — enhanced primaries
 

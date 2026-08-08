@@ -29,6 +29,17 @@ export function validateFieldValue(
   const schema = getFieldSchema(fieldPath);
   if (!schema) return { valid: false, error: `Unknown field: ${fieldPath}` };
 
+  // `typeof null === "object"` would sail past the type check below, so
+  // nulls are rejected explicitly unless the field opts in via `nullable`
+  // (the armor slots, where null = "nothing equipped").
+  if (value === null) {
+    if (schema.nullable) return { valid: true };
+    return {
+      valid: false,
+      error: `Field "${fieldPath}" does not accept null`,
+    };
+  }
+
   if (schema.type && typeof value !== schema.type) {
     if (!(schema.type === "array" && Array.isArray(value))) {
       return {
@@ -226,28 +237,10 @@ export function validateRPGRules(
     });
   }
 
-  if ((charData.attributes as Record<string, unknown> | undefined)?.primary) {
-    const primary = (charData.attributes as Record<string, unknown>)
-      .primary as Record<string, number>;
-    const primaryTotal = Object.values(primary).reduce(
-      (sum, val) => sum + (val || 0),
-      0,
-    );
-
-    if (primaryTotal > 80) {
-      errors.push({
-        field: "attributes.primary",
-        error: `Total primary attributes (${primaryTotal}) exceed budget of 80`,
-        code: "BUSINESS_RULE",
-      });
-    } else if (primaryTotal < 80) {
-      errors.push({
-        field: "attributes.primary",
-        error: `Total primary attributes (${primaryTotal}) do not use full budget of 80`,
-        code: "BUSINESS_RULE",
-      });
-    }
-  }
+  // The primary-attribute budget rule (sum exactly 80, ES §primaries)
+  // lives on the `attributes` schema field as
+  // `rpgValidators.attributePointsValid` and fires through the
+  // cross-field pass — at creation and on the merged-update pass.
 
   return errors;
 }

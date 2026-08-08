@@ -203,24 +203,19 @@ describe("getFieldPathsByProperty", () => {
       paths.includes("attributes.secondary.toughness.current"),
       "toughness.current has rpgValidators.currentHealthValid",
     );
+    // Derived secondary fields (defense, painThreshold, …) carry no
+    // validate hooks — they are server-controlled recalc output.
     assert.ok(
-      paths.includes("attributes.secondary.defense"),
-      "defense has rpgValidators.defenseValid",
-    );
-    assert.ok(
-      paths.includes("attributes.secondary.painThreshold"),
-      "painThreshold has rpgValidators.painThresholdValid",
-    );
-    assert.ok(
-      paths.includes("attributes.secondary.corruptionThreshold"),
-      "corruptionThreshold has rpgValidators.corruptionThresholdValid",
+      !paths.includes("attributes.secondary.defense"),
+      "defense is recalc output, no validator",
     );
     assert.ok(
       paths.includes("combat.carried"),
       "combat.carried has validateCombatCarried",
     );
-    // Exactly the 6 schema fields with validate functions
-    assert.equal(paths.length, 6);
+    // Exactly the 3 schema fields with validate functions: the attributes
+    // budget, the health range, and the combat carried tuple.
+    assert.equal(paths.length, 3);
   });
 });
 

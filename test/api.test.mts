@@ -503,7 +503,9 @@ describe("PATCH /api/v1/characters/:id", () => {
   });
 
   it("recalculates derived fields after update", async () => {
-    // Primary attributes are DM-only after creation
+    // Primary attributes are DM-only after creation, and base primaries
+    // must keep the exact-80 budget on every write — so the bump to
+    // strong is compensated by an equal drop elsewhere (rebalance).
     const res = await fetch(`${BASE}/api/v1/characters/${charId}`, {
       method: "PATCH",
       headers: {
@@ -513,6 +515,11 @@ describe("PATCH /api/v1/characters/:id", () => {
       body: JSON.stringify({
         updates: [
           { field: "attributes.primary.strong", value: 15, operation: "set" },
+          {
+            field: "attributes.primary.appealing",
+            value: 5,
+            operation: "set",
+          },
         ],
       }),
     });
@@ -1653,8 +1660,10 @@ describe("Domain layer integration", () => {
       owner,
     );
 
-    // DM-driven PATCH of a primary attribute → server must recalculate
+    // DM-driven PATCH of primary attributes → server must recalculate
     // derived secondary attributes and return them in the response body.
+    // Rebalanced (strong +5 / appealing −5) so the base total keeps the
+    // exact-80 budget the merged-update pass enforces.
     const res = await fetch(`${BASE}/api/v1/characters/${char.id}`, {
       method: "PATCH",
       headers: {
@@ -1666,6 +1675,11 @@ describe("Domain layer integration", () => {
           {
             field: "attributes.primary.strong",
             value: 15,
+            operation: "set",
+          },
+          {
+            field: "attributes.primary.appealing",
+            value: 5,
             operation: "set",
           },
         ],
