@@ -6,6 +6,11 @@ applyTo: "public/**/*.css, public/**/*.html, public/**/*.mjs"
 
 When this rule is in scope because of edits under `public/`, do **not** treat “server started” or a home-page load as sufficient verification. Use **Playwright MCP** or IDE Simple Browser to exercise the affected surface.
 
+Navigation quirks of the current UI — the hidden submit control, silent
+client-side validation, readonly-until-click fields, overlay intercepts —
+are collected in the **ui-navigation-playbook** scoped rule. Consult it
+before driving creation / edit flows.
+
 ## What to do
 
 1. Ensure the app is reachable (`npm run start:dev` → `http://127.0.0.1:3000` unless config says otherwise).

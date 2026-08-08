@@ -99,7 +99,7 @@ The project-agnostic three-scale comment ladder (module header → function doc-
 - **Server `.mts`** — the non-trivial-module header rule: **typescript**. [`src/rules/derived.mts`](src/rules/derived.mts) is the reference shape.
 - **Client `.mjs`** — no TypeScript syntax, client import ordering, and the `@param`/`@returns` JSDoc requirement: **javascript**. [`public/api.mjs`](public/api.mjs) is the reference shape.
 - **DOM / CSS** — ADR-012 widget & modern-CSS preferences: **hypertext**, **styling**.
-- **UI verification** — after `public/` CSS/HTML/client JS edits, exercise the affected view in-browser via Playwright MCP: **ui-browser-verify**.
+- **UI verification** — after `public/` CSS/HTML/client JS edits, exercise the affected view in-browser via Playwright MCP: **ui-browser-verify**. How to actually drive the current (pre-redesign) UI — create/edit flows, hidden submit control, readonly-until-click fields: **ui-navigation-playbook**.
 - **Rules engine** — consult-the-contract-first and the digest-lockstep rule for `docs/rpg-engine-semantics.md`: **rpg-engine-semantics**.
 
 Each scoped rule ships as two mirrored copies with identical bodies: `.cursor/rules/<name>.mdc` (Cursor; attached via `globs` / `alwaysApply`) and `.github/instructions/<name>.instructions.md` (GitHub Copilot; attached via `applyTo`). **When editing one mirror, apply the same edit to the other in the same commit.**
