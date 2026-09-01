@@ -497,15 +497,15 @@ Replaces the original Step 0 / Step 5 outline.
 | H.2   | Real validators (budget, health, strict catalog membership)  | ✅ Done (2026-08-08)  |
 | H.3   | `natural_weapon` unification via registry                    | ✅ Done (2026-09-01)  |
 | H.4   | Tracker & bookkeeping reconciliation                         | ✅ Done (2026-09-01)  |
-| H.5   | Contract docs: data-contracts & sibling integration          | ⏳ Not started        |
+| H.5   | Contract docs: data-contracts & sibling integration          | ✅ Done (2026-09-01)  |
 | I     | Catalog-driven client pickers (closes the usability gap)     | ⏳ Not started        |
 | J     | Real-data engine test suite                                  | ⏳ Not started        |
 
-> **Status (2026-09-01): engine-complete, phase open.** The typed
-> pipeline, per-slot combat model, validators, and catalog wiring shipped
-> with Chunks A–H.4. Outstanding before Phase 6 can close: H.5 (sibling
-> contract docs), Chunk I (usability — catalog-driven client pickers),
-> and Chunk J (real-data engine test suite). Phase 6 is **not** done.
+> **Status (2026-09-01): Chunk H complete — engine-complete, phase open.**
+> The typed pipeline, per-slot combat model, validators, catalog wiring,
+> and contract docs shipped with Chunks A–H. Outstanding before Phase 6
+> can close: Chunk I (usability — catalog-driven client pickers) and
+> Chunk J (real-data engine test suite). Phase 6 is **not** done.
 
 ### Chunk A Deliverables (done)
 

@@ -187,31 +187,36 @@ The canonical shape is locked in [ADR-015 — Typed Effect Targets, Final Vocabu
   "description": "string",
   "target":      EffectTarget,          // typed discriminated union, see below
   "modifier":    EffectModifier,        // per-phase shape, see below
-  "duration":    null                   // null = permanent, or ISO-8601 expiry
+  "duration":    null                   // engine-ignored; effect lifecycle is sibling-owned (NB-35)
 }
 ```
 
-The legacy dotted-path `target` strings, the `add`/`mul`/`set` modifier verbs, and the `priority` field are removed. Phase order replaces priority; effects within a single phase are commutative.
+The legacy dotted-path `target` strings, the `add`/`mul`/`set` modifier verbs, and the `priority` field are removed (ADR-015 §4). Phase order replaces priority (ES §phase-order); effects within a single phase are commutative. `duration` rides the wire untouched — the engine applies every effect it can parse regardless of expiry; lifecycle modelling belongs to sibling apps (ES §out-of-engine).
 
-#### `EffectTarget` (5-kind discriminated union)
+#### `EffectTarget` (8-kind discriminated union)
 
-| `kind`          | Shape                                                       | Notes                                                                  |
-| --------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `secondary`     | `{ kind: "secondary", attribute: SecondaryName }`           | `defense`, `armor`, `toughness.max`, `corruptionMax`, `pain`, `xpMax`. |
-| `combat`        | `{ kind: "combat", field: CombatField }`                    | `baseDamage`, `bonusDamage`, `attackAttribute`.                        |
-| `weaponQuality` | `{ kind: "weaponQuality", quality, appliesTo? }`            | Adds/removes a quality on weapons matching every `WeaponPredicate`.    |
-| `armorQuality`  | `{ kind: "armorQuality", quality, slot? }`                  | Adds/removes a quality on the armor in `slot` (default `body`).        |
-| `flag`          | `{ kind: "flag", name: string }`                            | Boolean toggle consumed by rules / UI.                                 |
+| `kind`                | Shape                                              | Notes                                                                                                                                       |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`             | `{ kind: "primary", stat: PrimaryName }`           | `addFlat` / `cap` only; own pre-pipeline phase writing `attributes.primaryEffective` (ADR-015 §3e).                                          |
+| `secondary`           | `{ kind: "secondary", stat: SecondaryName }`       | `toughness`, `defense`, `armor`, `painThreshold`, `corruptionThreshold`, `corruptionMax`. Gated by `condition?: ArmorCondition[]` (ADR-015 §3f). |
+| `combat`              | `{ kind: "combat", field: CombatField }`           | `baseDamage`, `bonusDamage`, `attackAttribute` (`setBase` only). Narrowed per slot by `appliesTo`.                                           |
+| `weaponQuality`       | `{ kind: "weaponQuality", quality: string }`       | Adds/removes a quality on weapons matching every `WeaponPredicate` in `appliesTo` (ADR-015 §3a).                                             |
+| `armorQuality`        | `{ kind: "armorQuality", quality: string }`        | Adds/removes a quality per armor piece; gated by `condition?: ArmorCondition[]` (ADR-015 §3f) — there is **no** `slot` key.                  |
+| `flag`                | `{ kind: "flag", name: string }`                   | Set-membership toggle consumed by rules / UI (ADR-015 §3a).                                                                                  |
+| `magicAttribute`      | `{ kind: "magicAttribute" }`                       | `setBase` only — re-points the spell-power roll attribute (ES §magic-initiative).                                                            |
+| `initiativeAttribute` | `{ kind: "initiativeAttribute" }`                  | `setBase` only — same mechanism for initiative rolls.                                                                                        |
+
+`appliesTo` and `condition` live on the **effect object**, not inside the target; the per-kind accept-list is ADR-015 §placement-table.
 
 `CheckTarget` is dropped — checks are derived from primaries/secondaries, not modified directly.
 
 #### `WeaponPredicate` (AND-composed)
 
 ```jsonc
-{ "kind": "any" | "type" | "quality" | "id", "values": ["string"] }
+{ "kind": "type" | "quality" | "id", "values": ["string"] }   // or { "kind": "any" } (no values)
 ```
 
-`appliesTo: WeaponPredicate[]` is AND-composed; default is a single `{ kind: "any", values: [] }`. Predicate `kind: "subtype"` is **not** part of the vocabulary.
+`appliesTo: WeaponPredicate[]` is AND-composed across entries, OR within `values[]`; default is a single `{ kind: "any" }`. Predicate `kind: "subtype"` is **not** part of the vocabulary.
 
 > **Conditional secondaries are skipped.** `appliesTo` narrows per-slot
 > `combat` / `weaponQuality` / `flag` effects. On a character-level
@@ -221,13 +226,13 @@ The legacy dotted-path `target` strings, the `add`/`mul`/`set` modifier verbs, a
 > sometimes-true bonus into the aggregate — e.g. a "+1 defense while
 > wielding a staff" would otherwise apply bare-handed). The effect and its
 > predicate still ride to sibling apps as documentary data; a UI surface
-> is deferred. Tracked in NB-34.
+> is deferred. Tracked in NB-34; system rationale in ES §conditional-secondary.
 
 #### `EffectModifier` (per phase)
 
 | `type`       | Shape                                          | Phase                       |
 | ------------ | ---------------------------------------------- | --------------------------- |
-| `setBase`    | `{ type: "setBase", value: string \| number }` | Base swap (e.g. attribute). |
+| `setBase`    | `{ type: "setBase", value: string }`           | Base swap — `value` is a **primary-attribute name**; competing candidates resolve default-inclusive max-by-primary (ADR-015 §4a, ES §setbase). |
 | `addFlat`    | `{ type: "addFlat", value: number }`           | Flat add after formula.     |
 | `multiply`   | `{ type: "multiply", value: number }`          | Multiplicative.             |
 | `cap`        | `{ type: "cap", value: number }`               | Upper bound.                |
@@ -237,7 +242,7 @@ Invariant: negatives are only ever **removed**; positives only ever **added**. T
 
 #### Canonical reference vocabularies
 
-Sourced from the reference files in `data/`:
+Sourced from the reference catalogs in `reference/`:
 
 | Domain          | Allowed values                                                                                                                                             |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -249,6 +254,27 @@ Sourced from the reference files in `data/`:
 | Quality `id`    | See `reference/qualities.{locale}.json` (ADR-016). Single namespace shared by weapons and armor; parametric variants use `_N` suffix (e.g. `fortified_2`).      |
 
 The armor reference field formerly named `defense` is now `armor` — it is the mitigation source for `secondary.armor`. The transition fallback for `equipment.armor.body.defense` was removed; existing characters must be re-saved or wiped.
+
+#### Validation contract (writes)
+
+Catalog membership is **strict** — reference catalogs are the sole source
+of truth and neither the website UI nor sibling apps may invent items:
+
+- Every id in `equipment.weapons[]`, `equipment.armor.body/.plug`,
+  `traits[]`, `talents[]`, `rituals[]`, and `traditions[]` must resolve in
+  its catalog; every item `qualities[]` id must resolve in the quality
+  registry (ADR-016).
+- Structural rules ride along: armor entry `slot` must match its position;
+  trait `tier ∈ {novice, adept, master}` with `source` consistent with
+  where the id resolved; talent `level` within `1..levels` from the
+  catalog entry; base primaries each 5–15 summing to exactly 80
+  (ES §primaries); `0 ≤ toughness.current ≤ toughness.max`.
+- Rejection vocabulary: creation failures return **400** naming the
+  offending id/field; PATCH failures return **422** (all-or-nothing —
+  "Some updates failed"). Client-supplied server-controlled fields at
+  creation are warn-and-ignored, not rejected.
+- `effects[]` is deliberately exempt: malformed entries are warn-and-skip
+  at recalc, never a write error (the raw boundary is the NB-35 design).
 
 #### Combat shape (ADR-014)
 

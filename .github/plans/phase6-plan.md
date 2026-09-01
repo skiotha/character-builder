@@ -1567,6 +1567,45 @@ above; executed in Chunk H.3 (NB-45).
 
 ### H.5 — Contract docs: data-contracts & sibling integration (docs)
 
+> **✅ Completed 2026-09-01.** Docs-only pass; 698 / 698 tests green
+> (`adr-anchors` lint passes over the new ADR-015 cites). Notes against
+> the outline:
+>
+> - **Steps 1–4 landed as listed.** `data-contracts.md` §1.1 now carries
+>   the 8-kind table (`stat` discriminator, `condition` gate on
+>   `armorQuality`, `setBase` value = primary name, `duration`
+>   engine-ignored) plus a new "Validation contract (writes)" block
+>   documenting H.2's strict membership and the 400 (creation) / 422
+>   (PATCH, all-or-nothing) vocabulary. Addon §8 rewritten consume-verbatim
+>   (no `priority`, no pipeline instruction to `Core/Effects.lua`); §2.5
+>   surfaces the full derived export (per-slot fields, `flags` /
+>   `specialAttacks` / `reactions`, `primaryEffective`,
+>   `magicAttribute` / `initiativeAttribute`); §9 uses `source` +
+>   tier/level split. Bot doc gained §2.3 (derived read surface, 3-slot,
+>   no `combat.active`, declarative actions) and §4.5 (strict-membership
+>   write contract).
+> - **User-approved riders (2026-09-01), beyond the outline:** addon §10
+>   table reconciled (§7 + `schemaVersion` marked shipped, rest marked
+>   deferred, on-hold banner); one-liner deferred-until-roadmap-completes
+>   status on the unbuilt surfaces (addon header covering §2/§5/§6, bot
+>   §3 `discordId`); both doc headers reframed — originally
+>   sibling-authored, **maintained website-side while sibling development
+>   is paused**, sibling-side review owed on resume.
+> - **schemaVersion ruling:** consistent at **2** everywhere; §3 gained a
+>   crisp note that bump discipline is **suspended** while the website is
+>   the sole consumer — no bumps until sibling consumption begins.
+> - **Sibling-repo debts parked, not executed** (sibling freeze): the
+>   digest plan's outstanding cross-repo pointer lines and the post-H.5
+>   mirror reconciliation (`nagara-addon`/`malizia` `data-contracts.md`)
+>   are recorded in `cross-repo-conventions-plan.md` under a new "Parked
+>   sibling-side updates" section — previously the pointer-line debt lived
+>   only in repo memory.
+> - **Sweep clean:** `src/` and `public/` have zero hits for
+>   `combat.active` / `mul` verbs / dotted-path targets /
+>   `bonusDamage: number[]`; remaining `docs/` mentions are negations
+>   ("there is no …") or exempt historical context (ADR-011/014/015,
+>   roadmap relocation notes).
+
 **Steps**
 
 1. **`docs/data-contracts.md` §1.1 reconciliation** (the Action shape,

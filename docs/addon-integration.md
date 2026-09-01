@@ -1,7 +1,13 @@
 # Nagara Website — Addon Integration Specification
 
 > Requirements the WoW addon places on the website.
-> This document lives in the website repo but is authored by the addon side.
+> This document lives in the website repo. It was originally authored by
+> the addon side; **addon development is paused until the website roadmap
+> completes**, so it is currently maintained website-side — the contract
+> content below reflects the server as shipped, with sibling-side review
+> owed when addon work resumes. The endpoints in §2, §5 and §6 are
+> specified but **not yet implemented**; that work is deferred to the
+> sibling-resume milestone.
 > Addon-side contracts and architecture:
 > [`nagara-addon/docs/data-contracts.md`](https://github.com/skiotha/nagara-addon/blob/main/docs/data-contracts.md),
 > [`nagara-addon/docs/architecture.md`](https://github.com/skiotha/nagara-addon/blob/main/docs/architecture.md).
@@ -90,11 +96,12 @@ For clarity, the exported object should contain exactly:
   "corruption":      { "permanent", "temporary" },
 
   "attributes": {
-    "primary":   { "accurate", "cunning", "discreet", "appealing",
-                   "quick", "resolute", "vigilant", "strong" },
-    "secondary": { "toughness": { "max", "current" },
-                   "painThreshold", "corruptionThreshold", "defense",
-                   "armor", "corruptionMax" }
+    "primary":          { "accurate", "cunning", "discreet", "appealing",
+                          "quick", "resolute", "vigilant", "strong" },
+    "primaryEffective": { /* same eight keys — server-derived, may exceed 15 */ },
+    "secondary":        { "toughness": { "max", "current" },
+                          "painThreshold", "corruptionThreshold", "defense",
+                          "armor", "corruptionMax" }
   },
 
   "traits":          [],
@@ -103,13 +110,26 @@ For clarity, the exported object should contain exactly:
   "effects":         [],
   "traditions":      [],
 
+  // Server-derived roll pointers (ADR-015 §3c/§3d) — which primary
+  // spell-power and initiative rolls use. Consume verbatim.
+  "magicAttribute":      "resolute",
+  "initiativeAttribute": "quick",
+
   "combat": {
-    "carried": [Slot|null, Slot|null, Slot]   // ADR-014; Slot = { weaponIndex }; own slot (index 2) required (own quality)
+    // ADR-014; Slot = { weaponIndex, ...derived }; own slot (index 2) required (own quality).
+    // Each occupied slot carries engine-derived fields: attackAttribute,
+    // baseDamage, bonusDamage, qualities, flags.
+    "carried": [Slot|null, Slot|null, Slot]
   },
+
+  // Derived collections — pure recalc output, consume verbatim (do not re-dedupe):
+  "flags":           [],             // character-level flag set
+  "specialAttacks":  [],             // Action[] with trigger === "manual"
+  "reactions":       [],             // Action[] with other triggers
 
   "equipment": {
     "money", "weapons", "ammunition",
-    "armor": { "body", "plug" },
+    "armor": { "body", "plug" },     // pieces may carry qualitiesEffective (server overlay; fall back to qualities)
     "runes",
     "assassin", "tools",
     "inventory": { "carried", "home" },
@@ -126,14 +146,31 @@ For clarity, the exported object should contain exactly:
 }
 ```
 
+Everything marked derived above (`primaryEffective`, `secondary`, the
+per-slot fields, `magicAttribute` / `initiativeAttribute`, `flags`,
+`specialAttacks`, `reactions`) is recalculated by the website's engine on
+every save. The addon **consumes these outputs verbatim** — it does not
+run effect pipelines or recompute derived stats (see §8). Weapon swapping
+during play is addon-side and not persisted per-swap; declarative action
+fields (`damageBonus`, `ignoresArmor`, `inflicts`, `isFree`, `appliesTo`)
+are resolved by the addon against the live carried weapon at play time
+(data-contracts §1.1, ES §actions-declarative). There is no
+`combat.active` field — the 3-slot `carried` tuple is the whole model.
+
 ---
 
 ## 3. Schema Versioning
 
 The website must include a `schemaVersion` field (integer) in every exported character. The addon uses it to detect format changes and run migrations.
 
-- Current version: **1**.
+- Current version: **2** (the server stamps 2 on every character).
 - When the character schema changes in a way that affects the addon, bump this number **and** coordinate with the addon repo so a matching migration is added to `Core/CharSheet.lua`.
+
+> **Bump discipline is suspended** while the website is the only consumer
+> of character data (sibling development paused). Schema changes before
+> production land without a version bump; the number stays at 2 until
+> sibling consumption begins, at which point the coordinate-and-bump rule
+> above takes effect.
 
 The `schemaVersion` is **not** the same as the website's internal data version or the API version. It tracks the shape of the data the addon expects.
 
@@ -287,7 +324,9 @@ These return the full dataset for each category as JSON arrays. The addon's `scr
 
 ## 8. Effect Object Schema
 
-Effects are the most structurally complex piece of shared data. Both sides must agree on the shape. An effect object looks like:
+Effects ride the wire fully typed; the canonical shape is
+[data-contracts §1.1](data-contracts.md) (locked by ADR-015). An effect
+object looks like:
 
 ```jsonc
 {
@@ -295,47 +334,62 @@ Effects are the most structurally complex piece of shared data. Both sides must 
   "source":      "ability" | "spell" | "item" | "ritual" | "rule",
   "name":        "string",
   "description": "string",
-  "target":      "string",           // dotted path, e.g. "attributes.secondary.defense"
-  "modifier": {
-    "type":  "setBase" | "addFlat" | "multiply" | "cap",
-    "value": "string | number"       // attribute name or numeric amount
-  },
-  "priority":    "number",           // lower = applied first
-  "duration":    "number | null"     // null = permanent
+  "target":      { "kind": "..." },  // 8-kind discriminated union (data-contracts §1.1)
+  "modifier":    { "type": "..." },  // setBase | addFlat | multiply | cap | remove
+  "duration":    null                // engine-ignored; lifecycle is addon-side
 }
 ```
 
-The addon's `Core/Effects.lua` processes these in priority order using the pipeline: `setBase → addFlat → multiply → cap`. The website should produce effects that follow this structure and ordering convention.
+There is **no `priority` field** and no priority-ordered processing: the
+website's engine resolves the full pipeline on every save, and the
+character the addon receives already carries the outcomes as derived
+fields (§2.5). The addon does **not** run an effect pipeline —
+`Core/Effects.lua` should treat `effects[]` as documentary data (display,
+tooltips) plus the declarative fields it resolves at play time
+(`appliesTo` predicates against the live carried weapon, action fields
+per data-contracts §1.1). Dotted-path `target` strings and the legacy
+`add` / `mul` / `set` modifier verbs no longer exist on the wire.
 
 ---
 
 ## 9. Trait Object Schema
 
+Learned entries on the character use a source discriminator, not a
+`category` field, and split tier/level by family
+(data-contracts §1.2):
+
 ```jsonc
-{
-  "id": "string",
-  "name": "string",
-  "category": "string", // e.g. "ability", "spell", "talent", "ritual"
-  "tier": "string | null", // "novice", "adept", "master", or null
-  "description": "string",
-}
+// traits[] — abilities and spells (tier model)
+{ "id": "string", "tier": "novice" | "adept" | "master", "source": "ability" | "spell" }
+
+// talents[] — sins and boons (level model)
+{ "id": "string", "level": 1, "source": "sin" | "boon" }
+
+// rituals[] (level model, no source)
+{ "id": "string", "level": 1 }
 ```
+
+`name` / `description` are **not** stored on the character — the addon
+resolves them from its baked static database by `id` (§7).
 
 ---
 
 ## 10. Summary of Required Work
 
-| Priority | Item                                    | Type           | Section |
-| -------- | --------------------------------------- | -------------- | ------- |
-| **P0**   | `GET .../export/addon` endpoint         | New endpoint   | §2      |
-| **P0**   | Serializer (Lua-compat or JSON)         | New utility    | §4      |
-| **P0**   | Base64 encoder                          | New utility    | §4.2    |
-| **P1**   | `POST .../import/addon` (paste-export)  | New endpoint   | §5      |
-| **P1**   | "Update from Addon" UI page             | New page       | §5.2    |
-| **P1**   | `POST .../sync` (DM sync)               | New endpoint   | §6      |
-| **P1**   | DM token issuance                       | Config / admin | §6.3    |
-| **P2**   | Static data endpoints (spells, etc.)    | New endpoints  | §7      |
-| **P2**   | `schemaVersion` field in character data | Schema change  | §3      |
+> **On hold** — all remaining items below are deferred until the website
+> roadmap completes and sibling development resumes.
+
+| Priority | Item                                    | Type           | Section | Status |
+| -------- | --------------------------------------- | -------------- | ------- | ------ |
+| **P0**   | `GET .../export/addon` endpoint         | New endpoint   | §2      | deferred |
+| **P0**   | Serializer (Lua-compat or JSON)         | New utility    | §4      | deferred |
+| **P0**   | Base64 encoder                          | New utility    | §4.2    | deferred |
+| **P1**   | `POST .../import/addon` (paste-export)  | New endpoint   | §5      | deferred |
+| **P1**   | "Update from Addon" UI page             | New page       | §5.2    | deferred |
+| **P1**   | `POST .../sync` (DM sync)               | New endpoint   | §6      | deferred |
+| **P1**   | DM token issuance                       | Config / admin | §6.3    | deferred |
+| **P2**   | Static data endpoints (spells, etc.)    | New endpoints  | §7      | ✅ shipped |
+| **P2**   | `schemaVersion` field in character data | Schema change  | §3      | ✅ shipped (stamps 2) |
 
 P0 = needed before the addon's paste-import implementation.
 P1 = needed before the addon's website-sync feature.

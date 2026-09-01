@@ -1,7 +1,11 @@
 # Nagara Website — Bot Integration Specification
 
 > Requirements the Discord bot places on the website.
-> This document lives in the website repo but is authored by the bot side.
+> This document lives in the website repo. It was originally authored by
+> the bot side; **bot development is paused until the website roadmap
+> completes**, so it is currently maintained website-side — the contract
+> content below reflects the server as shipped, with sibling-side review
+> owed when bot work resumes.
 > Bot-side contracts and architecture:
 > [malizia/docs/data-contracts.md](https://github.com/skiotha/malizia/blob/main/docs/data-contracts.md),
 > [malizia/docs/architecture.md](https://github.com/skiotha/malizia/blob/main/docs/architecture.md).
@@ -69,11 +73,33 @@ The bot depends on the structure of `index.json` and the character JSON schema. 
 
 Node.js `writeFile` on Linux (write-to-temp + rename) is atomic, so the bot will not encounter partial writes when reading files the website is updating. No locking or coordination mechanism is needed.
 
+### 2.3 Derived Read Surface
+
+Character files carry engine-derived state alongside authored data. The
+bot **consumes these verbatim** and never runs effect pipelines or
+recomputes derived stats:
+
+- `attributes.primaryEffective` / `attributes.secondary` — recalc output.
+- `combat.carried` is a 3-slot tuple (main-hand, off-hand, own; ADR-014) —
+  there is **no** `combat.active` field. Each occupied slot carries derived
+  `attackAttribute`, `baseDamage`, `bonusDamage`, `qualities`, `flags`.
+- Top-level `flags`, `specialAttacks`, `reactions` — derived collections;
+  do not re-dedupe.
+- `magicAttribute` / `initiativeAttribute` — server-derived roll pointers:
+  which primary the bot rolls for spell power and initiative.
+- Actions are **declarative** (data-contracts §1.1, ES §actions-declarative):
+  the bot resolves `damageBonus` / `ignoresArmor` / `appliesTo` and omitted
+  `damage` / `attackAttribute` defaults against the live carried weapon at
+  roll time; weapon swaps are bot-session state, not persisted per-swap.
+  Status lifecycle (`inflicts`, effect `duration`) is bot-owned — the
+  engine treats both as opaque pass-through.
+
 ---
 
 ## 3. Schema Extension: Discord Identity
 
-**New field.** Does not exist yet.
+**New field.** Does not exist yet — deferred until the website roadmap
+completes and bot development resumes.
 
 The bot needs to map Discord user IDs to characters so that players can update their own data and DMs can target specific players.
 
@@ -166,6 +192,18 @@ Standard website update format:
   ]
 }
 ```
+
+### 4.5 Write Validation Contract
+
+Catalog membership is **strict** (data-contracts §1.1 "Validation
+contract"): any id the bot writes into `equipment.weapons[]`,
+`equipment.armor.*`, `traits[]`, `talents[]`, `rituals[]`, or
+`traditions[]` — and every item `qualities[]` id — must resolve in the
+website's `reference/` catalogs. The bot must not invent items. Failed
+PATCHes return **422** (all-or-nothing) naming the offending field;
+derived fields (per-slot combat values, `flags`, `specialAttacks`,
+`reactions`, secondaries, `primaryEffective`) are rejected on write —
+the engine recalculates them on every save.
 
 ---
 

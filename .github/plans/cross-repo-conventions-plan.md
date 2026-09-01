@@ -48,6 +48,31 @@ rules, without per-repo drift.
 - **Per-sibling adoption scope.** Full bundle vs. universal subset, decided
   per sibling based on what scaffolding (ADRs, bug trackers) it has.
 
+## Parked sibling-side updates (out of bundle scope, same trigger)
+
+Not conventions-bundle work, but sibling-repo changes deliberately frozen
+until the same wake-up trigger (siblings resume after the website roadmap
+completes). Parked here so they live in a plan, not only in agent memory.
+
+- **Engine-semantics digest pointer lines** — the archived
+  [`done/engine-semantics-digest-plan.md`](done/engine-semantics-digest-plan.md)
+  closed with its cross-repo half outstanding: add pointer lines in
+  nagara-addon and malizia docs referencing
+  `character-builder/docs/rpg-engine-semantics.md` as the canonical
+  system-facts digest.
+- **Contract-doc mirror reconciliation (post-H.5)** — Phase 6 H.5
+  (2026-09-01) rewrote the contract content website-side
+  (`docs/data-contracts.md`, `docs/addon-integration.md`,
+  `docs/bot-integration.md`): 8-kind `EffectTarget`, no `priority`,
+  `schemaVersion` 2, derived export surface (per-slot combat fields,
+  `flags` / `specialAttacks` / `reactions`, `primaryEffective`,
+  `magicAttribute` / `initiativeAttribute`), strict catalog-membership
+  write contract. The sibling-side mirrors
+  (`nagara-addon/docs/data-contracts.md`, `malizia/docs/data-contracts.md`)
+  lag until reconciled on resume; sibling-side review of the
+  website-maintained integration docs is owed at the same time (their
+  headers say so).
+
 ## References to sweep on completion
 
 - _(none yet — this plan owns no in-code `TODO(<scope>)` sites.)_
