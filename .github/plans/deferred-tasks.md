@@ -33,15 +33,17 @@
 | **§3 Combat dual-wield** | ✅ Subsumed | Replaced wholesale by the per-slot model in **ADR-014**. Kept for historical context only; nothing to implement. |
 | ~~§4~~ | ✅ Relocated | Client weapon-pickers moved to the roadmap's later polish phase (see [`docs/roadmap.md`](../../docs/roadmap.md)); no longer in this file. |
 
-> **Orphans still needing a home (2026-07-01):**
+> **Orphans — deliberately parked (2026-08-07 ruling, during the Chunk-H
+> re-scope; annotated in the H.4 sweep, 2026-09-01). Nothing in this file is
+> actionable:**
 > 1. **`reference/runes.*.json`** — the runic-tattoo catalog (max 3 runes
->    per character) was never authored; only loosely mentioned by **NB-14**.
->    If runes are still in scope, give this a roadmap slot or a tracked bug;
->    if not, delete §2's runes block.
-> 2. **`traditions` as a separate file** — the open §2 micro-decision. The
->    live schema stores `traditions[]` as ability ids with no separate
->    catalog, so it is *de facto* “no separate file” — just never formally
->    closed. Low stakes.
+>    per character) was never authored. Stays parked; tracked open as
+>    **NB-14** in [`.github/bugs/engine.md`](../bugs/engine.md) (slimmed to
+>    this orphan). Gets a roadmap slot if runes come back into scope.
+> 2. **`traditions` as a separate file** — stays "no separate file", also
+>    parked. The live schema stores `traditions[]` as curated ability ids,
+>    and the Chunk-H.2 catalog-membership validator resolves them against
+>    `reference/abilities` — the de facto answer is now load-bearing.
 
 ---
 

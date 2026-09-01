@@ -7,61 +7,7 @@
 > See [`README.md`](README.md) for the `NB-N` id scheme, the severity rubric,
 > and the filing / closing procedure. Cite a bug from code as `NB-<n>`.
 
-## CRITICAL — Must Fix Before Building On
-
-### NB-1. Entire rules engine uses `Record<string, unknown>` instead of typed `Character`
-- **Where:** `src/rules/derived.mts`, `src/rules/attributes.mts`, `src/rules/applicator.mts`
-- **Impact:** All TypeScript interfaces from rpg-types.mts provide zero compile-time safety in the rules engine. Every property access is an unsafe cast chain. Schema changes break silently at runtime.
-- **Fix:** ADR-010 — pipeline operates on typed `Character` state (or a derived computation type). Functions receive typed sub-structures (`PrimaryAttributes`, `Combat`, etc.) not opaque records.
-- **Status:** ❌ Open — Phase 6 Chunk C (engine rewrite gate)
-
-### NB-2. No guaranteed effect ordering — numeric priority is insufficient
-- **Where:** `src/rules/derived.mts` — `allEffects.sort((a, b) => (a.priority || 10) - (b.priority || 10))`
-- **Impact:** Modifier math has strict ordering requirements: setBase MUST run before addFlat, addFlat before multiply, multiply before cap. Current system relies on data authors setting the right priority number. Wrong priority = silent math errors.
-- **Fix:** ADR-010 + ADR-015 — explicit phase enum, `priority` field dropped entirely.
-- **Status:** ❌ Open — Phase 6 Chunk C (engine rewrite gate)
-
 ## HIGH — Significant Risk
-
-### NB-19. rpg-types `EffectModifier.value: number` is wrong for setBase
-- **Where:** `src/rpg-types.mts` `EffectModifier` interface — `value: number`
-- **Impact:** `setBase` effects carry attribute name strings (e.g., `"discreet"`), not numbers. The type lies. Any code trusting the type for setBase values gets wrong results silently.
-- **Fix:** Change to `value: number | string` or better: ADR-010 defines proper modifier types per phase.
-- **Status:** ❌ Open — Phase 6 Chunk C
-
-### NB-20. Rules modules bypass rpg-types interfaces entirely
-- **Where:** `src/rules/applicator.mts` defines local `Modifier` with `value: unknown`. `src/rules/derived.mts` defines local `RuleEffect` with `modifier: { type: string; value: unknown }`. Neither imports from `rpg-types.mts`.
-- **Impact:** The shared types in rpg-types.mts provide zero compile-time safety in the rules engine. Two parallel type hierarchies that can diverge.
-- **Fix:** Subsumed by Phase 6 Chunk C — rewrite to use typed Character and canonical effect types.
-- **Status:** ❌ Open — Phase 6 Chunk C. Discovered in Phase 4 Session 4 testing.
-
-### NB-3. Dotted-path string targeting is fragile
-- **Where:** `src/rules/applicator.mts` — `applyEffect(character, targetPath, modifier)`, effect data uses `"attributes.secondary.defense"` strings
-- **Impact:** Can't be validated at compile time. Breaks silently on field renames. Planned array syntax (`"equipment.weapons[].qualities"`) makes traversal even more complex. Requires custom `getNestedValue`/`setNestedValue` which are themselves untyped.
-- **Fix:** ADR-015 — Typed discriminated-union targets (`{ kind: 'secondary', attribute: 'defense' }`). Gives exhaustive switch/case, refactor safety, autocomplete.
-- **Coexistence:** Must work alongside schema-driven renderer (ADR-009). Schema renderer uses dotted paths for data binding — effect targets can use typed unions internally while schema paths remain strings for UI. These are different concerns.
-- **Status:** ❌ Open — Phase 6 Chunk C
-
-### NB-4. Magic `"rules."` prefix convention for setBase detection
-- **Where:** `src/rules/derived.mts` — `effect.target?.startsWith("rules.")` + `target.split(".")[1]`
-- **Impact:** Undocumented convention baked into implementation. Only works for secondary attribute overrides. Won't generalize to combat attribute overrides, quality manipulation, or Tier B flags.
-- **Fix:** Subsumed by ADR-010 + ADR-015 — explicit phase enum makes setBase a phase, not a prefix pattern. Typed targets eliminate the need for string prefix parsing.
-- **Status:** ❌ Open — Resolved by Phase 6 Chunk C
-
-### NB-5. Dual/triple effect sources with no unified collection
-- **Where:** `src/rules/derived.mts` — three separate code paths:
-  1. `character.effects[]` (temporary) — filtered at top of recalculateDerivedFields
-  2. Ability/spell effects — NOT yet implemented (planned for Phase 6 Chunk E)
-  3. Equipment effects — handled separately in `applyEquipmentBonuses()`
-- **Impact:** Effects from different sources are processed at different points in the pipeline with different logic. No single place where "all effects on this character" is visible. Makes debugging and testing harder.
-- **Fix:** ADR-010 — explicit `collectAllEffects()` step that merges all sources into a single typed array before pipeline processing.
-- **Status:** ❌ Open — Phase 6 Chunk C (gate); data wired in Chunk E
-
-### NB-6. Applicator uses wrong modifier verb names
-- **Where:** `src/rules/applicator.mts` — `case "add"` / `case "mul"` / `case "set"`
-- **Impact:** Misaligned with canonical spec (`setBase`/`addFlat`/`multiply`/`cap`). Code and spec disagree. Any data using canonical names will fall through to the `default` case (no-op).
-- **Fix:** Rename when applicator is reworked in Phase 6 Chunk C; reference data updated in bulk in Chunk F.
-- **Status:** 📋 Already tracked — Phase 6 Chunks C + F, deferred-tasks §1.6
 
 ### NB-34. `secondary` + `appliesTo` has no engine semantics
 - **Where:** `src/rules/effects.mts` (parser), `src/rules/applicator.mts` (`secondary` apply paths). Authoring discovered: 9 abilities/spells carry `target.kind: "secondary"` effects with a `WeaponPredicate` `appliesTo` (e.g. Oils Novice, Cloak Dance Novice, Staff Mastery Novice ×2, Double Strike Novice, Shields Novice, Berserk Adept, Soldier Novice, Spirit Path Adept).
@@ -72,18 +18,6 @@
 - **Status:** ⚠️ Open — interim behavior is skip-not-apply (Chunk G.1); the conditional-secondary feature + UI surface are deferred to Phase 8.
 
 ## MEDIUM — Address During Engine Work
-
-### NB-21. Double toughness clamping (redundant logic)
-- **Where:** `src/rules/derived.mts` — `clampValues()` clamps `toughness.current` to `[0, max]`, then `enforceConsistency()` does the exact same clamping again a few lines later.
-- **Impact:** Wastes cycles, confuses readers about which stage "owns" clamping. If logic diverges later, creates subtle bugs.
-- **Fix:** Remove the duplicate from `enforceConsistency()` (ADR-010 pipeline separates these stages cleanly).
-- **Status:** ❌ Open — Phase 6 Chunk C. Discovered in Phase 4 Session 4 testing.
-
-### NB-22. Nested effects on RuleEffect never unwound
-- **Where:** `src/rules/derived.mts` — `allEffects` is `character.effects[]` only. RuleEffect type DOES have an `effects?` sub-array, but recalculateDerivedFields never recurses into it.
-- **Impact:** If any effect has child effects (conditional or triggered), they're silently ignored.
-- **Fix:** ADR-010 `collectAllEffects()` should recursively unwrap nested effect arrays.
-- **Status:** ❌ Open — Phase 6 Chunk C. Discovered in Phase 4 Session 4 testing.
 
 ### NB-33. Registry quality effects don't recurse — engine-added qualities are inert
 - **Where:** `src/rules/effects.mts` `collectAllEffects` / `appendArmorQualityEffects` (and the symmetric weapon path in `src/rules/derived.mts` `buildSlot`, which expands `weapon.qualities` once via the registry).
@@ -98,27 +32,12 @@
   3. **Inline expansion at apply-time.** When the applicator adds quality X, look X up in the registry and append its effects to a worklist for the same flag phase. Same cycle risk; phase ordering becomes implicit-DAG rather than fixed.
 - **Status:** ❌ Open — deferred. Discovered 2026-05-09 alongside Chunk-F-postpass Item 3 review. Tracker only; no work scheduled. Lean toward Option 1 unless authoring proves it doesn't scale.
 
-### NB-10. `effects.mts` and `registry.mts` are empty files
-- **Where:** `src/rules/effects.mts`, `src/rules/registry.mts`
-- **Impact:** Placeholder files with no implementation. Effect resolution and ability lookup don't exist yet.
-- **Fix:** Will be populated in Phase 6 Chunks C (effects pipeline) and E (ability registry lookup).
-- **Status:** 📋 Phase 6 Chunks C + E
-
 ## LOW — Track But Not Blocking
 
-### NB-12. 📋 No evaluation engine for conditional effects (Tier B)
-- **Where:** Planned in deferred-tasks §1.3 (Tier B vocabulary definition)
-- **Impact:** Many abilities have conditions ("when wielding heavy weapons", "when wearing no armor"). These remain text-only until a condition evaluator exists.
-- **Status:** 📋 Phase 6 Chunks C/E
-
-### NB-13. 📋 Effect data in reference files is free-text, not normalized
-- **Where:** `reference/abilities.en.json`, `reference/spells.en.json` — ~654 tier effects
-- **Impact:** Engine can't process any ability effect until normalization is done.
-- **Status:** 📋 Phase 6 Chunk F (bulk normalization)
-
-### NB-14. 📋 Reference data files missing (weapons, armor, runes)
-- **Where:** Planned in deferred-tasks §2
-- **Status:** 📋 Weapons + armor exist (armor refreshed in Chunk A); relocation to `reference/` in Chunk B; runes still pending.
+### NB-14. 📋 Rune reference data (`runes.*.json`) was never authored
+- **Where:** `reference/` — no `runes.{en,ru}.json` exists. Originally scoped in deferred-tasks §2 alongside the weapons + armor catalogs (both long shipped; entry slimmed to the runes orphan in the Chunk-H.4 sweep, 2026-09-01).
+- **Impact:** Runes (max 3 runic tattoos per character) have no catalog, no schema field, and no engine representation; they exist only in the rules vault. Nothing consumes them today.
+- **Status:** 📋 Open — formally parked per the 2026-08-07 ruling; see the orphan note in `.github/plans/deferred-tasks.md`. Gets a roadmap slot if runes come back into scope.
 
 ## DEFERRED — Track for later, not currently scoped
 

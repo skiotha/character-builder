@@ -466,8 +466,8 @@ reaction collections, and fully normalized reference data so that derived
 stats reflect equipped weapons and learned traits.
 
 **Detailed plan:** [phase6-plan.md](../.github/plans/phase6-plan.md) —
-8 chunks (A–H), each independently reviewable. Replaces the original
-Step 0 / Step 5 outline.
+chunks A–J (H split into H.1–H.5), each independently reviewable.
+Replaces the original Step 0 / Step 5 outline.
 
 **Basis:** [ADR-010](decisions/010-effect-resolution-pipeline.md),
 [ADR-014](decisions/014-per-slot-combat-special-attacks.md),
@@ -490,10 +490,22 @@ Step 0 / Step 5 outline.
 | D     | Schema migration: `Combat` + `specialAttacks` / `reactions`  | ✅ Done (2026-04-24)  |
 | E     | Combat phase per-slot fanout + weapon predicates             | ✅ Done (2026-04-25)  |
 | F.0   | Reference layout refactor (locale merge + quality registry)  | ✅ Done (2026-04-27)  |
-| F     | Effect normalization (data, collaborative bulk edit)         | ✅ Done — inheritance runtime → G |
-| G     | Wire trait/talent registry into recalc + per-weapon inheritance resolver | Not started       |
-| H     | Validators, sibling docs, cleanup (incl. `natural_weapon` unification) | Not started |
-| I     | Catalog-driven client pickers (closes the usability gap)     | Not started           |
+| F     | Effect normalization (data, collaborative bulk edit)         | ✅ Done (2026-05-19) — actions stay declarative; no engine inlining |
+| G.1   | Registry loader + effect/action wiring + reference-lint      | ✅ Done (2026-07-04)  |
+| G.2   | Declarative-action policy + ADR/doc/tracker reconciliation   | ✅ Done (2026-07-10)  |
+| H.1   | Legacy trim & engine cleanup                                 | ✅ Done (2026-08-07)  |
+| H.2   | Real validators (budget, health, strict catalog membership)  | ✅ Done (2026-08-08)  |
+| H.3   | `natural_weapon` unification via registry                    | ✅ Done (2026-09-01)  |
+| H.4   | Tracker & bookkeeping reconciliation                         | ✅ Done (2026-09-01)  |
+| H.5   | Contract docs: data-contracts & sibling integration          | ⏳ Not started        |
+| I     | Catalog-driven client pickers (closes the usability gap)     | ⏳ Not started        |
+| J     | Real-data engine test suite                                  | ⏳ Not started        |
+
+> **Status (2026-09-01): engine-complete, phase open.** The typed
+> pipeline, per-slot combat model, validators, and catalog wiring shipped
+> with Chunks A–H.4. Outstanding before Phase 6 can close: H.5 (sibling
+> contract docs), Chunk I (usability — catalog-driven client pickers),
+> and Chunk J (real-data engine test suite). Phase 6 is **not** done.
 
 ### Chunk A Deliverables (done)
 
@@ -517,7 +529,8 @@ are folded into the chunked plan:
 - Align effect modifier types (`add`/`mul`/`set` → `setBase`/`addFlat`/
   `multiply`/`cap` + `remove`) — **Chunk C** (engine rewrite) +
   **Chunk F** (data alignment).
-- Implement real `rpgValidators` — **Chunk H**.
+- Implement real `rpgValidators` — **Chunk H** *(✅ shipped in H.2,
+  2026-08-08)*.
 - Bump `schemaVersion` on schema changes — **Chunk D** (along with the
   `Combat` shape change).
 - Combat derived fields scalar vs array — settled by **Chunk D** schema

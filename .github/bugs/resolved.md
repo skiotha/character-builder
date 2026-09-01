@@ -6,6 +6,48 @@
 > move-on-close procedure. Do **not** delete entries — they explain why the
 > code looks the way it does.
 
+### NB-1. Entire rules engine uses `Record<string, unknown>` instead of typed `Character`
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts`, `src/rules/attributes.mts`, `src/rules/applicator.mts`
+- **Impact:** All TypeScript interfaces from rpg-types.mts provided zero compile-time safety in the rules engine. Every property access was an unsafe cast chain. Schema changes broke silently at runtime.
+- **Fix:** ADR-010 — pipeline operates on typed `Character` state. Functions receive typed sub-structures (`PrimaryAttributes`, `Combat`, etc.), not opaque records.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). The engine rewrite landed the typed pipeline; every later chunk built on it.
+
+### NB-2. No guaranteed effect ordering — numeric priority is insufficient
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts` — `allEffects.sort((a, b) => (a.priority || 10) - (b.priority || 10))`
+- **Impact:** Modifier math has strict ordering requirements: setBase MUST run before addFlat, addFlat before multiply, multiply before cap. The old system relied on data authors setting the right priority number; wrong priority = silent math errors.
+- **Fix:** ADR-010 + ADR-015 — explicit phase ordering; `priority` field dropped entirely.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). Phase-ordered pipeline shipped; the last vestige (`RawEffect.priority`) was deleted in Chunk H.1 (2026-08-07).
+
+### NB-3. Dotted-path string targeting is fragile
+- **Domain:** engine
+- **Where:** `src/rules/applicator.mts` — `applyEffect(character, targetPath, modifier)`, effect data used `"attributes.secondary.defense"` strings
+- **Impact:** Couldn't be validated at compile time; broke silently on field renames; required untyped `getNestedValue`/`setNestedValue` traversal.
+- **Fix:** ADR-015 — typed discriminated-union targets (`{ kind: 'secondary', stat: 'defense' }`): exhaustive switch/case, refactor safety, autocomplete. Schema paths remain strings for UI data binding (ADR-009) — different concern, as planned.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). Typed `EffectTarget` union shipped; the dotted-path reject special-case was trimmed in Chunk H.1.
+
+### NB-4. Magic `"rules."` prefix convention for setBase detection
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts` — `effect.target?.startsWith("rules.")` + `target.split(".")[1]`
+- **Impact:** Undocumented convention baked into the implementation; only worked for secondary attribute overrides.
+- **Fix:** ADR-010 + ADR-015 — setBase is an explicit phase on typed targets, not a prefix pattern.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). No string prefix parsing remains in the engine.
+
+### NB-5. Dual/triple effect sources with no unified collection
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts` — three separate code paths: `character.effects[]` filtered inline, ability/spell effects unimplemented, equipment effects handled separately in `applyEquipmentBonuses()`
+- **Impact:** Effects from different sources were processed at different pipeline points with different logic; no single place where "all effects on this character" was visible.
+- **Fix:** ADR-010 — explicit `collectAllEffects()` step merging all sources into a single typed array before pipeline processing.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24) shipped `collectAllEffects()`; Chunk G.1 (2026-07-04) wired the trait/talent catalog data through the registry loader, completing the unified collection.
+
+### NB-6. Applicator uses wrong modifier verb names
+- **Domain:** engine
+- **Where:** `src/rules/applicator.mts` — `case "add"` / `case "mul"` / `case "set"`
+- **Impact:** Misaligned with the canonical spec (`setBase`/`addFlat`/`multiply`/`cap`); data using canonical names fell through to the `default` case (no-op).
+- **Fix:** Renamed in the Chunk C applicator rework; reference data aligned in bulk in Chunk F.
+- **Status:** ✅ Resolved — Phase 6 Chunks C (engine verbs, 2026-04-24) + F (data alignment). The legacy `add`/`mul`/`set` reject special-cases were trimmed in Chunk H.1 (2026-08-07); no legacy verb handling remains under `src/rules/`.
+
 ### NB-7. `deriveCombat()` buried inside `enforceConsistency()`
 - **Domain:** engine
 - **Where:** `src/rules/derived.mts` — enforceConsistency() does: clamp toughness, reset negative XP, filter expired effects, ensure equipment defaults, AND derive combat
@@ -27,12 +69,32 @@
 - **Fix:** Per-slot fanout (Chunk D) populates these from each slot's weapon and from `{ kind: "combat", field: "bonusDamage" / "attackAttribute" }` effects (Chunk E wires the ability data).
 - **Status:** ✅ Resolved — Phase 6 Chunks D + E. Per-slot `attackAttribute`/`baseDamage`/`bonusDamage` are derived from the slot's weapon and from typed `combat`-targeted effects with `WeaponPredicate` routing. `attackAttribute` accepts `setBase` only; `baseDamage`/`bonusDamage` accept `addFlat`/`multiply`/`cap` (parser-enforced).
 
+### NB-10. `effects.mts` and `registry.mts` are empty files
+- **Domain:** engine
+- **Where:** `src/rules/effects.mts`, `src/rules/registry.mts`
+- **Impact:** Placeholder files with no implementation. Effect resolution and ability lookup didn't exist yet.
+- **Fix:** Populated during the Phase 6 engine work.
+- **Status:** ✅ Resolved — Phase 6 Chunks C + G.1. `effects.mts` carries the collection/normalization/deserialization layer (Chunk C, 2026-04-24); `registry.mts` carries the production `loadRegistry()` catalog loader (Chunk G.1, 2026-07-04). Both fully implemented.
+
 ### NB-11. `xp.mts` was a comment only + premature XP logic in validation
 - **Domain:** engine
 - **Where:** `src/rules/xp.mts` (deleted), `src/models/validation.mts` (cleaned)
 - **Impact:** `xp.mts` contained only a 5-line comment. `validateCharacterUpdate` had two XP-related blocks: a fully commented-out `increment` block (dead code) and an active `push` XP check that was reachable but premature — it assumed `trait.cost` was `number[]`, blindly indexed `[0]`, and had no corresponding XP deduction after validation passed.
 - **Fix:** Both blocks removed in Phase 5 Session 1. `xp.mts` deleted. XP validation will be rebuilt properly in Phase 6 with typed effects.
 - **Status:** ✅ Resolved — Phase 5 Session 1 (2026-04-16)
+
+### NB-12. No evaluation engine for conditional effects (Tier B)
+- **Domain:** engine
+- **Where:** Planned in deferred-tasks §1.3 (Tier B vocabulary definition)
+- **Impact:** Many abilities have conditions ("when wielding heavy weapons", "when wearing no armor"). These remain text-only without a condition evaluator.
+- **Status:** ✅ Resolved by decision (2026-09-01, Chunk H.4 sweep) — character-state condition evaluation is deliberately **out of engine**: the engine derives permanent character state; temporary/situational state is owned by sibling apps (`ES §out-of-engine`). Equipment-state conditions DID ship typed (`ArmorCondition` gating, `WeaponPredicate` routing — ADR-015). The one surviving conditional thread — weapon-conditional `secondary` bonuses — is tracked by NB-34.
+
+### NB-13. Effect data in reference files is free-text, not normalized
+- **Domain:** engine
+- **Where:** `reference/abilities.en.json`, `reference/spells.en.json` — ~654 tier effects
+- **Impact:** The engine couldn't process any ability effect until normalization was done.
+- **Fix:** Chunk F bulk normalization — catalogs author canonical typed `effects[]` (tier A/B/C, typed `target`/`modifier`, `appliesTo`, promoted actions) consumed directly by the pipeline.
+- **Status:** ✅ Resolved — Phase 6 Chunk F (bulk normalization; post-pass amendment items completed 2026-05-19). Shape enforced since by `test/rules/reference-lint.test.mts` (Chunk G.1).
 
 ### NB-15. XP check in validateCharacterUpdate is unreachable and architecturally wrong
 - **Domain:** infra
@@ -61,6 +123,34 @@
 - **Impact:** Guard `!effect.target?.startsWith("rules.")` evaluates `true` when `target` is `undefined`. The `!` non-null assertion then passes `undefined` to `applyEffect` → `getNestedValue(char, undefined)` → `undefined.split(".")` → runtime `TypeError` crash.
 - **Fix:** `effect.target` guarded before `applyEffect`; non-null assertion removed. Residual `setBase` `split(".")[1]!` is safe today (only entered when `target.startsWith("rules.")`) and TODO-marked for removal alongside ADR-015 typed targets in Phase 6 Chunk C.
 - **Status:** ✅ Resolved — Phase 5 Session 4 (2026-04-19). Regression tests in `test/rules/derived.test.mts`.
+
+### NB-19. rpg-types `EffectModifier.value: number` is wrong for setBase
+- **Domain:** engine
+- **Where:** `src/rpg-types.mts` `EffectModifier` interface — `value: number`
+- **Impact:** `setBase` effects carry attribute-name strings (e.g., `"discreet"`), not numbers. The type lied; code trusting it for setBase values got wrong results silently.
+- **Fix:** ADR-010 / ADR-015 — per-phase modifier shapes; `setBase` carries a primary-attribute name by type.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). Typed per-phase `EffectModifier` shipped with the pipeline rewrite.
+
+### NB-20. Rules modules bypass rpg-types interfaces entirely
+- **Domain:** engine
+- **Where:** `src/rules/applicator.mts` defined a local `Modifier` with `value: unknown`; `src/rules/derived.mts` defined a local `RuleEffect`. Neither imported from `rpg-types.mts`.
+- **Impact:** Two parallel type hierarchies that could diverge; the shared types provided zero compile-time safety in the engine.
+- **Fix:** Chunk C rewrite — the engine consumes the canonical `rpg-types.mts` shapes.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). The parallel local hierarchies are gone. Discovered in Phase 4 Session 4 testing.
+
+### NB-21. Double toughness clamping (redundant logic)
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts` — `clampValues()` clamped `toughness.current` to `[0, max]`, then `enforceConsistency()` did the exact same clamping again.
+- **Impact:** Wasted cycles; confused readers about which stage "owns" clamping.
+- **Fix:** ADR-010 pipeline separates the stages; clamping has a single home in `clampValues()`.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24) removed the duplicate; `enforceConsistency()` itself was deleted in Chunk H.1 (2026-08-07, NB-36). Discovered in Phase 4 Session 4 testing.
+
+### NB-22. Nested effects on RuleEffect never unwound
+- **Domain:** engine
+- **Where:** `src/rules/derived.mts` — the old `RuleEffect` type had an `effects?` sub-array that `recalculateDerivedFields` never recursed into.
+- **Impact:** Any effect carrying child effects was silently ignored.
+- **Fix:** The Chunk C type redesign removed the possibility instead of adding recursion: `ResolvedEffect` has no nested `effects[]` sub-array, so `collectAllEffects()` is flat by construction.
+- **Status:** ✅ Resolved — Phase 6 Chunk C (2026-04-24). Discovered in Phase 4 Session 4 testing.
 
 ### NB-23. `attackAttribute` `||` operator prevents effect overrides
 - **Domain:** engine

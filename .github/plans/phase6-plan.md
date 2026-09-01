@@ -57,7 +57,7 @@ chunks that resolve them.
 | H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ✅ Done (2026-08-07) |
 | H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ✅ Done (2026-08-08) |
 | H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ✅ Done (2026-09-01) |
-| H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ⏳ Not started |
+| H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ✅ Done (2026-09-01) |
 | H.5 | Contract docs: data-contracts & sibling integration | — | — | — | large | ⏳ Not started |
 
 ---
@@ -1498,6 +1498,34 @@ above; executed in Chunk H.3 (NB-45).
    response).
 
 ### H.4 — Tracker & bookkeeping reconciliation (trackers / roadmap / memory)
+
+> **✅ Completed 2026-09-01.** Pure tracker / roadmap / memory
+> reconciliation — no code changes. Notes against the outline:
+>
+> - **Steps 1–2 landed as listed.** Thirteen entries archived to
+>   `resolved.md` with resolution date + chunk (NB-1–6, NB-10, NB-12,
+>   NB-13, NB-19–22); NB-14 slimmed to the runes-only orphan and kept
+>   open. `engine.md` now holds exactly NB-33, NB-34, NB-35, NB-47 and
+>   slimmed NB-14.
+> - **Step-4 nit:** the roadmap table already carried a Chunk I row —
+>   only J was missing. Beyond the letter of the step, the
+>   Phase-5-relocation bullet for `rpgValidators` gained its shipped
+>   marker (H.2).
+> - **Step 5 went wider than the four listed bullets** — the refresh
+>   applied the memory-curation rules wholesale: deleted everything
+>   duplicated from `copilot-instructions.md` (import ordering, ADR
+>   digest, deployment, client architecture), the shipped/stale
+>   post-Chunk-F section (cites of the deleted `audit-reference.mts`,
+>   the pre-G.1 `lookupTalent` stub note), and point-in-time status
+>   lines. What remains: canonical-home pointers, verified gotchas,
+>   working-style preferences, environment facts.
+> - The step-5 caveat about `nagara-rpg-rules.md` was already moot — the
+>   digest plan shipped & archived 2026-09-01 and that memory file is
+>   long deleted; only the cross-repo sibling pointer lines remain (with
+>   the digest plan, not H).
+> - **Deliberately not done:** no NB filed for the `#character-name`
+>   pointer-interception quirk from H.2's UI pass — it stays folded into
+>   Chunk I's view rework, where it is already recorded.
 
 **Steps**
 
