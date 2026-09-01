@@ -56,7 +56,7 @@ chunks that resolve them.
 | G.2 | Declarative-action policy + ADR/doc/tracker reconciliation | small | — | small | medium | ✅ Done (2026-07-10) |
 | H.1 | Legacy trim & engine cleanup (`RawEffect` narrowed per NB-35; NB-36 audit) | small | — | small | — | ✅ Done (2026-08-07) |
 | H.2 | Real validators (budget invariant, health, strict catalog membership) | large | — | large | small | ✅ Done (2026-08-08) |
-| H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ⏳ Not started |
+| H.3 | `natural_weapon` unification via registry (NB-45) | medium | — | medium | small | ✅ Done (2026-09-01) |
 | H.4 | Tracker & bookkeeping reconciliation | — | — | — | medium | ⏳ Not started |
 | H.5 | Contract docs: data-contracts & sibling integration | — | — | — | large | ⏳ Not started |
 
@@ -1427,6 +1427,35 @@ above; executed in Chunk H.3 (NB-45).
 4. In-browser creation + edit round-trip verified.
 
 ### H.3 — `natural_weapon` unification (code, medium — closes NB-45)
+
+> **✅ Completed 2026-09-01.** 698 / 698 tests (+1 net) + typecheck green.
+> Landed as outlined; notes against the steps:
+>
+> - **Projection shape settled:** `lookupWeapon` returns the engine
+>   `Weapon` shape (`id`/`name`/`type`/`damage`/`qualities`, plus
+>   `effects` when authored non-empty) — catalog-only presentation
+>   fields (`description`, `cost`) are dropped (YAGNI). Returned objects
+>   are shared registry instances; both consumers clone before storing.
+> - **Injection mirror:** `initDefaultSeeds({ lookupWeapon })` lives in
+>   `src/models/schema-utils.mts` (re-exported via `#models`), wired in
+>   `src/app.mts` right after `initCharacterService` — same
+>   throw-if-uninitialised pattern.
+> - **Engine synthesis throws** (not warn-and-skip) when the registry
+>   lacks `natural_weapon`: production `loadRegistry()` fail-fasts at
+>   startup, so a miss at recalc time can only be a mis-built stub.
+> - **Guards replaced, not just dropped:** the E.0.5 snapshot test became
+>   a drift guard deep-equaling the creation seed against the projection
+>   of the REAL catalog record; `reference-lint` gained a per-locale
+>   `natural_weapon` anchor check (NB-45, beside the NB-39 `own` check);
+>   the POST /characters API test now asserts the own slot derives
+>   `baseDamage: 4` + `short` end-to-end.
+> - **Digest lockstep: no-op confirmed** — `docs/rpg-engine-semantics.md`
+>   makes no bare-hand damage claim (its one `natural_weapon` mention,
+>   "creation default", stays true).
+> - Stored dev characters wiped via `hard-delete.mts --all` (one
+>   character carried the retired damage-0 seed; no migration per the
+>   test-data policy). NB-45 moved to `resolved.md` (its "weapons[2]"
+>   index slip corrected in the archived entry).
 
 **Steps**
 

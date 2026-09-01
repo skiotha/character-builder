@@ -782,16 +782,10 @@ export const CHARACTER_SCHEMA: Record<
     weapons: {
       type: "array",
       permissions: perm_default,
-      // ADR-014: index 0 is the synthetic natural-weapon anchor for the own slot.
-      default: [
-        {
-          id: "natural_weapon",
-          name: "natural_weapon",
-          type: "natural",
-          damage: 0,
-          qualities: ["own"],
-        },
-      ],
+      // ADR-014: index 0 is the natural-weapon anchor for the own slot.
+      // No inline default — `generateDefaultCharacter` seeds it from the
+      // weapon catalog via the startup-injected lookup (NB-45), so the
+      // catalog record stays the single source of truth.
       ui: {
         section: "information.equipment",
         label: "Weapons",

@@ -33,6 +33,7 @@ import type {
   Reaction,
   ResolvedEffect,
   SpecialAttack,
+  Weapon,
 } from "#rpg-types";
 
 const TIER_ORDER: readonly AbilityTier[] = ["novice", "adept", "master"];
@@ -166,19 +167,54 @@ function buildQualityIndex(entries: ReferenceEntry[]): Map<string, Quality> {
 }
 
 /**
+ * Build the weapon index. Catalog entries are projected to the engine
+ * `Weapon` shape — `id`, `name`, `type`, `damage`, `qualities`, plus
+ * `effects` when authored non-empty. Catalog-only presentation fields
+ * (`description`, `cost`) are dropped: nothing engine-side reads them.
+ * Like qualities, weapon `effects[]` are authored in the typed
+ * `ResolvedEffect` shape and pass through unchanged (the reference-lint
+ * test validates them).
+ */
+function buildWeaponIndex(entries: ReferenceEntry[]): Map<string, Weapon> {
+  const map = new Map<string, Weapon>();
+  for (const entry of entries) {
+    const weapon: Weapon = {
+      id: entry.id,
+      name: typeof entry.name === "string" ? entry.name : entry.id,
+      type: typeof entry.type === "string" ? entry.type : "",
+      damage: typeof entry.damage === "number" ? entry.damage : 0,
+      qualities: Array.isArray(entry.qualities)
+        ? [...(entry.qualities as string[])]
+        : [],
+    };
+    if (Array.isArray(entry.effects) && entry.effects.length > 0) {
+      weapon.effects = entry.effects as ResolvedEffect[];
+    }
+    map.set(entry.id, weapon);
+  }
+  return map;
+}
+
+/**
  * Load and pre-deserialize the reference registry at `DEFAULT_LOCALE`.
  * Awaited once at startup (mirrors `loadQualityIndex`); the returned
  * `Registry`'s lookups are pure synchronous `Map` reads, so `recalculate`
  * stays synchronous. Throws on any malformed catalog entry.
  */
 export async function loadRegistry(): Promise<Registry> {
-  const [traitEntries, talentEntries, qualityEntries, statusEntries] =
-    await Promise.all([
-      ref.getMerged("traits", DEFAULT_LOCALE),
-      ref.getMerged("talents", DEFAULT_LOCALE),
-      ref.getTopic("qualities", DEFAULT_LOCALE),
-      ref.getTopic("statuses", DEFAULT_LOCALE),
-    ]);
+  const [
+    traitEntries,
+    talentEntries,
+    qualityEntries,
+    statusEntries,
+    weaponEntries,
+  ] = await Promise.all([
+    ref.getMerged("traits", DEFAULT_LOCALE),
+    ref.getMerged("talents", DEFAULT_LOCALE),
+    ref.getTopic("qualities", DEFAULT_LOCALE),
+    ref.getTopic("statuses", DEFAULT_LOCALE),
+    ref.getTopic("weapons", DEFAULT_LOCALE),
+  ]);
 
   const statusIds = new Set<string>(statusEntries.map((entry) => entry.id));
 
@@ -206,15 +242,29 @@ export async function loadRegistry(): Promise<Registry> {
     );
   }
 
+  // Weapons — engine projections of the catalog. The own-slot synthesis
+  // and the creation default both resolve `natural_weapon` here (NB-45),
+  // so its absence is a startup error, not a recalc-time surprise.
+  const weaponIndex = buildWeaponIndex(weaponEntries);
+  if (!weaponIndex.has("natural_weapon")) {
+    throw new Error(
+      `[registry] Weapons catalog is missing 'natural_weapon', required ` +
+        `to synthesize the own combat slot (ADR-014) and to seed new ` +
+        `characters (NB-45). Add a 'natural_weapon' entry to ` +
+        `reference/weapons.${DEFAULT_LOCALE}.json.`,
+    );
+  }
+
   console.log(
     `[registry] Loaded ${traitEntries.length} traits, ` +
-      `${talentEntries.length} talents, ${qualityIndex.size} qualities ` +
-      `(locale=${DEFAULT_LOCALE}).`,
+      `${talentEntries.length} talents, ${qualityIndex.size} qualities, ` +
+      `${weaponIndex.size} weapons (locale=${DEFAULT_LOCALE}).`,
   );
 
   return {
     lookupTrait: (id, tier) => traitResults.get(`${id}:${tier}`) ?? null,
     lookupTalent: (id) => talentResults.get(id) ?? null,
     lookupQuality: (id) => qualityIndex.get(id) ?? null,
+    lookupWeapon: (id) => weaponIndex.get(id) ?? null,
   };
 }

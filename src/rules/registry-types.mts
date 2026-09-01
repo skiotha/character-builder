@@ -17,6 +17,7 @@ import type {
   Reaction,
   ResolvedEffect,
   SpecialAttack,
+  Weapon,
 } from "#rpg-types";
 
 export interface TraitLookupResult {
@@ -69,4 +70,17 @@ export interface Registry {
    * Unknown ids throw (ADR-016 strictness).
    */
   lookupQuality(id: string): Quality | null;
+
+  /**
+   * Resolve a weapon catalog id to its engine `Weapon` projection
+   * (`id` / `name` / `type` / `damage` / `qualities`, plus `effects`
+   * when authored). Returns `null` when the id is unknown.
+   *
+   * Returned objects are SHARED registry instances — callers that store
+   * a weapon on a character must clone it (including `qualities`) so
+   * per-character state never aliases registry state. Used to
+   * synthesize the own-slot `natural_weapon` anchor (ADR-014) and to
+   * seed new characters (NB-45).
+   */
+  lookupWeapon(id: string): Weapon | null;
 }

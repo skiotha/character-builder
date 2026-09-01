@@ -15,11 +15,19 @@ import {
   generateDefaultCharacter,
   validateCrossFieldRules,
   validateRPGRules,
+  initDefaultSeeds,
 } from "#models/schema-utils";
+import { getTopic } from "#models/reference";
 
 import { makeCharacter, makePrimaryAttributes } from "./helpers/fixtures.mts";
+import { BASE_WEAPONS } from "./helpers/registry.mts";
 
 import type { ValidationError } from "#types";
+
+// `generateDefaultCharacter` resolves the own-slot natural_weapon through
+// the startup-injected lookup (NB-45); inject the catalog-shaped stub
+// before any describe body runs.
+initDefaultSeeds({ lookupWeapon: (id) => BASE_WEAPONS[id] ?? null });
 
 // ── validateFieldValue ────────────────────────────────────────────
 
@@ -887,21 +895,25 @@ describe("generateDefaultCharacter", () => {
     assert.equal(d.player, "Unknown");
   });
 
-  // Invariant: schema's seed natural_weapon must match the snapshot below.
-  // If the reference catalog's `natural_weapon` entry drifts, this test
-  // does NOT auto-update — the goal is to catch silent drift between the
-  // schema default and the canonical record. This test is the guard for
-  // that drift; the single-source fix is tracked in NB-45.
-  it("schema default for equipment.weapons[0] is the natural_weapon seed", () => {
+  // Drift guard: the creation default is seeded through the injected
+  // lookup (here the BASE_WEAPONS stub), and this test deep-equals it
+  // against the engine projection of the REAL catalog record — so if
+  // `reference/weapons.en.json` drifts, the stub (and thus every fixture
+  // mirroring it) fails loudly instead of silently diverging (NB-45).
+  it("seeds equipment.weapons[0] with the natural_weapon catalog projection", async () => {
+    const entries = await getTopic("weapons", "en");
+    const record = entries.find((e) => e.id === "natural_weapon");
+    assert.ok(record, "reference/weapons.en.json must define natural_weapon");
+
     const d = generateDefaultCharacter("pid");
     const equipment = d.equipment as Record<string, unknown>;
     const weapons = equipment.weapons as Array<Record<string, unknown>>;
     assert.deepEqual(weapons[0], {
-      id: "natural_weapon",
-      name: "natural_weapon",
-      type: "natural",
-      damage: 0,
-      qualities: ["own"],
+      id: record.id,
+      name: record.name,
+      type: record.type,
+      damage: record.damage,
+      qualities: record.qualities,
     });
   });
 });

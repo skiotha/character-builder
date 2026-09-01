@@ -179,6 +179,16 @@ describe("POST /api/v1/characters", () => {
     assert.ok(body.id);
     assert.ok(body.backupCode);
     assert.equal(body.characterName, "Freshara");
+
+    // End-to-end own-slot derivation (ADR-014, NB-45): the catalog-seeded
+    // natural_weapon flows creation → recalc → response with its real
+    // stats, not the retired damage-0 snapshot.
+    const combat = body.combat as {
+      carried: Array<{ baseDamage: number; qualities: string[] } | null>;
+    };
+    const ownSlot = combat.carried[2]!;
+    assert.equal(ownSlot.baseDamage, 4);
+    assert.ok(ownSlot.qualities.includes("short"));
   });
 
   it("returns 400 for invalid JSON body", async () => {

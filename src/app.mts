@@ -46,10 +46,11 @@ const portraitHandler = createPortraitRoute();
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
 
 // Load the reference-data registry once at startup: the ADR-016 quality
-// catalog plus the ability/spell (trait) and boon/sin (talent) effects
-// and actions, all at DEFAULT_LOCALE. Fail-fast — a malformed catalog
-// entry throws here, before any request can land. `recalculate` stays
-// synchronous; the returned registry's lookups are pure Map reads.
+// catalog, the ability/spell (trait) and boon/sin (talent) effects and
+// actions, and the weapon catalog, all at DEFAULT_LOCALE. Fail-fast — a
+// malformed catalog entry throws here, before any request can land.
+// `recalculate` stays synchronous; the returned registry's lookups are
+// pure Map reads.
 const registry = await loadRegistry();
 
 // Wire the character service once at startup (ADR-013). Domain mutations
@@ -60,6 +61,10 @@ nagara.initCharacterService({
   broadcast: broadcastToCharacter,
   broadcastDeleted: broadcastCharacterDeleted,
 });
+
+// Wire the default seeds (NB-45): `generateDefaultCharacter` resolves
+// the own-slot natural_weapon through the registry's weapon catalog.
+nagara.initDefaultSeeds({ lookupWeapon: registry.lookupWeapon });
 
 export default async function app(
   req: IncomingMessage,

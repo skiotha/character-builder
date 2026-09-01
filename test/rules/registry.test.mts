@@ -79,6 +79,25 @@ describe("loadRegistry (real reference data)", () => {
     assert.equal(feint.isFree, true);
     assert.ok(feint.appliesTo && feint.appliesTo.length > 0);
   });
+
+  it("projects weapons to the engine shape (NB-45)", async () => {
+    const registry = await loadRegistry();
+    // The own-slot anchor resolves — loadRegistry fail-fasts without it.
+    const natural = registry.lookupWeapon("natural_weapon")!;
+    assert.ok(natural);
+    // Engine projection: id/name/type/damage/qualities only —
+    // presentation-only catalog fields (description, cost) are dropped,
+    // and empty effects[] is omitted.
+    assert.deepEqual(natural, {
+      id: "natural_weapon",
+      name: "Natural Weapon",
+      type: "natural",
+      damage: 4,
+      qualities: ["own", "short"],
+    });
+    // Unknown ids resolve to null.
+    assert.equal(registry.lookupWeapon("does-not-exist"), null);
+  });
 });
 
 // ── deserializeEffect (fail-fast catalog boundary) ─────────────────

@@ -87,6 +87,14 @@ describe("reference-lint", () => {
         );
       }
 
+      // Own-slot weapon anchor (NB-45): `loadRegistry` fail-fasts on it,
+      // and the creation default seeds from it.
+      if (!weapons.some((w) => w.id === "natural_weapon")) {
+        errors.push(
+          `weapons.${locale}: missing 'natural_weapon' (own-slot anchor, NB-45)`,
+        );
+      }
+
       // Per-file id uniqueness.
       const files: Record<string, Entry[]> = {
         abilities,

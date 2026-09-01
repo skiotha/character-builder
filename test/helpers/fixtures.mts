@@ -112,13 +112,15 @@ function makeCharacter(
     equipment: {
       money: 5,
       weapons: [
-        // Own-slot anchor: synthetic natural_weapon (own quality, ADR-014).
+        // Own-slot anchor (ADR-014): the natural_weapon catalog record in
+        // its engine projection — mirrors BASE_WEAPONS in helpers/registry.mts
+        // and the creation seed (NB-45).
         {
           id: "natural_weapon",
-          name: "natural_weapon",
+          name: "Natural Weapon",
           type: "natural",
-          damage: 0,
-          qualities: ["own"],
+          damage: 4,
+          qualities: ["own", "short"],
         },
       ],
       ammunition: [],
@@ -189,9 +191,9 @@ function makeTypedCharacter(overrides?: Record<string, unknown>): Character {
         {
           weaponIndex: slot2.weaponIndex,
           attackAttribute: "accurate",
-          baseDamage: 0,
+          baseDamage: 4,
           bonusDamage: 0,
-          qualities: ["own"],
+          qualities: ["own", "short"],
           flags: [],
         },
       ],

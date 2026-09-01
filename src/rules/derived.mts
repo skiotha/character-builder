@@ -202,8 +202,9 @@ function collectActions(
 //
 // For each non-null carried slot:
 //   1. Resolve the weapon by index. If missing or malformed, the slot
-//      is left null (main-hand/off-hand) or replaced with the synthesized
-//      natural_weapon (own slot — required, ADR-014).
+//      is left null (main-hand/off-hand) or replaced with a
+//      natural_weapon synthesized from the registry's catalog record
+//      (own slot — required, ADR-014; single source per NB-45).
 //   2. Reset derived per-slot state from the weapon (qualities cloned,
 //      flags empty, attackAttribute = "accurate", baseDamage =
 //      weapon.damage, bonusDamage = 0).
@@ -215,14 +216,6 @@ function collectActions(
 //          honored if authored).
 //   4. Apply the slot-local effects in phase order:
 //        setBase → addFlat → multiply → cap → flag (weaponQuality only).
-
-const NATURAL_WEAPON: Weapon = {
-  id: "natural_weapon",
-  name: "natural_weapon",
-  type: "natural",
-  damage: 0,
-  qualities: ["own"],
-};
 
 // ── Primary attribute pre-pipeline ─────────────────────────────
 //
@@ -341,7 +334,22 @@ function deriveCombatSlots(
     (w) => Array.isArray(w?.qualities) && w.qualities.includes("own"),
   );
   if (ownIndex === -1) {
-    weapons.push({ ...NATURAL_WEAPON });
+    // Synthesize from the canonical catalog record (NB-45). Clone so the
+    // character never aliases the shared registry instance. A registry
+    // without the record is a wiring bug — production `loadRegistry()`
+    // fail-fasts on it at startup, so throwing here only trips stubs.
+    const natural = registry.lookupWeapon("natural_weapon");
+    if (!natural) {
+      throw new Error(
+        "[rules] Registry has no 'natural_weapon' entry — required to " +
+          "synthesize the own combat slot (ADR-014, NB-45).",
+      );
+    }
+    weapons.push({
+      ...natural,
+      qualities: [...natural.qualities],
+      ...(natural.effects ? { effects: structuredClone(natural.effects) } : {}),
+    });
     ownIndex = weapons.length - 1;
     if (equipment) equipment.weapons = weapons;
   }
@@ -532,4 +540,3 @@ function unknownWeaponQualityError(
       `entry in reference/qualities.<locale>.json (ADR-016).`,
   );
 }
-

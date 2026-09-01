@@ -4,6 +4,36 @@ import { CHARACTER_SCHEMA } from "./character.mts";
 import { SERVER_CONTROLLED_FIELDS } from "./validation.mts";
 
 import type { ValidationError, ValidationWarning, SchemaField } from "#types";
+import type { Weapon } from "#rpg-types";
+
+// ── Default-seed binding ──────────────────────────────────────
+//
+// `generateDefaultCharacter` seeds `equipment.weapons` with the catalog
+// `natural_weapon` record (own-slot anchor, ADR-014) instead of an
+// inline schema default, so the reference catalog stays the single
+// source of truth (NB-45). The models layer must not import `#rules`
+// (ADR-013 layering), so — mirroring `initCharacterService` — `app.mts`
+// injects the registry-backed weapon lookup once at startup.
+
+interface DefaultSeedDeps {
+  /** Resolve a weapon catalog id to its engine `Weapon` projection. */
+  lookupWeapon: (id: string) => Weapon | null;
+}
+
+let seedDeps: DefaultSeedDeps | null = null;
+
+export function initDefaultSeeds(deps: DefaultSeedDeps): void {
+  seedDeps = deps;
+}
+
+function requireSeedDeps(): DefaultSeedDeps {
+  if (!seedDeps) {
+    throw new Error(
+      "Default seeds not initialised. Call initDefaultSeeds() at app startup.",
+    );
+  }
+  return seedDeps;
+}
 
 export function canAccessField(
   fieldPath: string,
@@ -116,6 +146,24 @@ export function generateDefaultCharacter(
   }
 
   traverse(CHARACTER_SCHEMA);
+
+  // Own-slot anchor (ADR-014): seeded from the weapon catalog through
+  // the injected lookup — the schema carries no inline default (NB-45).
+  // Clone so each new character owns its arrays.
+  const natural = requireSeedDeps().lookupWeapon("natural_weapon");
+  if (!natural) {
+    throw new Error(
+      "[models] Weapon lookup has no 'natural_weapon' entry — required " +
+        "to seed the own-slot anchor (ADR-014, NB-45).",
+    );
+  }
+  setNestedValue(defaults, "equipment.weapons", [
+    {
+      ...natural,
+      qualities: [...natural.qualities],
+      ...(natural.effects ? { effects: structuredClone(natural.effects) } : {}),
+    },
+  ]);
 
   defaults.playerId = playerId;
   defaults.player = playerName;

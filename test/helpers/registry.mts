@@ -8,6 +8,7 @@ import type {
   Reaction,
   ResolvedEffect,
   SpecialAttack,
+  Weapon,
 } from "#rpg-types";
 import type {
   Registry,
@@ -36,6 +37,12 @@ export interface InMemoryRegistryConfig {
    * convenience pattern is `{ qualities: { ...BASE_QUALITIES, foo: ... } }`.
    */
   qualities?: Record<string, Quality>;
+  /**
+   * Keyed by weapon id, in the engine `Weapon` projection shape.
+   * `BASE_WEAPONS` is always available as a fallback so the own-slot
+   * synthesis (which resolves `natural_weapon`) never trips.
+   */
+  weapons?: Record<string, Weapon>;
 }
 
 /**
@@ -50,6 +57,25 @@ export interface InMemoryRegistryConfig {
  */
 export const BASE_QUALITIES: Readonly<Record<string, Quality>> = Object.freeze({
   own: { id: "own", effects: [] },
+  short: { id: "short", effects: [] },
+});
+
+/**
+ * Weapon entries every registry stub resolves by default. Mirrors the
+ * engine projection of the canonical `natural_weapon` catalog record
+ * (`reference/weapons.en.json`) — the own-slot synthesis and the
+ * creation default both resolve it (NB-45), so every recalc-touching
+ * test needs it. The drift guard in `test/validation.test.mts` asserts
+ * this shape deep-equals the real catalog projection.
+ */
+export const BASE_WEAPONS: Readonly<Record<string, Weapon>> = Object.freeze({
+  natural_weapon: {
+    id: "natural_weapon",
+    name: "Natural Weapon",
+    type: "natural",
+    damage: 4,
+    qualities: ["own", "short"],
+  },
 });
 
 export function createInMemoryRegistry(
@@ -58,6 +84,7 @@ export function createInMemoryRegistry(
   const traits = config.traits ?? {};
   const talents = config.talents ?? {};
   const qualities = config.qualities ?? {};
+  const weapons = config.weapons ?? {};
 
   return {
     lookupTrait(id: string, tier: AbilityTier): TraitLookupResult | null {
@@ -79,14 +106,18 @@ export function createInMemoryRegistry(
     /**
      * Strict: unmapped ids return `null` and the engine throws,
      * mirroring production. As a convenience, `BASE_QUALITIES`
-     * (currently `{ own }`) is always treated as a fallback so the
-     * default own-slot anchor in `makeTypedCharacter` doesn't crash
+     * (currently `{ own, short }`) is always treated as a fallback so
+     * the default own-slot anchor in `makeTypedCharacter` doesn't crash
      * tests that didn't opt into combat at all. Tests that want to
      * exercise the "`own` is missing from the registry" path should
      * construct a `Registry` literal directly.
      */
     lookupQuality(id: string): Quality | null {
       return qualities[id] ?? BASE_QUALITIES[id] ?? null;
+    },
+
+    lookupWeapon(id: string): Weapon | null {
+      return weapons[id] ?? BASE_WEAPONS[id] ?? null;
     },
   };
 }
@@ -95,7 +126,8 @@ export function createInMemoryRegistry(
  * Minimal-strictness default registry for tests that don't care about
  * trait/talent effects but do touch the recalc pipeline. Traits and
  * talents return null (warn-and-skip in `effects.mts`); qualities
- * resolve only for `BASE_QUALITIES` (currently just `own`). Any other
+ * resolve only for `BASE_QUALITIES` and weapons only for `BASE_WEAPONS`
+ * (the own-slot synthesis resolves `natural_weapon` there). Any other
  * quality id triggers the strict-throw (ADR-016) — which is the *right*
  * production behaviour. Use `createInMemoryRegistry({ qualities: ... })`
  * when the test fixture carries additional quality ids.
@@ -104,4 +136,5 @@ export const emptyRegistry: Registry = {
   lookupTrait: () => null,
   lookupTalent: () => null,
   lookupQuality: (id) => BASE_QUALITIES[id] ?? null,
+  lookupWeapon: (id) => BASE_WEAPONS[id] ?? null,
 };

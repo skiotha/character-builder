@@ -180,6 +180,10 @@ async function getAllCharacters(): Promise<Record<string, unknown>[]> {
 export type { DeleteResult } from "#types";
 export type { CharacterServiceDeps };
 
+// Startup-injected default seeds (NB-45) — wired alongside
+// `initCharacterService` in `app.mts`.
+export { initDefaultSeeds } from "./schema-utils.mts";
+
 export {
   initCharacterService,
   createCharacter,
