@@ -1093,27 +1093,12 @@ above; executed in Chunk H.3 (NB-45).
 
 ### Follow-up (post-G): canonical engine-semantics digest
 
-> Raised 2026-07-04; **evicted to its own scoping plan 2026-07-10** so it can
-> be tackled in isolation (sequenced **before** Chunk H):
-> [`engine-semantics-digest-plan.md`](./engine-semantics-digest-plan.md).
->
-> The need: a single canonical statement of the RPG-*system* facts the engine
-> must reflect — 8 primaries, secondaries derived from them, abilities
-> re-point those derivations (`setBase`), additive tier stacking, the
-> declarative-vs-derived line, opaque triggers / statuses, and so on —
-> authored **for agents** and kept in **lockstep** with the engine (any
-> breaking engine-semantics change updates it, and vice-versa). The eviction
-> plan collects the problem (incl. the already-stale `nagara-rpg-rules.md`
-> memory as live proof), the home options (git doc / `data-contracts.md`
-> section / cross-repo / **memory** / hybrid), a straw-man structure,
-> ownership, and the enforcement question.
->
-> **Status (2026-08-07):** the digest is authored
-> (`docs/rpg-engine-semantics.md`) and user-reviewed — content-stable for
-> Chunk H's purposes, with minor issues pending discussion, so it is
-> deliberately **not** marked stable in-file. H proceeds citing `ES §`
-> anchors against the current iteration; the digest plan's remaining steps
-> (memory deletion, sibling pointer lines, archival) stay with that plan.
+> ✅ **Shipped & signed off (2026-09-01).** The digest lives at
+> [`docs/rpg-engine-semantics.md`](../../docs/rpg-engine-semantics.md)
+> (cite `ES §<anchor>`). Scoping plan archived:
+> [`done/engine-semantics-digest-plan.md`](./done/engine-semantics-digest-plan.md).
+> Only the cross-repo sibling pointer lines (nagara-addon, malizia) remain,
+> coordinated separately in those repos.
 
 ---
 

@@ -1,11 +1,11 @@
 # Engine-Semantics Digest — Scoping & Discussion Plan
 
-> **Status:** 🚧 Implementing (2026-08-06) — scoping resolved 2026-08-03;
-> §12 steps 1–3 are done (digest authored at `docs/rpg-engine-semantics.md`,
-> signposts wired), **pending the user's manual review of the harvest
-> against the actual RPG rules**. Step 4's memory deletion and step 5
-> (siblings, pointer collapse, archive) wait for that sign-off. Originally
-> evicted from [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G):
+> **Status:** ✅ Done — archived 2026-09-01. The digest shipped at
+> `docs/rpg-engine-semantics.md` and the user reviewed and signed off on the
+> harvest. All §12 steps are complete except the **cross-repo** half of
+> step 5 (pointer lines in nagara-addon / malizia docs), which is
+> coordinated separately in those repos. Originally evicted from
+> [`phase6-plan.md`](../phase6-plan.md) "Follow-up (post-G):
 > canonical engine-semantics digest" on 2026-07-10 so it could be tackled in
 > isolation after Phase 6 Chunk G, **before** Chunk H.
 >
@@ -344,17 +344,17 @@ One chunk, ordered — steps 1–2 are the substance, 3–5 are wiring:
    not-lint-enforced); (c) cross-links added from ADR-010/014/015/016
    headers and `data-contracts.md`; ADR-015's anchor table gained the
    previously missing `§4a` row (setBase resolution).
-4. ⏳ **Memory.** `character-builder.md` pointer updated to the digest.
-   Deleting `/memories/repo/nagara-rpg-rules.md` **waits for the user's
-   review sign-off** (it stays available as the harvest cross-check until
-   then).
-5. ⏳ **Siblings + bookkeeping.** Pointer lines in nagara-addon / malizia
-   docs (cross-repo, coordinated separately); collapse the
-   `phase6-plan.md` follow-up pointer; archive this plan to `done/`; sweep
-   the list below.
+4. ✅ **Memory.** Done 2026-09-01 — `character-builder.md` pointer updated
+   to the digest; `/memories/repo/nagara-rpg-rules.md` deleted after the
+   user's review sign-off.
+5. ✅ **Siblings + bookkeeping.** In-repo half done 2026-09-01 — the
+   `phase6-plan.md` follow-up pointer collapsed, this plan archived to
+   `done/`, sweep list cleared. **Cross-repo half outstanding:** pointer
+   lines in nagara-addon / malizia docs, coordinated separately in those
+   repos (tracked in repo memory's Phase 6 pointers).
 
 ## References to sweep on completion
 
-- The [`phase6-plan.md`](./phase6-plan.md) "Follow-up (post-G): canonical
-  engine-semantics digest" section now points here — collapse that pointer
-  (and archive this plan to `done/`) once the digest ships (§12 step 5).
+- ✅ Swept 2026-09-01. The [`phase6-plan.md`](../phase6-plan.md) "Follow-up
+  (post-G): canonical engine-semantics digest" section was collapsed to a
+  shipped-pointer and this plan archived to `done/`.
