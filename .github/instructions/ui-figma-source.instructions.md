@@ -5,9 +5,14 @@ applyTo: "public/**/*.css, public/**/*.html, public/**/*.mjs"
 # UI design source (Figma)
 
 Figma file **Ahani.Base** is the design source of truth for the `public/`
-redesign (colors, type, screens, layout). The live client may still lag —
-see **ui-navigation-playbook**. Adapt MCP output to this stack (vanilla
-HTML/CSS/JS, ADR-012, **styling** / **hypertext**).
+redesign — for how things **look** (colors, type, layout, composition),
+not for what things **are**. Information architecture, the field
+inventory, widget behavior, and data shapes are owned by the schema
+(`src/models/character.mts`), the ADRs, and `docs/` — when a frame lags
+or contradicts those, the schema wins on content and Figma wins on look.
+The live client may still lag — see **ui-navigation-playbook**. Adapt MCP
+output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
+**hypertext**).
 
 - File: https://www.figma.com/design/n61wtRUXEaxhSc2gnL640J/Ahani.Base
 - `fileKey`: `n61wtRUXEaxhSc2gnL640J`

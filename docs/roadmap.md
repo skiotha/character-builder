@@ -498,7 +498,7 @@ Replaces the original Step 0 / Step 5 outline.
 | H.3   | `natural_weapon` unification via registry                    | ✅ Done (2026-09-01)  |
 | H.4   | Tracker & bookkeeping reconciliation                         | ✅ Done (2026-09-01)  |
 | H.5   | Contract docs: data-contracts & sibling integration          | ✅ Done (2026-09-01)  |
-| I     | Catalog-driven client pickers (closes the usability gap)     | ⏳ Not started        |
+| I     | Catalog-driven client pickers (closes the usability gap)     | 🔄 In progress (2026-09-01) — [phase6-chunkI-plan.md](../.github/plans/phase6-chunkI-plan.md) |
 | J     | Real-data engine test suite                                  | ⏳ Not started        |
 
 > **Status (2026-09-01): Chunk H complete — engine-complete, phase open.**
@@ -658,6 +658,32 @@ Discord bot.
       - Same widget code, two modes: live PATCH in view, deferred-buffer
         in creation. Decide the seam (mode prop, or a small
         `WeaponSlotsHost` wrapper) when the cards UI lands.
+- [ ] **Stateless creation preview endpoint
+      (`POST /api/v1/characters/preview`).** Validate + recalc a candidate
+      character without persisting, so the creation form can show
+      effect-aware derived values and catalog-picker interactions
+      pre-save. Chunk I deliberately shipped pickers view-mode-only
+      (create → land on the sheet → equip via live PATCH); this endpoint
+      is the sanctioned path to creation-time parity and would
+      absorb/supersede the deferred-buffer mode contemplated in the
+      weapon-slots parity item above.
+- [ ] **DM `effect-list` editor for `character.effects[]`.** The field
+      stays `ui.hidden` and stubbed after Chunk I; DM-side effect
+      injection requires raw API calls. Design it together with the NB-35
+      RawEffect lifecycle decision.
+- [ ] **Affiliations as world entities.** Chunk I ships plain string rows;
+      the intended end state is entity-backed affiliations (DM-curated
+      organizations with semantics), which needs its own data model.
+- [ ] **Traditions display surface.** `traditions[]` stays `ui.hidden` and
+      has no endpoint. When surfaced: traditions are curated ability ids —
+      filter `/api/v1/traits` by `source === "abilities"` or add a
+      dedicated endpoint.
+- [ ] **Catalogs or structured editors for the free-form equipment
+      arrays.** `equipment.{ammunition,runes,assassin,tools,artifacts}`
+      and `equipment.inventory.{carried,home}` render as disabled
+      placeholders after Chunk I (marked by `TODO` comments at the render
+      sites). Runes cataloging is NB-14; the rest each need an
+      authored-catalog-vs-free-text decision.
 
 ### Client-Side Test Coverage
 

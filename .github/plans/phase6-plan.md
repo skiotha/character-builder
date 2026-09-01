@@ -1046,8 +1046,8 @@ above; executed in Chunk H.3 (NB-45).
 > - **Conditional-secondary skip + talent stance** documented in
 >   `docs/data-contracts.md` (NB-34 / NB-47).
 > - **Verification #4 (manual UI) deferred to Chunk I** — no trait picker
->   exists yet and G.2 changed only docs/comments; folded into Chunk I
->   step 7.
+>   exists yet and G.2 changed only docs/comments; folded into Chunk I's
+>   close-out step ([`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md)).
 
 **Steps**
 
@@ -1089,7 +1089,8 @@ above; executed in Chunk H.3 (NB-45).
    values, flags, special attacks, and reactions populate.~~ **Deferred to
    Chunk I** (2026-07-10) — no trait picker exists yet (`trait-list` is
    read-only) and G.2 changed only docs / comments, so nothing it touched
-   is UI-observable. Folded into Chunk I step 7.
+   is UI-observable. Folded into Chunk I's close-out step
+   ([`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md)).
 
 ### Follow-up (post-G): canonical engine-semantics digest
 
@@ -1671,83 +1672,19 @@ above; executed in Chunk H.3 (NB-45).
 
 ## Chunk I — Catalog-Driven Client Pickers
 
-> Closes the gap between "engine works" and "user can actually use it."
-> Until this lands, the per-slot weapon dropdown is empty for any new
-> character (only the seeded `natural_weapon` shows up, and only in
-> the own slot), and there is no way to add traits, talents, rituals,
-> spells, armor, or extra weapons through the UI.
-
-**Context**
-
-The schema-driven renderer registers seven catalog-fed components as
-stubs in `public/renderers/component-registry.mjs`:
-
-- `equipment-list` — `equipment.weapons`, `equipment.ammunition`
-- `armor-slot` — `equipment.armor.body`, `equipment.armor.plug`
-- `trait-list` — `traits[]` (currently renders read-only; needs picker)
-- `talent-list` — `talents[]` (same)
-- `ritual-list` — `rituals[]`
-- `tradition-list` — `traditions[]`
-- `effect-list` — `effects[]` (DM/admin only — manual effect injection)
-- `affiliation-list`, `notes-list` — non-catalog, plain editors
-
-Each catalog-fed component needs to: (a) fetch the relevant
-`/api/v1/{traits,talents,rituals,weapons,armor}` endpoint on mount;
-(b) render an add/remove UI (typically a `<select>` of catalog
-entries plus a list of current selections); (c) PATCH the resulting
-array back through the existing API. The shape the client sends is
-already validated server-side by Chunk H's `rpgValidators` (e.g.
-weapon-ref validity, trait-ref validity).
-
-**Steps**
-
-1. **Authoring spec for client pickers** (`docs/client-pickers.md`):
-   - For each of the seven components: which `/api/v1/*` endpoint
-     it consumes, the shape of catalog entries it renders, the
-     PATCH body shape it emits, the validation it relies on.
-   - Locale handling: pickers honor the user's locale via the same
-     `?locale=` query the existing `weapon-slots` already uses
-     implicitly through pre-loaded `equipment.weapons[]`.
-   - Permission model: read-only when the schema field's permissions
-     reject the current role (mirrors existing `weapon-slots`).
-2. **Implement `equipment-list`** (highest priority — unblocks the
-   per-slot picker). Adds/removes weapons by id; PATCH replaces the
-   whole `equipment.weapons[]` array. Special handling: cannot
-   remove an entry currently referenced by `combat.carried`; cannot
-   remove the seeded `natural_weapon` (or auto-replace with another
-   `own` weapon).
-3. **Implement `armor-slot`** for `body` and `plug`. Single-select;
-   PATCH replaces the slot object. `null` clears the slot.
-4. **Implement `trait-list` / `talent-list` pickers** (the existing
-   `renderTraitList` / `renderTalentList` are display-only — extend
-   with add/remove). Each entry stores `{ id, tier }`; tier picker
-   surfaced inline.
-5. **Implement `ritual-list` / `tradition-list`**. Add/remove by id;
-   array of ids on the character.
-6. **Implement `effect-list`** (DM-only). Free-form editor for the
-   `effects[]` array — JSON textarea with structural validation, or
-   structured form. Simplest viable shape.
-7. **End-to-end manual test** (absorbs the manual verification deferred
-   from Chunk G.2): create a fresh character via UI,
-   add a weapon to `equipment.weapons[]`, see it appear in the
-   slot dropdown, assign it to slot 0, see derived `baseDamage` /
-   `attackAttribute` update, add a trait, and confirm the registry-driven
-   derived outputs populate — per-slot combat values, top-level `flags`,
-   `specialAttacks`, and `reactions`. (Chunk G.1 wired the registry so
-   these compute; Chunk I is the first point they're reachable through
-   the UI.)
-8. Update `.github/copilot-instructions.md` and
-   `/memories/repo/character-builder.md` — note that all schema
-   stub components are now real; no more stubs in `STUB_COMPONENTS`.
-
-**Verification**
-
-1. No entries in `STUB_COMPONENTS` in
-   `public/renderers/component-registry.mjs` (or only `notes-list` /
-   `affiliation-list` if they remain non-catalog placeholders).
-2. Manual round-trip: create → equip → assign → recalc visible in UI.
-3. Sibling-project parity check: any catalog-fed picker shape change
-   here is reflected in `docs/{addon,bot}-integration.md`.
+> **Extracted to a standalone plan (2026-09-01):**
+> [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) — re-scoped against the
+> post-H codebase and decision-locked with the user (own-slot policy stays
+> ADR-014, remove-weapon auto-unassign + `weaponIndex` re-mapping, pickers
+> view-mode-only, notes/affiliations unhide, free-form equipment arrays
+> deferred as placeholders). The original eight-step outline (authored
+> 2026-04-21) had drifted: `equipment-list` spans eight schema paths (not
+> two), `effects` / `traditions` / `affiliations` / `notes` are `ui.hidden`
+> today (their stubs render nothing), no `/api/v1/traditions` endpoint
+> exists, verification #1 ("no stubs left") was unachievable as written,
+> and the `combat.carried` re-indexing obligation was missing. Status and
+> the G.2-deferred manual verification live in the standalone plan; this
+> section flips to ✅ when it ships.
 
 ---
 
