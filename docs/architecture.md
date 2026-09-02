@@ -302,6 +302,15 @@ SSE character-updated
 Same pipeline for initial render and real-time updates
 ```
 
+> **Component overrides ([ADR-017](decisions/017-client-component-lifecycle.md)):**
+> the `subscribeField(path)` → `updateFieldValue()` path above applies to
+> native leaf controls only. Schema `ui.component` overrides (portrait,
+> trait / talent lists, weapon slots, catalog pickers) are light-DOM custom
+> elements that declare their dependency paths and re-render themselves via
+> `render(character)`; change detection is structural (no notification when
+> nothing changed). The diagram is updated to the as-built shape when that
+> work lands.
+
 > **Legacy flow (being removed):** Server-rendered HTML fragments via
 > `GET /api/v1/view/*` endpoints, injected into the DOM by the client.
 > See [ADR-004](decisions/004-hybrid-spa-server-views.md) (superseded).

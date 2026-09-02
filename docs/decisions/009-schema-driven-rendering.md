@@ -175,6 +175,7 @@ The migration is incremental. Each step leaves the application functional:
 - **Positive:** Server becomes a simpler, pure JSON API. Easier to test. No string-template maintenance.
 - **Positive:** The existing behavior system (`data-behavior`, `enhanceElement()`, `cleanupBehaviors()`) works unchanged — it processes any DOM with the right attributes, regardless of who generated it.
 - **Positive:** The existing state system (`subscribeField`, `setCurrentCharacter`, diff-based notification) works unchanged. SSE updates feed data into the same pipeline.
+  > **Amended by [ADR-017](017-client-component-lifecycle.md) (2026-09-02):** this holds for native leaf controls only. Component overrides are not updated through `subscribeField` → `updateFieldValue()`; they are custom elements with their own declared dependencies and lifecycle, and change detection is structural rather than reference-based. See ADR-017 §3–§4.
 - **Negative:** The schema takes on UI concerns (section, label, display order). It's no longer a pure data schema — it's a UI model. This is an intentional trade-off: one schema to maintain vs. two rendering paths.
 - **Negative:** Custom sections (portrait upload, ability list with add/remove) need component overrides in the renderer. The renderer can't be purely generic.
 - **Negative:** Dashboard and landing page don't benefit from the schema renderer and remain bespoke. This is acceptable — they're simple views.

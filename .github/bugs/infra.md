@@ -7,6 +7,20 @@
 > See [`README.md`](README.md) for the `NB-N` id scheme, the severity rubric,
 > and the filing / closing procedure. Cite a bug from code as `NB-<n>`.
 
+## MEDIUM — Address During API / Validation Work
+
+### NB-50. Per-field PATCH validators see the stored character, not the merged batch
+- **Where:** `src/models/validation.mts` `validateCharacterUpdate` — the per-field loop calls `validateFieldValue(field, value, character)` with the **stored** character as `allData`; the merged clone is only built afterwards for the cross-field / catalog pass.
+- **Impact:** Any schema `validate:` hook that reads sibling fields evaluates against pre-PATCH state. Concrete case: `validateCombatCarried` checks `weaponIndex` range and the own-slot `own` quality against the stored `equipment.weapons[]`. A single atomic PATCH that removes a weapon and re-maps `combat.carried` in the same batch (the Chunk I picker contract) is validated as *new indices against the old array*. With the own slot at `natural_weapon` (index 0) this is coincidentally safe; once NB-49 lets the own slot point at a later own-quality weapon, removing any lower-index weapon yields a spurious 422 ("must reference a weapon with the `own` quality") for a batch that is valid once merged. Other hooks are currently unaffected: `attributePointsValid` is re-run on the merged clone anyway; `currentHealthValid` reads a server-controlled field that cannot be in the batch.
+- **Fix:** build the merged clone **before** per-field validation — apply every writable update to `structuredClone(character)` (FORBIDDEN ones excluded) and pass that clone as `allData` to `validateFieldValue`; reuse the same clone for the existing merged-state pass. Structurally invalid values applied to the clone are harmless because any error rejects the whole batch. Add a `test/validation.test.mts` case: weapons shrink + carried re-map in one PATCH with a non-zero own index passes; the same carried tuple alone against the stored array fails.
+- **Status:** ⚠️ Open — fix together with NB-49 (same commit); filed 2026-09-02 during the Chunk I step-1 readiness review.
+
+### NB-51. Fresh characters omit every schema field without a `default` — contract says `[]`
+- **Where:** `src/models/schema-utils.mts` `generateDefaultCharacter` — the traversal only seeds `field.default` and recurses into `type: "object"`; array / string / nullable-object fields with no `default` are skipped. Affected on a freshly created character (verified via `GET /characters/:id` as owner, 2026-09-02): `traits`, `talents`, `rituals`, `traditions`, `effects`, `affiliations`, `location`, `portrait`, `background.notes`, `background.journal.*`, `background.kinkList`.
+- **Impact:** `docs/data-contracts.md` §1 documents these as always-present (`"talents": []`, `"rituals": []`, …) and the sibling contracts inherit that shape; a Lua `ipairs(character.talents)` or a bot-side `.length` on a fresh character hits `nil` / `undefined`. Client-side, absent keys also mean the field never appears in the state diff until a first PATCH creates it. The engine tolerates absence (`?? []` reads), so this is a contract / sibling risk, not a recalc failure.
+- **Fix when scoped:** either add explicit `default: []` (and `default: ""` / `default: null` where appropriate) to the schema fields, or have `generateDefaultCharacter` seed `type: "array"` fields with `[]` when no default is authored. Existing on-disk characters keep the gap — decide between a read-path backfill in the domain layer and a one-off migration. Watch `test/data-contracts.test.mts` and the creation-shape fixtures in `test/helpers/fixtures.mts` (which already assume the arrays exist).
+- **Status:** ⚠️ Open — filed 2026-09-02 as a side finding of the Chunk I step-1 readiness review; not scheduled. Promote before Phase 7 sibling integration.
+
 ## DEFERRED — Track for later, not currently scoped
 
 ### NB-40. `x-forwarded-for` parsing for rate limiter (and any future client-IP logic)

@@ -17,6 +17,13 @@
 - **Update (Chunk G.1, 2026-07-04):** the engine now **skips** any `secondary`-target effect that carries an `appliesTo` predicate (`collectAllEffects` filters them out) instead of applying it unconditionally. Applying a weapon-conditional bonus unconditionally bakes a sometimes-true value into the derived stat (e.g. `double-strike.novice` granting +1 defense even bare-handed); skipping is the safe interim behavior. The predicate still rides to sibling apps as documentary data. The weapon-conditional-secondary *feature* remains unbuilt (a UI "this weapon grants X" surface is deferred to roadmap Phase 8), so this stays open.
 - **Status:** ⚠️ Open — interim behavior is skip-not-apply (Chunk G.1); the conditional-secondary feature + UI surface are deferred to Phase 8.
 
+### NB-49. Own combat slot ignores the stored `weaponIndex` — only the first own-quality weapon is reachable
+- **Where:** `src/rules/derived.mts` `deriveCombat` — `ownIndex = weapons.findIndex(w => w.qualities.includes("own"))`, then `buildSlot(weapons, ownIndex, …)`. The stored `character.combat.carried[2].weaponIndex` is never read (the hand slots do read `existing[0|1].weaponIndex`).
+- **Impact:** A validated own-slot write is silently discarded. `validateCombatCarried` accepts any own-quality weapon for the own slot (ADR-014; `ES §carried-slots`: "must reference a weapon carrying the `own` quality"), the PATCH returns 200, and recalc then overwrites the slot with the first own-quality weapon in `equipment.weapons[]`. Since `natural_weapon` is permanently index 0, War Claws / Battle Heels can never occupy the own slot. Blocks the Chunk I weapons picker (own-slot select would visibly snap back). Hand slots are unaffected.
+- **Repro (verified 2026-09-02):** weapons `[natural_weapon, two_handed_sword, war_claws]`; `PATCH combat.carried = [null, null, { weaponIndex: 2 }]` → 200; response `carried[2].weaponIndex === 0`.
+- **Fix:** honor `existing?.[2]?.weaponIndex` when it indexes a weapon whose `qualities` include `own`; otherwise fall back to the current `findIndex` scan; otherwise synthesize `natural_weapon` (unchanged). Update the `ES §carried-slots` Engine bullet in the same commit (digest lockstep) and add `test/rules/` cases for honored / invalid / missing own index. Coupled with NB-50 — once the own slot can be a non-first weapon, the atomic weapons + carried re-map PATCH trips the stale-`allData` validator; fix both together.
+- **Status:** ⚠️ Open — scheduled as the first commit of the Chunk I resumption (see `.github/plans/phase6-chunkI-plan.md`).
+
 ## MEDIUM — Address During Engine Work
 
 ### NB-33. Registry quality effects don't recurse — engine-added qualities are inert

@@ -498,7 +498,7 @@ Replaces the original Step 0 / Step 5 outline.
 | H.3   | `natural_weapon` unification via registry                    | ✅ Done (2026-09-01)  |
 | H.4   | Tracker & bookkeeping reconciliation                         | ✅ Done (2026-09-01)  |
 | H.5   | Contract docs: data-contracts & sibling integration          | ✅ Done (2026-09-01)  |
-| I     | Catalog-driven client pickers (closes the usability gap)     | 🔄 In progress (2026-09-01) — [phase6-chunkI-plan.md](../.github/plans/phase6-chunkI-plan.md) |
+| I     | Catalog-driven client pickers (closes the usability gap)     | ⏸️ Paused (2026-09-02) — [phase6-chunkI-plan.md](../.github/plans/phase6-chunkI-plan.md); step 1 blocked on [client-component-lifecycle-plan.md](../.github/plans/client-component-lifecycle-plan.md) |
 | J     | Real-data engine test suite                                  | ⏳ Not started        |
 
 > **Status (2026-09-01): Chunk H complete — engine-complete, phase open.**
@@ -506,6 +506,16 @@ Replaces the original Step 0 / Step 5 outline.
 > and contract docs shipped with Chunks A–H. Outstanding before Phase 6
 > can close: Chunk I (usability — catalog-driven client pickers) and
 > Chunk J (real-data engine test suite). Phase 6 is **not** done.
+>
+> **Update (2026-09-02):** Chunk I's step-1 readiness review found the
+> client has no component re-render contract (state updates overwrite
+> component roots with text) and that the engine ignores the own-slot
+> choice (NB-49, with coupled validator defect NB-50). The client fix is a
+> stand-alone prerequisite plan —
+> [client-component-lifecycle-plan.md](../.github/plans/client-component-lifecycle-plan.md)
+> (custom-element lifecycle + structural change detection, decided in
+> [ADR-017](decisions/017-client-component-lifecycle.md)) — after which
+> Chunk I resumes.
 
 ### Chunk A Deliverables (done)
 

@@ -13,7 +13,7 @@ which file or severity a bug currently sits under. A bug keeps its id when it
 moves between trackers, is re-triaged, or is archived, so an `NB-<n>` written in
 a code comment resolves for good.
 
-**Next unused id:** `NB-49` — recorded here and advanced as bugs are filed.
+**Next unused id:** `NB-52` — recorded here and advanced as bugs are filed.
 
 A code citation is a bare `NB-<n>` (no filename, no `#`). The
 `test/bug-anchors.test.mts` lint checks that every cited id resolves to exactly

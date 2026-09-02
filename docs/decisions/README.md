@@ -23,3 +23,4 @@ decisions are marked as such, not deleted.
 | 014 | [Per-slot combat, special attacks & reactions](014-per-slot-combat-special-attacks.md) | Accepted |
 | 015 | [Typed effect targets, final vocabulary](015-typed-effect-targets-final.md)   | Accepted   |
 | 016 | [Quality registry as single source of truth](016-quality-registry.md)         | Accepted   |
+| 017 | [Client component lifecycle — custom elements & structural change detection](017-client-component-lifecycle.md) | Accepted (amends ADR-009) |

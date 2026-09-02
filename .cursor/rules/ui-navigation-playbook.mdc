@@ -67,3 +67,38 @@ were ironed out or register a new bug.
   and manual effects cannot be added through the UI (see `docs/roadmap.md`,
   Phase 6 chunk table). Seed that state via the API (PATCH with catalog
   ids) or fixtures instead.
+- **Interim defect — component roots get clobbered after any save.** Until
+  the ADR-017 component lifecycle lands, every PATCH response and SSE update
+  runs the leaf-field updater over component roots too, so the weapon-slots
+  `<ol>`, the trait / talent `<ul>`s and the equipment stubs turn into
+  `"[object Object]"` text. The data is fine — **reload the page** to
+  restore the sheet; do not read it as a server bug. (Retire this entry when
+  ADR-017 ships.)
+
+## Seeding a fixture via the API
+
+`data/` is gitignored — assume no characters exist. Creating one through
+the form works, but the API is faster for a test fixture:
+
+1. `POST /api/v1/characters` with header `x-player-id: <token>` and the
+   **full** required payload: `characterName`, `background.{race,age}`,
+   the eight `attributes.primary.*` (sum 80), `attributes.secondary`
+   (`toughness.{max,current}`, `defense`, `armor`, `painThreshold`,
+   `corruptionThreshold`, `corruptionMax`), `experience.{total,unspent}`,
+   `corruption.{permanent,temporary}`, `equipment.money`. Any omission is a
+   400 with `REQUIRED` details — the form fills these silently, the API
+   does not.
+2. `PATCH /api/v1/characters/:id` (same header, body `{ updates: [{ field,
+   value }] }`). Weapons: keep `natural_weapon` at index 0 and append
+   catalog clones with `id` / `name` / `type` / `damage` / `qualities`
+   (e.g. `two_handed_sword`; `war_claws` is a second own-quality weapon).
+   Traits: `{ id, tier, source }` with a **catalog** id — it is `polearm`,
+   not `polearm-mastery`; unknown ids fail with `UNKNOWN_REFERENCE`.
+3. In the browser: `localStorage.setItem("x-player-id", "<token>")`, load
+   `/#character/<id>`, then **reload once** — a same-document hash change
+   from a scripted `goto` does not re-render the route. The form should
+   carry `data-role="owner"`.
+4. Useful probes: a `MutationObserver` on every `[data-path]` element
+   watching `class` for the `updated` flash lists exactly which elements a
+   state update touched; `selectOption` on
+   `[data-path="combat.carried"] select[data-slot="0"]` fires a real PATCH.

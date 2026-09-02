@@ -1,6 +1,9 @@
 # Plan — Phase 6 Chunk I: Catalog-Driven Client Pickers
 
-**Status:** active (extracted from [`phase6-plan.md`](./phase6-plan.md) Chunk I, 2026-09-01)
+**Status:** paused (2026-09-02) — step 1 is blocked on
+[`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md);
+step 0 shipped. Extracted from [`phase6-plan.md`](./phase6-plan.md) Chunk I,
+2026-09-01.
 **Owner:** user (design authority) + agent (implementation)
 **Trigger:** Chunks A–H made the engine complete, but the UI cannot reach it:
 every catalog-fed component renders as a `[component-name]` stub, so a new
@@ -30,6 +33,36 @@ Verified against the code on 2026-09-01:
 - The outline omitted the `combat.carried` **re-indexing obligation**: slots
   reference weapons by `weaponIndex`, so every add/remove of
   `equipment.weapons[]` must re-map the tuple in the same atomic PATCH.
+
+## Step-1 readiness review (2026-09-02) — why the plan is paused
+
+Verified in-browser and via the API before starting step 1:
+
+- **No component re-render contract.** `bindFieldsToState` pipes every
+  `[data-path]` element — component roots included — through
+  `updateFieldValue`, and `notifyChangedPaths` treats arrays as always-
+  changed, so one slot change (200 OK) turned `OL combat.carried`,
+  `UL traits` and the `equipment.weapons` stub into `"[object Object]"`
+  text. Nothing re-renders a component when its dependencies change. Every
+  step-1–4 "done when" depends on exactly that, so the fix is a
+  prerequisite, not a quickfix: **[`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md)**
+  (custom-element lifecycle + structural change detection). Chunk I resumes
+  on that contract; step 1 below is rewritten against it at resumption.
+- **Engine ignores the own-slot choice** — NB-49: `deriveCombat` uses the
+  first own-quality weapon and never reads `carried[2].weaponIndex`, so War
+  Claws / Battle Heels can never occupy the own slot. Coupled validator
+  defect NB-50: per-field PATCH validation runs against the stored
+  `equipment.weapons`, which breaks decision 4's atomic re-map once the own
+  slot can be a non-first weapon. Both are server-side and independent of
+  the client work — fixed in **step ½** below.
+- Side finding filed, not scheduled here: NB-51 (fresh characters omit
+  every no-default field — `talents`, `rituals`, … — that the contract
+  documents as `[]`).
+- Confirmed assumptions: the H.2 validator accepts `id` / `name` / `type` /
+  `damage` / `qualities` (+ optional `effects` array) and does not reject
+  extra keys; `weapon-slots.mjs` already filters the own slot to own-quality
+  with no empty option; dangling `weaponIndex` values degrade to `null`
+  slots rather than throwing.
 
 ## Decisions locked (2026-09-01, with the user)
 
@@ -117,7 +150,22 @@ in-browser pass over the touched view (Playwright MCP, per the
   in progress, Phase 8 gains the preview-endpoint, DM-effects-editor,
   affiliations-entity, traditions-surface, and free-form-catalogs items.
   **Done when:** `npm test` green (anchor lints pass over the edited files).
+- **Step ½ — Own-slot engine fix (NB-49) + merged-batch validation
+  (NB-50).** Server-only, no client dependency. `deriveCombat` honors
+  `carried[2].weaponIndex` when it indexes an own-quality weapon, falling
+  back to the first own-quality weapon, then to `natural_weapon` synthesis;
+  `ES §carried-slots` Engine bullet updated in the same commit.
+  `validateCharacterUpdate` builds the merged clone before the per-field pass
+  and hands it to `validateFieldValue` as `allData`. Tests: honored / invalid
+  / missing own index in `test/rules/`; weapons-shrink + carried re-map with
+  a non-zero own index passes in `test/validation.test.mts`. Both NB entries
+  move to `resolved.md`.
+  **Done when:** `PATCH combat.carried = [null, null, { weaponIndex: <war_claws> }]`
+  round-trips with that index; `npm test` green.
 - **Step 1 — Weapons picker + free-form placeholders (`equipment-list`).**
+  _Blocked on the client-lifecycle plan; rewrite this step against
+  `NagaraElement` (declared `deps`, `render(character)`,
+  `api.patchCharacter`) when resuming._
   New component registered for all eight paths; branch on path:
   `equipment.weapons` → real picker, the other seven → greyed-out disabled
   placeholder + `TODO(<scope>)`. Picker: fetch `/api/v1/weapons`; add =
@@ -197,6 +245,8 @@ pointer to this plan.
 ## Progress
 
 - [x] Step 0 — Extraction & bookkeeping (2026-09-01)
+- [ ] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50)
+- [ ] _(blocked)_ [`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md) — must ship before step 1
 - [ ] Step 1 — Weapons picker + free-form placeholders
 - [ ] Step 2 — Armor slots
 - [ ] Step 3 — Traits & talents pickers
