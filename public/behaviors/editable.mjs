@@ -1,12 +1,6 @@
+import * as api from "api";
 import * as nagara from "state";
 import { updateFieldValue } from "../utils/dom.mjs";
-
-const { protocol, hostname, port } = window.location;
-const base = `${protocol}//${hostname}${port ? ":" + port : ""}`;
-const API_BASE = `${base}/api/v1`;
-
-// const API_BASE = "http://127.0.0.1:3000/api/v1";
-// const API_BASE = "https://nagara.team/api/v1";
 
 const pendingUpdates = new Map();
 const abortControllerMap = new WeakMap();
@@ -108,28 +102,11 @@ export async function saveField(field, newValue, originalValue) {
   abortControllerMap.set(field, controller);
 
   try {
-    const headers = { "Content-Type": "application/json" };
-
-    const playerToken = nagara.getPlayerToken();
-    if (playerToken) {
-      headers["x-player-id"] = playerToken;
-    }
-
-    const dmToken = nagara.getDMToken();
-    if (dmToken) {
-      headers["x-dm-id"] = dmToken;
-    }
-
-    const response = await fetch(`${API_BASE}/characters/${characterId}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({
-        updates: [{ field: fieldPath, value: newValue }],
-      }),
-      signal: controller.signal,
-    });
-
-    const result = await response.json();
+    const result = await api.patchCharacter(
+      characterId,
+      [{ field: fieldPath, value: newValue }],
+      { signal: controller.signal },
+    );
 
     if (result.success) {
       nagara.setCurrentCharacter(result.character);
@@ -138,13 +115,12 @@ export async function saveField(field, newValue, originalValue) {
       showFieldError(field, result.error);
     }
   } catch (error) {
-    console.log(error);
     if (error.name === "AbortError") {
       return;
     }
 
     updateFieldValue(field, originalValue);
-    showFieldError(field, "Network error");
+    showFieldError(field, error);
   } finally {
     pendingUpdates.delete(field);
     abortControllerMap.delete(field);

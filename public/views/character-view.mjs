@@ -9,6 +9,11 @@ import {
 } from "../state.mjs";
 import { updateFieldValue, createViewNav } from "../utils/dom.mjs";
 
+// Only native controls are bound to the leaf update path (ADR-017 §leaf-binding);
+// component hosts manage their own updates.
+const LEAF_CONTROL_SELECTOR =
+  "input[data-path], select[data-path], textarea[data-path], output[data-path]";
+
 export async function renderCharacter(container, params) {
   try {
     container.innerHTML = "<div>Loading character screen</div>";
@@ -54,7 +59,7 @@ export async function renderCharacter(container, params) {
 }
 
 function detachCharacterViewListeners(container) {
-  container.querySelectorAll("[data-path]").forEach((field) => {
+  container.querySelectorAll(LEAF_CONTROL_SELECTOR).forEach((field) => {
     if (field._unsubscribe) {
       field._unsubscribe();
       delete field._unsubscribe;
@@ -63,7 +68,7 @@ function detachCharacterViewListeners(container) {
 }
 
 function bindFieldsToState(container) {
-  const fields = container.querySelectorAll("[data-path]");
+  const fields = container.querySelectorAll(LEAF_CONTROL_SELECTOR);
 
   fields.forEach((field) => {
     const path = field.dataset.path;

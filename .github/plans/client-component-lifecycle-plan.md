@@ -1,7 +1,7 @@
 # Plan — Client component lifecycle (custom elements + structural change detection)
 
 **Status:** active (2026-09-02) — design locked with the user and recorded as
-[ADR-017](../../docs/decisions/017-client-component-lifecycle.md); step 0
+[ADR-017](../../docs/decisions/017-client-component-lifecycle.md); steps 0–1
 shipped. Blocks [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 1.
 **Owner:** user (design authority) + agent (implementation)
 **Session note:** every step from 1 on is executed in a fresh agent session
@@ -206,6 +206,18 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   clobbered elements keep their children (weapon-slots is still stale at
   this step — that is expected); inline-edit Location while a PATCH from a
   second tab lands → typed value survives until blur.
+  > ✅ Completed 2026-09-04. Divergences from the outline: `tsconfig`
+  > gained `"allowJs": true` instead of a `.d.mts` shim (the `include` list
+  > is unchanged, so only test-imported `.mjs` files enter the program);
+  > `api.patchCharacter(id, updates, { signal })` accepts an abort signal and
+  > resolves with the parsed body on **any** HTTP status (callers branch on
+  > `success`; network / abort errors propagate, no logging in the helper);
+  > root subscribers receive `(character, "", character)`; the `_permissions`
+  > carry-over is guarded by `old.id === incoming.id`; a subtree that appears,
+  > vanishes or is replaced by a primitive reports its leaves (so leaf
+  > subscribers beneath it fire); `public/utils/flatten.mjs` deleted (dead).
+  > In-browser: `Location` sits in a hidden section, so the mid-edit gate was
+  > run on `background.race` — same `edit-enabled` path.
 - **Step 2 — Base element + first port (weapon-slots).** `base.mjs`;
   registry / renderer pass `data`; `weapon-slots` becomes
   `<nagara-weapon-slots>` with `deps = ["combat.carried",
@@ -263,7 +275,7 @@ cleanup obligation is "follow this checklist", not "remember to grep".
 ## Progress
 
 - [x] Step 0 — Decision lock + ADR-017 (2026-09-02)
-- [ ] Step 1 — Structural change detection
+- [x] Step 1 — Structural change detection (2026-09-04)
 - [ ] Step 2 — Base element + first port (weapon-slots)
 - [ ] Step 3 — Port the remaining components
 - [ ] Step 4 — Teardown + leak check

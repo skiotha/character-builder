@@ -108,6 +108,39 @@ export async function createCharacter(characterData) {
   }
 }
 
+/**
+ * PATCH a character (ADR-017 §patch-helper). Resolves with the parsed body on
+ * any HTTP status — callers branch on `body.success`; network and abort errors
+ * propagate untouched so callers can tell them apart.
+ *
+ * @param {string} characterId
+ * @param {{ field: string, value: * }[]} updates
+ * @param {{ signal?: AbortSignal }} [options]
+ * @returns {Promise<object>} Parsed response body
+ */
+export async function patchCharacter(characterId, updates, { signal } = {}) {
+  const headers = { "Content-Type": "application/json" };
+
+  const playerToken = nagara.getPlayerToken();
+  if (playerToken) {
+    headers["x-player-id"] = playerToken;
+  }
+
+  const dmToken = nagara.getDMToken();
+  if (dmToken) {
+    headers["x-dm-id"] = dmToken;
+  }
+
+  const response = await fetch(`${API_BASE}/characters/${characterId}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ updates }),
+    signal,
+  });
+
+  return await response.json();
+}
+
 export async function recoverCharacter(characterName, backupCode) {
   try {
     const response = await fetch(`${API_BASE}/recover`, {

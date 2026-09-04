@@ -1,5 +1,5 @@
 import { validateDM, validateToken } from "./api.mjs";
-import { flatten } from "./utils/flatten.mjs";
+import { changedPaths } from "./utils/diff.mjs";
 
 function getNestedValue(obj, path) {
   return path.split(".").reduce((o, k) => o?.[k], obj);
@@ -54,9 +54,19 @@ function setPlayerRole(role) {
 function setCurrentCharacter(character) {
   const oldCharacter = state.currentCharacter;
 
+  // `_permissions` rides only on GET responses (ADR-017 §structural-diff);
+  // PATCH / SSE payloads omit it, so keep the last one for the same character.
+  if (
+    character &&
+    !character._permissions &&
+    oldCharacter?._permissions &&
+    oldCharacter.id === character.id
+  ) {
+    character = { ...character, _permissions: oldCharacter._permissions };
+  }
+
   state.currentCharacter = character;
 
-  // notify("character", character);
   notifyChangedPaths(oldCharacter, character);
 }
 
@@ -81,6 +91,16 @@ export function subscribeField(path, callback) {
   return () => subscribers.get(path).delete(callback);
 }
 
+/**
+ * Subscribe to any change of the current character (the root path `""`).
+ * The callback receives `(character, "", character)`.
+ * @param {(character: object, path: string, character: object) => void} callback
+ * @returns {() => void} Unsubscribe
+ */
+export function subscribeCharacter(callback) {
+  return subscribeField("", callback);
+}
+
 export function getDMToken() {
   return localStorage.getItem("x-dm-id");
 }
@@ -95,22 +115,17 @@ export async function setDMToken(token) {
 
 function notify(path, character) {
   if (subscribers.has(path)) {
-    const newValue = getNestedValue(character, path);
+    const newValue = path === "" ? character : getNestedValue(character, path);
     subscribers.get(path).forEach((cb) => cb(newValue, path, character));
   }
 }
 
+// Structural diff with ancestor bubbling (ADR-017 §structural-diff): identical
+// payloads notify nobody, subtree subscribers hear about deep changes.
 function notifyChangedPaths(oldChar, newChar) {
-  const oldFlat = flatten(oldChar || {});
-  const newFlat = flatten(newChar);
-
-  const allPaths = new Set([...Object.keys(oldFlat), ...Object.keys(newFlat)]);
-
-  allPaths.forEach((path) => {
-    if (oldFlat[path] !== newFlat[path]) {
-      notify(path, newChar);
-    }
-  });
+  for (const path of changedPaths(oldChar, newChar)) {
+    notify(path, newChar);
+  }
 }
 
 function setSchema(schema) {

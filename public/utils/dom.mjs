@@ -1,11 +1,14 @@
 /**
  * Set a field's value, normalizing across input types.
  * Adds a brief "updated" visual flash for UX feedback.
+ * No-op while the field is being inline-edited (ADR-017 §leaf-binding).
  *
  * @param {HTMLElement} field - The form control or output element
  * @param {*} newValue - Value to set
  */
 export function updateFieldValue(field, newValue) {
+  if (field.hasAttribute("data-editing")) return;
+
   const tagName = field.tagName.toUpperCase();
   const type = field.type;
 
