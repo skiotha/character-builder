@@ -97,7 +97,9 @@ function renderFields(container, fields, data, role, mode) {
     if (componentName) {
       const componentFn = getComponent(componentName);
       if (componentFn) {
-        container.appendChild(componentFn(path, schema, value, role, mode));
+        container.appendChild(
+          componentFn(path, schema, value, role, mode, data),
+        );
         continue;
       }
     }

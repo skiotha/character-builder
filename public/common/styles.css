@@ -79,6 +79,11 @@
     all: unset;
   }
 
+  /* CUSTOM COMPONENTS */
+  nagara-weapon-slots {
+    display: contents;
+  }
+
   #root,
   #__next {
     isolation: isolate;

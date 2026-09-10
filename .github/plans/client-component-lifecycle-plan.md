@@ -1,7 +1,7 @@
 # Plan — Client component lifecycle (custom elements + structural change detection)
 
 **Status:** active (2026-09-02) — design locked with the user and recorded as
-[ADR-017](../../docs/decisions/017-client-component-lifecycle.md); steps 0–1
+[ADR-017](../../docs/decisions/017-client-component-lifecycle.md); steps 0–2
 shipped. Blocks [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 1.
 **Owner:** user (design authority) + agent (implementation)
 **Session note:** every step from 1 on is executed in a fresh agent session
@@ -228,14 +228,31 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   (instrument with a counter or the `updated` flash); a second tab's slot
   change updates this tab's dropdowns; open off-hand dropdown is not closed
   by an unrelated SSE update.
+  > ✅ Completed 2026-09-10. Divergences from the outline: `base.mjs` also
+  > exports `componentFactory(ElementClass)` (builds the six-argument
+  > registry factory, assigns props + host `data-path`) and gives
+  > `NagaraElement` a `rebuild(...nodes)` helper (`cleanupBehaviors` →
+  > `replaceChildren` → `enhanceElement`); `update()` refreshes
+  > `this.character` from state before calling `render`. The
+  > `display: contents` host rule landed here (in `@layer reset`, one
+  > selector — step 3 extends the list) rather than in step 3. `data-path`
+  > sits on the host only; the inner `ol.weapon-slots` no longer carries it.
+  > `character-view.mjs` now calls `setCurrentCharacter` **before** building
+  > the form, so hosts subscribing in `connectedCallback` see no diff and
+  > render exactly once on load. Gate note: per-slot derived fields live
+  > inside `combat.carried`, so the "unrelated SSE update" check must use a
+  > field outside the deps (run on `background.race`: 0 renders, focused
+  > off-hand `<select>` kept identity and focus). Create-mode host verified
+  > via the CTA (`#character/new` on reload is routed as an id by `app.mjs`
+  > — pre-existing).
 - **Step 3 — Port the remaining components.** `trait-list`, `talent-list`
   (rebuild; keep the lazy trait-library enrichment), `character-name`
   (in-place `value` patch, respects `data-editing`), `portrait` (in-place
   `src` / transform patch; element owns `initPortraitUpload` wiring via
   `connectedCallback` / `disconnectedCallback` in **both** modes — replacing
   `portraitManager` in `creation-view.mjs` and enabling upload on the sheet
-  for roles with `portrait` write permission, design item 9). Add the
-  `display: contents` host rule.
+  for roles with `portrait` write permission, design item 9). Extend the
+  `display: contents` host selector list to every `nagara-*` host.
   **Done when:** in-browser: creation flow unchanged end-to-end (portrait
   upload + crop + submit); on the sheet, owner uploads a portrait and a
   second tab shows it via SSE; a trait PATCHed from a second tab appears
@@ -245,6 +262,9 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   (no duplicate subscriptions); `disconnectedCallback` observed for each
   host on navigation (temporary console instrumentation, removed before
   commit). Remove the now-dead `_unsubscribe` sweep if nothing uses it.
+  Note: `disconnectedCallback` fires when the **next** view clears the
+  container, not inside the previous view's `cleanup()` — instrument at
+  that point.
   **Done when:** counts match; `npm test` green.
 - **Step 5 — Docs & bookkeeping.** `docs/architecture.md` §4.3 redrawn to
   the as-built two update paths (replacing the interim note);
@@ -276,7 +296,7 @@ cleanup obligation is "follow this checklist", not "remember to grep".
 
 - [x] Step 0 — Decision lock + ADR-017 (2026-09-02)
 - [x] Step 1 — Structural change detection (2026-09-04)
-- [ ] Step 2 — Base element + first port (weapon-slots)
+- [x] Step 2 — Base element + first port (weapon-slots) (2026-09-10)
 - [ ] Step 3 — Port the remaining components
 - [ ] Step 4 — Teardown + leak check
 - [ ] Step 5 — Docs & bookkeeping

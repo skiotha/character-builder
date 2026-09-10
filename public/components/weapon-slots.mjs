@@ -1,7 +1,8 @@
 /**
- * Weapon-slots component override (ADR-014).
+ * Weapon-slots component override (ADR-014, ADR-017).
  *
- * Renders the 3-element `combat.carried` tuple as three labeled slots:
+ * `<nagara-weapon-slots>` renders the 3-element `combat.carried` tuple as
+ * three labeled slots:
  *   - Main-hand (carried weapon, optional)
  *   - Off-hand  (carried weapon, optional)
  *   - Own       (innate weapon, required, must have `own` quality)
@@ -11,87 +12,118 @@
  * own slot is filtered to weapons that carry the `own` quality (the
  * server seeds `natural_weapon` on creation so this list is never empty).
  *
- * On change the whole `combat.carried` tuple is PATCHed back. Per-slot
- * derived fields (`attackAttribute`, `baseDamage`, `bonusDamage`,
- * `qualities`) are pure recalc output — shown read-only below the
- * dropdown but never written.
+ * On change the whole `combat.carried` tuple is PATCHed back as stripped
+ * `{ weaponIndex }` entries; the element re-renders from the response via
+ * its deps (ADR-017 §deps). Per-slot derived fields (`attackAttribute`,
+ * `baseDamage`, `bonusDamage`, `qualities`) are pure recalc output — shown
+ * read-only below the dropdown but never written.
  */
 
-import * as nagara from "../state.mjs";
+import * as api from "api";
+import { setCurrentCharacter } from "../state.mjs";
+import { NagaraElement, componentFactory } from "./base.mjs";
 
 const SLOT_LABELS = ["Main-hand", "Off-hand", "Own"];
 const EMPTY_OPTION = "— empty —";
 
-const API_BASE = (() => {
-  const { protocol, hostname, port } = window.location;
-  return `${protocol}//${hostname}${port ? ":" + port : ""}/api/v1`;
-})();
+class WeaponSlotsElement extends NagaraElement {
+  static deps = ["combat.carried", "equipment.weapons"];
 
-export function renderWeaponSlots(path, fieldSchema, value, role, _mode) {
-  const carried = Array.isArray(value) ? value : [null, null, null];
-  const writable = isWritable(fieldSchema, role);
+  render(character) {
+    const carried = Array.isArray(character?.combat?.carried)
+      ? character.combat.carried
+      : [null, null, null];
+    const weapons = Array.isArray(character?.equipment?.weapons)
+      ? character.equipment.weapons
+      : [];
+    const writable = isWritable(this.fieldSchema, this.role);
 
-  const character = nagara.getState().currentCharacter || {};
-  const weapons = Array.isArray(character?.equipment?.weapons)
-    ? character.equipment.weapons
-    : [];
+    const list = document.createElement("ol");
+    list.classList.add("weapon-slots");
 
-  const root = document.createElement("ol");
-  root.classList.add("weapon-slots");
-  root.dataset.path = path;
+    for (let i = 0; i < 3; i++) {
+      list.appendChild(this.#renderSlot(i, carried[i], weapons, writable));
+    }
 
-  for (let i = 0; i < 3; i++) {
-    root.appendChild(
-      renderSlot(i, carried[i], weapons, writable, character.id),
-    );
+    this.rebuild(list);
   }
 
-  return root;
+  #renderSlot(index, slot, weapons, writable) {
+    const li = document.createElement("li");
+    li.classList.add("weapon-slot");
+    li.dataset.slot = String(index);
+
+    const heading = document.createElement("h4");
+    heading.textContent = SLOT_LABELS[index];
+    li.appendChild(heading);
+
+    const select = document.createElement("select");
+    select.dataset.slot = String(index);
+    if (!writable) select.disabled = true;
+
+    const isOwnSlot = index === 2;
+
+    if (!isOwnSlot) {
+      const empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = EMPTY_OPTION;
+      if (slot === null || slot === undefined) empty.selected = true;
+      select.appendChild(empty);
+    }
+
+    for (let w = 0; w < weapons.length; w++) {
+      const weapon = weapons[w] || {};
+      const qualities = Array.isArray(weapon.qualities)
+        ? weapon.qualities
+        : [];
+      if (isOwnSlot && !qualities.includes("own")) continue;
+
+      const option = document.createElement("option");
+      option.value = String(w);
+      option.textContent = weapon.name || `(weapon ${w})`;
+      if (slot && slot.weaponIndex === w) option.selected = true;
+      select.appendChild(option);
+    }
+
+    if (writable) {
+      select.addEventListener("change", () => this.#onSlotChange());
+    }
+    li.appendChild(select);
+
+    li.appendChild(renderDerivedDisplay(slot));
+    return li;
+  }
+
+  async #onSlotChange() {
+    const carried = [null, null, null];
+
+    for (const sel of this.querySelectorAll("select[data-slot]")) {
+      const i = Number(sel.dataset.slot);
+      carried[i] = sel.value === "" ? null : { weaponIndex: Number(sel.value) };
+    }
+
+    try {
+      const result = await api.patchCharacter(this.character.id, [
+        { field: "combat.carried", value: carried },
+      ]);
+      if (result.success) {
+        setCurrentCharacter(result.character);
+      } else {
+        console.error("[weapon-slots] PATCH failed:", result.error);
+      }
+    } catch (err) {
+      console.error("[weapon-slots] PATCH error:", err);
+    }
+  }
 }
 
-function renderSlot(index, slot, weapons, writable, characterId) {
-  const li = document.createElement("li");
-  li.classList.add("weapon-slot");
-  li.dataset.slot = String(index);
+customElements.define("nagara-weapon-slots", WeaponSlotsElement);
 
-  const heading = document.createElement("h4");
-  heading.textContent = SLOT_LABELS[index];
-  li.appendChild(heading);
-
-  const select = document.createElement("select");
-  select.dataset.slot = String(index);
-  if (!writable) select.disabled = true;
-
-  const isOwnSlot = index === 2;
-
-  if (!isOwnSlot) {
-    const empty = document.createElement("option");
-    empty.value = "";
-    empty.textContent = EMPTY_OPTION;
-    if (slot === null || slot === undefined) empty.selected = true;
-    select.appendChild(empty);
-  }
-
-  for (let w = 0; w < weapons.length; w++) {
-    const weapon = weapons[w] || {};
-    const qualities = Array.isArray(weapon.qualities) ? weapon.qualities : [];
-    if (isOwnSlot && !qualities.includes("own")) continue;
-
-    const option = document.createElement("option");
-    option.value = String(w);
-    option.textContent = weapon.name || `(weapon ${w})`;
-    if (slot && slot.weaponIndex === w) option.selected = true;
-    select.appendChild(option);
-  }
-
-  if (writable) {
-    select.addEventListener("change", () => onSlotChange(characterId, select));
-  }
-  li.appendChild(select);
-
-  li.appendChild(renderDerivedDisplay(slot));
-  return li;
-}
+/**
+ * Registry factory for the `weapon-slots` override.
+ * @type {(path: string, fieldSchema: object, value: *, role: string, mode: string, data: object) => WeaponSlotsElement}
+ */
+export const renderWeaponSlots = componentFactory(WeaponSlotsElement);
 
 function renderDerivedDisplay(slot) {
   const dl = document.createElement("dl");
@@ -119,51 +151,6 @@ function renderDerivedDisplay(slot) {
   }
 
   return dl;
-}
-
-async function onSlotChange(characterId, select) {
-  const root = select.closest(".weapon-slots");
-  if (!root) return;
-
-  const selects = root.querySelectorAll("select[data-slot]");
-  const carried = [null, null, null];
-
-  for (const sel of selects) {
-    const i = Number(sel.dataset.slot);
-    if (sel.value === "") {
-      carried[i] = null;
-    } else {
-      carried[i] = { weaponIndex: Number(sel.value) };
-    }
-  }
-
-  await patchCarried(characterId, carried);
-}
-
-async function patchCarried(characterId, carried) {
-  const headers = { "Content-Type": "application/json" };
-  const playerToken = nagara.getPlayerToken();
-  if (playerToken) headers["x-player-id"] = playerToken;
-  const dmToken = nagara.getDMToken();
-  if (dmToken) headers["x-dm-id"] = dmToken;
-
-  try {
-    const response = await fetch(`${API_BASE}/characters/${characterId}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({
-        updates: [{ field: "combat.carried", value: carried }],
-      }),
-    });
-    const result = await response.json();
-    if (result.success) {
-      nagara.setCurrentCharacter(result.character);
-    } else {
-      console.error("[weapon-slots] PATCH failed:", result.error);
-    }
-  } catch (err) {
-    console.error("[weapon-slots] PATCH error:", err);
-  }
 }
 
 function isWritable(fieldSchema, role) {

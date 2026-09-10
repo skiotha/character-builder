@@ -1,7 +1,8 @@
 /**
  * Component override registry.
- * Maps component names (from schema ui.component) to render functions.
- * Each function: (path, fieldSchema, value, role, mode) → HTMLElement
+ * Maps component names (from schema ui.component) to factories.
+ * Each factory: (path, fieldSchema, value, role, mode, data) → HTMLElement,
+ * where `data` is the full character the renderer holds (ADR-017 §render-arg).
  */
 
 import { renderPortrait } from "../components/portrait.mjs";
@@ -13,9 +14,9 @@ import { renderWeaponSlots } from "../components/weapon-slots.mjs";
 const registry = new Map();
 
 /**
- * Register a component override renderer.
+ * Register a component override factory.
  * @param {string} name - Component name matching schema ui.component value
- * @param {Function} renderFn - (path, fieldSchema, value, role, mode) → HTMLElement
+ * @param {Function} renderFn - (path, fieldSchema, value, role, mode, data) → HTMLElement
  */
 export function registerComponent(name, renderFn) {
   registry.set(name, renderFn);
@@ -41,7 +42,7 @@ export function hasComponent(name) {
 
 // ── Stub placeholder for unimplemented components ─────────────
 
-function stubComponent(path, fieldSchema, value, role, mode) {
+function stubComponent(path, fieldSchema, value, role, mode, _data) {
   const el = document.createElement("div");
   el.classList.add("component-stub");
   el.dataset.component = fieldSchema.ui?.component || "unknown";

@@ -26,6 +26,10 @@ export async function renderCharacter(container, params) {
     ]);
 
     const role = characterData._permissions?.role || "public";
+
+    setCurrentCharacter(characterData);
+    setPlayerRole(role);
+
     const form = renderCharacterForm(schema, characterData, role, "view");
 
     container.setAttribute("id", "character-view");
@@ -36,8 +40,6 @@ export async function renderCharacter(container, params) {
 
     container.appendChild(form);
 
-    setCurrentCharacter(characterData);
-    setPlayerRole(role);
     bindFieldsToState(container);
     enhanceElement(container);
     sse.connectCharacterStream(characterId);
