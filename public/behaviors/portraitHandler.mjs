@@ -1,5 +1,38 @@
-export function initPortraitUpload(container) {
-  const portrait = container.querySelector("section#portrait");
+/**
+ * Portrait upload + pan-zoom behavior.
+ *
+ * Owns the interaction inside a rendered `section#portrait` (drop zone,
+ * file input, preview image): drag/drop or file-pick an image, then pan
+ * (pointer / touch) and wheel-zoom it inside the viewport. It never talks
+ * to the network — the owning `<nagara-portrait>` element decides what a
+ * finished file or a settled crop means for its mode (upload + PATCH on
+ * the sheet, deferred to form submit during creation).
+ *
+ * The handler holds DOM references captured at init, so the element must
+ * patch those nodes in place rather than replace them (ADR-017 §render-arg
+ * names portrait as the in-place case).
+ *
+ * Crop values are pixel offsets relative to the drop zone's rendered size
+ * at the time of the edit (`viewportSize`); the sheet and the creation form
+ * therefore must render the zone at the same size for a stored crop to
+ * reproduce.
+ */
+
+const CROP_SETTLE_MS = 300;
+
+/**
+ * Wire portrait upload + pan-zoom onto the `section#portrait` inside `host`.
+ * @param {HTMLElement} host - Element containing `section#portrait`
+ * @param {{
+ *   onFileReady?: (file: File, data: object) => void,
+ *   onCropChange?: (crop: { x: number, y: number, scale: number, rotation: number }, data: object) => void,
+ * }} [callbacks] - `onFileReady` fires once a picked/dropped image is
+ *   decoded and previewed; `onCropChange` fires when a pan or zoom gesture
+ *   settles.
+ * @returns {{ getPortraitData: () => object, removePortrait: (e?: Event) => void, cleanup: () => void }}
+ */
+export function initPortraitUpload(host, callbacks = {}) {
+  const portrait = host.querySelector("section#portrait");
   const dropZone = portrait.querySelector(":scope > div");
   const fileInput = portrait.querySelector("input");
   const previewImg = portrait.querySelector("img");
@@ -13,34 +46,45 @@ export function initPortraitUpload(container) {
     originalSize: { width: 0, height: 0 },
   };
 
-  dropZone.addEventListener("dragenter", handleDragEnter);
-  dropZone.addEventListener("dragover", handleDragOver);
-  dropZone.addEventListener("dragleave", handleDragLeave);
-  dropZone.addEventListener("drop", handleDrop);
+  let disablePanZoom = null;
+  let cropSettleTimer = null;
 
-  dropZone.addEventListener(
-    "click",
-    () => !currentPortraitData.url && fileInput.click(),
-  );
+  // TODO(portrait-recrop): a click on an already-saved portrait opens the
+  // file picker (replace); re-cropping the stored image without re-upload
+  // is Chunk I step 4½ (.github/plans/phase6-chunkI-plan.md).
+  const handleClick = () => !currentPortraitData.url && fileInput.click();
 
-  fileInput.addEventListener("change", handleFileSelect);
-
-  dropZone.addEventListener("keydown", (e) => {
+  const handleKeydown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       fileInput.click();
     }
-  });
+  };
 
-  let disablePanZoom = null;
+  dropZone.addEventListener("dragenter", handleDragEnter);
+  dropZone.addEventListener("dragover", handleDragOver);
+  dropZone.addEventListener("dragleave", handleDragLeave);
+  dropZone.addEventListener("drop", handleDrop);
+  dropZone.addEventListener("click", handleClick);
+  dropZone.addEventListener("keydown", handleKeydown);
+  fileInput.addEventListener("change", handleFileSelect);
 
   const cleanup = () => {
+    clearTimeout(cropSettleTimer);
     if (currentPortraitData.url) {
       URL.revokeObjectURL(currentPortraitData.url);
     }
     if (disablePanZoom) {
       disablePanZoom();
+      disablePanZoom = null;
     }
+    dropZone.removeEventListener("dragenter", handleDragEnter);
+    dropZone.removeEventListener("dragover", handleDragOver);
+    dropZone.removeEventListener("dragleave", handleDragLeave);
+    dropZone.removeEventListener("drop", handleDrop);
+    dropZone.removeEventListener("click", handleClick);
+    dropZone.removeEventListener("keydown", handleKeydown);
+    fileInput.removeEventListener("change", handleFileSelect);
   };
 
   function handleDragEnter(e) {
@@ -90,6 +134,14 @@ export function initPortraitUpload(container) {
         throw new Error("Image is to big, try less than 20MB");
       }
 
+      if (currentPortraitData.url) {
+        URL.revokeObjectURL(currentPortraitData.url);
+      }
+      if (disablePanZoom) {
+        disablePanZoom();
+        disablePanZoom = null;
+      }
+
       const url = URL.createObjectURL(file);
 
       const img = new Image();
@@ -117,17 +169,27 @@ export function initPortraitUpload(container) {
 
       updatePreview();
       disablePanZoom = enablePanZoom();
+      callbacks.onFileReady?.(file, getPortraitData());
     } catch (error) {
       console.error("Image processing error:", error);
       showError(error.message);
     }
   }
 
+  function scheduleCropChange() {
+    clearTimeout(cropSettleTimer);
+    cropSettleTimer = setTimeout(() => {
+      callbacks.onCropChange?.(
+        { ...currentPortraitData.crop },
+        getPortraitData(),
+      );
+    }, CROP_SETTLE_MS);
+  }
+
   function enablePanZoom() {
     let isPanning = false;
     let lastX = 0;
     let lastY = 0;
-    let scale = currentPortraitData.crop.scale;
 
     dropZone.addEventListener("mousedown", startPan);
     dropZone.addEventListener("mousemove", pan);
@@ -140,15 +202,6 @@ export function initPortraitUpload(container) {
     });
     dropZone.addEventListener("touchmove", handleTouchMove, { passive: false });
     dropZone.addEventListener("touchend", stopPan);
-
-    const eventHandlers = {
-      startPan,
-      pan,
-      stopPan,
-      handleZoom,
-      handleTouchStart,
-      handleTouchMove,
-    };
 
     function startPan(e) {
       isPanning = true;
@@ -177,8 +230,10 @@ export function initPortraitUpload(container) {
     }
 
     function stopPan() {
+      if (!isPanning) return;
       isPanning = false;
       dropZone.style.cursor = "grab";
+      scheduleCropChange();
     }
 
     function handleZoom(e) {
@@ -204,6 +259,7 @@ export function initPortraitUpload(container) {
 
       constrainImageToViewport();
       updatePreview();
+      scheduleCropChange();
     }
 
     function getEventPoint(e) {
@@ -255,8 +311,6 @@ export function initPortraitUpload(container) {
 
     constrainImageToViewport();
 
-    cleanup.eventHandlers = eventHandlers;
-
     return function disablePanZoom() {
       dropZone.removeEventListener("mousedown", startPan);
       dropZone.removeEventListener("mousemove", pan);
@@ -266,6 +320,7 @@ export function initPortraitUpload(container) {
       dropZone.removeEventListener("touchstart", handleTouchStart);
       dropZone.removeEventListener("touchmove", handleTouchMove);
       dropZone.removeEventListener("touchend", stopPan);
+      dropZone.style.cursor = "";
     };
   }
 
@@ -279,56 +334,18 @@ export function initPortraitUpload(container) {
         scale(${currentPortraitData.crop.scale})
         rotate(${currentPortraitData.crop.rotation}deg)
     `;
-
-    // if (!previewContainer.querySelector(".portrait-controls")) {
-    //   const controls = document.createElement("div");
-    //   controls.id = "portrait-controls";
-    //   controls.innerHTML = `
-    //     <button type="button"
-    //       data-action="fit-portrait"
-    //       aria-label="Fit image to viewport"
-    //       tabindex="-1">
-    //         <span>O</span>
-    //     </button>
-    //     <button type="button"
-    //       data-action="remove-portrait"
-    //       aria-label="Remove portrait"
-    //       tabindex="-1">
-    //         <span>X</span>
-    //     </button>
-    //     `;
-    //   previewContainer.appendChild(controls);
-
-    //   controls
-    //     .querySelector("[data-action='fit-portrait']")
-    //     .addEventListener("click", fitImageToViewport);
-    //   controls
-    //     .querySelector("[data-action='remove-portrait']")
-    //     .addEventListener("click", removePortrait);
-    // }
-  }
-
-  function fitImageToViewport() {
-    const viewport = dropZone.getBoundingClientRect();
-    const { originalSize } = currentPortraitData;
-
-    const scaleX = viewport.width / originalSize.width;
-    const scaleY = viewport.height / originalSize.height;
-    const newScale = Math.max(scaleX, scaleY);
-
-    const newX = (viewport.width - originalSize.width * newScale) * 0.5;
-    const newY = (viewport.height - originalSize.height * newScale) * 0.5;
-
-    currentPortraitData.crop = { x: newX, y: newY, scale: newScale };
-    updatePreview();
   }
 
   function removePortrait(e) {
     if (currentPortraitData.url) {
       URL.revokeObjectURL(currentPortraitData.url);
     }
+    if (disablePanZoom) {
+      disablePanZoom();
+      disablePanZoom = null;
+    }
 
-    e.stopPropagation();
+    e?.stopPropagation();
 
     currentPortraitData = {
       file: null,
@@ -346,8 +363,12 @@ export function initPortraitUpload(container) {
     console.error("Portrait error:", message);
   }
 
+  function getPortraitData() {
+    return { ...currentPortraitData, crop: { ...currentPortraitData.crop } };
+  }
+
   return {
-    getPortraitData: () => ({ ...currentPortraitData }),
+    getPortraitData,
     removePortrait,
     cleanup,
   };

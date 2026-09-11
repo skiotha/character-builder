@@ -58,6 +58,16 @@ were ironed out or register a new bug.
 - After creation, base primaries are owner-read-only (DM-only writes;
   in-game changes arrive as effects) and every secondary value is
   server-computed — assert those, don't try to edit them.
+- **Portrait upload works on the sheet** for owner / DM: `setInputFiles` on
+  `#portrait-input` (inside `<nagara-portrait>`) → one `POST …/portrait`
+  then one PATCH carrying six leaves (`portrait.crop.{x,y,scale,rotation}`,
+  `portrait.dimensions.{width,height}`); a mouse drag or wheel on the drop
+  zone fires one more six-leaf PATCH after ~300 ms. Don't PATCH
+  `portrait.crop` wholesale — the node has no permissions and the server
+  rejects it. The uploading tab keeps its blob preview until you navigate
+  away; assert the server `src` / transform in a **second** tab. Public
+  role: the file input is `disabled`. Re-cropping an already-saved portrait
+  is not wired yet (Chunk I).
 
 ## Not wired in the client yet — don't hunt for it
 
@@ -71,7 +81,9 @@ were ironed out or register a new bug.
   `<ol>`, the trait / talent `<ul>`s and the equipment stubs turn into
   `"[object Object]"` text. The data is fine — **reload the page** to
   restore the sheet; do not read it as a server bug. (Retire this entry when
-  ADR-017 ships.)
+  ADR-017 ships.) _Status 2026-09-11: with every override ported to
+  `nagara-*` elements this no longer reproduces — the entry stays only until
+  the lifecycle plan's close-out confirms it._
 
 ## Seeding a fixture via the API
 

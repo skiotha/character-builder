@@ -82,6 +82,22 @@ export class NagaraElement extends HTMLElement {
 }
 
 /**
+ * Whether the current user may write a component's field. In `create` mode
+ * there is no role yet — anything the server does not own is editable; in
+ * `view` mode the schema's per-role permissions decide.
+ * @param {object} fieldSchema - Serialized schema field descriptor
+ * @param {string} role - "dm" | "owner" | "public"
+ * @param {string} [mode="view"] - "view" | "create"
+ * @returns {boolean}
+ */
+export function isWritable(fieldSchema, role, mode = "view") {
+  if (fieldSchema.serverControlled || fieldSchema.immutable) return false;
+  if (fieldSchema.derived) return false;
+  if (mode === "create") return true;
+  return fieldSchema.permissions?.[role]?.write === true;
+}
+
+/**
  * Build the registry factory for an element class: the returned function
  * matches the `(path, fieldSchema, value, role, mode, data)` registry
  * contract, creates the element and assigns the renderer's props. `value`

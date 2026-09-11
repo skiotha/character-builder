@@ -7,7 +7,6 @@ import {
   setPlayerToken,
 } from "../state.mjs";
 import { navigate } from "router";
-import { initPortraitUpload } from "../behaviors/portraitHandler.mjs";
 import { renderCharacterForm } from "../renderers/form-renderer.mjs";
 import { createViewNav } from "../utils/dom.mjs";
 import {
@@ -18,7 +17,6 @@ import {
 
 const BUDGET = 80;
 
-let portraitManager = null;
 let isSubmitting = false;
 
 export async function renderCreation(container, params) {
@@ -77,9 +75,6 @@ export async function renderCreation(container, params) {
     expInput.value = "50";
     form.appendChild(expInput);
 
-    // Wire portrait
-    portraitManager = initPortraitUpload(container);
-
     // Wire submission
     form.addEventListener("submit", handleFormSubmit);
   } catch (error) {
@@ -94,7 +89,6 @@ export async function renderCreation(container, params) {
 
   return () => {
     container.removeAttribute("id");
-    if (portraitManager) portraitManager.cleanup();
     const form = container.querySelector("form#character-form");
     if (form) form.removeEventListener("submit", handleFormSubmit);
   };
@@ -196,15 +190,14 @@ const handleFormSubmit = async (e) => {
       characterData.playerId = playerToken;
     }
 
-    // Attach portrait crop data
-    if (portraitManager) {
-      const portraitData = portraitManager.getPortraitData();
-      if (portraitData?.crop && portraitData?.originalSize) {
-        characterData.portrait = {
-          crop: portraitData.crop,
-          dimensions: portraitData.originalSize,
-        };
-      }
+    // Attach portrait crop data staged by <nagara-portrait>
+    const portraitData =
+      form.querySelector("nagara-portrait")?.getPortraitData() ?? null;
+    if (portraitData?.file && portraitData.originalSize) {
+      characterData.portrait = {
+        crop: portraitData.crop,
+        dimensions: portraitData.originalSize,
+      };
     }
 
     // Submit
@@ -218,15 +211,21 @@ const handleFormSubmit = async (e) => {
     setCurrentCharacter(character);
     setCharacters([...state.characters, character]);
 
-    // Upload portrait if exists
-    if (portraitManager) {
-      const portraitData = portraitManager.getPortraitData();
-      if (portraitData?.file) {
-        try {
-          await uploadPortrait(character.id, portraitData.file);
-        } catch (err) {
-          console.warn("Portrait upload failed (character was created):", err);
+    // Upload portrait if one was staged
+    if (portraitData?.file) {
+      try {
+        const result = await api.uploadPortrait(
+          character.id,
+          portraitData.file,
+        );
+        if (!result.success) {
+          console.warn(
+            "Portrait upload failed (character was created):",
+            result.error,
+          );
         }
+      } catch (err) {
+        console.warn("Portrait upload failed (character was created):", err);
       }
     }
 
@@ -274,30 +273,6 @@ function collectFormData(form) {
   }
 
   return data;
-}
-
-// ── Portrait upload ───────────────────────────────────────────
-
-async function uploadPortrait(characterId, file) {
-  const formData = new FormData();
-  formData.append("portrait", file);
-
-  const headers = {};
-  const playerToken = getPlayerToken();
-  if (playerToken) headers["x-player-id"] = playerToken;
-
-  const response = await fetch(`/api/v1/characters/${characterId}/portrait`, {
-    method: "POST",
-    headers,
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Portrait upload failed: ${response.status} ${errorText}`);
-  }
-
-  return response.json();
 }
 
 // ── UI helpers ────────────────────────────────────────────────

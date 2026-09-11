@@ -11,10 +11,32 @@ const INIT_FUNCS = {
   initEditable: initEditable,
 };
 
+/**
+ * True when `element` sits inside a `nagara-*` component host that is a
+ * strict descendant of `root`. Hosts enhance and clean up their own
+ * subtree (ADR-017 §deps), so a view-level sweep must leave it alone or
+ * every behavior inside gets wired twice.
+ * @param {Element} element
+ * @param {Element} root
+ * @returns {boolean}
+ */
+function ownedByNestedHost(element, root) {
+  for (
+    let node = element.parentElement;
+    node && node !== root;
+    node = node.parentElement
+  ) {
+    if (node.localName.startsWith("nagara-")) return true;
+  }
+  return false;
+}
+
 export function enhanceElement(rootElement) {
   const behaviorElements = rootElement.querySelectorAll("[data-behavior]");
 
   behaviorElements.forEach((element) => {
+    if (ownedByNestedHost(element, rootElement)) return;
+
     const behaviorTags = element.dataset.behavior.trim().split(/\s+/);
 
     const configs = [];
@@ -40,18 +62,13 @@ export function enhanceElement(rootElement) {
         });
       }
 
-      if (config.initFunction) {
-        const initFunc = INIT_FUNCS[config.initFunction];
-
-        const cleanup = INIT_FUNCS[config.initFunction](element);
+      const initFunc = INIT_FUNCS[config.initFunction];
+      if (initFunc) {
+        const cleanup = initFunc(element);
         if (typeof cleanup === "function") {
           if (!element._behaviorCleanups) element._behaviorCleanups = [];
 
           element._behaviorCleanups.push(cleanup);
-        }
-
-        if (initFunc) {
-          initFunc(element);
         }
       }
     }
@@ -60,6 +77,8 @@ export function enhanceElement(rootElement) {
 
 export function cleanupBehaviors(rootElement) {
   rootElement.querySelectorAll("[data-behavior]").forEach((el) => {
+    if (ownedByNestedHost(el, rootElement)) return;
+
     if (el._behaviorCleanups) {
       el._behaviorCleanups.forEach((fn) => fn());
       delete el._behaviorCleanups;

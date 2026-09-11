@@ -257,6 +257,46 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   upload + crop + submit); on the sheet, owner uploads a portrait and a
   second tab shows it via SSE; a trait PATCHed from a second tab appears
   live; character name SSE update lands unless editing.
+  > ✅ Completed 2026-09-11. Divergences from the outline:
+  > - **Crop PATCH shape.** The plan assumed a client-side crop PATCH already
+  >   existed; it did not (crop rode only in the create POST). The
+  >   `portrait.crop` schema node carries no `permissions`, so a wholesale
+  >   `portrait.crop` write is rejected (422 verified). `<nagara-portrait>`
+  >   therefore PATCHes **six leaves** (`portrait.crop.{x,y,scale,rotation}`,
+  >   `portrait.dimensions.{width,height}`) after upload and on every settled
+  >   pan / wheel gesture (300 ms debounce, `AbortController` supersedes the
+  >   in-flight PATCH). Upload goes through a new shared `api.uploadPortrait`
+  >   (multipart POST; the hand-rolled copy in `creation-view.mjs` is gone).
+  > - **Portrait local-session guard.** Once a file is picked in a connection
+  >   the element skips incoming renders (`#editing`) so the server echo does
+  >   not fight the blob preview; the session ends on disconnect. The
+  >   handler (`portraitHandler.mjs`) now takes the host + `{ onFileReady,
+  >   onCropChange }` callbacks, does no network I/O, and `cleanup()` removes
+  >   every listener it adds. Re-cropping an already-saved portrait without a
+  >   re-upload is deferred (`TODO(portrait-recrop)` → Chunk I step 4½).
+  > - **`character-name` has `deps = []`.** Its inner `<input data-path>` is
+  >   the one component descendant the view's leaf binding owns, so SSE /
+  >   PATCH echoes land via `updateFieldValue()` (which honours
+  >   `data-editing`); an element-level subscription would only race it. It
+  >   also now sets `data-role-allowed` — `initEditable()` bails without it,
+  >   so the banner input had never actually been editable on the sheet.
+  > - **Behaviors.** `enhanceElement` / `cleanupBehaviors` skip elements
+  >   inside a nested `nagara-*` host (hosts own their subtree), and the
+  >   pre-existing double-init (each init function ran twice) is fixed;
+  >   `initEditable` returns its cleanup instead of stashing it on the node.
+  > - **Shared `isWritable(fieldSchema, role, mode)`** exported from
+  >   `base.mjs` replaces the four per-component copies (weapon-slots adopted
+  >   it too). Registry and export names unchanged.
+  > Gate: creation E2E (POST 201 → portrait POST 200 → sheet shows the
+  > upload), sheet upload = exactly one POST + one six-leaf PATCH, second tab
+  > received new `src` + transform via SSE; drag → 1 PATCH, two quick wheel
+  > ticks → 1 PATCH; traits / talents PATCHed via API re-rendered once each
+  > (trait names enriched); remote rename skipped while `data-editing`,
+  > landed otherwise; public role: file input `disabled`, no add slots, no
+  > `edit-enabled`; navigate away → hosts gone, handler released, no console
+  > errors; no `[object Object]` anywhere. Drop zone measured 30rem×45rem on
+  > both routes, so stored crops reproduce — but the pan / zoom math itself
+  > is wrong (user-reported; folded into Chunk I step 4½).
 - **Step 4 — Teardown + leak check.** Navigate sheet → dashboard → sheet
   three times, then PATCH once: every affected element flashes exactly once
   (no duplicate subscriptions); `disconnectedCallback` observed for each
@@ -297,6 +337,6 @@ cleanup obligation is "follow this checklist", not "remember to grep".
 - [x] Step 0 — Decision lock + ADR-017 (2026-09-02)
 - [x] Step 1 — Structural change detection (2026-09-04)
 - [x] Step 2 — Base element + first port (weapon-slots) (2026-09-10)
-- [ ] Step 3 — Port the remaining components
+- [x] Step 3 — Port the remaining components (2026-09-11)
 - [ ] Step 4 — Teardown + leak check
 - [ ] Step 5 — Docs & bookkeeping

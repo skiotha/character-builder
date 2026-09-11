@@ -203,6 +203,30 @@ in-browser pass over the touched view (Playwright MCP, per the
   plain string-row editors for both.
   **Done when:** in-browser: add a ritual; add/edit/remove note and
   affiliation rows; PATCH round-trips + SSE live update.
+- **Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix.**
+  Registered 2026-09-11 from lifecycle-plan step 3, which shipped view-mode
+  portrait upload (`<nagara-portrait>` → `api.uploadPortrait` → six-leaf
+  crop PATCH) but deliberately left two gaps. **(a) Re-crop without
+  re-upload:** today the drop zone only opens the file picker while no image
+  is staged, so an already-saved portrait cannot be panned / zoomed again —
+  the element must enable the pan-zoom session on the server image (same
+  `onCropChange` → six-leaf PATCH path) and offer an explicit "replace"
+  affordance instead of the click-to-pick guard. **(b) The crop math is
+  wrong** (user-reported): the translate / scale / constrain calculations in
+  `portraitHandler.mjs` (`processImageFile` initial fit, `pan`,
+  `handleZoom`, `constrainImageToViewport`) do not behave as expected and
+  must be re-derived — pick one coordinate convention (image-origin offset
+  in viewport px vs. centre-anchored), make zoom anchor at the pointer, and
+  make the constraint keep the image covering the viewport. Crop values are
+  viewport-pixel-relative, so both routes must keep rendering the zone at
+  the same size (30rem×45rem measured on both, 2026-09-11) or the stored
+  crop must become size-independent — decide here. Sibling readers of
+  `portrait.crop` (addon / bot contracts) must be checked before changing
+  the stored meaning.
+  **Done when:** in-browser: pan / zoom an already-saved portrait → PATCH
+  → second tab shows the same framing; replace via the affordance still
+  works; a stored crop reproduces pixel-identically on creation and sheet;
+  the `TODO(portrait-recrop)` site is removed.
 - **Step 5 — Styling & usability pass.** Creation + character view to
   "usable" (dashboard/initial only if cheap); fix the `#character-name`
   pointer interception (Location field mouse-editable at common viewports);
@@ -240,7 +264,8 @@ step-1 placeholder TODOs cite roadmap capabilities / NB-14, **not** this
 plan, so they do not belong here — only add entries if a TODO gains a
 pointer to this plan.
 
-- _(none yet)_
+- `public/behaviors/portraitHandler.mjs` — `TODO(portrait-recrop)` at the
+  drop-zone click guard (step 4½ removes it).
 
 ## Progress
 
@@ -251,5 +276,6 @@ pointer to this plan.
 - [ ] Step 2 — Armor slots
 - [ ] Step 3 — Traits & talents pickers
 - [ ] Step 4 — Rituals picker + notes/affiliations editors
+- [ ] Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix
 - [ ] Step 5 — Styling & usability pass
 - [ ] Step 6 — Close-out

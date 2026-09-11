@@ -21,7 +21,7 @@
 
 import * as api from "api";
 import { setCurrentCharacter } from "../state.mjs";
-import { NagaraElement, componentFactory } from "./base.mjs";
+import { NagaraElement, componentFactory, isWritable } from "./base.mjs";
 
 const SLOT_LABELS = ["Main-hand", "Off-hand", "Own"];
 const EMPTY_OPTION = "— empty —";
@@ -36,7 +36,7 @@ class WeaponSlotsElement extends NagaraElement {
     const weapons = Array.isArray(character?.equipment?.weapons)
       ? character.equipment.weapons
       : [];
-    const writable = isWritable(this.fieldSchema, this.role);
+    const writable = isWritable(this.fieldSchema, this.role, this.mode);
 
     const list = document.createElement("ol");
     list.classList.add("weapon-slots");
@@ -73,9 +73,7 @@ class WeaponSlotsElement extends NagaraElement {
 
     for (let w = 0; w < weapons.length; w++) {
       const weapon = weapons[w] || {};
-      const qualities = Array.isArray(weapon.qualities)
-        ? weapon.qualities
-        : [];
+      const qualities = Array.isArray(weapon.qualities) ? weapon.qualities : [];
       if (isOwnSlot && !qualities.includes("own")) continue;
 
       const option = document.createElement("option");
@@ -151,12 +149,4 @@ function renderDerivedDisplay(slot) {
   }
 
   return dl;
-}
-
-function isWritable(fieldSchema, role) {
-  if (fieldSchema.serverControlled || fieldSchema.immutable) return false;
-  if (fieldSchema.derived) return false;
-  if (!fieldSchema.permissions) return false;
-  const rolePerms = fieldSchema.permissions[role];
-  return !!(rolePerms && rolePerms.write === true);
 }

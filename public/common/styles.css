@@ -79,7 +79,11 @@
     all: unset;
   }
 
-  /* CUSTOM COMPONENTS */
+  /* CUSTOM COMPONENTS -- light-DOM hosts stay out of layout (ADR-017 §light-dom) */
+  nagara-portrait,
+  nagara-trait-list,
+  nagara-talent-list,
+  nagara-character-name,
   nagara-weapon-slots {
     display: contents;
   }

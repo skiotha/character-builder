@@ -141,6 +141,40 @@ export async function patchCharacter(characterId, updates, { signal } = {}) {
   return await response.json();
 }
 
+/**
+ * Upload a portrait image for a character. Resolves with
+ * the parsed body on any HTTP status — callers branch on `body.success`;
+ * network errors propagate. The server stores the file and PATCHes
+ * `portrait.path` / `portrait.status` itself; the crop is a separate PATCH.
+ *
+ * @param {string} characterId
+ * @param {File} file - Image file from an `<input type="file">` or drop
+ * @returns {Promise<{ success?: boolean, portraitPath?: string, error?: string }>}
+ */
+export async function uploadPortrait(characterId, file) {
+  const headers = {};
+
+  const playerToken = nagara.getPlayerToken();
+  if (playerToken) {
+    headers["x-player-id"] = playerToken;
+  }
+
+  const dmToken = nagara.getDMToken();
+  if (dmToken) {
+    headers["x-dm-id"] = dmToken;
+  }
+
+  const body = new FormData();
+  body.append("portrait", file);
+
+  const response = await fetch(
+    `${API_BASE}/characters/${characterId}/portrait`,
+    { method: "POST", headers, body },
+  );
+
+  return await response.json();
+}
+
 export async function recoverCharacter(characterName, backupCode) {
   try {
     const response = await fetch(`${API_BASE}/recover`, {

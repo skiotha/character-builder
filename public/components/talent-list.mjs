@@ -1,37 +1,42 @@
 /**
- * Talent list component override.
- * Renders the character's talents with level indicators and management buttons,
- * or empty add-button slots.
+ * `<nagara-talent-list>` — learned-talents component override (ADR-017).
+ *
+ * Rebuilds its list on every `talents` subtree change: each talent renders
+ * with its level and, when writable for the current role, a level-up
+ * button; a trailing add-talent slot appears for writable roles.
  *
  * Character data shape: talents = LearnedTalent[]
  *   LearnedTalent = { id: string, level: number, source: "sin" | "boon" }
  *
- * Reference data (talent names, descriptions) is fetched lazily from
- * the reference file. For now, the talent id is used as a display name
- * until a reference endpoint exists.
+ * Talent ids are shown title-cased until a talent reference endpoint is
+ * wired into the client.
  *
- * @param {string} path - Schema field path (e.g. "talents")
- * @param {object} fieldSchema - Serialized schema field descriptor
- * @param {Array} value - Array of learned talents or undefined
- * @param {string} role - "dm" | "owner" | "public"
- * @returns {HTMLElement}
+ * No descendant carries `data-path` — the level `output` is display-only
+ * here; the view's leaf binding (ADR-017 §leaf-binding) owns native
+ * controls and the host carries the path.
  */
-export function renderTalentList(path, fieldSchema, value, role, mode) {
-  const talents = Array.isArray(value) ? value : [];
-  const writable = isWritable(fieldSchema, role);
 
-  const list = document.createElement("ul");
-  list.dataset.path = path;
+import { NagaraElement, componentFactory, isWritable } from "./base.mjs";
 
-  for (let i = 0; i < talents.length; i++) {
-    list.appendChild(renderTalentItem(talents[i], i, writable));
+class TalentListElement extends NagaraElement {
+  static deps = ["talents"];
+
+  render(character) {
+    const talents = Array.isArray(character?.talents) ? character.talents : [];
+    const writable = isWritable(this.fieldSchema, this.role, this.mode);
+
+    const list = document.createElement("ul");
+
+    for (let i = 0; i < talents.length; i++) {
+      list.appendChild(renderTalentItem(talents[i], i, writable));
+    }
+
+    if (writable) {
+      list.appendChild(renderAddSlot(talents.length));
+    }
+
+    this.rebuild(list);
   }
-
-  if (writable) {
-    list.appendChild(renderAddSlot(talents.length));
-  }
-
-  return list;
 }
 
 /**
@@ -115,17 +120,13 @@ function renderAddSlot(index) {
 
 // ── Helpers ───────────────────────────────────────────────────
 
-function isWritable(fieldSchema, role) {
-  if (fieldSchema.serverControlled || fieldSchema.immutable) return false;
-  if (fieldSchema.derived) return false;
-  if (!fieldSchema.permissions) return false;
-  const rolePerms = fieldSchema.permissions[role];
-  return rolePerms && rolePerms.write === true;
-}
-
 function formatId(id) {
   return id
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+customElements.define("nagara-talent-list", TalentListElement);
+
+export const renderTalentList = componentFactory(TalentListElement);

@@ -23,8 +23,7 @@ export function initEditable(element) {
 
   element.addEventListener("click", clickHandler);
 
-  element._editableCleanup = () => {
-    console.log("Editable deleted");
+  return () => {
     element.removeEventListener("click", clickHandler);
   };
 }

@@ -1,21 +1,23 @@
 /**
- * Trait list component override.
- * Renders the character's learned traits with tier indicators,
- * or an empty add-button slot when the list is empty.
+ * `<nagara-trait-list>` — learned-traits component override (ADR-017).
+ *
+ * Rebuilds its list on every `traits` subtree change: each trait renders
+ * with tier indicators, followed by an add-trait slot when the field is
+ * writable for the current role.
  *
  * Character data shape: traits = LearnedTrait[]
  *   LearnedTrait = { id: string, tier: "novice" | "adept" | "master", source: "ability" | "spell" }
  *
- * Reference data (full name, descriptions) is fetched lazily from
- * GET /api/v1/traits?locale=… and cached in module scope. Each entry
- * carries a `source: "ability" | "spell"` discriminator.
+ * Reference data (full name, tier descriptions) is fetched lazily from
+ * GET /api/v1/traits?locale=… and cached in module scope; names render as
+ * title-cased ids until the library resolves, then are enriched in place.
+ * Enrichment re-runs after every rebuild so live updates keep real names.
  *
- * @param {string} path - Schema field path (e.g. "traits")
- * @param {object} fieldSchema - Serialized schema field descriptor
- * @param {Array} value - Array of learned traits or undefined
- * @param {string} role - "dm" | "owner" | "public"
- * @returns {HTMLElement}
+ * No descendant carries `data-path` — the view's leaf binding
+ * (ADR-017 §leaf-binding) owns native controls; the host carries the path.
  */
+
+import { NagaraElement, componentFactory, isWritable } from "./base.mjs";
 
 const TIER_ORDER = ["novice", "adept", "master"];
 const TIER_ICONS = {
@@ -62,27 +64,32 @@ async function ensureLibrary() {
   return libraryPromise;
 }
 
-export function renderTraitList(path, fieldSchema, value, role, mode) {
-  const traits = Array.isArray(value) ? value : [];
-  const writable = isWritable(fieldSchema, role);
+class TraitListElement extends NagaraElement {
+  static deps = ["traits"];
 
-  const list = document.createElement("ul");
-  list.dataset.path = path;
+  render(character) {
+    const traits = Array.isArray(character?.traits) ? character.traits : [];
+    const writable = isWritable(this.fieldSchema, this.role, this.mode);
 
-  for (let i = 0; i < traits.length; i++) {
-    list.appendChild(renderTraitItem(traits[i], i));
+    const list = document.createElement("ul");
+
+    for (let i = 0; i < traits.length; i++) {
+      list.appendChild(renderTraitItem(traits[i], i));
+    }
+
+    if (writable) {
+      list.appendChild(renderAddSlot(traits.length));
+    }
+
+    this.rebuild(list);
+
+    if (traits.length > 0) {
+      ensureLibrary().then((lib) => {
+        // A later rebuild may have replaced the list; enrich only if still live.
+        if (list.isConnected) enrichTraitNames(list, lib);
+      });
+    }
   }
-
-  if (writable) {
-    list.appendChild(renderAddSlot(traits.length));
-  }
-
-  // Kick off library fetch to enrich names asynchronously
-  if (traits.length > 0) {
-    ensureLibrary().then((lib) => enrichTraitNames(list, lib));
-  }
-
-  return list;
 }
 
 /**
@@ -204,17 +211,13 @@ function enrichTraitNames(container, lib) {
 
 // ── Helpers ───────────────────────────────────────────────────
 
-function isWritable(fieldSchema, role) {
-  if (fieldSchema.serverControlled || fieldSchema.immutable) return false;
-  if (fieldSchema.derived) return false;
-  if (!fieldSchema.permissions) return false;
-  const rolePerms = fieldSchema.permissions[role];
-  return rolePerms && rolePerms.write === true;
-}
-
 function formatId(id) {
   return id
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+customElements.define("nagara-trait-list", TraitListElement);
+
+export const renderTraitList = componentFactory(TraitListElement);
