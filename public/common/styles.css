@@ -84,7 +84,8 @@
   nagara-trait-list,
   nagara-talent-list,
   nagara-character-name,
-  nagara-weapon-slots {
+  nagara-weapon-slots,
+  nagara-equipment-list {
     display: contents;
   }
 
@@ -1419,6 +1420,126 @@
 
           &:last-of-type {
             justify-self: flex-end;
+          }
+        }
+
+        /* Weapons picker and free-form placeholders */
+        /* @TODO: take a look */
+        nagara-equipment-list {
+          ul {
+            flex-direction: column;
+            gap: 0.4rem;
+
+            li {
+              block-size: auto;
+              inline-size: auto;
+
+              display: flex;
+              flex-wrap: wrap;
+              align-items: baseline;
+              gap: 0.6rem;
+
+              &.empty {
+                color: var(--color-grey);
+              }
+
+              small {
+                color: var(--color-grey);
+              }
+
+              button {
+                all: unset;
+
+                inline-size: auto;
+                block-size: auto;
+                display: inline-block;
+
+                cursor: pointer;
+                font: inherit;
+                font-size: 0.85em;
+                padding: 0.1rem 0.6rem;
+                border: 1px solid currentColor;
+                border-radius: 0.3rem;
+                color: var(--color-grey);
+                transition:
+                  color 120ms ease,
+                  border-color 120ms ease;
+
+                &:hover,
+                &:focus-visible {
+                  color: var(--color-accent);
+                  outline: none;
+                }
+              }
+            }
+          }
+
+          .weapon-slot-badge {
+            font-size: 0.8em;
+            padding: 0.05rem 0.5rem;
+            border-radius: 1rem;
+            color: var(--color-black);
+            background-color: var(--color-main);
+          }
+
+          .weapon-add {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            margin-block-start: 0.6rem;
+
+            select {
+              font: inherit;
+              color: inherit;
+              background-color: transparent;
+              border: 1px solid var(--color-grey);
+              border-radius: 0.3rem;
+              padding: 0.1rem 0.4rem;
+
+              &:focus-visible {
+                border-color: var(--color-main);
+                outline: none;
+              }
+            }
+
+            button {
+              inline-size: auto;
+              block-size: auto;
+              padding: 0.1rem 0.8rem;
+              border: 1px solid var(--color-main);
+              border-radius: 0.3rem;
+              color: var(--color-main);
+              transition:
+                background-color 120ms ease,
+                color 120ms ease;
+
+              &:hover:not(:disabled),
+              &:focus-visible {
+                color: var(--color-black);
+                background-color: var(--color-main);
+                outline: none;
+              }
+
+              &:disabled {
+                cursor: default;
+                opacity: 0.4;
+              }
+            }
+          }
+
+          .weapon-catalog-status,
+          .equipment-placeholder-note {
+            color: var(--color-grey);
+            font-size: 0.85em;
+          }
+
+          .weapon-catalog-status[data-status="error"] {
+            color: var(--color-accent);
+          }
+
+          .equipment-placeholder {
+            opacity: 0.55;
           }
         }
       }

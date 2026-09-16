@@ -4,6 +4,11 @@ const { protocol, hostname, port } = window.location;
 const base = `${protocol}//${hostname}${port ? ":" + port : ""}`;
 const API_BASE = `${base}/api/v1`;
 
+// NOTE: the server resolves `Accept-Language` before its default locale, so
+// pickers that clone catalog entries into the character must pin the locale
+// or a RU browser would persist RU display strings. EN is the project default.
+export const CATALOG_LOCALE = "en";
+
 // const API_BASE = "http://127.0.0.1:3000/api/v1";
 // const API_BASE = "https://nagara.team/api/v1";
 
@@ -222,6 +227,19 @@ export async function getTraits() {
     console.log("Error getting traits from the server:", error);
     return false;
   }
+}
+
+/**
+ * Fetch the weapons catalog at `CATALOG_LOCALE`. Unlike `getTraits()` this
+ * throws on a non-2xx response so pickers can render an "unavailable" state.
+ * @returns {Promise<object[]>} Raw catalog entries
+ */
+export async function getWeapons() {
+  const response = await fetch(`${API_BASE}/weapons?locale=${CATALOG_LOCALE}`);
+  if (!response.ok) {
+    throw new Error(`Weapons catalog fetch failed: ${response.status}`);
+  }
+  return await response.json();
 }
 
 let cachedSchemaETag = null;

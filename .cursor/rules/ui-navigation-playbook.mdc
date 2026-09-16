@@ -91,13 +91,26 @@ were ironed out or register a new bug.
   away; assert the server `src` / transform in a **second** tab. Public
   role: the file input is `disabled`. Re-cropping an already-saved portrait
   is not wired yet (Chunk I).
+- **Weapons picker works on the sheet** for owner / DM, inside
+  `[data-path="equipment.weapons"]` (`<nagara-equipment-list>`):
+  `selectOption` on `select.weapon-add-select` (catalog id, e.g.
+  `two_handed_sword`; already-owned ids are not listed) enables the Add
+  button → one PATCH carrying `equipment.weapons` only. Each row's
+  `button.weapon-remove` fires one PATCH carrying **both**
+  `equipment.weapons` and the re-mapped `combat.carried` (hand slots
+  pointing at the removed weapon → `null`, own slot → `natural_weapon`).
+  `natural_weapon` has no remove button. Expect one `render` on every
+  `nagara-equipment-list` host (all eight share `deps: ["equipment"]`)
+  plus one on `nagara-weapon-slots`, none on the SSE echo. Public role:
+  no controls. The other seven equipment lists render a read-only
+  "Not editable yet." placeholder.
 
 ## Not wired in the client yet — don't hunt for it
 
-- Catalog pickers don't exist: traits, talents, rituals, weapons, armor,
-  and manual effects cannot be added through the UI (see `docs/roadmap.md`,
-  Phase 6 chunk table). Seed that state via the API (PATCH with catalog
-  ids) or fixtures instead.
+- Catalog pickers don't exist for traits, talents, rituals, armor, and
+  manual effects — they cannot be added through the UI (see
+  `docs/roadmap.md`, Phase 6 chunk table). Seed that state via the API
+  (PATCH with catalog ids) or fixtures instead.
 
 ## Seeding a fixture via the API
 

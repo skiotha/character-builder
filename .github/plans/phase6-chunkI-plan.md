@@ -269,6 +269,27 @@ in-browser pass over the touched view (Playwright MCP, per the
   the carried weapon → auto-unassign observed in the same PATCH →
   `natural_weapon` cannot be removed; public role sees the list read-only;
   creation form still renders the placeholder without controls.
+
+  > ✅ **Completed 2026-09-16.** Divergences from the text above:
+  > - The pure logic (catalog projection, tuple strip, carried re-map on
+  >   remove, owned-id filter) lives in `public/utils/weapons.mjs` with
+  >   `test/client-weapons.test.mts` covering it; the component imports
+  >   those helpers rather than inlining them.
+  > - The catalog is cached at **module scope** (one fetch per page load,
+  >   shared by every host), not per element instance; a failed fetch
+  >   resets the promise so the next render retries.
+  > - **Add** PATCHes `equipment.weapons` only (appending never disturbs
+  >   indices); **remove** sends the two-field batch as planned.
+  > - A `p.weapon-catalog-status` line shows "Loading weapon catalog…" and,
+  >   on fetch failure, "Weapon catalog unavailable — adding is disabled."
+  >   with the add controls omitted.
+  > - The placeholder branch's TODO scope is `TODO(equipment-catalogs)`.
+  > - Browser pass: add `two_handed_sword` → 1 PATCH, 1 render on each of
+  >   the 8 `nagara-equipment-list` hosts + 1 on `nagara-weapon-slots`, no
+  >   SSE-echo renders; assign main-hand → `baseDamage` 10 / `accurate`;
+  >   remove → one PATCH carrying both fields, main-hand back to empty;
+  >   `war_claws` → own → remove → own back to `natural_weapon`; public
+  >   role zero controls; creation form 8 hosts, zero controls, POST 201.
 - **Step 2 — Armor slots (`armor-slot`).** For `equipment.armor.body` /
   `.plug`: fetch `/api/v1/armor`, filter entries by `slot` matching the
   position, single-select, `null` clears. Clone minus presentation fields
@@ -322,7 +343,24 @@ in-browser pass over the touched view (Playwright MCP, per the
   seed `ux-wishlist.md` with observations from steps 1–4. Per the
   **styling** rule: `@layer`/`@scope`/native nesting; existing stylesheets
   predate ADR-012 and are not reference implementations.
-  **Done when:** full-flow in-browser pass at common viewport sizes.
+  _Carried in from step 1 (2026-09-16; observed, not blocking testing):_
+  - The `div#equipment` block is squeezed at the default viewport — the
+    legacy layout gives it no room once a list holds more than a tile, so
+    the weapons picker is functional but cramped. Give the section real
+    width / wrapping at common viewports.
+  - The picker's interim styles live in a `nagara-equipment-list` nested
+    block inside `div#equipment` in `public/common/styles.css`, written to
+    **override** the legacy icon-tile rules (`ul { display: flex }`,
+    `li { 9rem × 9rem }`, `button { all: unset }`) and the layout-layer
+    `button` sizing by specificity. Fold them into the redesigned equipment
+    styling instead of keeping the override stack; decide whether the
+    seven free-form placeholders stay as greyed lists or get a single
+    "not editable yet" block.
+  - The add row is `<label>Add weapon <select>…</select></label>` +
+    `<button type="button">Add</button>`; Figma may want a different
+    affordance (inline search, dialog) — check the source before restyling.
+  **Done when:** full-flow in-browser pass at common viewport sizes,
+  including the equipment section with three-plus weapons stored.
 - **Step 6 — Close-out.** Formal E2E scenario: create a fresh character via
   UI → add weapon → see it in the slot dropdown → assign to main-hand →
   derived values update → add a trait → registry-driven outputs (per-slot
@@ -361,7 +399,7 @@ pointer to this plan.
 - [x] Step 0 — Extraction & bookkeeping (2026-09-01)
 - [x] _(prerequisite)_ [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md) — shipped 2026-09-16
 - [x] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50) (2026-09-16)
-- [ ] Step 1 — Weapons picker + free-form placeholders
+- [x] Step 1 — Weapons picker + free-form placeholders (2026-09-16)
 - [ ] Step 2 — Armor slots
 - [ ] Step 3 — Traits & talents pickers
 - [ ] Step 4 — Rituals picker + notes/affiliations editors
