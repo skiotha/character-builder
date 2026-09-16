@@ -85,6 +85,17 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
           qualities: ["balanced"],
           effects: [],
         },
+        // Second own-quality weapon so own-slot selection is testable
+        // end-to-end (ES §carried-slots, NB-49).
+        {
+          id: "war_claws",
+          name: "War Claws",
+          type: "natural",
+          damage: 4,
+          cost: 1,
+          qualities: ["own", "short", "deep_wounds"],
+          effects: [],
+        },
       ],
     ],
     [

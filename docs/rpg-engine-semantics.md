@@ -291,10 +291,14 @@ when the designer changes the loop.*
   selects from it.
 - **Engine.** `combat.carried` is `[Slot|null, Slot|null, Slot]`; the own
   slot is required and must reference a weapon carrying the `own` quality
-  (creation default `natural_weapon`). There is **no `combat.active`** —
-  which weapon is in use is sibling session state.
+  (creation default `natural_weapon`). On recalc the own slot resolves in
+  order: the stored `weaponIndex` when it points at an own-quality weapon →
+  the first own-quality weapon in `equipment.weapons[]` → a synthesized
+  `natural_weapon`. Hand slots whose index no longer resolves become `null`.
+  There is **no `combat.active`** — which weapon is in use is sibling
+  session state.
 - **Where.** `validateCombatCarried` in `src/models/character.mts`;
-  ADR-014.
+  `deriveCombatSlots` in `src/rules/derived.mts`; ADR-014.
 
 ### ES §per-slot-fanout — combat derives per weapon
 

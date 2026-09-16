@@ -41,10 +41,10 @@ function weapon(
 
 /**
  * Build a typed character carrying the given weapons. `equipment.weapons`
- * is the array; `combat.carried` references entries by index. The own slot
- * is always pinned to the natural_weapon synthesized at index 0 of the
- * fixture's default equipment unless an `own`-qualified weapon is added
- * to `weapons`.
+ * is the array; `combat.carried` references entries by index. Index 0 of
+ * `carried` selects natural_weapon (prepended at weapons[0]); any other
+ * own index addresses `weapons[i]` and is honored by recalc only when
+ * that weapon carries the `own` quality (ES §carried-slots).
  */
 function withLoadout(
   weapons: Weapon[],
@@ -266,6 +266,49 @@ describe("deriveCombatSlots: slot shape", () => {
     const slot2 = result.combat.carried[2]!;
     const slot2Weapon = result.equipment.weapons[slot2.weaponIndex] as Weapon;
     assert.ok(slot2Weapon.qualities.includes("own"));
+  });
+});
+
+// ── deriveCombatSlots — own-slot index resolution (NB-49) ──────────
+
+describe("deriveCombatSlots: own-slot index resolution", () => {
+  // withLoadout prepends natural_weapon at index 0; user indices shift +1.
+  const sword = weapon("longsword", "main", 4);
+  const claws = weapon("war_claws", "natural", 5, ["own", "deep_wounds"]);
+  const registry = createInMemoryRegistry({
+    qualities: { deep_wounds: { id: "deep_wounds", effects: [] } },
+  });
+
+  it("honors a stored own index that points at an own-quality weapon", () => {
+    // weapons: [natural_weapon, longsword, war_claws]; own → war_claws (2)
+    const char = withLoadout([sword, claws], [null, null, 1]);
+    const result = recalculate(char, registry);
+    const slot2 = result.combat.carried[2]!;
+    assert.equal(slot2.weaponIndex, 2);
+    assert.equal(slot2.baseDamage, 5);
+    assert.ok(slot2.qualities.includes("deep_wounds"));
+  });
+
+  it("falls back to the first own-quality weapon when the stored index is not own-quality", () => {
+    // own → longsword (1), which lacks `own` → natural_weapon (0)
+    const char = withLoadout([sword, claws], [null, null, 0]);
+    (char.combat.carried[2] as { weaponIndex: number }).weaponIndex = 1;
+    const result = recalculate(char, registry);
+    assert.equal(result.combat.carried[2]!.weaponIndex, 0);
+  });
+
+  it("falls back to the first own-quality weapon when the stored index is out of range", () => {
+    const char = withLoadout([sword, claws], [null, null, 0]);
+    (char.combat.carried[2] as { weaponIndex: number }).weaponIndex = 99;
+    const result = recalculate(char, registry);
+    assert.equal(result.combat.carried[2]!.weaponIndex, 0);
+  });
+
+  it("falls back to the first own-quality weapon when no own slot is stored", () => {
+    const char = withLoadout([sword, claws], [null, null, 0]);
+    (char.combat as unknown as { carried: unknown[] }).carried = [null, null];
+    const result = recalculate(char, registry);
+    assert.equal(result.combat.carried[2]!.weaponIndex, 0);
   });
 });
 

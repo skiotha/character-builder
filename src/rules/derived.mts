@@ -202,9 +202,11 @@ function collectActions(
 //
 // For each non-null carried slot:
 //   1. Resolve the weapon by index. If missing or malformed, the slot
-//      is left null (main-hand/off-hand) or replaced with a
+//      is left null (main-hand/off-hand). The own slot is required
+//      (ADR-014): its stored index is honored when it points at an
+//      own-quality weapon, else the first own-quality weapon, else a
 //      natural_weapon synthesized from the registry's catalog record
-//      (own slot — required, ADR-014; single source per NB-45).
+//      (single source per NB-45).
 //   2. Reset derived per-slot state from the weapon (qualities cloned,
 //      flags empty, attackAttribute = "accurate", baseDamage =
 //      weapon.damage, bonusDamage = 0).
@@ -328,11 +330,19 @@ function deriveCombatSlots(
 ): void {
   const equipment = character.equipment;
   const weapons = (equipment?.weapons ?? []) as Weapon[];
+  const existing = character.combat?.carried;
 
-  // Locate or synthesize the `own` weapon (own-slot anchor).
-  let ownIndex = weapons.findIndex(
-    (w) => Array.isArray(w?.qualities) && w.qualities.includes("own"),
-  );
+  // Own-slot anchor resolution (ES §carried-slots): the stored own index
+  // wins when it points at an own-quality weapon (NB-49 — the player's
+  // choice used to be discarded here); otherwise the first own-quality
+  // weapon; otherwise synthesize `natural_weapon`.
+  const isOwn = (w: Weapon | undefined): boolean =>
+    Array.isArray(w?.qualities) && w.qualities.includes("own");
+  const storedOwn = existing?.[2]?.weaponIndex;
+  let ownIndex =
+    typeof storedOwn === "number" && isOwn(weapons[storedOwn])
+      ? storedOwn
+      : weapons.findIndex(isOwn);
   if (ownIndex === -1) {
     // Synthesize from the canonical catalog record (NB-45). Clone so the
     // character never aliases the shared registry instance. A registry
@@ -360,7 +370,6 @@ function deriveCombatSlots(
     (e) => e.target.kind === "combat" || e.target.kind === "weaponQuality",
   );
 
-  const existing = character.combat?.carried;
   const slot0 = buildSlot(
     weapons,
     existing?.[0]?.weaponIndex,

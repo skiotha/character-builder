@@ -545,6 +545,75 @@ describe("PATCH /api/v1/characters/:id", () => {
     // toughness.max = max(strong, 10) = 15
     assert.equal(body.character.attributes.secondary.toughness.max, 15);
   });
+
+  it("honors a non-first own-quality weapon in the own slot and re-maps it atomically", async () => {
+    // NB-49 repro: [natural_weapon, test-weapon, war_claws]; own → war_claws.
+    const NATURAL = {
+      id: "natural_weapon",
+      name: "Natural Weapon",
+      type: "natural",
+      damage: 4,
+      qualities: ["own", "short"],
+    };
+    const TEST_WEAPON = {
+      id: "test-weapon",
+      name: "Test Weapon",
+      type: "melee",
+      damage: 6,
+      qualities: ["balanced"],
+    };
+    const CLAWS = {
+      id: "war_claws",
+      name: "War Claws",
+      type: "natural",
+      damage: 4,
+      qualities: ["own", "short", "deep_wounds"],
+    };
+    const char = await createTestCharacter(
+      { characterName: "Clawara" },
+      "player-own-slot",
+    );
+    const patch = async (updates: unknown[]): Promise<Response> =>
+      fetch(`${BASE}/api/v1/characters/${char.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-player-id": "player-own-slot",
+        },
+        body: JSON.stringify({ updates }),
+      });
+    interface Slot {
+      weaponIndex: number;
+      qualities: string[];
+    }
+    interface PatchBody {
+      character: { combat: { carried: [Slot | null, Slot | null, Slot] } };
+    }
+
+    let res = await patch([
+      { field: "equipment.weapons", value: [NATURAL, TEST_WEAPON, CLAWS] },
+    ]);
+    assert.equal(res.status, 200, await res.clone().text());
+
+    res = await patch([
+      { field: "combat.carried", value: [null, null, { weaponIndex: 2 }] },
+    ]);
+    assert.equal(res.status, 200, await res.clone().text());
+    let own = ((await res.json()) as PatchBody).character.combat.carried[2];
+    assert.equal(own.weaponIndex, 2, "stored own index survives recalc");
+    assert.ok(own.qualities.includes("deep_wounds"));
+
+    // NB-50: remove test-weapon and shift the own slot in the same batch —
+    // valid only against the merged array.
+    res = await patch([
+      { field: "equipment.weapons", value: [NATURAL, CLAWS] },
+      { field: "combat.carried", value: [null, null, { weaponIndex: 1 }] },
+    ]);
+    assert.equal(res.status, 200, await res.clone().text());
+    own = ((await res.json()) as PatchBody).character.combat.carried[2];
+    assert.equal(own.weaponIndex, 1);
+    assert.ok(own.qualities.includes("deep_wounds"));
+  });
 });
 
 describe("DELETE /api/v1/characters/:id", () => {

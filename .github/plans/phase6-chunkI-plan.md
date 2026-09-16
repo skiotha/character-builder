@@ -22,9 +22,10 @@ Verified against the code on 2026-09-01:
   `equipment.assassin` (private), `equipment.tools`,
   `equipment.inventory.carried`, `equipment.inventory.home` (private),
   `equipment.artifacts`. Only `weapons` is catalog-validated.
-- `effects`, `traditions`, `affiliations`, and `notes` are `ui.hidden` in the
-  schema — their "stub components" render nothing today, so "implementing"
-  them is not a gap-closing obligation; two stay parked (see Non-goals).
+- `effects`, `traditions`, `affiliations`, `notes`, and `rituals` are
+  `ui.hidden` in the schema — their "stub components" render nothing today,
+  so "implementing" them is not a gap-closing obligation; two stay parked
+  (see Non-goals).
 - No `/api/v1/traditions` endpoint exists (traditions are curated ability
   ids; a future picker would filter `/api/v1/traits` by
   `source === "abilities"`).
@@ -50,13 +51,14 @@ Verified in-browser and via the API before starting step 1:
   implementation record with per-step divergences is
   [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md).
   Step 1 below is rewritten against that contract.
-- **Engine ignores the own-slot choice** — NB-49: `deriveCombat` uses the
-  first own-quality weapon and never reads `carried[2].weaponIndex`, so War
-  Claws / Battle Heels can never occupy the own slot. Coupled validator
-  defect NB-50: per-field PATCH validation runs against the stored
-  `equipment.weapons`, which breaks decision 4's atomic re-map once the own
-  slot can be a non-first weapon. Both are server-side and independent of
-  the client work — fixed in **step ½** below.
+- **Engine ignores the own-slot choice** _(resolved 2026-09-16, step ½)_ —
+  NB-49: `deriveCombatSlots` used the first own-quality weapon and never
+  read `carried[2].weaponIndex`, so War Claws / Battle Heels could never
+  occupy the own slot. Coupled validator defect NB-50: per-field PATCH
+  validation ran against the stored `equipment.weapons`, which broke
+  decision 4's atomic re-map once the own slot can be a non-first weapon.
+  Both were server-side and independent of the client work — fixed in
+  **step ½** below; entries archived in `.github/bugs/resolved.md`.
 - Side finding filed, not scheduled here: NB-51 (fresh characters omit
   every no-default field — `talents`, `rituals`, … — that the contract
   documents as `[]`).
@@ -153,7 +155,7 @@ in-browser pass over the touched view (Playwright MCP, per the
   affiliations-entity, traditions-surface, and free-form-catalogs items.
   **Done when:** `npm test` green (anchor lints pass over the edited files).
 - **Step ½ — Own-slot engine fix (NB-49) + merged-batch validation
-  (NB-50).** Server-only, no client dependency. `deriveCombat` honors
+  (NB-50).** Server-only, no client dependency. `deriveCombatSlots` honors
   `carried[2].weaponIndex` when it indexes an own-quality weapon, falling
   back to the first own-quality weapon, then to `natural_weapon` synthesis;
   `ES §carried-slots` Engine bullet updated in the same commit.
@@ -164,6 +166,20 @@ in-browser pass over the touched view (Playwright MCP, per the
   move to `resolved.md`.
   **Done when:** `PATCH combat.carried = [null, null, { weaponIndex: <war_claws> }]`
   round-trips with that index; `npm test` green.
+
+  > ✅ **Completed 2026-09-16.** Divergences from the text above:
+  > - The function is `deriveCombatSlots` (the plan said `deriveCombat`);
+  >   the module's pipeline header comment was updated alongside the digest.
+  > - The validator's pre-apply is **guarded**: an update whose
+  >   `applyFieldUpdate` throws (an earlier update in the same batch replaced
+  >   its parent with a primitive) is reported as a `VALIDATION` error on
+  >   that field instead of propagating; a third `test/validation.test.mts`
+  >   case covers it.
+  > - An API E2E was added on top of the unit cases: `test/api.test.mts`
+  >   runs the NB-49 repro (own → `war_claws`, index survives recalc, slot
+  >   carries `deep_wounds`) and then the NB-50 shrink + re-map batch in one
+  >   PATCH. `test/helpers/http.mts` now seeds `war_claws` into the test
+  >   weapons catalog to make that possible.
 - **Step 1 — Weapons picker + free-form placeholders (`equipment-list`).**
   _(Rewritten 2026-09-16 against ADR-017; `public/components/weapon-slots.mjs`
   is the reference port.)_
@@ -172,7 +188,8 @@ in-browser pass over the touched view (Playwright MCP, per the
     `static deps = ["equipment", "combat.carried"]` (the picker rebuilds on
     any equipment array and must re-map slots, so it needs the tuple too).
     Export `renderEquipmentList = componentFactory(EquipmentListElement)`
-    and register it in `component-registry.mjs` for all eight
+    and register it in `public/renderers/component-registry.mjs` for all
+    eight
     `equipment-list` paths, removing `"equipment-list"` from
     `STUB_COMPONENTS`. `render(character)` branches on `this.path`:
     `equipment.weapons` → real picker; the other seven → a greyed-out,
@@ -233,10 +250,11 @@ in-browser pass over the touched view (Playwright MCP, per the
   qualities / flags / specialAttacks / reactions populate (first half of the
   G.2-deferred verification); tier/level bounds enforced by the UI.
 - **Step 4 — Rituals picker + notes/affiliations editors.** `ritual-list`:
-  fetch `/api/v1/rituals`; entries `{id, level ≥ 1}`. Schema: unhide `notes`
-  + `affiliations` (add `ui.section`/`label`/`order` — the chunk's only
-  server-side change; watch schema-serializer / data-contracts tests);
-  plain string-row editors for both.
+  fetch `/api/v1/rituals`; entries `{id, level ≥ 1}`. Schema: unhide
+  `rituals`, `notes` + `affiliations` (add `ui.section`/`label`/`order` —
+  the chunk's only server-side change after step ½; watch
+  schema-serializer / data-contracts tests); plain string-row editors for
+  notes and affiliations.
   **Done when:** in-browser: add a ritual; add/edit/remove note and
   affiliation rows; PATCH round-trips + SSE live update.
 - **Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix.**
@@ -287,8 +305,8 @@ in-browser pass over the touched view (Playwright MCP, per the
 
 - `npm run typecheck` clean; `npm test` green at every step.
 - Per-step in-browser gates above; step 6 runs the end-to-end scenario.
-- No server behavior change except the step-4 schema unhide —
-  data-contracts tests confirm.
+- No server behavior change except step ½ (engine + validator fixes) and
+  the step-4 schema unhide — data-contracts tests confirm.
 - Grep gate at close-out: no `[component-name]`-style stub renders remain
   for player-editable fields; `STUB_COMPONENTS` matches the step-6 target.
 
@@ -306,8 +324,8 @@ pointer to this plan.
 ## Progress
 
 - [x] Step 0 — Extraction & bookkeeping (2026-09-01)
-- [ ] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50)
 - [x] _(prerequisite)_ [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md) — shipped 2026-09-16
+- [x] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50) (2026-09-16)
 - [ ] Step 1 — Weapons picker + free-form placeholders
 - [ ] Step 2 — Armor slots
 - [ ] Step 3 — Traits & talents pickers

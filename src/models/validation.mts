@@ -140,19 +140,46 @@ export async function validateCharacterUpdate(
   const errors: UpdateValidationResult["errors"] = [];
   const validUpdates: FieldUpdate[] = [];
 
+  const permitted: FieldUpdate[] = [];
   for (const update of updates) {
-    const { field, value, operation = "set" } = update;
-
-    if (!isFieldWritable(field, role)) {
+    if (!isFieldWritable(update.field, role)) {
       errors.push({
-        field,
-        error: `Not allowed to edit ${field}`,
+        field: update.field,
+        error: `Not allowed to edit ${update.field}`,
         code: "FORBIDDEN",
       });
       continue;
     }
+    permitted.push(update);
+  }
 
-    const validation = validateFieldValue(field, value, character);
+  // Merged view of the batch, built BEFORE the per-field pass so schema
+  // `validate:` hooks that read sibling fields see the post-PATCH state
+  // (NB-50 — e.g. `validateCombatCarried` checking `weaponIndex` against
+  // an `equipment.weapons` shrunk in the same batch). Applying not-yet-
+  // validated values is harmless: any error rejects the whole batch. The
+  // apply itself can throw when an earlier update in the batch replaced
+  // a parent with a primitive; that is reported as a VALIDATION error.
+  const merged = structuredClone(character);
+  const unappliable = new Set<FieldUpdate>();
+  for (const update of permitted) {
+    try {
+      applyFieldUpdate(merged, update.field, update.value, update.operation);
+    } catch {
+      unappliable.add(update);
+      errors.push({
+        field: update.field,
+        error: `Cannot apply ${update.field}: parent path is not an object`,
+        code: "VALIDATION",
+      });
+    }
+  }
+
+  for (const update of permitted) {
+    if (unappliable.has(update)) continue;
+    const { field, value } = update;
+
+    const validation = validateFieldValue(field, value, merged);
     if (!validation.valid) {
       errors.push({
         field,
@@ -165,11 +192,11 @@ export async function validateCharacterUpdate(
     validUpdates.push(update);
   }
 
-  // Merged-state pass: apply the valid updates to a clone and re-run the
-  // cross-field hooks, business rules, and strict catalog-membership
-  // checks against the merged character. Per-field validation cannot see
-  // aggregates (e.g. the exact-80 primary budget when a single leaf
-  // changes, ES §primaries) or ids inside PATCHed arrays.
+  // Merged-state pass: re-run the cross-field hooks, business rules, and
+  // strict catalog-membership checks against the merged character.
+  // Per-field validation cannot see aggregates (e.g. the exact-80 primary
+  // budget when a single leaf changes, ES §primaries) or ids inside
+  // PATCHed arrays.
   //
   // Both re-runs are scoped to the subtrees the PATCH touched: the hooks
   // and the catalog checks are INPUT-shape validators, while untouched
@@ -179,10 +206,6 @@ export async function validateCharacterUpdate(
   // the batch on any error, so partial-merge diagnostics would just add
   // noise.
   if (errors.length === 0 && validUpdates.length > 0) {
-    const merged = structuredClone(character);
-    for (const update of validUpdates) {
-      applyFieldUpdate(merged, update.field, update.value, update.operation);
-    }
     const touched = validUpdates.map((u) => u.field);
     const affectedHooks = FIELDS_WITH_VALIDATION.filter((root) =>
       touchesSubtree(touched, root),

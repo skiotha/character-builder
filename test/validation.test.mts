@@ -625,6 +625,90 @@ describe("validateCharacterUpdate", () => {
     assert.equal(result.errors.length, 0);
     assert.equal(result.validUpdates.length, 1);
   });
+
+  // ── Per-field hooks see the merged batch (NB-50) ────────────────
+
+  // Catalog-shaped entries so the merged catalog pass accepts them.
+  const NATURAL = {
+    id: "natural_weapon",
+    name: "Natural Weapon",
+    type: "natural",
+    damage: 4,
+    qualities: ["own", "short"],
+  };
+  const SWORD = {
+    id: "two_handed_sword",
+    name: "Two-Handed Sword",
+    type: "heavy",
+    damage: 6,
+    qualities: ["long"],
+  };
+  const CLAWS = {
+    id: "war_claws",
+    name: "War Claws",
+    type: "natural",
+    damage: 4,
+    qualities: ["own", "short", "deep_wounds"],
+  };
+
+  it("accepts a weapons shrink + carried re-map with a non-zero own index in one batch", async () => {
+    // Stored: [natural, sword, claws], own → claws (2). Remove the sword
+    // and shift the own slot to claws' new index (1) in the same PATCH.
+    const char = makeCharacter({
+      equipment: { weapons: [NATURAL, SWORD, CLAWS] },
+      combat: { carried: [{ weaponIndex: 1 }, null, { weaponIndex: 2 }] },
+    });
+    const result = await validateCharacterUpdate(
+      [
+        { field: "equipment.weapons", value: [NATURAL, CLAWS] },
+        { field: "combat.carried", value: [null, null, { weaponIndex: 1 }] },
+      ],
+      char,
+      "owner",
+    );
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.validUpdates.length, 2);
+  });
+
+  it("rejects the same re-mapped carried tuple when the weapons array is not in the batch", async () => {
+    // Against the stored array index 1 is the sword (no `own` quality).
+    const char = makeCharacter({
+      equipment: { weapons: [NATURAL, SWORD, CLAWS] },
+      combat: { carried: [{ weaponIndex: 1 }, null, { weaponIndex: 2 }] },
+    });
+    const result = await validateCharacterUpdate(
+      [{ field: "combat.carried", value: [null, null, { weaponIndex: 1 }] }],
+      char,
+      "owner",
+    );
+    assert.equal(result.validUpdates.length, 0);
+    assert.equal(result.errors.length, 1);
+    assert.equal(result.errors[0]!.field, "combat.carried");
+    assert.match(result.errors[0]!.error, /own/);
+  });
+
+  it("reports a VALIDATION error instead of throwing when a batch nulls a parent's path via a primitive", async () => {
+    // `equipment` set to a string, then a leaf under it: the pre-apply
+    // cannot create a property on a primitive.
+    const result = await validateCharacterUpdate(
+      [
+        { field: "equipment", value: "broken" },
+        { field: "equipment.money", value: 10 },
+      ],
+      makeCharacter(),
+      "owner",
+    );
+    assert.ok(
+      result.errors.some(
+        (e) => e.field === "equipment.money" && e.code === "VALIDATION",
+      ),
+      "unappliable leaf is reported, not thrown",
+    );
+    assert.ok(
+      result.errors.some((e) => e.field === "equipment"),
+      "the primitive parent itself fails type validation",
+    );
+  });
 });
 
 // ── skipOnCreation ────────────────────────────────────────────────
