@@ -136,6 +136,11 @@ Placeholder stubs for not-yet-implemented components remain plain elements
 Every client PATCH goes through `api.patchCharacter(id, updates)`, which
 attaches the `x-player-id` / `x-dm-id` headers once and returns the parsed
 response. Components and behaviors do not hand-roll `fetch` + headers.
+The same rule covers the one non-PATCH write the client makes: portrait
+uploads go through `api.uploadPortrait(id, file)` (multipart POST, same
+header handling), and the resulting crop is then written with
+`api.patchCharacter`. Both helpers resolve with the parsed body on any HTTP
+status — callers branch on `success`; only network / abort errors propagate.
 
 ### 7. Amendment to ADR-009
 

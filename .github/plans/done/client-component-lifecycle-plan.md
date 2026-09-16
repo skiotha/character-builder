@@ -1,8 +1,14 @@
 # Plan — Client component lifecycle (custom elements + structural change detection)
 
-**Status:** active (2026-09-02) — design locked with the user and recorded as
-[ADR-017](../../docs/decisions/017-client-component-lifecycle.md); steps 0–2
-shipped. Blocks [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 1.
+> **Status:** ✅ Done — archived 2026-09-16. All five steps shipped; the
+> normative contract is [ADR-017](../../../docs/decisions/017-client-component-lifecycle.md)
+> and the as-built flow is `docs/architecture.md` §4.3. This file is kept
+> for the per-step divergence notes and the fixture / instrumentation recipe
+> (also in the **ui-navigation-playbook** rule). Unblocked
+> [`phase6-chunkI-plan.md`](../phase6-chunkI-plan.md) step 1.
+
+**Original status:** active (2026-09-02) — design locked with the user and
+recorded as ADR-017. Blocked `phase6-chunkI-plan.md` step 1.
 **Owner:** user (design authority) + agent (implementation)
 **Session note:** every step from 1 on is executed in a fresh agent session
 with no memory of this one — this file, ADR-017 and the **ui-navigation-
@@ -384,6 +390,21 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   unblocked (status back to active, step 1 rewritten to target
   `NagaraElement`); sweep the references list.
   **Done when:** all bookkeeping in one commit; Chunk I step 1 can start.
+  > ✅ Completed 2026-09-16. `docs/architecture.md` §4.3 redrawn (two update
+  > paths, load order, teardown); ADR-017 §6 gained `api.uploadPortrait` as
+  > the second transport helper (as-built amendment); the ADR-017 bullet in
+  > `.github/copilot-instructions.md` + `AGENTS.md` now lists
+  > `componentFactory` / `isWritable` / `rebuild` / the `isConnected` guard
+  > and drops the pointer to this plan (plans are ephemeral — ADR-017 is the
+  > sole stable authority). Playbook mirrors: clobber quirk and "reload once"
+  > retired, stale `#home` `type=submit` note corrected, new "Routing &
+  > getting around" section (`#home` → `#dashboard`, inert nav placeholders,
+  > auth fallback, NB-52), instrumentation recipe from fixture item 5 moved
+  > into the seeding section. Chunk I plan: status active, readiness-review
+  > bullet marked resolved, step 1 fully rewritten against `NagaraElement`
+  > (deps, `componentFactory`, `rebuild`, `isWritable`, `api.getWeapons`,
+  > atomic re-map PATCH, `isConnected` guard). Roadmap Chunk I row → in
+  > progress. Repo memory refreshed. Sweep list below verified empty.
 
 ## Verification
 
@@ -399,7 +420,9 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
 Every code-side `TODO(<scope>)` that cites this plan is listed here, so the
 cleanup obligation is "follow this checklist", not "remember to grep".
 
-- _(none yet)_
+- _(none)_ — verified at close-out (2026-09-16): the only `TODO(<scope>)`
+  under `public/` is `TODO(portrait-recrop)`, which cites the Chunk I plan,
+  not this one.
 
 ## Progress
 
@@ -408,4 +431,4 @@ cleanup obligation is "follow this checklist", not "remember to grep".
 - [x] Step 2 — Base element + first port (weapon-slots) (2026-09-10)
 - [x] Step 3 — Port the remaining components (2026-09-11)
 - [x] Step 4 — Teardown + leak check (2026-09-16)
-- [ ] Step 5 — Docs & bookkeeping
+- [x] Step 5 — Docs & bookkeeping (2026-09-16)

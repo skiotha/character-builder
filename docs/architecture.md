@@ -280,36 +280,45 @@ sse.broadcastToCharacter
 Response: 200 { character }
 ```
 
-### 4.3 Schema-Driven Rendering (target, see [ADR-009](decisions/009-schema-driven-rendering.md))
+### 4.3 Schema-Driven Rendering ([ADR-009](decisions/009-schema-driven-rendering.md), [ADR-017](decisions/017-client-component-lifecycle.md))
 
 ```
 Client (browser)
   │ GET /api/v1/schema          (once, cached)
-  │ GET /api/v1/characters/:id  (JSON data)
+  │ GET /api/v1/characters/:id  (JSON data, + _permissions)
   ▼
-schema + data + role
+setCurrentCharacter(data)       (before the form is built — hosts see no diff)
   │ → form renderer(schema, data, role)
   ▼
-DOM with data-path, data-behavior attributes
-  │ → enhanceElement() attaches behaviors
-  │ → subscribeField(path) binds SSE updates
-  ▼
-SSE character-updated
+DOM: native leaf controls            component hosts <nagara-*>
+     [data-path] input/select/        (light DOM, display: contents,
+      textarea/output                  extend NagaraElement)
+  │ → enhanceElement() attaches        │ connectedCallback():
+  │   data-behavior hooks              │   subscribeField(dep) ∀ static deps
+  │ → view: subscribeField(path)       │   render(character)   ← data as argument
+  ▼                                    ▼
+Incoming character (own PATCH response via api.patchCharacter,
+                    or SSE character-updated)
   │ → setCurrentCharacter(newData)
-  │ → field subscribers fire
-  │ → updateFieldValue() patches DOM
+  │ → changedPaths(old, new): structural diff, arrays are leaves,
+  │   changed leaves + every ancestor + root "", `_`-keys excluded,
+  │   nothing notified when nothing changed (SSE echo = no-op)
+  ├──▶ leaf subscribers → updateFieldValue()   (skips data-editing)
+  └──▶ host dep subscribers → update() → one render(character) per microtask
   ▼
-Same pipeline for initial render and real-time updates
+Navigating away: view cleanup releases leaf subscriptions, cleanupBehaviors(),
+container.replaceChildren() → every host's disconnectedCallback() unsubscribes;
+SSE stream closed; currentCharacter reset to null
 ```
 
-> **Component overrides ([ADR-017](decisions/017-client-component-lifecycle.md)):**
-> the `subscribeField(path)` → `updateFieldValue()` path above applies to
-> native leaf controls only. Schema `ui.component` overrides (portrait,
-> trait / talent lists, weapon slots, catalog pickers) are light-DOM custom
-> elements that declare their dependency paths and re-render themselves via
-> `render(character)`; change detection is structural (no notification when
-> nothing changed). The diagram is updated to the as-built shape when that
-> work lands.
+The two update paths never cross: `updateFieldValue()` targets only native
+controls carrying `data-path` (ADR-017 §leaf-binding), and component hosts
+re-render solely through their declared `deps` (ADR-017 §deps). A host with
+`deps = []` (`<nagara-character-name>`) owns no state subscription — its
+inner `<input data-path>` is a native leaf the view binds like any other.
+All client writes go through `api.patchCharacter` / `api.uploadPortrait`
+(ADR-017 §patch-helper); a response that lands after the view was torn down
+is dropped (`isConnected` guard), so it cannot repopulate the cleared state.
 
 > **Legacy flow (being removed):** Server-rendered HTML fragments via
 > `GET /api/v1/view/*` endpoints, injected into the DOM by the client.

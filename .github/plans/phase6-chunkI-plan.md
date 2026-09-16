@@ -1,9 +1,10 @@
 # Plan — Phase 6 Chunk I: Catalog-Driven Client Pickers
 
-**Status:** paused (2026-09-02) — step 1 is blocked on
-[`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md);
-step 0 shipped. Extracted from [`phase6-plan.md`](./phase6-plan.md) Chunk I,
-2026-09-01.
+**Status:** active (resumed 2026-09-16) — the client-lifecycle prerequisite
+shipped ([ADR-017](../../docs/decisions/017-client-component-lifecycle.md);
+plan archived at [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md)).
+Step 0 shipped; steps ½ and 1 are next. Extracted from
+[`phase6-plan.md`](./phase6-plan.md) Chunk I, 2026-09-01.
 **Owner:** user (design authority) + agent (implementation)
 **Trigger:** Chunks A–H made the engine complete, but the UI cannot reach it:
 every catalog-fed component renders as a `[component-name]` stub, so a new
@@ -34,20 +35,21 @@ Verified against the code on 2026-09-01:
   reference weapons by `weaponIndex`, so every add/remove of
   `equipment.weapons[]` must re-map the tuple in the same atomic PATCH.
 
-## Step-1 readiness review (2026-09-02) — why the plan is paused
+## Step-1 readiness review (2026-09-02) — why the plan was paused
 
 Verified in-browser and via the API before starting step 1:
 
-- **No component re-render contract.** `bindFieldsToState` pipes every
-  `[data-path]` element — component roots included — through
-  `updateFieldValue`, and `notifyChangedPaths` treats arrays as always-
-  changed, so one slot change (200 OK) turned `OL combat.carried`,
-  `UL traits` and the `equipment.weapons` stub into `"[object Object]"`
-  text. Nothing re-renders a component when its dependencies change. Every
-  step-1–4 "done when" depends on exactly that, so the fix is a
-  prerequisite, not a quickfix: **[`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md)**
-  (custom-element lifecycle + structural change detection). Chunk I resumes
-  on that contract; step 1 below is rewritten against it at resumption.
+- **No component re-render contract** _(resolved 2026-09-16)_.
+  `bindFieldsToState` piped every `[data-path]` element — component roots
+  included — through `updateFieldValue`, and `notifyChangedPaths` treated
+  arrays as always-changed, so one slot change (200 OK) turned
+  `OL combat.carried`, `UL traits` and the `equipment.weapons` stub into
+  `"[object Object]"` text. Fixed as a stand-alone prerequisite — ADR-017
+  (light-DOM `nagara-*` elements on `NagaraElement`, structural change
+  detection, leaf-only binding, shared `api.patchCharacter`); the
+  implementation record with per-step divergences is
+  [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md).
+  Step 1 below is rewritten against that contract.
 - **Engine ignores the own-slot choice** — NB-49: `deriveCombat` uses the
   first own-quality weapon and never reads `carried[2].weaponIndex`, so War
   Claws / Battle Heels can never occupy the own slot. Coupled validator
@@ -163,24 +165,58 @@ in-browser pass over the touched view (Playwright MCP, per the
   **Done when:** `PATCH combat.carried = [null, null, { weaponIndex: <war_claws> }]`
   round-trips with that index; `npm test` green.
 - **Step 1 — Weapons picker + free-form placeholders (`equipment-list`).**
-  _Blocked on the client-lifecycle plan; rewrite this step against
-  `NagaraElement` (declared `deps`, `render(character)`,
-  `api.patchCharacter`) when resuming._
-  New component registered for all eight paths; branch on path:
-  `equipment.weapons` → real picker, the other seven → greyed-out disabled
-  placeholder + `TODO(<scope>)`. Picker: fetch `/api/v1/weapons`; add =
-  clone catalog entry projected to the engine `Weapon` shape (`id`, `name`,
-  `type`, `damage`, `qualities`, plus `effects` when authored non-empty —
-  mirror the H.3 `lookupWeapon` projection; strip `description`/`cost` —
-  confirm the H.2 validator's accepted key set during implementation);
-  remove = auto-unassign + `weaponIndex` re-map per decision 4;
-  `natural_weapon` undeletable. Weapon-slots interplay: own-slot select
-  filters to own-quality with no empty option; hand slots keep the empty
-  option (verify current `weapon-slots.mjs` behavior while there).
+  _(Rewritten 2026-09-16 against ADR-017; `public/components/weapon-slots.mjs`
+  is the reference port.)_
+  - **Component shape.** `public/components/equipment-list.mjs` defines
+    `<nagara-equipment-list>` extending `NagaraElement` (`base.mjs`) with
+    `static deps = ["equipment", "combat.carried"]` (the picker rebuilds on
+    any equipment array and must re-map slots, so it needs the tuple too).
+    Export `renderEquipmentList = componentFactory(EquipmentListElement)`
+    and register it in `component-registry.mjs` for all eight
+    `equipment-list` paths, removing `"equipment-list"` from
+    `STUB_COMPONENTS`. `render(character)` branches on `this.path`:
+    `equipment.weapons` → real picker; the other seven → a greyed-out,
+    disabled placeholder listing the stored entries read-only, with a
+    `TODO(<scope>)` at the render site (cite the roadmap capability / NB-14
+    for runes, never this plan). Rebuild via `this.rebuild(...nodes)`; do
+    **not** read `getState()` inside `render` (ADR-017 §render-arg). Gate
+    every write on `isWritable(this.fieldSchema, this.role, this.mode)`; in
+    `create` mode the element renders once with no add / remove controls
+    (decision 5).
+  - **Catalog fetch.** `api.getWeapons()` (add to `public/api.mjs` beside
+    `getTraits()`, server `DEFAULT_LOCALE`, decision 9);
+    fetch lazily on first render and cache per element instance. Late
+    catalog responses check `this.isConnected` before touching the DOM.
+  - **Add** = clone the catalog entry projected to the engine `Weapon`
+    shape (`id`, `name`, `type`, `damage`, `qualities`, plus `effects` only
+    when authored non-empty — mirror the H.3 `lookupWeapon` projection;
+    strip `description` / `cost`; confirm the H.2 validator's accepted key
+    set while implementing). **Remove** = splice + auto-unassign per
+    decision 4: hand slots pointing at the removed index → `null`, own slot
+    → `natural_weapon`'s new index, all other `weaponIndex` values shifted.
+    `natural_weapon` is never offered for removal (decision 2).
+  - **Write path.** One `api.patchCharacter(this.character.id, updates)`
+    carrying both `equipment.weapons` and the re-mapped `combat.carried`
+    (stripped `{ weaponIndex }` entries, as `weapon-slots` sends) so the
+    server's all-or-nothing 422 keeps it atomic. On resolve: `if
+    (!this.isConnected) return;` then branch on `result.success` →
+    `setCurrentCharacter(result.character)` (the element and
+    `<nagara-weapon-slots>` both re-render from their deps; the SSE echo is
+    a no-op) or `console.error`. Depends on step ½ for a non-first own
+    index to validate.
+  - **Weapon-slots interplay.** No changes expected: the own-slot `<select>`
+    already filters to own-quality with no empty option and the hand slots
+    keep the empty option; verify while there.
+  - **Verification instrumentation:** the archived lifecycle plan's fixture
+    recipe (also in the **ui-navigation-playbook** rule): wrap `render` on
+    `customElements.get("nagara-equipment-list").prototype` and
+    `…("nagara-weapon-slots")` to assert exactly one render each per PATCH.
   **Done when:** in-browser: add weapon → appears in slot dropdowns →
-  assign to main-hand → derived `baseDamage`/`attackAttribute` update via
-  SSE → remove the carried weapon → auto-unassign observed →
-  `natural_weapon` cannot be removed.
+  assign to main-hand → derived `baseDamage`/`attackAttribute` update from
+  the PATCH response (one render per host, none on the SSE echo) → remove
+  the carried weapon → auto-unassign observed in the same PATCH →
+  `natural_weapon` cannot be removed; public role sees the list read-only;
+  creation form still renders the placeholder without controls.
 - **Step 2 — Armor slots (`armor-slot`).** For `equipment.armor.body` /
   `.plug`: fetch `/api/v1/armor`, filter entries by `slot` matching the
   position, single-select, `null` clears. Clone minus presentation fields
@@ -271,7 +307,7 @@ pointer to this plan.
 
 - [x] Step 0 — Extraction & bookkeeping (2026-09-01)
 - [ ] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50)
-- [ ] _(blocked)_ [`client-component-lifecycle-plan.md`](./client-component-lifecycle-plan.md) — must ship before step 1
+- [x] _(prerequisite)_ [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md) — shipped 2026-09-16
 - [ ] Step 1 — Weapons picker + free-form placeholders
 - [ ] Step 2 — Armor slots
 - [ ] Step 3 — Traits & talents pickers
