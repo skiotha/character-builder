@@ -107,6 +107,9 @@ export async function saveField(field, newValue, originalValue) {
       { signal: controller.signal },
     );
 
+    // The sheet may have been torn down (and its state cleared) meanwhile.
+    if (!field.isConnected) return;
+
     if (result.success) {
       nagara.setCurrentCharacter(result.character);
     } else {

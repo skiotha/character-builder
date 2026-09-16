@@ -104,6 +104,8 @@ class WeaponSlotsElement extends NagaraElement {
       const result = await api.patchCharacter(this.character.id, [
         { field: "combat.carried", value: carried },
       ]);
+      // The sheet may have been torn down (and its state cleared) meanwhile.
+      if (!this.isConnected) return;
       if (result.success) {
         setCurrentCharacter(result.character);
       } else {

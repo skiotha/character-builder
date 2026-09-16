@@ -13,7 +13,7 @@ which file or severity a bug currently sits under. A bug keeps its id when it
 moves between trackers, is re-triaged, or is archived, so an `NB-<n>` written in
 a code comment resolves for good.
 
-**Next unused id:** `NB-52` — recorded here and advanced as bugs are filed.
+**Next unused id:** `NB-53` — recorded here and advanced as bugs are filed.
 
 A code citation is a bare `NB-<n>` (no filename, no `#`). The
 `test/bug-anchors.test.mts` lint checks that every cited id resolves to exactly
@@ -32,6 +32,7 @@ files is free to grow and shrink.
   | --- | --- |
   | [`engine.md`](engine.md) | RPG-engine logic and design weaknesses. |
   | [`infra.md`](infra.md) | API, HTTP, security, storage, validation. |
+  | [`client.md`](client.md) | Browser SPA: router, views, components, client state. |
 
 - **Closed bugs** are pooled into an archive — currently
   [`resolved.md`](resolved.md) — and kept rather than deleted, so a code comment

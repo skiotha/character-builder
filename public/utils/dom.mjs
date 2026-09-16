@@ -31,7 +31,8 @@ export function updateFieldValue(field, newValue) {
 const VIEW_NAV_LABELS = ["BIO", "INVENTORY", "DESCRIPTION"];
 
 /**
- * Build the shared `<nav>` used by character and creation views.
+ * Build the shared `<nav>` used by character and creation views. Entries are
+ * placeholder hyperlinks (no `href`) until section navigation exists.
  * @returns {HTMLElement}
  */
 export function createViewNav() {
@@ -41,7 +42,6 @@ export function createViewNav() {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.textContent = label;
-    a.href = "#";
     li.appendChild(a);
     ul.appendChild(li);
   }

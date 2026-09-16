@@ -8,4 +8,10 @@ enough context to rediscover the spot.
 
 ## Wishes
 
-- _(none yet)_
+- **Header `#home` on the welcome page links to itself.** Since the router
+  became hash-driven (lifecycle plan step 4) `#home` is `<a href="#dashboard">`;
+  with no player token the router falls back to the welcome view, so on
+  `#initial-view` the control is a no-op. The Figma `initial` frame
+  (`1021:58`) shows it there, so this is a design-expectation update first
+  (hide it, or make it mean something) — code follows the frame. Observed
+  2026-09-16.

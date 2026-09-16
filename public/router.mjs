@@ -1,5 +1,5 @@
 import * as views from "views";
-import { getState } from "state";
+import { getPlayerToken, isDM } from "state";
 
 let currentView = null;
 let rootElement = null;
@@ -21,37 +21,51 @@ const routes = {
   },
   "character/:id": {
     view: views.renderCharacter,
-    auth: true,
+    auth: false,
   },
 };
 
-export function navigate(path, data = {}) {
+/**
+ * Go to a route. Routing is hash-driven: setting the hash fires
+ * `hashchange`, which runs `handleRoute`; when the hash already matches
+ * (initial load) the route is handled directly.
+ * @param {string} path - Route path, with or without a leading `/`
+ * @returns {void}
+ */
+export function navigate(path) {
   if (path.startsWith("/")) {
     path = path.substring(1);
   }
 
-  window.location.hash = path;
   console.log("navigation initialized: ", path);
-  handleRoute(data);
+  if (window.location.hash.slice(1) === path) {
+    handleRoute();
+  } else {
+    window.location.hash = path;
+  }
 }
 
 export function init(root) {
   rootElement = root;
+  window.addEventListener("hashchange", () => handleRoute());
 }
 
-async function handleRoute(data = {}) {
+async function handleRoute() {
+  // NB-52: a hash change landing during the await below is dropped.
   if (isNavigating) return;
 
   isNavigating = true;
   try {
-    const hash = window.location.hash.slice(1);
-    const path = hash || "";
+    const path = window.location.hash.slice(1);
 
-    const route = matchRoute(path);
+    let route = matchRoute(path);
 
     if (!route) {
       console.warn(`No route found for path: ${path}, using default`);
-      return routes[""].view(rootElement, data);
+      route = { ...routes[""], pattern: "" };
+    } else if (route.auth && !getPlayerToken() && !isDM()) {
+      console.warn(`Route ${path} requires a player; showing start page`);
+      route = { ...routes[""], pattern: "" };
     }
 
     const params = extractParams(route.pattern, path);
@@ -61,7 +75,7 @@ async function handleRoute(data = {}) {
     }
 
     currentView = {
-      cleanup: await route.view(rootElement, { ...data, ...params }),
+      cleanup: await route.view(rootElement, params),
     };
   } finally {
     setTimeout(() => {

@@ -63,7 +63,9 @@ async function handleHashRoute(hash) {
   const route = parts[0];
   const param = parts[1];
 
-  if (route === "character" && param) {
+  if (route === "character" && param === "new") {
+    navigate("character/new");
+  } else if (route === "character" && param) {
     await loadCharacterView(param);
   } else {
     await showStartPage();

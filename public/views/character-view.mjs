@@ -40,9 +40,21 @@ export async function renderCharacter(container, params) {
 
     container.appendChild(form);
 
-    bindFieldsToState(container);
+    const unsubscribes = bindFieldsToState(container);
     enhanceElement(container);
     sse.connectCharacterStream(characterId);
+
+    // Teardown order matters: the DOM goes before the state is cleared so
+    // hosts disconnect (ADR-017 §deps) instead of rendering the null character.
+    return () => {
+      for (const unsubscribe of unsubscribes) unsubscribe();
+      cleanupBehaviors(container);
+      container.replaceChildren();
+      container.removeAttribute("id");
+      sse.disconnectCharacterStream();
+      setCurrentCharacter(null);
+      setPlayerRole("public");
+    };
   } catch (error) {
     console.error("Failed to render character view:", error);
     container.innerHTML = `
@@ -51,36 +63,25 @@ export async function renderCharacter(container, params) {
         <p>${error.message}</p>
       </div>
     `;
+    return () => {
+      container.removeAttribute("id");
+      setCurrentCharacter(null);
+      setPlayerRole("public");
+    };
   }
-  return () => {
-    setPlayerRole("public");
-    detachCharacterViewListeners(container);
-    cleanupBehaviors(container);
-    sse.disconnectCharacterStream();
-  };
 }
 
-function detachCharacterViewListeners(container) {
-  container.querySelectorAll(LEAF_CONTROL_SELECTOR).forEach((field) => {
-    if (field._unsubscribe) {
-      field._unsubscribe();
-      delete field._unsubscribe;
-    }
-  });
-}
-
+/**
+ * Subscribe every native leaf control to its `data-path`.
+ * @param {HTMLElement} container
+ * @returns {Array<() => void>} Unsubscribe functions, released by the view's cleanup
+ */
 function bindFieldsToState(container) {
   const fields = container.querySelectorAll(LEAF_CONTROL_SELECTOR);
 
-  fields.forEach((field) => {
-    const path = field.dataset.path;
-
-    if (field._unsubscribe) field._unsubscribe();
-
-    const unsubscribe = subscribeField(path, (newValue, path, fullCharacter) =>
+  return Array.from(fields, (field) =>
+    subscribeField(field.dataset.path, (newValue) =>
       updateFieldValue(field, newValue),
-    );
-
-    field._unsubscribe = unsubscribe;
-  });
+    ),
+  );
 }

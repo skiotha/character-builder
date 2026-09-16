@@ -488,7 +488,7 @@
     }
   }
 
-  button:not(#home) {
+  button {
     cursor: pointer;
 
     inline-size: 12rem;
@@ -517,7 +517,7 @@
     display: block;
   }
 
-  button#home {
+  a#home {
     margin-block-start: var(--md-pad);
     margin-inline-end: var(--md-pad);
 

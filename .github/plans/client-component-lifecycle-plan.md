@@ -175,15 +175,26 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
    `polearm`, not `polearm-mastery`). Entry shape: `id`, `name`, `type`,
    `damage`, `qualities`.
 4. In the browser: `localStorage.setItem("x-player-id", "<token>")`, then
-   load `/#character/<id>` and **reload once** (the hash route does not
-   re-render on a same-document hash change from `page.goto`). The form
-   should report `data-role="owner"`.
+   load `/#character/<id>`. Before step 4 a same-document hash change from
+   `page.goto` did not re-render (reload once); since step 4 the router
+   listens to `hashchange`, so it does. The form should report
+   `data-role="owner"`.
 5. Instrumentation that worked: a `MutationObserver` on every `[data-path]`
    element watching the `class` attribute for the `updated` flash gives the
    exact set of elements a state set touched; `page.selectOption` on
    `[data-path="combat.carried"] select[data-slot="0"]` triggers a real
-   PATCH. Regression probe: no `[data-path]` element's `textContent`
-   contains `[object Object]`.
+   PATCH. Host lifecycle counts without touching source: in
+   `page.evaluate`, wrap `render` on each `customElements.get("nagara-*").
+   prototype` — that works because `render` is looked up dynamically.
+   Wrapping `connectedCallback` / `disconnectedCallback` on the base
+   prototype does **not**: custom-element reactions are captured at
+   `customElements.define` time, so only subclasses that call
+   `super.connectedCallback()` (portrait) hit the wrapper. Assert teardown
+   through DOM + behaviour instead: zero `nagara-*` hosts after leaving, and
+   `setCurrentCharacter(<sheet snapshot>)` on the dashboard producing zero
+   `render` calls (proves the dep subscriptions were released). Regression
+   probe: no `[data-path]` element's `textContent` contains
+   `[object Object]`.
 
 - **Step 0 — Decision lock + ADR-017.** Confirm the design items above with
   the user; write `docs/decisions/017-client-component-lifecycle.md` with its
@@ -297,20 +308,78 @@ under "Seeding a fixture via the API"; this copy is the step-gate checklist):
   > errors; no `[object Object]` anywhere. Drop zone measured 30rem×45rem on
   > both routes, so stored crops reproduce — but the pan / zoom math itself
   > is wrong (user-reported; folded into Chunk I step 4½).
-- **Step 4 — Teardown + leak check.** Navigate sheet → dashboard → sheet
-  three times, then PATCH once: every affected element flashes exactly once
-  (no duplicate subscriptions); `disconnectedCallback` observed for each
-  host on navigation (temporary console instrumentation, removed before
-  commit). Remove the now-dead `_unsubscribe` sweep if nothing uses it.
-  Note: `disconnectedCallback` fires when the **next** view clears the
-  container, not inside the previous view's `cleanup()` — instrument at
-  that point.
-  **Done when:** counts match; `npm test` green.
+- **Step 4 — Teardown + leak check (scope expanded 2026-09-16).** The
+  readiness review found the gate could not be driven as written: the sheet
+  has **no path back to the dashboard** (nav links are `href="#"`
+  placeholders, the header `#home` is an `<a>` without `href` nested in a
+  `<button>`, and the router has no `hashchange` listener, so the back
+  button is inert too), and `state.currentCharacter` is never cleared on
+  leaving the sheet. Both are fixed here rather than worked around:
+  - **Router becomes hash-driven** (`public/router.mjs`): `init(root)`
+    installs one `hashchange` → `handleRoute()` listener; `navigate(path)`
+    sets the hash and lets the event route (calls `handleRoute()` directly
+    only when the hash is already equal — the initial-load path from
+    `app.mjs`); the unused `data` parameter is dropped; an unmatched hash
+    falls through the normal cleanup path to the `""` route; `route.auth`
+    is finally enforced (no player token and not DM → `""` route);
+    `character/:id` flips to `auth: false` (public-role viewing is a
+    verified feature, step 3 gate).
+  - **Header `#home`** (`index.html` + `styles.css`) becomes
+    `<a id="home" href="#dashboard">` — the visible back control on the
+    sheet and the creation form. `createViewNav` drops `href="#"` from
+    BIO / INVENTORY / DESCRIPTION (inert placeholder hyperlinks) so they no
+    longer route to the welcome view once `hashchange` is live.
+  - **Sheet cleanup owns its teardown** (`character-view.mjs`), in this
+    order: release leaf unsubscribes (closure-local array returned by
+    `bindFieldsToState`; the `field._unsubscribe` expando and
+    `detachCharacterViewListeners` go) → `cleanupBehaviors(container)` →
+    `container.replaceChildren()` (hosts hit `disconnectedCallback` **here**,
+    deterministically — the earlier note that it fires in the next view is
+    retired) → `sse.disconnectCharacterStream()` →
+    `setCurrentCharacter(null)` → `setPlayerRole("public")`. Late PATCH
+    responses (`weapon-slots`, `editable`) check `isConnected` before
+    `setCurrentCharacter`, so a response landing after navigation cannot
+    re-populate the cleared state.
+  - **Leak gate**, instrumented from Playwright with **no source edits**:
+    wrap `render` on each `customElements.get("nagara-*").prototype` and
+    `connectedCallback` / `disconnectedCallback` on the shared base
+    prototype, plus the `updated`-flash `MutationObserver` from fixture
+    item 5. Click `#home` → dashboard → card → sheet three times, then
+    PATCH main-hand once: `weapon-slots` renders exactly once, the other
+    hosts zero, each affected leaf flashes once; `disconnectedCallback`
+    count equals host count per departure; `currentCharacter === null` on
+    the dashboard; exactly one live `/stream`; back / forward re-render;
+    welcome-page `#home` stays on welcome without an error block; nav
+    placeholders do nothing; creation form still submits.
+  **Done when:** counts match; `npm run typecheck` + `npm test` green.
+  > ✅ Completed 2026-09-16. Gate driven end to end (718 tests, typecheck
+  > clean): welcome `#home` without a token re-renders welcome (no error
+  > block, hash stays `#dashboard`); sheet → `#home` → dashboard → VIEW →
+  > sheet ×3 — zero hosts and `currentCharacter === null` on every
+  > dashboard visit, five hosts and one live `/stream` on every sheet, zero
+  > live streams on the dashboard; main-hand `selectOption` → `weapon-slots`
+  > renders once, other hosts zero, no leaf flashes (the swap changes no
+  > native leaf); replaying the sheet snapshot into state from the
+  > dashboard produces zero renders (subscriptions released); back / forward
+  > re-render; nav placeholders inert on both routes; creation form POST
+  > 201 → new sheet as owner; a PATCH whose response lands after `#home`
+  > leaves `currentCharacter` null (`isConnected` guard). Divergences:
+  > `app.mjs` `handleHashRoute` now routes a hard-loaded `#character/new`
+  > to the creation view instead of fetching a character named "new";
+  > `character-view.mjs` cleanup also drops the container `id` (initial /
+  > dashboard / creation already did) and the error path returns a
+  > state-clearing cleanup too; the `disconnectedCallback`-count check was
+  > replaced by the DOM + zero-render probe (fixture item 5 explains why);
+  > the mid-load hash drop (`isNavigating`) is filed as NB-52 in the new
+  > `.github/bugs/client.md` tracker, and the welcome-page `#home`
+  > self-link is parked in `ux-wishlist.md` (Figma shows it there).
 - **Step 5 — Docs & bookkeeping.** `docs/architecture.md` §4.3 redrawn to
   the as-built two update paths (replacing the interim note);
   **ui-navigation-playbook** mirrors (`.github/instructions/` +
-  `.cursor/rules/`) — retire the interim clobber quirk, keep the fixture
-  recipe; `.github/copilot-instructions.md` + `AGENTS.md` ADR-017 bullet
+  `.cursor/rules/`) — retire the interim clobber quirk and the "reload
+  once" hash-route quirk (step 4 made the router hash-driven), document
+  `#home` as the way back to the dashboard, keep the fixture recipe;
+  `.github/copilot-instructions.md` + `AGENTS.md` ADR-017 bullet
   checked against the as-built contract; repo memory refreshed; Chunk I plan
   unblocked (status back to active, step 1 rewritten to target
   `NagaraElement`); sweep the references list.
@@ -338,5 +407,5 @@ cleanup obligation is "follow this checklist", not "remember to grep".
 - [x] Step 1 — Structural change detection (2026-09-04)
 - [x] Step 2 — Base element + first port (weapon-slots) (2026-09-10)
 - [x] Step 3 — Port the remaining components (2026-09-11)
-- [ ] Step 4 — Teardown + leak check
+- [x] Step 4 — Teardown + leak check (2026-09-16)
 - [ ] Step 5 — Docs & bookkeeping
