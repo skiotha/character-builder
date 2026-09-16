@@ -697,6 +697,17 @@ Discord bot.
       placeholders after Chunk I (marked by `TODO` comments at the render
       sites). Runes cataloging is NB-14; the rest each need an
       authored-catalog-vs-free-text decision.
+- [ ] **Weapon acquisition model: inventory → equip.** Design ruling
+      2026-09-16 (post-Phase-6, after Chunk I). In the finished app a
+      player equips weapons **only from their inventory**; the inventory is
+      populated by (a) creation-time ability grants — e.g. a bow-related
+      ability adds a bow; creation only, never afterwards — (b) a shop that
+      exchanges gold (`equipment.money`) for catalog weapons, and (c) a
+      DM-permission action that grants a weapon from the reference list.
+      Chunk I's weapons picker adds straight from the catalog as a
+      deliberate stopgap (`TODO(weapon-acquisition)` at the add control);
+      this item supersedes it and decides the inventory layer together with
+      the free-form `equipment.inventory` item above.
 
 ### Client-Side Test Coverage
 
@@ -721,7 +732,11 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
 - [ ] Extract displayable text constants for l10n — hardcoded English
       strings (headings, descriptions, button labels, contact data) in all
       client views and components. Define a text/locale system (at minimum
-      EN + RU) and centralize all user-visible strings.
+      EN + RU) and centralize all user-visible strings. Note: Chunk I
+      pickers fetch catalogs at `CATALOG_LOCALE = "en"` (`public/api.mjs`)
+      and store EN display strings (`equipment.weapons[].name`, …) in the
+      character, so RU display must resolve names by `id` from the catalog,
+      never from the stored string.
 - [ ] Deduplicate `getNestedValue` — four independent copies exist in
       `state.mjs`, `section-renderer.mjs`, `validation/engine.mjs` (×2).
       Extract a single version into `public/utils/object.mjs` and import

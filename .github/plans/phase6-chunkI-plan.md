@@ -106,6 +106,13 @@ Verified in-browser and via the API before starting step 1:
    the picker wire shape identical to what H.2 validates, so H.2's
    "revisit no-canonicalization alongside Chunk I" rider is discharged as a
    no-op. RU l10n of the client is Phase 8.
+   _Mechanism (2026-09-16):_ `parseLocale` prefers `Accept-Language` over
+   `DEFAULT_LOCALE`, so a bare catalog fetch from a RU browser would
+   **store** RU names. Every picker fetch therefore sends an explicit
+   `?locale=` from a `CATALOG_LOCALE = "en"` constant in `public/api.mjs`
+   (EN is the project-wide default, so hardcoding is safe). Phase 8's l10n
+   item notes the consequence: RU display must resolve names by `id` from
+   the catalog, not from the stored string.
 10. **Figma scope clarified** (rule edited in step 0): the Figma file is the
     authority for how things **look**, not for what things **are** —
     information architecture and behavior are owned by the schema, ADRs, and
@@ -116,6 +123,25 @@ Verified in-browser and via the API before starting step 1:
 12. **Sibling parity:** pickers clone catalog entries client-side, so the
     character wire shape does not change → no sibling-doc updates expected;
     re-confirmed at close-out.
+
+_Added 2026-09-16 (with the user), during the step-1 readiness check:_
+
+13. **No duplicate weapons.** Nothing in the RPG system forbids two copies
+    of the same catalog weapon, but it is meaningless for the player, so the
+    picker omits catalog entries whose `id` is already present in
+    `equipment.weapons[]`. Client-side only — ADR-003 trusted posture, no
+    server validator.
+14. **Weapon acquisition model is deferred — step 1 adds straight from the
+    catalog as a stopgap.** In the finished app a player equips only from
+    their **inventory**, which is populated by (a) creation-time ability
+    grants (e.g. a bow-related ability adds a bow — creation only, never
+    afterwards), (b) a shop that exchanges gold for catalog weapons, and
+    (c) DM grants from the reference list. None of that exists yet and it
+    lands after Phase 6 / after this chunk — registered as the roadmap
+    Phase 8 item **"Weapon acquisition model: inventory → equip"**. The
+    step-1 add control carries a `TODO(weapon-acquisition)` citing that
+    roadmap item, so the direct-catalog add is visibly a deliberate
+    interim, not the intended end state.
 
 ## Goals
 
@@ -201,17 +227,26 @@ in-browser pass over the touched view (Playwright MCP, per the
     `create` mode the element renders once with no add / remove controls
     (decision 5).
   - **Catalog fetch.** `api.getWeapons()` (add to `public/api.mjs` beside
-    `getTraits()`, server `DEFAULT_LOCALE`, decision 9);
-    fetch lazily on first render and cache per element instance. Late
-    catalog responses check `this.isConnected` before touching the DOM.
+    `getTraits()`, sending `?locale=${CATALOG_LOCALE}` — decision 9
+    mechanism); fetch lazily on first render and cache per element
+    instance. Late catalog responses check `this.isConnected` before
+    touching the DOM.
   - **Add** = clone the catalog entry projected to the engine `Weapon`
     shape (`id`, `name`, `type`, `damage`, `qualities`, plus `effects` only
     when authored non-empty — mirror the H.3 `lookupWeapon` projection;
-    strip `description` / `cost`; confirm the H.2 validator's accepted key
-    set while implementing). **Remove** = splice + auto-unassign per
-    decision 4: hand slots pointing at the removed index → `null`, own slot
-    → `natural_weapon`'s new index, all other `weaponIndex` values shifted.
-    `natural_weapon` is never offered for removal (decision 2).
+    strip `description` / `cost`; the H.2 validator's accepted key set was
+    re-confirmed 2026-09-16: `id` in catalog, `name`/`type` strings,
+    numeric `damage`, registry-checked `qualities`, optional `effects`
+    array, extra keys tolerated). The add `<select>` lists only catalog
+    entries not already in `equipment.weapons[]` (decision 13) and carries
+    a `TODO(weapon-acquisition)` citing the roadmap Phase 8 acquisition
+    item (decision 14). Picker controls stay unnamed and use
+    `type="button"` — both views live inside a `<form>` and the creation
+    view collects `form.elements` by `name`. **Remove** = splice +
+    auto-unassign per decision 4: hand slots pointing at the removed index
+    → `null`, own slot → `natural_weapon`'s new index, all other
+    `weaponIndex` values shifted. `natural_weapon` is never offered for
+    removal (decision 2).
   - **Write path.** One `api.patchCharacter(this.character.id, updates)`
     carrying both `equipment.weapons` and the re-mapped `combat.carried`
     (stripped `{ weaponIndex }` entries, as `weapon-slots` sends) so the
