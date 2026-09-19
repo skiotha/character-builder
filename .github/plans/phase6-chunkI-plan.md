@@ -294,8 +294,52 @@ in-browser pass over the touched view (Playwright MCP, per the
   `.plug`: fetch `/api/v1/armor`, filter entries by `slot` matching the
   position, single-select, `null` clears. Clone minus presentation fields
   (same accepted-key-set check as step 1).
+  - **Plug ruling (2026-09-19).** A plug's own `armor` field is never read
+    by the engine (`ES §secondaries` reads only the body piece); plugs
+    contribute solely through their qualities' registry effects. No engine
+    / validator / ES change — the digest and `docs/reference-authoring.md`
+    now state it explicitly, and every authored plug carries `armor: 0`.
+  - **Placeholder catalog.** The catalog had **no** plug entries; three
+    `plug_test_*` placeholders (`hampering_2` + one of `fortified` /
+    `protective` / `oiled`) make the slot exercisable. Replacing them is a
+    roadmap Phase 8 item ("Author the plug armor catalog"). `flexible` is
+    avoided so the numbers are unambiguous (NB-33).
+  - **Acquisition.** Picking straight from the catalog is a stopgap
+    mirroring step 1: `TODO(armor-acquisition)` at the picker cites the new
+    roadmap Phase 8 "Armor acquisition model: inventory → equip" item.
   **Done when:** in-browser: equip body armor → derived `armor` updates;
-  clear → reverts; plug slot likewise.
+  clear → reverts; plug slot: equip a `fortified` plug with body empty →
+  `armor` +1 and `defense` −2 from qualities alone; clear → reverts.
+  API test covers the plug path end-to-end.
+
+  > ✅ **Completed 2026-09-19.** Divergences from the text above:
+  > - Pure helpers (`projectCatalogArmor`, `armorSlotFromPath`,
+  >   `catalogEntriesForSlot`) live in `public/utils/armor.mjs` with
+  >   `test/client-armor.test.mts`; the component imports them.
+  > - The step-1 module-scope catalog cache was extracted into
+  >   `public/utils/catalog-cache.mjs` (`createCatalogCache(fetcher,
+  >   label)`) and `equipment-list.mjs` was refactored onto it, behaviour
+  >   unchanged; `armor-slot.mjs` shares the same primitive.
+  > - `api.getArmor()` added beside `getWeapons()`.
+  > - Each host is a `<label>` wrapping one unnamed `<select>` (`— none —`
+  >   + slot-filtered options labelled `name (armor N · qualities)`), a
+  >   `p.armor-catalog-status` loading / error line while the catalog is
+  >   not in hand, and a read-only `<dl>` (Armor, Qualities from
+  >   `qualitiesEffective ?? qualities`). A stored id the catalog does not
+  >   offer stays visible as a disabled `(unknown: id)` option.
+  > - `deps = ["equipment.armor"]` only; `armor-slot` removed from
+  >   `STUB_COMPONENTS`; interim CSS block under `div#equipment`.
+  > - Test seed: `fortified` and `hampering_2` carry their real registry
+  >   effects in `test/helpers/http.mts` plus a `test-plug-fortified`
+  >   entry; new PATCH test asserts `armor` +1 / `defense` −2 /
+  >   `qualitiesEffective`, then reverts on `null`.
+  > - Browser pass (owner): body `light_armor` → 1 PATCH, `armor` 0→4,
+  >   `defense` 10→8, 1 render on each of 2 `nagara-armor-slot` + 8
+  >   `nagara-equipment-list` hosts, 0 on `nagara-weapon-slots`, 0 on the
+  >   SSE echo; clear → reverts; plug `plug_test_fortified` → `armor` 1,
+  >   `defense` 8, summary shows `hampering_2, fortified`; clear → reverts.
+  >   Public role: both selects disabled. Creation form: 2 hosts, disabled,
+  >   unnamed (not in form data), POST 201.
 - **Step 3 — Traits & talents pickers.** Extend the display-only
   `renderTraitList` / `renderTalentList` with add/remove. Traits:
   `/api/v1/traits` (merged, `source`-stamped); stored shape per
@@ -400,7 +444,7 @@ pointer to this plan.
 - [x] _(prerequisite)_ [`done/client-component-lifecycle-plan.md`](./done/client-component-lifecycle-plan.md) — shipped 2026-09-16
 - [x] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50) (2026-09-16)
 - [x] Step 1 — Weapons picker + free-form placeholders (2026-09-16)
-- [ ] Step 2 — Armor slots
+- [x] Step 2 — Armor slots (2026-09-19)
 - [ ] Step 3 — Traits & talents pickers
 - [ ] Step 4 — Rituals picker + notes/affiliations editors
 - [ ] Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix

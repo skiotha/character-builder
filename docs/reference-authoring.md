@@ -431,12 +431,19 @@ would consume.)
   "name": "Embroidered Silk",
   "description": "Optional flavour text.",   // localized, optional
   "slot": "body" | "plug",
-  "armor": 4,                                // mitigation — feeds secondary.armor
+  "armor": 4,                                // mitigation — feeds secondary.armor (body only; see below)
   "cost": 10,                                // display-only; engine ignores.
   "qualities": ["hampering", "flexible"],    // every id must resolve in qualities.{en,ru}.json
   "effects": []                              // bespoke one-offs ONLY (§6.1)
 }
 ```
+
+**Plug pieces carry no native mitigation.** The engine reads `armor`
+only from the `body` piece (`ES §secondaries`); author `armor: 0` on
+every `slot: "plug"` entry and express its whole contribution through
+`qualities` (e.g. `fortified` → `secondary.armor +1`, `hampering_N` →
+`defense −N`). The current `plug_test_*` entries are placeholders until
+the plug catalog is authored (see `docs/roadmap.md`).
 
 There is **no** `tags` field on weapons or armor (items aren't searched
 in isolation from what equips them).

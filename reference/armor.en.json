@@ -208,5 +208,35 @@
     "cost": 100,
     "qualities": ["oiled"],
     "effects": []
+  },
+  {
+    "id": "plug_test_fortified",
+    "name": "Test Plug (Fortified)",
+    "description": "Placeholder plug piece until the plug catalog is authored. Plugs carry no mitigation of their own; everything flows through qualities.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "fortified"],
+    "effects": []
+  },
+  {
+    "id": "plug_test_protective",
+    "name": "Test Plug (Protective)",
+    "description": "Placeholder plug piece until the plug catalog is authored. Plugs carry no mitigation of their own; everything flows through qualities.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "protective"],
+    "effects": []
+  },
+  {
+    "id": "plug_test_oiled",
+    "name": "Test Plug (Oiled)",
+    "description": "Placeholder plug piece until the plug catalog is authored. Plugs carry no mitigation of their own; everything flows through qualities.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "oiled"],
+    "effects": []
   }
 ]

@@ -85,7 +85,8 @@
   nagara-talent-list,
   nagara-character-name,
   nagara-weapon-slots,
-  nagara-equipment-list {
+  nagara-equipment-list,
+  nagara-armor-slot {
     display: contents;
   }
 
@@ -1540,6 +1541,61 @@
 
           .equipment-placeholder {
             opacity: 0.55;
+          }
+        }
+
+        /* Armor-slot pickers (body / plug) */
+        /* @TODO: also take a look */
+        nagara-armor-slot {
+          .armor-slot-picker {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            margin-block-start: 0.6rem;
+
+            select {
+              font: inherit;
+              color: inherit;
+              background-color: transparent;
+              border: 1px solid var(--color-grey);
+              border-radius: 0.3rem;
+              padding: 0.1rem 0.4rem;
+
+              &:focus-visible {
+                border-color: var(--color-main);
+                outline: none;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+              }
+            }
+          }
+
+          .armor-catalog-status {
+            color: var(--color-grey);
+            font-size: 0.85em;
+
+            &[data-status="error"] {
+              color: var(--color-accent);
+            }
+          }
+
+          .armor-slot-derived {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            column-gap: 0.6rem;
+            margin-block: 0.2rem 0;
+            font-size: 0.85em;
+
+            dt {
+              color: var(--color-grey);
+            }
+
+            dd {
+              margin: 0;
+            }
           }
         }
       }

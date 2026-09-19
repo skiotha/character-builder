@@ -39,7 +39,6 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
     "entangling",
     "flaming",
     "flexible",
-    "fortified",
     "hampering",
     "long",
     "massive",
@@ -53,7 +52,33 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
     "vengeful",
     "versatile",
   ];
-  const qualitySeed = qualityIds.map((id) => ({ id, effects: [] }));
+  const qualitySeed: Array<{ id: string; effects: unknown[] }> = qualityIds.map(
+    (id) => ({ id, effects: [] }),
+  );
+  // Two armor qualities carry their real registry effects so the plug path
+  // (mitigation flows only through qualities, ES §secondaries) is
+  // observable end-to-end: `fortified` → secondary.armor +1,
+  // `hampering_2` → secondary.defense −2.
+  qualitySeed.push(
+    {
+      id: "fortified",
+      effects: [
+        {
+          target: { kind: "secondary", stat: "armor" },
+          modifier: { type: "addFlat", value: 1 },
+        },
+      ],
+    },
+    {
+      id: "hampering_2",
+      effects: [
+        {
+          target: { kind: "secondary", stat: "defense" },
+          modifier: { type: "addFlat", value: -2 },
+        },
+      ],
+    },
+  );
   // Seed entries are structurally complete: the strict catalog-membership
   // pass (`#models/reference-validation`) validates character entries by
   // id against these files, and the creation default seeds
@@ -117,6 +142,16 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
           armor: 2,
           cost: 15,
           qualities: [],
+          effects: [],
+        },
+        // Plug whose whole contribution is its qualities (`armor: 0`).
+        {
+          id: "test-plug-fortified",
+          name: "Test Plug (Fortified)",
+          slot: "plug",
+          armor: 0,
+          cost: 10,
+          qualities: ["hampering_2", "fortified"],
           effects: [],
         },
       ],

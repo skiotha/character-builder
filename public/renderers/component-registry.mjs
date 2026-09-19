@@ -11,6 +11,7 @@ import { renderTalentList } from "../components/talent-list.mjs";
 import { renderCharacterName } from "../components/character-name.mjs";
 import { renderWeaponSlots } from "../components/weapon-slots.mjs";
 import { renderEquipmentList } from "../components/equipment-list.mjs";
+import { renderArmorSlot } from "../components/armor-slot.mjs";
 
 const registry = new Map();
 
@@ -58,7 +59,6 @@ const STUB_COMPONENTS = [
   "ritual-list",
   "tradition-list",
   "effect-list",
-  "armor-slot",
   "affiliation-list",
   "notes-list",
 ];
@@ -75,3 +75,4 @@ registerComponent("talent-list", renderTalentList);
 registerComponent("character-name", renderCharacterName);
 registerComponent("weapon-slots", renderWeaponSlots);
 registerComponent("equipment-list", renderEquipmentList);
+registerComponent("armor-slot", renderArmorSlot);

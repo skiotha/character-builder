@@ -118,6 +118,10 @@ when the designer changes the loop.*
   | `defense` | `quick` | `quick` |
   | `armor` | — (equipment) | body armor value |
 
+  The `armor` base reads **only** `equipment.armor.body.armor`; the plug
+  piece's own `armor` field is never read. A plug contributes to `armor`
+  (and every other secondary) solely through its qualities' registry
+  effects — which is why authored plugs carry `armor: 0`.
 - **Engine.** Recomputed from scratch on every save; effects then modify the
   formula output (§ Pipeline order). `toughness` effects write the single
   `.max` value; `.current` is player state clamped into `[0, max]`.

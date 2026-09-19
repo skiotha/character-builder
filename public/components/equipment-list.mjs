@@ -17,13 +17,15 @@
  * the picker must re-render when either side changes. In `create` mode the
  * element renders once with no controls — pickers are view-mode-only.
  *
- * Catalog data is cached at module scope (one fetch per page life); a late
- * response checks `this.isConnected` before re-rendering.
+ * Catalog data is cached at module scope via `createCatalogCache` (one
+ * fetch per page life); a late response checks `this.isConnected` before
+ * re-rendering.
  */
 
 import * as api from "api";
 import { setCurrentCharacter } from "../state.mjs";
 import { NagaraElement, componentFactory, isWritable } from "./base.mjs";
+import { createCatalogCache } from "../utils/catalog-cache.mjs";
 import {
   availableCatalogEntries,
   projectCatalogWeapon,
@@ -35,37 +37,7 @@ const WEAPONS_PATH = "equipment.weapons";
 const SLOT_LABELS = ["Main-hand", "Off-hand", "Own"];
 const EMPTY_TEXT = "— empty —";
 
-/** @type {object[]|null} */
-let catalog = null;
-/** @type {Promise<object[]>|null} */
-let catalogPromise = null;
-/** @type {Error|null} */
-let catalogError = null;
-
-/**
- * Fetch the weapons catalog once; a failure is remembered for the current
- * render and retried on the next one.
- * @returns {Promise<object[]>}
- */
-function ensureCatalog() {
-  if (catalog) return Promise.resolve(catalog);
-  if (catalogPromise) return catalogPromise;
-
-  catalogError = null;
-  catalogPromise = api
-    .getWeapons()
-    .then((entries) => {
-      catalog = Array.isArray(entries) ? entries : [];
-      return catalog;
-    })
-    .catch((err) => {
-      console.error("[equipment-list] Failed to load weapons catalog:", err);
-      catalogError = err;
-      catalogPromise = null;
-      throw err;
-    });
-  return catalogPromise;
-}
+const weaponsCatalog = createCatalogCache(api.getWeapons, "weapons");
 
 class EquipmentListElement extends NagaraElement {
   static deps = ["equipment", "combat.carried"];
@@ -164,22 +136,20 @@ class EquipmentListElement extends NagaraElement {
     const row = document.createElement("div");
     row.classList.add("weapon-add");
 
+    const catalog = weaponsCatalog.value;
     if (!catalog) {
       const note = document.createElement("p");
       note.classList.add("weapon-catalog-status");
-      if (catalogError) {
+      if (weaponsCatalog.error) {
         note.textContent = "Weapon catalog unavailable — adding is disabled.";
         note.dataset.status = "error";
       } else {
         note.textContent = "Loading weapon catalog…";
         note.dataset.status = "loading";
-        ensureCatalog()
-          .then(() => {
-            if (this.isConnected) this.render(this.character);
-          })
-          .catch(() => {
-            if (this.isConnected) this.render(this.character);
-          });
+        const rerender = () => {
+          if (this.isConnected) this.render(this.character);
+        };
+        weaponsCatalog.get().then(rerender, rerender);
       }
       row.appendChild(note);
       return row;
@@ -233,7 +203,7 @@ class EquipmentListElement extends NagaraElement {
   }
 
   async #addWeapon(catalogId) {
-    const entry = catalog?.find((e) => e.id === catalogId);
+    const entry = weaponsCatalog.value?.find((e) => e.id === catalogId);
     if (!entry) return;
     const weapons = Array.isArray(this.character?.equipment?.weapons)
       ? this.character.equipment.weapons

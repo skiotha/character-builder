@@ -242,6 +242,19 @@ export async function getWeapons() {
   return await response.json();
 }
 
+/**
+ * Fetch the armor catalog at `CATALOG_LOCALE` (both `body` and `plug`
+ * pieces in one array). Throws on a non-2xx response like `getWeapons()`.
+ * @returns {Promise<object[]>} Raw catalog entries
+ */
+export async function getArmor() {
+  const response = await fetch(`${API_BASE}/armor?locale=${CATALOG_LOCALE}`);
+  if (!response.ok) {
+    throw new Error(`Armor catalog fetch failed: ${response.status}`);
+  }
+  return await response.json();
+}
+
 let cachedSchemaETag = null;
 let cachedSchema = null;
 

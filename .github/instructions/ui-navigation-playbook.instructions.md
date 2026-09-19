@@ -102,11 +102,24 @@ were ironed out or register a new bug.
   plus one on `nagara-weapon-slots`, none on the SSE echo. Public role:
   no controls. The other seven equipment lists render a read-only
   "Not editable yet." placeholder.
+- **Armor-slot pickers work on the sheet** for owner / DM, inside
+  `[data-path="equipment.armor.body"]` and `[data-path="equipment.armor.plug"]`
+  (`<nagara-armor-slot>`): `selectOption` on the host's `select` with a
+  catalog id (`light_armor`; plugs are the `plug_test_*` placeholders) →
+  one PATCH carrying only that slot path with the projected piece
+  (`id` / `name` / `armor` / `qualities`); `""` ("— none —") PATCHes
+  `null`. Body `light_armor`: `armor` 0→4, `defense` −2. Plug
+  `plug_test_fortified` with body empty: `armor` 1 (via `fortified`),
+  `defense` −2 — plug `.armor` is never read. Expect one `render` on both
+  `nagara-armor-slot` hosts plus the eight `nagara-equipment-list` hosts,
+  none on `nagara-weapon-slots`, none on the SSE echo. Avoid `flexible`
+  pieces when asserting `defense` (NB-33). Public role and the creation
+  form: `select` is `disabled` (and unnamed, so it never enters form data).
 
 ## Not wired in the client yet — don't hunt for it
 
-- Catalog pickers don't exist for traits, talents, rituals, armor, and
-  manual effects — they cannot be added through the UI (see
+- Catalog pickers don't exist for traits, talents, rituals, and manual
+  effects — they cannot be added through the UI (see
   `docs/roadmap.md`, Phase 6 chunk table). Seed that state via the API
   (PATCH with catalog ids) or fixtures instead.
 

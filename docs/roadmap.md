@@ -708,6 +708,18 @@ Discord bot.
       deliberate stopgap (`TODO(weapon-acquisition)` at the add control);
       this item supersedes it and decides the inventory layer together with
       the free-form `equipment.inventory` item above.
+- [ ] **Armor acquisition model: inventory → equip.** Same ruling as the
+      weapons item: body and plug pieces should be equipped only from an
+      inventory fed by creation grants, the shop, or DM grants. Chunk I's
+      armor-slot pickers select straight from the catalog as a deliberate
+      stopgap (`TODO(armor-acquisition)` at the picker); this item
+      supersedes it and rides on the inventory layer above.
+- [ ] **Author the plug armor catalog.** `reference/armor.{en,ru}.json`
+      ships three `plug_test_*` placeholders (`armor: 0`, `hampering_2` +
+      one of `fortified` / `protective` / `oiled`) so the plug slot is
+      exercisable end-to-end. Replace them with the real plug list once
+      the rules decide which qualities plugs may carry and whether a plug
+      always costs a `hampering_N` penalty.
 
 ### Client-Side Test Coverage
 

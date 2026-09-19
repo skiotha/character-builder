@@ -614,6 +614,68 @@ describe("PATCH /api/v1/characters/:id", () => {
     assert.equal(own.weaponIndex, 1);
     assert.ok(own.qualities.includes("deep_wounds"));
   });
+
+  it("equips a plug whose contribution flows only through its qualities", async () => {
+    // Plug `.armor` is never read by the engine (ES §secondaries); a
+    // `fortified` + `hampering_2` plug must still show up as
+    // secondary.armor +1 / defense −2 via registry effects.
+    const char = await createTestCharacter(
+      { characterName: "Plugara" },
+      "player-plug-slot",
+    );
+    const patch = async (value: unknown): Promise<Response> =>
+      fetch(`${BASE}/api/v1/characters/${char.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-player-id": "player-plug-slot",
+        },
+        body: JSON.stringify({
+          updates: [{ field: "equipment.armor.plug", value }],
+        }),
+      });
+    interface PatchBody {
+      character: {
+        attributes: { secondary: { armor: number; defense: number } };
+        equipment: {
+          armor: {
+            plug: { id: string; qualitiesEffective?: string[] } | null;
+          };
+        };
+      };
+    }
+
+    const before = (await (
+      await fetch(`${BASE}/api/v1/characters/${char.id}`, {
+        headers: { "x-player-id": "player-plug-slot" },
+      })
+    ).json()) as PatchBody["character"];
+    const baseArmor = before.attributes.secondary.armor;
+    const baseDefense = before.attributes.secondary.defense;
+
+    let res = await patch({
+      id: "test-plug-fortified",
+      name: "Test Plug (Fortified)",
+      armor: 0,
+      qualities: ["hampering_2", "fortified"],
+    });
+    assert.equal(res.status, 200, await res.clone().text());
+    let body = (await res.json()) as PatchBody;
+    assert.equal(body.character.attributes.secondary.armor, baseArmor + 1);
+    assert.equal(body.character.attributes.secondary.defense, baseDefense - 2);
+    assert.deepEqual(body.character.equipment.armor.plug?.qualitiesEffective, [
+      "hampering_2",
+      "fortified",
+    ]);
+
+    // Clearing the slot reverts both secondaries.
+    res = await patch(null);
+    assert.equal(res.status, 200, await res.clone().text());
+    body = (await res.json()) as PatchBody;
+    assert.equal(body.character.equipment.armor.plug, null);
+    assert.equal(body.character.attributes.secondary.armor, baseArmor);
+    assert.equal(body.character.attributes.secondary.defense, baseDefense);
+  });
 });
 
 describe("DELETE /api/v1/characters/:id", () => {

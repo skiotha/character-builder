@@ -208,5 +208,35 @@
     "cost": 100,
     "qualities": ["oiled"],
     "effects": []
+  },
+  {
+    "id": "plug_test_fortified",
+    "name": "Тестовая вставка (укреплённая)",
+    "description": "Временная вставка до появления каталога вставок. Собственной брони у вставок нет — всё даётся качествами.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "fortified"],
+    "effects": []
+  },
+  {
+    "id": "plug_test_protective",
+    "name": "Тестовая вставка (защитная)",
+    "description": "Временная вставка до появления каталога вставок. Собственной брони у вставок нет — всё даётся качествами.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "protective"],
+    "effects": []
+  },
+  {
+    "id": "plug_test_oiled",
+    "name": "Тестовая вставка (промасленная)",
+    "description": "Временная вставка до появления каталога вставок. Собственной брони у вставок нет — всё даётся качествами.",
+    "slot": "plug",
+    "armor": 0,
+    "cost": 10,
+    "qualities": ["hampering_2", "oiled"],
+    "effects": []
   }
 ]
