@@ -91,6 +91,11 @@ Verified in-browser and via the API before starting step 1:
    preview endpoint — filed as a roadmap Phase-8 item, not built here.
    Rejected alternatives: duplicating the effect engine client-side;
    persist-immediately draft characters.
+   _Amended 2026-09-19:_ **traits and talents are the exception** — their
+   creation-time behaviour is pure XP arithmetic (no effect engine
+   needed), so [`catalog-picker-dialog-plan.md`](./catalog-picker-dialog-plan.md)
+   ships them in creation mode too (staged buffer, submitted with the
+   form). Weapons / armor / rituals stay view-mode-only as stated.
 6. **Out of scope, stay `ui.hidden`, zero code**: `effect-list` (DM effects
    editor) and `tradition-list`. Both remain in `STUB_COMPONENTS`; both have
    roadmap Phase-8 homes.
@@ -340,15 +345,23 @@ in-browser pass over the touched view (Playwright MCP, per the
   >   `defense` 8, summary shows `hampering_2, fortified`; clear → reverts.
   >   Public role: both selects disabled. Creation form: 2 hosts, disabled,
   >   unnamed (not in form data), POST 201.
-- **Step 3 — Traits & talents pickers.** Extend the display-only
-  `renderTraitList` / `renderTalentList` with add/remove. Traits:
-  `/api/v1/traits` (merged, `source`-stamped); stored shape per
-  `docs/data-contracts.md` §1.2 (id, tier ∈ novice/adept/master, source);
-  tier picker inline. Talents: `/api/v1/talents`; level within `1..levels`
-  from the catalog entry.
-  **Done when:** in-browser: add Polearm Mastery + a polearm → slot
-  qualities / flags / specialAttacks / reactions populate (first half of the
-  G.2-deferred verification); tier/level bounds enforced by the UI.
+- **Step 3 — Traits & talents pickers.** _Derouted 2026-09-19_ into the
+  prerequisite plan
+  [`catalog-picker-dialog-plan.md`](./catalog-picker-dialog-plan.md). The
+  step-3 readiness review found the inline-`<select>` sketch below does not
+  match the design (Figma popup `1166:237`: search, filters, full preview)
+  and that every mechanism it depends on is missing — dialog primitive, XP
+  model, engine-derived `traditions[]`, catalog fields for the cards,
+  creation-form staging seam. That plan ships the finished traits and
+  talents pickers (view **and** creation mode — see decision 5's
+  amendment) and its step 4 carries this step's G.2-deferred verification
+  (Polearm Mastery + polearm → slot qualities / flags populate). This step
+  flips when that plan closes; nothing else to do here.
+  _Original sketch (superseded):_ extend the display-only
+  `renderTraitList` / `renderTalentList` with add/remove; traits from
+  `/api/v1/traits` (merged, `source`-stamped), stored shape per
+  `docs/data-contracts.md` §1.2, tier picker inline; talents from
+  `/api/v1/talents`, level within `1..levels`.
 - **Step 4 — Rituals picker + notes/affiliations editors.** `ritual-list`:
   fetch `/api/v1/rituals`; entries `{id, level ≥ 1}`. Schema: unhide
   `rituals`, `notes` + `affiliations` (add `ui.section`/`label`/`order` —
@@ -445,7 +458,8 @@ pointer to this plan.
 - [x] Step ½ — Own-slot engine fix (NB-49) + merged-batch validation (NB-50) (2026-09-16)
 - [x] Step 1 — Weapons picker + free-form placeholders (2026-09-16)
 - [x] Step 2 — Armor slots (2026-09-19)
-- [ ] Step 3 — Traits & talents pickers
+- [ ] _(prerequisite)_ [`catalog-picker-dialog-plan.md`](./catalog-picker-dialog-plan.md) — opened 2026-09-19
+- [ ] Step 3 — Traits & talents pickers _(flips with the prerequisite)_
 - [ ] Step 4 — Rituals picker + notes/affiliations editors
 - [ ] Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix
 - [ ] Step 5 — Styling & usability pass
