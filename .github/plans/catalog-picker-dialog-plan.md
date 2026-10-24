@@ -4,7 +4,8 @@
 second-opinion follow-ups and the XP-transition decision gate below remain
 open for step planning. Step-0 metadata decisions recorded 2026-10-23
 (see "Step-0 metadata decisions"); step 0 done 2026-10-24. Step-1
-decisions recorded 2026-10-24 (see "Step-1 decisions"). Blocks
+decisions recorded 2026-10-24 (see "Step-1 decisions"). Step-2
+decisions recorded 2026-10-24 (see "Step-2 decisions"). Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -325,6 +326,86 @@ disposable, and the cross-project contract docs are provisional drafts.
   still move in lockstep: `docs/rpg-engine-semantics.md`,
   `docs/reference-authoring.md`, `docs/roadmap.md`.
 
+## Step-2 decisions (2026-10-24, with the user)
+
+Settled at the step-2 readiness review; they answer review follow-ups 2 / 6
+for the dialog primitive and replace the provisional API sketch.
+
+- **S2-1. Select, then commit; the caller saves.** Clicking in the left
+  column only **selects** (card renderers receive a `select(detail)`
+  callback — e.g. a trait card's rank block selects that entry at that
+  rank) and marks the selection. A **primary footer button** (caller
+  label, e.g. "Learn") commits it; it is disabled until something is
+  selected and while the caller's `canCommit(selection)` returns a reason
+  string, which the footer shows (affordability, creation tier ceiling).
+  No double-click commit — a commit spends XP. Committing resolves the
+  promise and closes the dialog; the dialog never PATCHes. The caller
+  then saves (one atomic PATCH, or a creation-draft update) and surfaces
+  any 422 on the sheet. The promise resolves `Selection[] | null` —
+  always an array, one element in this plan — so the roadmap multi-pick
+  item turns the single selection into a set without touching callers.
+  A selection survives search / filter changes that hide its card (the
+  preview and footer keep showing it).
+- **S2-2. Dismissal: ✕, Cancel, Escape, outside click.** ✕ in the header
+  and Cancel in the footer (Figma's CANCEL) are `<form method="dialog">`
+  buttons; Escape is the native `cancel`; an outside click uses
+  `closedby="any"` plus a small backdrop-click fallback (Safari lacks
+  `closedby` as of 2026-10). All resolve `null`.
+- **S2-3. Mounted on `document.body`, closed on navigation.** `showModal()`
+  puts the dialog in the top layer, so DOM placement is about lifetime,
+  not looks. Inside the host it would die on every `rebuild()` and would
+  nest inside the creation `<form>`; on `body` it survives re-renders but
+  nothing removes it when the view changes underneath (browser Back while
+  it is open). So it closes itself (`null`) on `hashchange` and accepts an
+  optional `signal: AbortSignal` for any other caller teardown. Settles
+  exactly once; the element is removed on close.
+- **S2-4. Opens instantly; loading lives inside.** `entries` is an array
+  **or** a promise (e.g. a `createCatalogCache` `get()`). While pending the
+  list shows a loader; on rejection, an error line with a Retry button
+  that calls a caller-supplied `reload()` (typically `cache.get()` again).
+  Callers warm their catalog cache when the sheet / creation form
+  renders, so the loader is normally never seen.
+- **S2-5. Frozen copy, re-checked on save.** The dialog renders from data
+  captured at open; SSE updates while it is open do not re-render it.
+  After a pick the caller re-checks against current state (already
+  learned, still affordable, still eligible) before saving, and reports
+  instead of saving when the pick went stale.
+- **S2-6. Focus.** Opening focuses the search box. On close, focus returns
+  to the opener if it is still connected, else to a caller-given
+  `returnFocus` fallback (hosts `rebuild()` their children, so the opener
+  button is often gone by then).
+- **S2-7. One dialog at a time.** Opening while a catalog dialog is
+  already open resolves `null` immediately.
+- **S2-8. Right column: search, filters, preview, recall stubs.** Left
+  column: **full-detail cards** (Figma `ability-select-popup`). Right
+  column, top to bottom: search + filter chips; a **preview** of the
+  current selection as it will look on the sheet (the compact card in the
+  frame — Equipment / Stats lines, one line per rank), rendered by an
+  optional caller `renderPreview(selection) → Node`, with an empty-state
+  hint when nothing is selected; then disabled stub buttons for the
+  roadmap remember / recall item (`TODO(trait-recall)`; captions
+  **Remember** / **Recall** — open item E). Space check
+  against the 1200 × 600 frame: the right column is ~410 px wide, search
+  + filters take ~180 px of height, the compact card ~150 × 180 px, the
+  stubs one row — it fits; on short viewports the column scrolls.
+  Step 2 ships the slot; step 4 fills it once the step-3 formatter
+  exists. If the preview proves cramped in practice, it is dropped
+  without touching callers (the option is optional).
+- **S2-10. Enter must not dismiss or commit by accident.** In a
+  `<form method="dialog">`, Enter in the search box triggers implicit
+  submission through the form's **first** submit button in tree order —
+  the header ✕ would close the dialog. Keep the search input outside the
+  dismiss form (or swallow Enter there); Enter commits only from the
+  focused primary button.
+- **S2-11. Not the weapons / armor dialog.** The roadmap's weapon-card
+  `<dialog>` (Phase 8) will be its own design; this primitive is shaped
+  for traits, talents and (Chunk I step 4) rituals only.
+- **S2-9. Verification without a harness file.** The step-2 check imports
+  `/components/catalog-dialog.mjs` dynamically in the browser
+  (Playwright) on a running sheet, against the **traits** catalog (pinned
+  in this step), not the weapons catalog. Search / filter / exclude
+  logic lives in a pure module so `node:test` covers it.
+
 ## Open items (settle at the step named)
 
 - **A. Tradition key vocabulary (step 0, user).** ✅ _Resolved 2026-10-23
@@ -346,6 +427,10 @@ disposable, and the cross-project contract docs are provisional drafts.
   talent refunds. Define when a creation-draft choice becomes committed
   and how cancellation / revision of an unsubmitted draft works; do not
   silently assume a refund exception for the creation form.
+- **E. Remember / recall stub captions (step 2, user).** ✅ _Resolved
+  2026-10-24: **Remember** / **Recall** (the Figma wording). "Store" was
+  floated and dropped — it collides with the planned gold shop (roadmap
+  acquisition items)._
 
 ## Goals
 
@@ -363,8 +448,9 @@ disposable, and the cross-project contract docs are provisional drafts.
 
 ## Non-goals
 
-- Remember / recall (roadmap Phase 8 UX item); styling beyond "usable"
-  (Chunk I step 5 owns the pass); RU l10n (Phase 8).
+- Remember / recall (roadmap Phase 8 UX item; only disabled stubs here);
+  styling beyond "usable" outside the catalog dialog (Chunk I step 5 owns
+  that pass; the dialog itself is styled in step 2c); RU l10n (Phase 8).
 - Rituals picker (Chunk I step 4 — but it reuses `catalog-dialog.mjs`).
 - Server-side XP bookkeeping / audit, DM XP grants UI (Phase 8; the DM can
   still PATCH `experience.total` directly).
@@ -525,28 +611,74 @@ revisited during planning of their owning steps, not deferred to close-out.
   > - `deferred-tasks.md` orphan note on `traditions` updated (no longer
   >   curated ability ids).
   > - Dev characters wiped (S1-2).
-- **Step 2 — Dialog primitive + API plumbing.**
+- **Step 2 — Dialog primitive + API plumbing.** Applies S2-1 … S2-11.
   `public/components/catalog-dialog.mjs`: `openCatalogDialog({ title,
-  entries, exclude, search: { fields }, filters: [{ label, predicate }],
-  renderCard(entry) → Node, renderPreview(entry) → Node, renderPick(entry)
-  → Node })` — builds a native `<dialog>` (heading, search `<input
-  type="search">`, filter chips as `<input type="checkbox">` /
-  `<fieldset>`, scrollable card list, preview column, Cancel), appends to
-  `document.body`, `showModal()`, resolves `Promise<pick | null>` where
-  the pick node dispatches a `catalog-pick` `CustomEvent` with `detail`;
-  Escape / Cancel / `close` resolve `null`; the element is removed on
-  close; keyboard focus lands in the search box. Remove `<dialog
-  id="modal">` from `index.html` and delete `modal.mjs`. `api.mjs`: pin
-  `getTraits()` to `CATALOG_LOCALE`, add `getTalents()`; both wrapped in
-  `createCatalogCache`. Reassess the API sketch for caller-owned
-  cancellation, state freshness and failure handling (review follow-ups
-  2 / 6) before committing to its signature.
-  **Done when:** a throwaway harness page (not
-  committed) opens the dialog with the weapons catalog, search narrows the
-  list, a filter chip toggles, a pick resolves the promise, Escape resolves
-  `null`, and `document.querySelector("dialog")` is `null` afterwards;
-  the teardown / focus / failure cases agreed for follow-up 6 are covered;
-  `npm test` green.
+  header?, entries, reload?, exclude, search: { fields }, filters: [{
+  label, predicate }], renderCard(entry, select, selection) → Node,
+  renderPreview?(selection) → Node, commitLabel, canCommit?(selection) →
+  true | string, signal?, returnFocus? }) → Promise<Selection[] | null>`.
+  Split into three sub-steps (user, 2026-10-24), each its own commit and
+  confirmation stop; the in-browser checks run per S2-9.
+  - **Step 2a — Shell.** Native `<dialog>` appended to `document.body`,
+    `showModal()`, with the frame's regions as empty containers: header
+    (title, caller `header` node such as the XP balance, ✕); left column
+    (scrollable list); vertical divider; right column; footer (Cancel +
+    primary commit button, disabled until 2b wires selection). Dismissal
+    (S2-2), close on `hashchange` / `signal` (S2-3), settle-once +
+    removal on close, one instance (S2-7), focus in / out (S2-6), Enter
+    handling (S2-10), loader / error + Retry for a promised `entries`
+    (S2-4). Only the CSS needed to see the regions. Remove `<dialog
+    id="modal">` from `index.html` and delete `modal.mjs`. `api.mjs`:
+    pin `getTraits()` to `CATALOG_LOCALE` and make it throw on non-2xx
+    like `getWeapons()` (it has no callers), add `getTalents()`;
+    consumers wrap them in `createCatalogCache` (steps 4 / 5).
+    **Done when:** the dialog opens from the traits catalog with a
+    throwaway `renderCard`; Enter in search neither closes nor commits;
+    ✕, Cancel, Escape and an outside click each resolve `null`; a
+    `hashchange` and an aborted `signal` each close it; a pending
+    `entries` promise shows the loader and a rejected one shows Retry,
+    which recovers; a second open while one is open resolves `null`;
+    focus starts in search and returns to the opener (or `returnFocus`
+    when the opener is gone); `document.querySelector("dialog")` is
+    `null` after every path; `npm test` green.
+  - **Step 2b — Contents.** Pure search / filter / exclude logic in
+    `public/utils/catalog-filter.mjs`, tested in
+    `test/client-catalog-filter.test.mts`. Right column: search
+    `<input type="search">`, filter chips (`<fieldset>` of checkboxes),
+    preview slot with an empty-state hint, disabled **Remember** /
+    **Recall** stubs (S2-8). Selection state, selected-card marking,
+    primary button enablement and the `canCommit` reason line (S2-1).
+    CSS stays functional: columns, scroll, divider, a visible selected
+    state.
+    **Done when:** search narrows the list; a filter chip toggles;
+    `exclude` hides entries; clicking a card selects it and updates the
+    preview; the selection survives a search that hides its card; the
+    primary button is disabled with nothing selected and while
+    `canCommit` returns a reason (shown), and commits `[selection]`
+    otherwise; the stubs are present and disabled; the 2a paths still
+    pass; `npm test` green.
+  - **Step 2c — Dialog CSS pass.** Brings the dialog chrome to the
+    redesign now instead of waiting for Chunk I step 5 (which keeps
+    the rest of the sheet). Tokens from Figma per the
+    **ui-figma-source** rule (`get_variable_defs` on
+    `ability-select-popup` and the `view` frame), mapped to `:root`
+    custom properties — no hex / fonts from memory. Per the **styling**
+    rule: an `@layer`ed, `@scope`d dialog stylesheet with native nesting;
+    surface, `::backdrop`, header / title type, columns and divider,
+    search and chips, preview frame, stubs, footer buttons (primary vs
+    Cancel), hover / `:focus-visible` / selected / disabled states,
+    open / close motion with `@starting-style` honoring
+    `prefers-reduced-motion`, and a narrow-viewport fallback (columns
+    stack, list scrolls). Also the **card contract** the step-4 / 5
+    renderers fill: a styled card skeleton (name, attribute lines,
+    description, rank row of three blocks as in the frame, selected rank)
+    so the real cards land pre-styled. Re-check the frame first: it is
+    an early draft, so settle open visual questions with the user before
+    styling them.
+    **Done when:** screenshots at desktop and narrow widths reviewed by
+    the user against the frame; keyboard-only run through every control
+    shows focus; reduced motion disables the animation; the 2a / 2b
+    paths still pass; `npm test` green.
 - **Step 2½ — Existing-character XP transition (decision gate).** Lock
   the policy with the user before implementing the XP model or enabling
   spending / refunds. Review current totals against potentially unpaid
@@ -594,8 +726,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   search over `name` + `tags` + derived summary text; card = name,
   `startingEquipment`, derived enhanced-attribute line, description, three
   rank blocks with check attribute, **full** effect / specialAttack /
-  reaction detail per rank, tier pick buttons labelled with cumulative
-  cost and disabled when unaffordable. Pick → one PATCH
+  reaction detail per rank, each rank block selecting that rank (S2-1)
+  and labelled with its cumulative cost; `canCommit` reports unaffordable
+  / ineligible selections; the preview slot shows `traitCardLines` for
+  the selection. Commit → one PATCH
   `[{ field: "traits", value }, { field: "experience.unspent", value }]`;
   422 → inline error, no state change. Sheet card: compact lines from
   `traitCardLines`, N/A/M control as up / down buttons, remove button,
@@ -645,9 +779,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   dialog, present on the sheet dialog; draft revision follows the recorded
   item-D ruling.
 - **Step 7 — Close-out.** Flip the Chunk I step-3 notch, refresh Chunk I
-  decision 5's amendment note and Non-goals; roadmap: mark the traits /
-  talents part of creation parity done, add "remember / recall" UX item,
-  narrow the preview-endpoint item's wording; `docs/architecture.md`
+  decision 5's amendment note and Non-goals, and note in Chunk I step 5
+  that the catalog dialog was styled in step 2c here; roadmap: mark the traits /
+  talents part of creation parity done (the "remember / recall" and
+  "multi-pick" items were added 2026-10-24), narrow the preview-endpoint item's wording; `docs/architecture.md`
   mentions `catalog-dialog.mjs`; reconcile the review follow-ups with their
   step decisions and the XP-transition gate; sweep the References list
   below; update repo memory with the picker recipe.
@@ -698,6 +833,9 @@ empty list is fine — state it explicitly.
 - [x] Step 1 — Server groundwork: NB-51 defaults + derived traditions
   _(2026-10-24)_
 - [ ] Step 2 — Dialog primitive + API plumbing
+  - [ ] Step 2a — Shell
+  - [ ] Step 2b — Contents
+  - [ ] Step 2c — Dialog CSS pass
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
 - [ ] Step 3 — XP model + compact formatter
 - [ ] Step 4 — Traits picker (view mode)

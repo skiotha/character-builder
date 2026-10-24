@@ -693,6 +693,21 @@ Discord bot.
       endpoint or editor is needed. What remains is the display only,
       e.g. a read-only line on the sheet that resolves each key to its
       tradition ability's localized name.
+- [ ] **Catalog picker: remember / recall to compare.** The Figma
+      ability picker (frame `ability-select-popup`) reserves the lower
+      right column of the dialog, under search, for "remember abilities and
+      recall them to compare": the player pins entries while browsing and
+      sees them side by side as compact (sheet-style) cards. The
+      [catalog-picker plan](../.github/plans/catalog-picker-dialog-plan.md)
+      ships the dialog without it: that area holds disabled stub buttons
+      (`TODO(trait-recall)` in the dialog module). Design it together with
+      the multi-pick item below — both want that column.
+- [ ] **Catalog picker: multi-pick.** Stage several new traits / talents
+      in one dialog session and confirm once; the caller fills that many
+      vacant cards in one atomic PATCH (or one creation-draft update).
+      The dialog already resolves an array of selections (one element
+      today), so this turns its single selection into a set and shows a
+      running XP total across it — no change to callers' save path.
 - [ ] **Catalogs or structured editors for the free-form equipment
       arrays.** `equipment.{ammunition,runes,assassin,tools,artifacts}`
       and `equipment.inventory.{carried,home}` render as disabled
