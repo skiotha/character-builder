@@ -7,14 +7,6 @@
 > See [`README.md`](README.md) for the `NB-N` id scheme, the severity rubric,
 > and the filing / closing procedure. Cite a bug from code as `NB-<n>`.
 
-## MEDIUM — Address During API / Validation Work
-
-### NB-51. Fresh characters omit every schema field without a `default` — contract says `[]`
-- **Where:** `src/models/schema-utils.mts` `generateDefaultCharacter` — the traversal only seeds `field.default` and recurses into `type: "object"`; array / string / nullable-object fields with no `default` are skipped. Affected on a freshly created character (verified via `GET /characters/:id` as owner, 2026-09-02): `traits`, `talents`, `rituals`, `traditions`, `effects`, `affiliations`, `location`, `portrait`, `background.notes`, `background.journal.*`, `background.kinkList`.
-- **Impact:** `docs/data-contracts.md` §1 documents these as always-present (`"talents": []`, `"rituals": []`, …) and the sibling contracts inherit that shape; a Lua `ipairs(character.talents)` or a bot-side `.length` on a fresh character hits `nil` / `undefined`. Client-side, absent keys also mean the field never appears in the state diff until a first PATCH creates it. The engine tolerates absence (`?? []` reads), so this is a contract / sibling risk, not a recalc failure.
-- **Fix when scoped:** either add explicit `default: []` (and `default: ""` / `default: null` where appropriate) to the schema fields, or have `generateDefaultCharacter` seed `type: "array"` fields with `[]` when no default is authored. Existing on-disk characters keep the gap — decide between a read-path backfill in the domain layer and a one-off migration. Watch `test/data-contracts.test.mts` and the creation-shape fixtures in `test/helpers/fixtures.mts` (which already assume the arrays exist).
-- **Status:** ⚠️ Open — filed 2026-09-02 as a side finding of the Chunk I step-1 readiness review; not scheduled. Promote before Phase 7 sibling integration.
-
 ## DEFERRED — Track for later, not currently scoped
 
 ### NB-40. `x-forwarded-for` parsing for rate limiter (and any future client-IP logic)

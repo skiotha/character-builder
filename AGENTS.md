@@ -218,14 +218,22 @@ The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<s
 
 See [`docs/roadmap.md`](docs/roadmap.md) for the full phased work plan and current status.
 
+## Project Status — pre-launch
+
+The character builder has **not been launched** (recorded 2026-10-24). Until it runs somewhere real:
+
+- **There is no production data.** Every character under `data/` is a disposable development character. Wipe and rebuild (`scripts/hard-delete.mts --all`) rather than writing migrations, backfills or compatibility shims — unless a migration is genuinely simpler than erasing and recreating.
+- **`schemaVersion` is not bumped** for shape changes; it stays at its current value until launch.
+- **The cross-project contract docs are provisional drafts, not constraints.** `docs/data-contracts.md`, `docs/addon-integration.md` and `docs/bot-integration.md` record early ideas the project has already moved away from several times. Nothing reads from this app yet. Do not treat their claims as requirements, do not keep a design choice because a contract doc says so, and do not block work on keeping them in sync. They will be rewritten to match reality at launch. The code, the ADRs, and `docs/rpg-engine-semantics.md` / `docs/reference-authoring.md` remain authoritative.
+
 ## Sibling Projects
 
 When making changes that affect the character data model or API, check:
 
-- `docs/addon-integration.md` — what the addon expects
-- `docs/bot-integration.md` — what the Discord bot expects
-- `docs/data-contracts.md` — canonical schema and API contract
+- `docs/addon-integration.md` — what the addon expects (provisional, see Project Status)
+- `docs/bot-integration.md` — what the Discord bot expects (provisional, see Project Status)
+- `docs/data-contracts.md` — draft schema and API contract (provisional, see Project Status)
 - [nagara-addon/docs/data-contracts.md](https://github.com/skiotha/nagara-addon/blob/main/docs/data-contracts.md) — addon-side contract
 - [malizia/docs/data-contracts.md](https://github.com/skiotha/malizia/blob/main/docs/data-contracts.md) — bot-side contract
 
-If a proposed change is incompatible with a sibling contract, do not silently proceed. State the incompatibility explicitly, label it a **breaking change**, and propose either (a) a backwards-compatible alternative or (b) the minimum coordinated update needed across all three projects before the change can land.
+Pre-launch, an incompatibility with a sibling contract is **not** a blocker: mention it in the plan or commit message so it can be reconciled at launch, and proceed with whichever option serves the project best. After launch, the rule below applies: if a proposed change is incompatible with a sibling contract, do not silently proceed. State the incompatibility explicitly, label it a **breaking change**, and propose either (a) a backwards-compatible alternative or (b) the minimum coordinated update needed across all three projects before the change can land.

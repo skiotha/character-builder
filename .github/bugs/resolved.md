@@ -275,3 +275,17 @@
 - **Impact:** Any schema `validate:` hook that reads sibling fields evaluated against pre-PATCH state. Concrete case: `validateCombatCarried` checks `weaponIndex` range and the own-slot `own` quality against the stored `equipment.weapons[]`. A single atomic PATCH that removes a weapon and re-maps `combat.carried` in the same batch (the Chunk I picker contract) was validated as *new indices against the old array*. With the own slot at `natural_weapon` (index 0) this was coincidentally safe; once NB-49 let the own slot point at a later own-quality weapon, removing any lower-index weapon yielded a spurious 422 for a batch that is valid once merged.
 - **Fix:** the merged clone is built **before** per-field validation — every permitted (non-FORBIDDEN) update is applied to `structuredClone(character)` and that clone is passed as `allData` to `validateFieldValue`; the same clone feeds the existing merged-state pass. An update whose apply throws (an earlier update in the batch replaced its parent with a primitive) is reported as a `VALIDATION` error rather than propagating. Tests in `test/validation.test.mts`: weapons shrink + carried re-map with a non-zero own index passes; the same carried tuple alone against the stored array fails; the primitive-parent batch is reported, not thrown.
 - **Status:** ✅ Resolved — Phase 6 Chunk I step ½ (2026-09-16), same commit as NB-49. Filed 2026-09-02 during the Chunk I step-1 readiness review.
+
+### NB-51. Fresh characters omit every schema field without a `default` — contract says `[]`
+- **Domain:** infra
+- **Where:** `src/models/schema-utils.mts` `generateDefaultCharacter`. The traversal only seeded `field.default` and recursed into `type: "object"`, so array / string fields with no `default` were skipped. On a fresh character that meant `traits`, `talents`, `rituals`, `traditions`, `effects`, `affiliations`, `location`, `portrait`, `background.notes`, `background.journal.*` and `background.kinkList` were all absent.
+- **Impact:** Consumers had to guard every array and string read on a fresh character (a Lua `ipairs` or a bot-side `.length` hit `nil` / `undefined`). Client-side, an absent key never appeared in the state diff until the first PATCH created it.
+- **Fix:** `generateDefaultCharacter` now:
+  - seeds a fresh `[]` for every non-server-controlled `type: "array"` field without a `default`;
+  - deep-clones authored defaults, so `combat.carried` is no longer shared by reference;
+  - explicitly seeds the server-controlled portrait leaves, `portrait.path = ""` and `portrait.status = "unset"`.
+
+  In the schema, `location` / `background.shadow` / `background.profession` gained `default: ""`. `portrait.crop` gained `type: "object"` so the traversal descends into it, and the crop and dimensions leaves gained numeric defaults. `traditions` is engine-derived now (`rpg-engine-semantics.md` ES §traditions), so `recalculate` writes it on every save.
+  
+  Existing development characters were wiped instead of migrated (pre-launch, no production data). Tests: the `generateDefaultCharacter` shape tests in `test/validation.test.mts`, and the minimal-body POST test in `test/api.test.mts`.
+- **Status:** ✅ Resolved — catalog-picker step 1 (2026-10-24). Filed 2026-09-02 during the Chunk I step-1 readiness review.

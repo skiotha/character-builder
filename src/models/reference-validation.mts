@@ -50,8 +50,6 @@ interface CatalogIndexes {
   /** Talent id → stamped source + max purchasable level (if authored). */
   talentById: Map<string, { source: string; levels: number | null }>;
   ritualIds: Set<string>;
-  /** Traditions resolve against abilities only (curated ability ids). */
-  abilityIds: Set<string>;
 }
 
 async function loadIndexes(): Promise<CatalogIndexes> {
@@ -74,10 +72,8 @@ async function loadIndexes(): Promise<CatalogIndexes> {
   }
 
   const traitSourceById = new Map<string, string>();
-  const abilityIds = new Set<string>();
   for (const entry of traits) {
     traitSourceById.set(entry.id, entry.source ?? "");
-    if (entry.source === "ability") abilityIds.add(entry.id);
   }
 
   const talentById = new Map<string, { source: string; levels: number | null }>();
@@ -95,7 +91,6 @@ async function loadIndexes(): Promise<CatalogIndexes> {
     traitSourceById,
     talentById,
     ritualIds: new Set(rituals.map((e) => e.id)),
-    abilityIds,
   };
 }
 
@@ -351,29 +346,6 @@ function checkRituals(
   });
 }
 
-function checkTraditions(
-  character: Record<string, unknown>,
-  idx: CatalogIndexes,
-  errors: ValidationError[],
-): void {
-  const traditions = character.traditions;
-  if (traditions === undefined) return;
-  if (!Array.isArray(traditions)) {
-    errors.push(structural("traditions", "must be an array"));
-    return;
-  }
-  traditions.forEach((id, i) => {
-    const field = `traditions[${i}]`;
-    if (typeof id !== "string" || id.length === 0) {
-      errors.push(structural(field, "tradition must be an ability id string"));
-      return;
-    }
-    if (!idx.abilityIds.has(id)) {
-      errors.push(unknownRef(field, id, "abilities"));
-    }
-  });
-}
-
 /** Field roots each sub-check owns, for update-time scoping. */
 const CHECK_ROOTS: ReadonlyArray<{
   roots: string[];
@@ -388,7 +360,6 @@ const CHECK_ROOTS: ReadonlyArray<{
   { roots: ["traits"], run: checkTraits },
   { roots: ["talents"], run: checkTalents },
   { roots: ["rituals"], run: checkRituals },
-  { roots: ["traditions"], run: checkTraditions },
 ];
 
 function touchesSubtree(touched: string[], root: string): boolean {
@@ -403,9 +374,10 @@ function touchesSubtree(touched: string[], root: string): boolean {
 /**
  * Validate the catalog-referencing arrays on a merged character:
  * `equipment.weapons[]`, `equipment.armor.{body,plug}`, `traits[]`,
- * `talents[]`, `rituals[]`, `traditions[]`. Absent fields are skipped
+ * `talents[]`, `rituals[]`. Absent fields are skipped
  * (defaulting is the schema's job); present fields are checked for
- * structural shape and strict id membership.
+ * structural shape and strict id membership. `traditions[]` is
+ * engine-derived (ES §traditions) and not validated here.
  *
  * @param character the merged character (defaults + payload, or stored
  *   character + applied updates) — never a bare PATCH fragment.

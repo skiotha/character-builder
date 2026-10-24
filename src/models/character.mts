@@ -596,6 +596,7 @@ export const CHARACTER_SCHEMA: Record<
 
   location: {
     type: "string",
+    default: "",
     permissions: perm_default,
     error: "Location must be a string",
     ui: {
@@ -636,10 +637,13 @@ export const CHARACTER_SCHEMA: Record<
     },
   },
 
+  // Engine-derived tradition keys (ES §traditions): written by
+  // `recalculate` from learned tradition abilities, never by clients.
   traditions: {
     type: "array",
-    permissions: perm_default,
-    error: "Traditions must be an array of tradition IDs",
+    derived: true,
+    serverControlled: true,
+    permissions: { owner: RO, dm: RO, public: RO },
     ui: {
       hidden: true,
     },
@@ -700,6 +704,7 @@ export const CHARACTER_SCHEMA: Record<
 
     shadow: {
       type: "string",
+      default: "",
       permissions: perm_default,
       error: "Shadow description must be a string",
       ui: {
@@ -709,6 +714,7 @@ export const CHARACTER_SCHEMA: Record<
 
     profession: {
       type: "string",
+      default: "",
       permissions: perm_default,
       error: "Profession description must be a string",
       ui: {
@@ -932,9 +938,13 @@ export const CHARACTER_SCHEMA: Record<
     },
 
     crop: {
+      type: "object",
+      permissions: perm_default,
+
       x: {
         type: "number",
         integer: false,
+        default: 0,
         permissions: perm_default,
         error: "Horizontal offset must be a float number",
         ui: { hidden: true },
@@ -943,6 +953,7 @@ export const CHARACTER_SCHEMA: Record<
       y: {
         type: "number",
         integer: false,
+        default: 0,
         permissions: perm_default,
         error: "Vertical offset must be a float number",
         ui: { hidden: true },
@@ -952,6 +963,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         integer: false,
         min: 0.0,
+        default: 1,
         permissions: perm_default,
         error: "Scale factor must be a positive float number",
         ui: { hidden: true },
@@ -960,6 +972,7 @@ export const CHARACTER_SCHEMA: Record<
       rotation: {
         type: "number",
         integer: false,
+        default: 0,
         permissions: perm_default,
         error: "Rotation degree must be a float number",
         ui: { hidden: true },
@@ -974,6 +987,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         min: 0,
         integer: true,
+        default: 0,
         permissions: perm_default,
         error: "Portrait width can't be negative",
         ui: { hidden: true },
@@ -983,6 +997,7 @@ export const CHARACTER_SCHEMA: Record<
         type: "number",
         min: 0,
         integer: true,
+        default: 0,
         permissions: perm_default,
         error: "Portrait height can't be negative",
         ui: { hidden: true },

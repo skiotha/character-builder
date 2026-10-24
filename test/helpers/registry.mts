@@ -20,6 +20,8 @@ export interface TraitFixture {
   effects?: ResolvedEffect[];
   specialAttacks?: SpecialAttack[];
   reactions?: Reaction[];
+  /** Tradition key granted by this trait (tradition abilities only). */
+  tradition?: string;
 }
 
 export interface InMemoryRegistryConfig {
@@ -94,6 +96,7 @@ export function createInMemoryRegistry(
         effects: entry.effects ?? [],
         specialAttacks: entry.specialAttacks ?? [],
         reactions: entry.reactions ?? [],
+        ...(entry.tradition ? { tradition: entry.tradition } : {}),
       };
     },
 

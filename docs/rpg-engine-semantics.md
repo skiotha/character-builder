@@ -67,7 +67,8 @@ when the designer changes the loop.*
   Temporary corruption clears over time; permanent corruption marks the
   character forever. Crossing `corruptionThreshold` / exhausting
   `corruptionMax` has severe in-fiction consequences. Holding a matching
-  **tradition** reduces corruption from that school's spells. The engine
+  **tradition** reduces corruption from that school's spells (ES
+  §traditions). The engine
   derives the two thresholds (§ Attributes); all accrual bookkeeping is
   sibling-side (§ Out of engine).
 - **Experience.** Characters earn XP in play (`experience.total` lifetime,
@@ -152,6 +153,27 @@ when the designer changes the loop.*
 - **Where.** `deriveMagicAttribute` / `deriveInitiativeAttribute` in
   `src/rules/derived.mts`; ADR-015 §3, §spell-tier-actions.
 
+### ES §traditions — tradition membership is derived from abilities
+
+- **Rule.** A mystic may follow a mystical tradition; membership is
+  expressed by learning that tradition's separate **ability**, at any tier
+  (vault `rpg/ru/01-core/abilities.md` "Мистические традиции"). Any mystic
+  may learn any spell regardless of tradition, so spells never confer
+  membership. A tradition shields its **own** spells: learning them costs
+  no permanent corruption, and casting them accrues less temporary
+  corruption (vault `rpg/ru/01-core/magic.md` "О магии").
+- **Engine.** `character.traditions` is a server-derived, server-controlled
+  list of canonical tradition keys (`order`, `circle`, …), sorted and
+  de-duplicated, rebuilt on every recalc from learned traits whose catalog
+  entry carries a singular `tradition` key. A spell's plural `traditions`
+  is a school tag and never contributes. Client writes are rejected.
+  Matching character keys against a spell's `traditions` for corruption is
+  sibling-side (§ Out of engine).
+- **Where.** `deriveTraditions` in `src/rules/derived.mts`;
+  `TraitLookupResult.tradition` set by `deserializeTrait` in
+  `src/rules/registry.mts`; key vocabulary in
+  [reference-authoring.md](reference-authoring.md).
+
 ---
 
 ## Pipeline order
@@ -163,8 +185,9 @@ when the designer changes the loop.*
   before multipliers, multipliers before caps, set-membership last.
 - **Engine.** Fixed phase sequence enforced by code structure, never by
   data: `primary` → `setBase` → formulas → `addFlat` → `multiply` → `cap` →
-  flags/set-membership → per-slot combat fanout → action collection →
-  clamps. Within a phase, order is undefined and must be semantically
+  flags/set-membership → clamps → per-slot combat fanout → action
+  collection → tradition derivation (ES §traditions). Within a phase,
+  order is undefined and must be semantically
   order-independent. There is **no `priority` field**; legacy `priority` in
   data is ignored.
 - **Where.** `recalculate` in `src/rules/derived.mts` (module header
@@ -389,7 +412,7 @@ updates this document first.
 | Dice rolls (d20 checks, damage dice) | siblings / the table | ES §phase-order derives static values only |
 | Character-state conditions ("while raging", "at low health", "while prone") | siblings gate at roll time (Tier C) | ES §tier-abc |
 | Effect lifecycle — `duration` is ignored, expiry never pruned | siblings add/remove `character.effects[]` and re-save | drop site: `src/rules/effects.mts` |
-| Corruption accrual & spell cost (traditions vs. spell school) | siblings compute; engine derives thresholds only | ES §secondaries; [data-contracts.md](data-contracts.md) |
+| Corruption accrual & spell cost (traditions vs. spell school) | siblings compute; engine derives thresholds and tradition membership only | ES §secondaries; ES §traditions |
 | XP pricing & spending | the table; engine guards non-negativity only | `src/models/schema-utils.mts` |
 | Action economy (free-attack counting) | siblings sum `isFree` grants | ADR-014 §is-free |
 | Trigger & status semantics | siblings | ES §opaque-tokens |

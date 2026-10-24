@@ -147,7 +147,7 @@ function makeCharacter(
       path: "",
       crop: { x: 0, y: 0, scale: 1, rotation: 0 },
       dimensions: { width: 0, height: 0 },
-      status: "none",
+      status: "unset",
     },
   };
 

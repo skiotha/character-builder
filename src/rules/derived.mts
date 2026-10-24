@@ -7,8 +7,9 @@
 //
 // Pipeline order:
 //   1. clone the input character; reset derived collections
-//      (`flags`, `specialAttacks`, `reactions`) to empty so previously
-//      written values can never leak across recalcs (closes NB-31).
+//      (`flags`, `specialAttacks`, `reactions`, `traditions`) to empty
+//      so previously written values can never leak across recalcs
+//      (closes NB-31).
 //   2. collect + group effects by phase
 //   3. setBase  → build SecondaryAttribute → PrimaryAttribute override map
 //   4. formula  → SECONDARY_FORMULAS, using the override map
@@ -27,6 +28,8 @@
 //                           from the registry, deduped by `Action.id`
 //                           with last-write-wins (master rewrites
 //                           adept rewrites novice; ADR-014 §action-rewrite).
+//   10b. deriveTraditions — sorted unique tradition keys granted by
+//                           learned tradition abilities (ES §traditions).
 //
 // Recalc is a pure derivation over its input: it never sanitizes
 // player-authored fields (XP, equipment presence, …) — input validity
@@ -68,6 +71,7 @@ export function recalculate(
   result.flags = [];
   result.specialAttacks = [];
   result.reactions = [];
+  result.traditions = [];
   // Reset the per-piece `qualitiesEffective` overlay from the authored
   // `qualities` set. The applicator writes to `qualitiesEffective` only;
   // `qualities` is the player-authored base and is never mutated by the
@@ -154,6 +158,9 @@ export function recalculate(
   // per-equipment actions).
   collectActions(result, registry);
 
+  // ── 8b. deriveTraditions (ES §traditions) ────────────────────────
+  deriveTraditions(result, registry);
+
   return result;
 }
 
@@ -196,6 +203,25 @@ function collectActions(
 
   character.specialAttacks = [...saMap.values()];
   character.reactions = [...reactMap.values()];
+}
+
+/**
+ * Derive `character.traditions` (ES §traditions): the sorted, de-duplicated
+ * tradition keys of every learned trait whose registry entry grants one.
+ * Membership comes from the tradition ability at any tier; spells never
+ * contribute. Unknown trait ids are skipped silently — `collectAllEffects`
+ * already warned for them.
+ */
+function deriveTraditions(
+  character: { traits?: LearnedTrait[]; traditions: string[] },
+  registry: Registry,
+): void {
+  const keys = new Set<string>();
+  for (const trait of character.traits ?? []) {
+    const key = registry.lookupTrait(trait.id, trait.tier)?.tradition;
+    if (key) keys.add(key);
+  }
+  character.traditions = [...keys].sort();
 }
 
 // ── Per-slot combat fanout (ADR-014) ───────────────────────────────

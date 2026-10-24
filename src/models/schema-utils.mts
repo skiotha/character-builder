@@ -120,6 +120,16 @@ export function validateFieldValue(
   return { valid: true };
 }
 
+/**
+ * Build the creation baseline for a new character: every
+ * client-visible field the schema declares is present.
+ *
+ * - Authored `default`s are deep-cloned so no two characters share one
+ *   instance (e.g. the `combat.carried` tuple).
+ * - Array fields without a `default` start as a fresh `[]`.
+ * - Server-controlled paths are skipped — they are stamped by the
+ *   domain layer, derived by `recalculate`, or seeded explicitly below.
+ */
 export function generateDefaultCharacter(
   playerId: string,
   playerName: string = "Unknown",
@@ -138,7 +148,9 @@ export function generateDefaultCharacter(
       }
 
       if (field.default !== undefined) {
-        setNestedValue(defaults, fullPath, field.default);
+        setNestedValue(defaults, fullPath, structuredClone(field.default));
+      } else if (field.type === "array") {
+        setNestedValue(defaults, fullPath, []);
       } else if (field.type === "object") {
         traverse(field, fullPath);
       }
@@ -146,6 +158,12 @@ export function generateDefaultCharacter(
   }
 
   traverse(CHARACTER_SCHEMA);
+
+  // Server-controlled portrait leaves the traversal skips: only the
+  // upload handler writes them after creation; `"uploaded"` is the sole
+  // status readers act on.
+  setNestedValue(defaults, "portrait.path", "");
+  setNestedValue(defaults, "portrait.status", "unset");
 
   // Own-slot anchor (ADR-014): seeded from the weapon catalog through
   // the injected lookup — the schema carries no inline default (NB-45).

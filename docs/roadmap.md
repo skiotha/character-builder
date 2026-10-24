@@ -687,10 +687,12 @@ Discord bot.
 - [ ] **Affiliations as world entities.** Chunk I ships plain string rows;
       the intended end state is entity-backed affiliations (DM-curated
       organizations with semantics), which needs its own data model.
-- [ ] **Traditions display surface.** `traditions[]` stays `ui.hidden` and
-      has no endpoint. When surfaced: traditions are curated ability ids —
-      filter `/api/v1/traits` by `source === "abilities"` or add a
-      dedicated endpoint.
+- [ ] **Traditions display surface.** `traditions[]` stays `ui.hidden`.
+      It is engine-derived (`rpg-engine-semantics.md` ES §traditions):
+      sorted tradition keys from the learned tradition abilities, so no
+      endpoint or editor is needed. What remains is the display only,
+      e.g. a read-only line on the sheet that resolves each key to its
+      tradition ability's localized name.
 - [ ] **Catalogs or structured editors for the free-form equipment
       arrays.** `equipment.{ammunition,runes,assassin,tools,artifacts}`
       and `equipment.inventory.{carried,home}` render as disabled

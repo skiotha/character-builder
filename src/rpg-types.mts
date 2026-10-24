@@ -536,6 +536,7 @@ export interface Character {
   traits: LearnedTrait[];
   rituals: LearnedRitual[];
   talents: LearnedTalent[];
+  /** Engine-derived tradition keys (ES §traditions); server-controlled. */
   traditions: string[];
   /** Manual / persistent overrides authored by player or DM. Lifecycle is
    *  sibling-app-owned; the engine treats every entry as permanent. */

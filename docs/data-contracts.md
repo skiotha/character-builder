@@ -1,6 +1,15 @@
 # Nagara Character Builder — Data Contracts
 
-> Canonical data shapes for the character builder and its consumers.
+> ⚠️ **Provisional draft — not authoritative (2026-10-24).** The character
+> builder has not launched and nothing reads from it yet. This document
+> records early ideas that the code has since moved away from in several
+> places. Where it disagrees with the code, the ADRs,
+> [rpg-engine-semantics.md](rpg-engine-semantics.md) or
+> [reference-authoring.md](reference-authoring.md), **they win**. Do not
+> treat its claims as requirements or keep it in lockstep with changes. It
+> will be rewritten to match reality at launch.
+
+> Intended data shapes for the character builder and its consumers.
 > Cross-project integration details live in
 > [addon-integration.md](addon-integration.md) (addon-authored) and
 > [bot-integration.md](bot-integration.md) (bot-authored).

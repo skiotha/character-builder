@@ -41,9 +41,10 @@
 >    **NB-14** in [`.github/bugs/engine.md`](../bugs/engine.md) (slimmed to
 >    this orphan). Gets a roadmap slot if runes come back into scope.
 > 2. **`traditions` as a separate file** — stays "no separate file", also
->    parked. The live schema stores `traditions[]` as curated ability ids,
->    and the Chunk-H.2 catalog-membership validator resolves them against
->    `reference/abilities` — the de facto answer is now load-bearing.
+>    parked. Since catalog-picker step 1 (2026-10-24) `traditions[]` is
+>    engine-derived from the learned abilities' `tradition` keys
+>    (`docs/rpg-engine-semantics.md` ES §traditions); the keys live on the
+>    `reference/abilities` entries — no separate file needed.
 
 ---
 

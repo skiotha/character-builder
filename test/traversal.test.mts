@@ -167,6 +167,7 @@ describe("getFieldPathsByProperty", () => {
     assert.ok(paths.includes("backupCode"));
     assert.ok(paths.includes("portrait.path"));
     assert.ok(paths.includes("portrait.status"));
+    assert.ok(paths.includes("traditions"));
   });
 
   it("skips _config key", () => {

@@ -36,6 +36,13 @@ export interface TraitLookupResult {
   specialAttacks: SpecialAttack[];
   /** Reactions granted at the queried tier. Same ordering contract as `specialAttacks`. */
   reactions: Reaction[];
+  /**
+   * Canonical tradition key (`order`, `circle`, …) granted by this trait,
+   * present only on tradition abilities and identical at every tier.
+   * Spells never carry it — their plural `traditions` is a school tag,
+   * not membership (ES §traditions).
+   */
+  tradition?: string;
 }
 
 export interface TalentLookupResult {

@@ -80,6 +80,25 @@ describe("loadRegistry (real reference data)", () => {
     assert.ok(feint.appliesTo && feint.appliesTo.length > 0);
   });
 
+  it("exposes an ability's tradition key at every tier, never a spell's (ES §traditions)", async () => {
+    const registry = await loadRegistry();
+    for (const tier of ["novice", "adept", "master"] as const) {
+      assert.equal(
+        registry.lookupTrait("mystical-tradition-order", tier)?.tradition,
+        "order",
+      );
+    }
+    // Spells carry a plural `traditions` school tag, not membership.
+    const spell = registry.lookupTrait("break-will", "novice");
+    assert.ok(spell);
+    assert.equal(spell.tradition, undefined);
+    // Non-tradition abilities carry none either.
+    assert.equal(
+      registry.lookupTrait("smoke-and-mirrors", "novice")?.tradition,
+      undefined,
+    );
+  });
+
   it("projects weapons to the engine shape (NB-45)", async () => {
     const registry = await loadRegistry();
     // The own-slot anchor resolves — loadRegistry fail-fasts without it.

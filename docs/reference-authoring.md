@@ -161,6 +161,10 @@ files (§0.1). "Localized: yes" keys are on the drift allowlist.
   `traditions`, e.g. `"traditions": ["runes", "theurgy", "circle"]`.
 - Tradition membership is matched **only** through these keys, never
   through `tags`. Tags may keep the same words for search.
+- A character's `traditions` is derived from these keys: learning a
+  granting ability, at any tier, adds its key (`rpg-engine-semantics.md`
+  ES §traditions). The ability's `tradition` key is therefore engine-read,
+  not display-only.
 - `witchcraft` is **not** a tradition. The `witchcraft` ability is a
   magical ability like any other: no `tradition` key, and no spell or
   ritual may list `"witchcraft"`.
@@ -479,8 +483,9 @@ the tier object (§11 is the canonical wire shape):
   tier root.
 - **`trigger`** distinguishes a `SpecialAttack` (`"manual"`) from a
   `Reaction` (any other trigger), per §11.
-- There is **no** `cost` field — sibling apps compute corruption from
-  `traditions` vs spell tags.
+- There is **no** `cost` field — sibling apps compute corruption from the
+  character's `traditions` (engine-derived keys, `rpg-engine-semantics.md`
+  ES §traditions) vs the spell's `traditions`.
 
 If a spell does no damage and has no triggered behaviour, omit the
 `specialAttacks[]` / `reactions[]` arrays entirely.

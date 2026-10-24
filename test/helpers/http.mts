@@ -84,7 +84,20 @@ async function startTestServer(tempDir: TempDir): Promise<TestServer> {
   // id against these files, and the creation default seeds
   // `natural_weapon` — it MUST resolve here or every POST in tests 400s.
   const seedTopics: Array<[string, unknown]> = [
-    ["abilities", [{ id: "test-ability", name: "Test Ability" }]],
+    [
+      "abilities",
+      [
+        { id: "test-ability", name: "Test Ability" },
+        // Tradition ability: learning it derives `traditions: ["order"]`
+        // through the real registry (ES §traditions).
+        {
+          id: "mystical-tradition-order",
+          name: "Mystical Tradition: Order",
+          tradition: "order",
+          tiers: { novice: { effects: [] } },
+        },
+      ],
+    ],
     ["spells", [{ id: "test-spell", name: "Test Spell" }]],
     ["boons", [{ id: "test-boon", name: "Test Boon", levels: 3 }]],
     ["sins", [{ id: "test-sin", name: "Test Sin", levels: 1 }]],

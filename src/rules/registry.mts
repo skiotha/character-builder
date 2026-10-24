@@ -58,6 +58,11 @@ function deserializeTrait(
 ): Map<AbilityTier, TraitLookupResult> {
   const results = new Map<AbilityTier, TraitLookupResult>();
   const tiers = (entry as { tiers?: unknown }).tiers;
+  const rawTradition = (entry as { tradition?: unknown }).tradition;
+  const tradition =
+    typeof rawTradition === "string" && rawTradition !== ""
+      ? rawTradition
+      : undefined;
 
   const effects: ResolvedEffect[] = [];
   const specialAttacks: SpecialAttack[] = [];
@@ -117,6 +122,7 @@ function deserializeTrait(
       effects: [...effects],
       specialAttacks: [...specialAttacks],
       reactions: [...reactions],
+      ...(tradition ? { tradition } : {}),
     });
   }
 

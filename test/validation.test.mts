@@ -979,6 +979,54 @@ describe("generateDefaultCharacter", () => {
     assert.equal(d.player, "Unknown");
   });
 
+  // NB-51: every client-visible field is present on a fresh character.
+  it("seeds every non-server-controlled array field as []", () => {
+    const d = generateDefaultCharacter("pid");
+    const bg = d.background as Record<string, Record<string, unknown>>;
+    const eq = d.equipment as Record<string, Record<string, unknown>>;
+    for (const key of ["traits", "rituals", "talents", "effects", "affiliations"]) {
+      assert.deepEqual(d[key], [], key);
+    }
+    assert.deepEqual(bg.journal, { open: [], done: [], rumours: [] });
+    assert.deepEqual(bg.notes, []);
+    assert.deepEqual(bg.kinkList, []);
+    for (const key of ["ammunition", "runes", "assassin", "tools", "artifacts"]) {
+      assert.deepEqual(eq[key], [], `equipment.${key}`);
+    }
+    assert.deepEqual(eq.inventory, { carried: [], home: [] });
+  });
+
+  it("leaves engine-derived traditions to recalc (server-controlled)", () => {
+    assert.equal(defaults.traditions, undefined);
+  });
+
+  it("seeds the optional strings as empty", () => {
+    const d = generateDefaultCharacter("pid");
+    const bg = d.background as Record<string, unknown>;
+    assert.equal(d.location, "");
+    assert.equal(bg.shadow, "");
+    assert.equal(bg.profession, "");
+  });
+
+  it("seeds the full portrait shape", () => {
+    assert.deepEqual(generateDefaultCharacter("pid").portrait, {
+      path: "",
+      crop: { x: 0, y: 0, scale: 1, rotation: 0 },
+      dimensions: { width: 0, height: 0 },
+      status: "unset",
+    });
+  });
+
+  it("gives each character its own array and default instances", () => {
+    const a = generateDefaultCharacter("a");
+    const b = generateDefaultCharacter("b");
+    assert.notEqual(a.traits, b.traits);
+    const carriedA = (a.combat as { carried: unknown[] }).carried;
+    const carriedB = (b.combat as { carried: unknown[] }).carried;
+    assert.notEqual(carriedA, carriedB);
+    assert.notEqual(carriedA[2], carriedB[2]);
+  });
+
   // Drift guard: the creation default is seeded through the injected
   // lookup (here the BASE_WEAPONS stub), and this test deep-equals it
   // against the engine projection of the REAL catalog record — so if

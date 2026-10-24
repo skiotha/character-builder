@@ -218,16 +218,4 @@ describe("validateCatalogRefs", () => {
       errors.some((e) => e.code === "VALIDATION" && /level/.test(e.error)),
     );
   });
-
-  // ── traditions ──────────────────────────────────────────────────
-
-  it("accepts an ability id as a tradition and rejects a spell id", async () => {
-    const ok = await validateCatalogRefs({ traditions: ["witchcraft"] });
-    assert.deepEqual(ok, []);
-
-    // Traditions are curated ability ids; a spell id must not resolve.
-    const bad = await validateCatalogRefs({ traditions: ["break-will"] });
-    assert.equal(bad[0]!.code, "UNKNOWN_REFERENCE");
-    assert.equal(bad[0]!.field, "traditions[0]");
-  });
 });

@@ -191,6 +191,63 @@ describe("POST /api/v1/characters", () => {
     assert.ok(ownSlot.qualities.includes("short"));
   });
 
+  // NB-51: a body carrying only the required fields comes back with
+  // every non-required field defaulted — consumers never see an absent key.
+  it("defaults every non-required field on a minimal body", async () => {
+    const full = makeCharacter({ characterName: "Minimara" });
+    const background = full.background as Record<string, unknown>;
+    const equipment = full.equipment as Record<string, unknown>;
+    const minimal = {
+      characterName: full.characterName,
+      attributes: full.attributes,
+      experience: full.experience,
+      corruption: full.corruption,
+      background: { age: background.age, race: background.race },
+      equipment: { money: equipment.money },
+    };
+
+    const res = await fetch(`${BASE}/api/v1/characters`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": "player-minimal-create",
+      },
+      body: JSON.stringify(minimal),
+    });
+
+    assert.equal(res.status, 201, await res.clone().text());
+    const body = (await res.json()) as Record<string, unknown>;
+    for (const key of [
+      "traits",
+      "talents",
+      "rituals",
+      "traditions",
+      "effects",
+      "affiliations",
+    ]) {
+      assert.deepEqual(body[key], [], key);
+    }
+    assert.equal(body.location, "");
+    assert.deepEqual(body.portrait, {
+      path: "",
+      crop: { x: 0, y: 0, scale: 1, rotation: 0 },
+      dimensions: { width: 0, height: 0 },
+      status: "unset",
+    });
+    const bg = body.background as Record<string, unknown>;
+    assert.equal(bg.shadow, "");
+    assert.equal(bg.profession, "");
+    assert.deepEqual(bg.journal, { open: [], done: [], rumours: [] });
+    assert.deepEqual(bg.notes, []);
+    assert.deepEqual(bg.kinkList, []);
+    const eq = body.equipment as Record<string, unknown>;
+    for (const key of ["ammunition", "runes", "assassin", "tools", "artifacts"]) {
+      assert.deepEqual(eq[key], [], `equipment.${key}`);
+    }
+    assert.deepEqual(eq.inventory, { carried: [], home: [] });
+    assert.deepEqual(eq.armor, { body: null, plug: null });
+  });
+
   it("returns 400 for invalid JSON body", async () => {
     const res = await fetch(`${BASE}/api/v1/characters`, {
       method: "POST",
@@ -445,6 +502,67 @@ describe("PATCH /api/v1/characters/:id", () => {
     assert.equal(res.status, 422);
     const body = (await res.json()) as { errors: unknown[] };
     assert.ok(body.errors.length > 0);
+  });
+
+  // ES §traditions: membership is derived from learned tradition
+  // abilities on every save; clients can never write it.
+  it("derives traditions from a learned tradition ability", async () => {
+    const res = await fetch(`${BASE}/api/v1/characters/${charId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": OWNER,
+      },
+      body: JSON.stringify({
+        updates: [
+          {
+            field: "traits",
+            value: [
+              {
+                id: "mystical-tradition-order",
+                tier: "novice",
+                source: "ability",
+              },
+            ],
+            operation: "set",
+          },
+        ],
+      }),
+    });
+
+    assert.equal(res.status, 200, await res.clone().text());
+    const body = (await res.json()) as { character: Record<string, unknown> };
+    assert.deepEqual(body.character.traditions, ["order"]);
+
+    const reread = await fetch(`${BASE}/api/v1/characters/${charId}`, {
+      headers: { "x-player-id": OWNER },
+    });
+    const stored = (await reread.json()) as Record<string, unknown>;
+    assert.deepEqual(stored.traditions, ["order"]);
+  });
+
+  it("rejects a client write to traditions with a FORBIDDEN entry", async () => {
+    const res = await fetch(`${BASE}/api/v1/characters/${charId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-player-id": OWNER,
+      },
+      body: JSON.stringify({
+        updates: [{ field: "traditions", value: ["circle"], operation: "set" }],
+      }),
+    });
+
+    assert.equal(res.status, 422);
+    const body = (await res.json()) as {
+      errors: Array<{ field: string; code: string }>;
+    };
+    assert.ok(
+      body.errors.some(
+        (e) => e.field === "traditions" && e.code === "FORBIDDEN",
+      ),
+      JSON.stringify(body.errors),
+    );
   });
 
   it("returns 400 for empty updates array", async () => {

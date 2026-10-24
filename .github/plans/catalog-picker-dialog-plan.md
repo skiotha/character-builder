@@ -3,7 +3,8 @@
 **Status:** active (2026-09-19) — direction agreed with the user; the
 second-opinion follow-ups and the XP-transition decision gate below remain
 open for step planning. Step-0 metadata decisions recorded 2026-10-23
-(see "Step-0 metadata decisions"); nothing implemented yet. Blocks
+(see "Step-0 metadata decisions"); step 0 done 2026-10-24. Step-1
+decisions recorded 2026-10-24 (see "Step-1 decisions"). Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -192,6 +193,10 @@ sketches remain provisional where a follow-up changes their assumptions.
   existing-data handling without making coordinated sibling releases a
   prerequisite. Canonical-key validation must catch unknown keys; locale
   parity alone does not establish correctness.
+  _Settled 2026-10-24 (S1-2 / S1-4): pre-launch, nothing reads the
+  contracts and there is no data to carry over. The new meaning is
+  recorded in the authoritative docs only; the contract docs catch up
+  at launch. Key validation stays in `checkPickerMetadata` (step 0)._
 4. **Medium — Existing-character XP (step 2½, before steps 3–6).** Earlier
   picks may never have been charged, and earlier sins may never have
   credited their XP. Refunding an unpaid trait would manufacture XP.
@@ -199,6 +204,9 @@ sketches remain provisional where a follow-up changes their assumptions.
   exceptional DM / administrator adjustments are treated, before enabling
   spending or refunds. Do not assume that current totals reconstruct
   acquisition history.
+  _Input recorded 2026-10-24 (S1-2): there is no production data and
+  development characters are disposable, so a wipe-and-rebuild baseline
+  is available. The policy itself is still locked at step 2½._
 5. **Medium — Formatter and authoring contract (steps 0 / 3).** None of
   the 375 English rank descriptions checked in the review begins with
   the proposed italic check-attribute markup. Attribute replacement is
@@ -282,6 +290,40 @@ against `reference/*.en.json` and `rpg/ru/03-reference/*.md`.
   specific weapon the ability names. New `kind`s arrive with new item
   catalogs. Granting the items into a new character's inventory is out of
   scope here (Non-goals); the data is shaped so a later consumer can.
+
+## Step-1 decisions (2026-10-24, with the user)
+
+Settled at the step-1 readiness review. The project is **pre-launch**
+(recorded in `.github/copilot-instructions.md` / `AGENTS.md` "Project
+Status"): no production data exists, development characters are
+disposable, and the cross-project contract docs are provisional drafts.
+
+- **S1-1. NB-51 is fixed in full, not just for arrays.** A fresh character
+  carries every non-required, client-visible field the schema declares:
+  `[]` for every `type: "array"` field without an authored default
+  (generic seeding in `generateDefaultCharacter`), `""` for the optional
+  strings (`location`, `background.shadow`, `background.profession`), and
+  a complete `portrait` object. Target portrait shape: `{ path: "", crop:
+  { x: 0, y: 0, scale: 1, rotation: 0 }, dimensions: { width: 0, height:
+  0 }, status: "unset" }` (`"unset"` matches the client's
+  `DEFAULT_CHARACTER`; only `"uploaded"` is meaningful to readers). Step 1
+  chooses between generic seeding and explicit `default:`s per field. NB-51
+  then moves to `resolved.md` with nothing split off.
+- **S1-2. No migration, no read-path backfill.** Existing development
+  characters are wiped (`scripts/hard-delete.mts --all`) after step 1
+  lands instead of being migrated; stale or absent `traditions` on them
+  is moot. This also records the follow-up 3 "existing `traditions`
+  values" treatment.
+- **S1-3. `schemaVersion` stays `2`.** Nothing reads it before launch;
+  the project-status note says it is not bumped for pre-launch shape
+  changes.
+- **S1-4. Contract docs are not step-1 obligations.**
+  `docs/data-contracts.md` (now banner-marked provisional),
+  `docs/addon-integration.md` and `docs/bot-integration.md` are not
+  updated for the `traditions` change; they are rewritten at launch.
+  Review follow-up 3 is settled by this (see there). Authoritative docs
+  still move in lockstep: `docs/rpg-engine-semantics.md`,
+  `docs/reference-authoring.md`, `docs/roadmap.md`.
 
 ## Open items (settle at the step named)
 
@@ -417,25 +459,72 @@ revisited during planning of their owning steps, not deferred to close-out.
   > - `startingEquipment` is on 23 / 75 abilities — weapons / armor
   >   only; abilities naming other items wait for their catalogs.
 - **Step 1 — Server groundwork: NB-51 defaults + derived traditions.**
-  `generateDefaultCharacter` seeds `[]` for every `type: "array"` field
-  without an explicit default (NB-51 → resolved, moved to `resolved.md`).
-  Registry exposes each trait's `tradition`; `recalculate()` writes
-  `traditions` = sorted unique keys of learned abilities carrying one
-  (spells do **not** contribute — a tradition is granted by its ability).
-  Schema: `traditions` → `derived: true, serverControlled: true`, stays
-  `ui.hidden`; `checkTraditions` removed with its tests; new engine tests
-  (learn `mystical-tradition-order` → `["order"]`; remove → `[]`; spell
-  alone → `[]`). Docs in the same commit: `docs/rpg-engine-semantics.md`
-  gains an `ES §traditions` entry; `docs/data-contracts.md` L79-87 and
-  §1.2 say derived + key vocabulary; `docs/reference-authoring.md` L322
-  pointer; `docs/addon-integration.md` / `docs/bot-integration.md` get a
-  note about the changed values / ownership, not a compatibility claim;
-  record treatment of existing `traditions` values (review follow-up 3).
-  Roadmap "Traditions display surface" item narrowed.
-  **Done when:** `npm test` green; API test: POST
-  fresh character → body has `traits: []`, `talents: []`, `traditions:
-  []`; PATCH `traits` with a tradition ability → `traditions` populated;
-  client PATCH of `traditions` → 4xx (server-controlled).
+  Applies S1-1 … S1-4.
+  - **Defaults (NB-51, S1-1).** `generateDefaultCharacter` seeds `[]` for
+    every `type: "array"` field without an explicit default, `""` for the
+    optional strings, and the full `portrait` shape. Two traps:
+    `portrait.crop` has no `type: "object"`, so the traversal never walks
+    into it, and `portrait.path` / `portrait.status` are
+    `serverControlled`, which the traversal skips. Their seed has to come
+    from somewhere else: the create stamp in `createCharacter`, or a
+    targeted seed like the `natural_weapon` one. NB-51 → resolved, moved
+    to `resolved.md`.
+  - **Derived traditions.** The registry exposes each trait's `tradition`
+    (either a field on `TraitLookupResult` or a separate lookup; update the
+    test stub `test/helpers/registry.mts`, including `emptyRegistry`).
+    `recalculate()` **always** writes `traditions` = sorted unique keys of
+    learned abilities carrying one, at any tier (spells do **not**
+    contribute — a tradition is granted by its ability). It resets the
+    field like `flags`. This reset is what puts `traditions: []` on a fresh
+    character: `generateDefaultCharacter` skips server-controlled paths, so
+    once `traditions` is server-controlled it is never seeded there.
+  - **Schema.** `traditions` → `derived: true, serverControlled: true`,
+    stays `ui.hidden`. `checkTraditions` is removed along with its tests
+    (`test/reference-validation.test.mts` "traditions" block) and the
+    then-unused `abilityIds` in `CatalogIndexes`.
+  - **Tests.** New engine tests: learn `mystical-tradition-order` →
+    `["order"]`; remove → `[]`; spell alone → `[]`; two traditions →
+    sorted. The API gate needs a seeded ability carrying `tradition` in
+    `startTestServer` (`test/helpers/http.mts` seeds only `test-ability`
+    today).
+  - **Docs, same commit.** `docs/rpg-engine-semantics.md` gains an
+    `ES §traditions` entry. Its rule comes from the vault:
+    `rpg/ru/01-core/abilities.md` "Мистические традиции" (membership is
+    a separate ability) and `rpg/ru/01-core/magic.md` (traditions shield
+    their own spells' corruption). Also update `ES §phase-order`'s
+    sequence and the out-of-engine corruption row.
+    `docs/reference-authoring.md` §2: update the "sibling apps compute
+    corruption from `traditions` vs spell tags" sentence to "character
+    `traditions` (derived keys) vs the spell's `traditions`". Roadmap: the
+    "Traditions display surface" item is narrowed (it still says "curated
+    ability ids"). Contract docs are skipped per S1-4. ADR-014's
+    historical mention stays.
+  - **After landing:** wipe the development characters (S1-2).
+  **Done when:** `npm test` green; API test: POST fresh character → body
+  has `traits: []`, `talents: []`, `rituals: []`, `traditions: []`,
+  `effects: []`, `affiliations: []`, `location: ""` and the full
+  `portrait` shape (no absent non-required field); PATCH `traits` with a
+  tradition ability → `traditions` populated; client PATCH of
+  `traditions` → 422 with a `FORBIDDEN` error entry (server-controlled).
+  > ✅ **Completed 2026-10-24.** Divergences from the text above:
+  > - The portrait `path` / `status` seed is a targeted post-traversal seed
+  >   in `generateDefaultCharacter` (not the create stamp), so the
+  >   default-shape tests see it without going through `createCharacter`.
+  > - `generateDefaultCharacter` now `structuredClone`s authored defaults —
+  >   `combat.carried`'s default tuple was previously shared by reference
+  >   across every fresh character.
+  > - The registry carries `tradition` as an optional field on
+  >   `TraitLookupResult` (spread onto every tier), not a separate lookup.
+  > - `ES §phase-order`'s sequence was also corrected while there: clamps
+  >   come after flags, then per-slot combat fanout → action collection →
+  >   tradition derivation.
+  > - `docs/reference-authoring.md` gained a Tradition-keys bullet: the
+  >   ability's `tradition` is now engine-read (feeds the derived field).
+  > - `test/helpers/fixtures.mts` portrait status `"none"` → `"unset"` to
+  >   match the new creation seed.
+  > - `deferred-tasks.md` orphan note on `traditions` updated (no longer
+  >   curated ability ids).
+  > - Dev characters wiped (S1-2).
 - **Step 2 — Dialog primitive + API plumbing.**
   `public/components/catalog-dialog.mjs`: `openCatalogDialog({ title,
   entries, exclude, search: { fields }, filters: [{ label, predicate }],
@@ -582,8 +671,8 @@ revisited during planning of their owning steps, not deferred to close-out.
   the transition, concurrency or creation-guard decisions need more;
   data-contracts / schema-serializer tests confirm the learned-entry wire
   shapes remain unchanged.
-- Low-priority contract bookkeeping at steps 1 / 7 records the changed
-  `traditions` values and write ownership; no coordinated sibling release
+- Contract bookkeeping for the changed `traditions` values and write
+  ownership is deferred to launch (S1-4); no coordinated sibling release
   is required for these provisional contracts.
 - Step gates must include the agreed shared-budget, stale-state, teardown,
   mixed-summary and resolved-output cases from the review follow-ups, plus
@@ -606,7 +695,8 @@ empty list is fine — state it explicitly.
 
 - [x] Step 0 — Authoring sweep (user) + catalog contract (agent)
   _(2026-10-24; summaries are placeholders, authored iteratively)_
-- [ ] Step 1 — Server groundwork: NB-51 defaults + derived traditions
+- [x] Step 1 — Server groundwork: NB-51 defaults + derived traditions
+  _(2026-10-24)_
 - [ ] Step 2 — Dialog primitive + API plumbing
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
 - [ ] Step 3 — XP model + compact formatter
