@@ -28,14 +28,15 @@ targets). It does **not** repeat the type definitions — see
 ### 0.1 Locale parity (lint-enforced)
 
 `<topic>.en.json` and `<topic>.ru.json` are **structurally identical**.
-Every leaf must deep-equal across the two files **except** for the three
+Every leaf must deep-equal across the two files **except** for the
 allowlisted localized fields:
 
 - `name`
 - `description`
 - `tags`
+- `summary` (per trait rank, §0.8)
 
-These three may differ in length, content, or **presence** (e.g. you may
+These may differ in length, content, or **presence** (e.g. you may
 skip `description` in one locale). Everything else — ids, ordering, all
 target/modifier/predicate shapes, weapon `damage`, armor `armor`, quality
 lists, etc. — must be byte-identical or
@@ -81,8 +82,9 @@ which mechanical layer the entry belongs to:
 | `C`    | Pure narrative / GM-adjudicated (rage rules, action economy, reactions, "once per scene"). | **No** — `description` only.      |
 
 Tier C entries **must** still appear in `effects[]` for completeness; they
-just carry only `tier`, `description`, and (optionally) a localized
-`name`. They have no `target` or `modifier` and the engine ignores them.
+just carry only `tier`, `description`, (optionally) a localized `name`, and
+(optionally) the `check` a player rolls for them (§0.8). They have no
+`target` or `modifier` and the engine ignores them.
 
 ### 0.5 The "do not encode" list (Tier C territory)
 
@@ -105,7 +107,8 @@ mechanic in `description` and let the GM / sibling app handle it.
 
 ### 0.6 The localized-field rule
 
-**Engine code MUST NOT branch on `name`, `description`, or `tags`.** If you
+**Engine code MUST NOT branch on `name`, `description`, `tags`, or
+`summary`.** If you
 find yourself wanting to encode mechanics in a description string, stop and
 add a real `target`/`modifier`. Descriptions are for humans only.
 
@@ -116,6 +119,154 @@ Mirror of §0.6 for statuses. **Engine code MUST NOT branch on
 only; their text is display data for humans and sibling apps. If the
 engine needs to react to a status, model it as a `flag` target, not as
 string-matching on a status row (ADR-016).
+
+### 0.8 Picker & card metadata (lint-enforced)
+
+Optional keys read by the character builder's catalog picker, its sheet
+cards and sibling apps. **None of them changes how the engine resolves
+effects.** Placement and vocabulary are checked by
+[`test/rules/reference-lint.test.mts`](../test/rules/reference-lint.test.mts)
+(`checkPickerMetadata`); its `todo` test lists every entry still missing
+required metadata.
+
+| Key                 | Where                                                     | Localized | Value |
+| ------------------- | --------------------------------------------------------- | --------- | ----- |
+| `tradition`         | ability entry — the 8 tradition abilities only            | no        | one tradition key (table below) |
+| `traditions`        | spell and ritual entry — **every** spell and ritual       | no        | non-empty array of unique tradition keys |
+| `availability`      | ability entry                                             | no        | `"creation"` (default when absent) or `"faction"` |
+| `startingEquipment` | ability entry                                             | no        | non-empty array of `{ kind, id, count? }` catalog references |
+| `check`             | Tier B / C objects in `tiers.<rank>.effects[]` on abilities / spells; entry on boons / sins | no | non-empty array of unique primary attribute keys |
+| `summary`           | `tiers.<rank>` on abilities / spells                      | yes       | one short card line, ≤ 140 characters |
+
+"Localized: no" means the value is structural: identical in both locale
+files (§0.1). "Localized: yes" keys are on the drift allowlist.
+
+#### Tradition keys
+
+| Key         | Granting ability                    |
+| ----------- | ----------------------------------- |
+| `order`     | `mystical-tradition-order`          |
+| `circle`    | `mystical-tradition-witches-circle` |
+| `theurgy`   | `mystical-tradition-theurgy`        |
+| `tribe`     | `mystical-tradition-tribe`          |
+| `sorcery`   | `mystical-tradition-sorcery`        |
+| `sirens`    | `mystical-tradition-sirens`         |
+| `symbolism` | `mystical-tradition-symbolism`      |
+| `runes`     | `mystical-tradition-rune-magic`     |
+
+- Each key is granted by exactly one ability; that ability carries
+  `"tradition": "<key>"` and no other ability does (the lint rejects a key
+  on the wrong ability).
+- A spell or ritual lists **every** tradition it belongs to in
+  `traditions`, e.g. `"traditions": ["runes", "theurgy", "circle"]`.
+- Tradition membership is matched **only** through these keys, never
+  through `tags`. Tags may keep the same words for search.
+- `witchcraft` is **not** a tradition. The `witchcraft` ability is a
+  magical ability like any other: no `tradition` key, and no spell or
+  ritual may list `"witchcraft"`.
+
+#### `availability`
+
+`"faction"` marks an ability bound to a faction or profession (the group
+the vault places at the bottom of the ability list): hidden in the
+creation-form picker, available on the character sheet. Omit the key for
+everything else — absent means `"creation"`.
+
+#### `startingEquipment`
+
+The items an ability puts into a new character's backpack, as references
+into the item catalogs. Author one item for every weapon type, kind or
+specific weapon the ability's rules name — usually the cheapest variant.
+The list is hand-picked; nothing derives it from the prose.
+
+```jsonc
+"startingEquipment": [
+  { "kind": "weapon", "id": "staff" },
+  { "kind": "armor", "id": "witchs_robe" },
+  { "kind": "weapon", "id": "parring_dagger", "count": 2 }   // count: optional, default 1
+]
+```
+
+- `kind` names the catalog the `id` must resolve in: `"weapon"` →
+  `weapons.<locale>.json`, `"armor"` → `armor.<locale>.json`. New kinds
+  arrive together with new item catalogs.
+- `count` is a positive integer; list an item once and raise `count`
+  rather than repeating it (the lint rejects duplicates).
+- Structural, not localized: the picker shows each item's `name` from
+  its catalog in the reader's locale.
+- The engine never reads it. Granting the items when a character is
+  created is a consumer feature; today the list is data only.
+
+#### `check`
+
+The primary attributes a player may roll for a rank or talent. The array
+lists **alternatives for a single roll** (any one of them may be used,
+e.g. talking one's way in with `cunning` or `appealing`); it never means
+several rolls. Values are `accurate`, `cunning`, `discreet`, `appealing`,
+`quick`, `resolute`, `vigilant`, `strong`, each at most once. A single
+attribute is still an array: `"check": ["cunning"]`. Order is display
+order and carries no precedence.
+
+Author it only where the rule names a roll (vault rank texts that read
+*Сообразительность*, чтобы …); leave the `description` prose unchanged.
+Attribute **substitutions** ("*Сообразительность* вместо *Скорости* …")
+are not checks — they are `setBase` effects on the relevant target
+(§0.3). `check` is metadata, not an effect: the engine never reads it,
+and rolls stay out of `target` / `modifier` (§0.5).
+
+- Abilities / spells: on the **effect** the roll belongs to, i.e. the
+  Tier C entry (or Tier B capability flag) in `tiers.<rank>.effects[]`
+  whose `description` states that mechanic. A rank with two rolled
+  mechanics carries two effects, each with its own `check`. Tier A stat
+  math is never rolled, and the lint rejects `check` there, at rank level,
+  and inside `specialAttacks` / `reactions`.
+- Boons / sins: once per entry, `check` (talents have one description).
+
+```jsonc
+"effects": [
+  { "tier": "C", "check": ["cunning"],
+    "description": "Cunning check to identify an artifact's quality and hidden qualities." },
+  { "tier": "B", "check": ["vigilant"],
+    "description": "Vigilant check to see the true nature of an object, place, or creature.",
+    "target": { "kind": "flag", "name": "trueSight" },
+    "modifier": { "type": "addFlat", "value": 1 } }
+]
+```
+
+The lint checks every occurrence of the §0.8 keys at any depth of an
+entry, so a key authored in the wrong object fails instead of being
+silently ignored.
+
+#### `summary`
+
+One short line per rank for the **prose-only** (Tier C) mechanics that
+rank adds, shown on the compact sheet card. Mechanized effects, special
+attacks and reactions are rendered from their structure, so do not repeat
+them; omit `summary` on a rank whose mechanics are all mechanized. A rank
+mixing both (e.g. *Mystical Tradition: Order*) summarizes only its prose
+part. Like effects (§0.3), each rank covers only what it adds. Entry-level
+summaries, and summaries on talents or rituals, are not specified and are
+rejected by the lint.
+
+Style, so cards read alike:
+
+- **Length:** aim for ≤ 90 characters in English; Russian may run about a
+  quarter longer. The lint fails anything over **140** characters
+  (counted in code points) in either locale.
+- **Rules, not flavor.** `description` says what the rank is; `summary`
+  is what a player needs at the table — dice, caps, durations, costs, as
+  numbers (`d6`, `+d2`, `1 turn`).
+- **Telegraphic.** Start with the verb or the mechanic; no "Allows…",
+  no ability or rank name, no "you". Separate clauses with `; `, no
+  trailing period.
+- **Don't repeat the `check`.** The card shows the rolled attributes from
+  `check`; write "heal d4 Toughness/day" rather than "Cunning to heal…".
+- **Same terms as the sheet.** Use the attribute and stat names the
+  catalog and sheet use, in the same capitalization.
+
+Example — *Medic*, master (vault: "Healing without supplies won't exceed
+d8, with supplies no more than d10; even failures heal d4 or d6"):
+`Heal cap d8, or d10 with supplies; failed attempts still heal d4/d6`
 
 ---
 
@@ -131,9 +282,16 @@ string-matching on a status row (ADR-016).
   "description": "Agility, maneuverability, and gymnastic techniques…",  // localized
   "tags": ["mobility", "defense", "quick"],  // localized; free-form
   "source": "03-reference/abilities",    // pointer to RPG vault path
+  "tradition": "order",                  // OPTIONAL — tradition abilities only (§0.8)
+  "availability": "faction",             // OPTIONAL — omit = "creation" (§0.8)
+  "startingEquipment": [                 // OPTIONAL — catalog references (§0.8)
+    { "kind": "weapon", "id": "staff" }
+  ],
   "tiers": {
     "novice": { "description": "...", "effects": [ /* new effects */ ] },
-    "adept":  { "description": "...", "effects": [ /* new effects only */ ] },
+    "adept":  { "description": "...", "effects": [ /* new effects only;
+                  a Tier B / C effect may carry "check": ["cunning"] (§0.8) */ ],
+                "summary": "..." },     // OPTIONAL — localized prose-only card line (§0.8)
     "master": { "description": "...", "effects": [ /* new effects only */ ] }
   }
 }
@@ -148,7 +306,8 @@ string-matching on a status row (ADR-016).
   "description": "What this does in prose.",  // localized; required for Tier C, recommended otherwise
   "target":   EffectTarget,              // required for Tier A and B
   "modifier": EffectModifier,            // required for Tier A and B
-  "appliesTo": [WeaponPredicate, ...]    // optional; only meaningful for combat / weaponQuality targets
+  "appliesTo": [WeaponPredicate, ...],   // optional; only meaningful for combat / weaponQuality targets
+  "check": ["cunning"]                   // optional; Tier B / C only — attribute(s) rolled for this mechanic (§0.8)
 }
 ```
 
@@ -285,10 +444,12 @@ rule note.
 
 ### Entry shape
 
-Identical to abilities (§1) with two deltas:
+Identical to abilities (§1) with these deltas:
 
 - `category` is `"spell"`.
 - `source` is `"03-reference/spells"`.
+- `traditions` (array of tradition keys, §0.8) is present on every spell;
+  `tradition`, `availability` and `startingEquipment` are not used.
 
 ### Spell-tier actions (when the spell deals damage)
 
@@ -338,6 +499,7 @@ If a spell does no damage and has no triggered behaviour, omit the
   "tags": ["boon", "profession"],          // localized; free-form
   "levels": 3,                             // total ranks the character can buy
   "description": "...",                    // localized; covers all ranks (more ranks = more of the same)
+  "check": ["cunning", "appealing"],       // OPTIONAL — rolled attribute(s) (§0.8)
   "effects": []                            // OPTIONAL — see "Opportunistic engine effects" below
 }
 ```
@@ -391,13 +553,15 @@ remain flat narrative entries.
   "name": "Form",                          // localized
   "category": "ritual",                    // literal "ritual"
   "tags": ["magic", "transformation"],     // localized
-  "description": "..."                     // localized
+  "description": "...",                    // localized
+  "traditions": ["order"]                  // tradition keys (§0.8); every ritual
 }
 ```
 
 Rituals are grandiose mystical activities that can't be expressed in
 combat terms. The engine has no use for them. Same YAGNI rationale as
-boons — flat shape, no `effects[]`, no per-level structure.
+boons — flat shape, no `effects[]`, no per-level structure, no `check`
+or `summary`.
 
 (Characters still store `{ id, level: number }` per
 [data-contracts.md §1.2](data-contracts.md#L233); the catalog just
@@ -1035,9 +1199,14 @@ For each entry you author or update:
 4. For combat / weaponQuality effects: write `appliesTo` predicates that
    match the prose ("with polearms" → `{ kind: "type", values: ["polearm"] }`).
 5. Mirror the change in the **other** locale file in the same commit.
-6. Run `npm test` — locale-drift lint (`test/reference-locale-drift.test.mts`)
-   and the engine tests will catch most authoring mistakes.
-7. If you used a new flag name, extend `EffectFlag` in
+6. Fill in the picker / card metadata (§0.8): `traditions` on spells and
+   rituals, `check` on the effect whose rule names a roll, `summary` for prose-only
+   rank mechanics, and — on abilities — `tradition`, `availability`,
+   `startingEquipment` where they apply.
+7. Run `npm test` — locale-drift lint (`test/reference-locale-drift.test.mts`),
+   the reference lint (`test/rules/reference-lint.test.mts`) and the
+   engine tests will catch most authoring mistakes.
+8. If you used a new flag name, extend `EffectFlag` in
    [`src/rpg-types.mts`](../src/rpg-types.mts) and re-run typecheck.
 
 ---
@@ -1053,9 +1222,9 @@ Things deliberately not covered here:
   `src/rules/registry.mts` own how files are loaded, merged across
   locales, and validated. Authors only need to know the on-disk
   shape, which is what this doc covers.
-- **Catalog-driven UI pickers.** A future client-side pass may surface
-  authored catalogs in the character builder UI. Out of scope here —
-  this doc only specifies the wire data those pickers would read.
+- **Catalog-driven UI pickers.** How the character builder's pickers
+  behave is out of scope here — this doc only specifies the wire data
+  they read, including the §0.8 metadata.
 
 ---
 

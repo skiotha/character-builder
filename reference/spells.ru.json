@@ -5,10 +5,12 @@
     "category": "spell",
     "description": "Подчинение чужой воли и принуждение жертвы к нужным мистику действиям.",
     "tags": ["магия", "статус", "орден", "круг", "колдовство", "воля"],
+    "traditions": ["order", "circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет захватить контроль над одним существом, пока мистик поддерживает концентрацию и успешные проверки Воли.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -18,6 +20,7 @@
       },
       "adept": {
         "description": "Сохраняет контроль без концентрации и не мешает мистику действовать самому.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -27,6 +30,7 @@
       },
       "master": {
         "description": "Делает контроль полным и позволяет принуждать цель использовать весь свой доступный потенциал.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -42,10 +46,12 @@
     "category": "spell",
     "description": "Искажение восприятия реальности, позволяющее переигрывать неудачные для мистика проверки.",
     "tags": ["магия", "реакция", "защита", "поддержка", "орден", "воля"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет один раз за ход как реакцию повторить проваленную защиту.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -63,6 +69,7 @@
       },
       "adept": {
         "description": "Расширяет повтор на любую проверку, связанную с самим мистиком.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -80,6 +87,7 @@
       },
       "master": {
         "description": "Позволяет вмешиваться в любые проверки поблизости, даже чужие.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -111,10 +119,12 @@
       "теургия",
       "воля"
     ],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Поднимает мистика над землей, но требует концентрации и грозит падением при ее потере.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -124,6 +134,7 @@
       },
       "adept": {
         "description": "Позволяет левитировать союзника с теми же рисками при срыве эффекта.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -133,6 +144,7 @@
       },
       "master": {
         "description": "Поднимает самого мистика и всю группу, а при срыве эффекта обеспечивает мягкое приземление.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -148,10 +160,12 @@
     "category": "spell",
     "description": "Телекинетическое перемещение объектов и врагов силой одной мысли.",
     "tags": ["магия", "урон", "статус", "реакция", "дальний", "орден", "воля"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет бросать предметы в цель и перехватывать атаки поднятым объектом.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -178,6 +192,7 @@
       },
       "adept": {
         "description": "Дает возможность поднимать и швырять врага, опрокидывая его на спину.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -197,6 +212,7 @@
       },
       "master": {
         "description": "Распространяет бросок сразу на группу врагов, пока проверки не начнут проваливаться.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -230,10 +246,12 @@
       "теургия",
       "воля"
     ],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет видеть сквозь иллюзии и эффекты, скрывающие истинную природу вещей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -243,6 +261,7 @@
       },
       "adept": {
         "description": "Выводит подлинную сущность наружу сразу у группы существ и срывает трансформации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -252,6 +271,7 @@
       },
       "master": {
         "description": "Не дает цели снова сменить форму после раскрытия ее природы.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -267,10 +287,12 @@
     "category": "spell",
     "description": "Отведение чужого внимания, превращающее мистика и его союзников в невидимок.",
     "tags": ["магия", "мобильность", "поддержка", "орден", "теургия", "воля"],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Убирает мистика из области чувств одного существа до первого вредоносного действия.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -280,6 +302,7 @@
       },
       "adept": {
         "description": "Расширяет незаметность на целую группу наблюдателей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -289,6 +312,7 @@
       },
       "master": {
         "description": "Позволяет скрывать от группы не только себя, но и союзников.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -304,10 +328,12 @@
     "category": "spell",
     "description": "Создание призрачных копий, которые сбивают противников с толку и принимают удары на себя.",
     "tags": ["магия", "защита", "орден", "воля"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Создает вокруг мистика d4 иллюзорные копии, исчезающие от попаданий.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -317,6 +343,7 @@
       },
       "adept": {
         "description": "Увеличивает число копий и делает их устойчивее к урону по площади.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -326,6 +353,7 @@
       },
       "master": {
         "description": "Доводит число копий до d8 и делает их невосприимчивыми к площадному урону.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -349,10 +377,12 @@
       "орден",
       "воля"
     ],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Создает психическую копию оружия и дает повторную попытку при промахе.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -370,6 +400,7 @@
       },
       "adept": {
         "description": "Парализует цель и делает физическую часть удара автоматически успешной.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -388,6 +419,7 @@
       },
       "master": {
         "description": "Добавляет к удару отдельный психический урон, игнорирующий броню.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -412,11 +444,13 @@
     "name": "Анафема",
     "category": "spell",
     "description": "Развеивание чужой магии и любых не-ритуальных мистических эффектов.",
-    "tags": ["магия", "поддержка", "руны", "теургия", "колдовство", "воля"],
+    "tags": ["магия", "поддержка", "руны", "теургия", "круг", "воля"],
+    "traditions": ["runes", "theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Снимает длящийся эффект чужого заклинания с одной цели.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -426,6 +460,7 @@
       },
       "adept": {
         "description": "Позволяет развеивать эффекты сразу у группы целей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -435,6 +470,7 @@
       },
       "master": {
         "description": "Очищает от магии целую область, включая призванных существ и сотворенные явления.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -450,10 +486,12 @@
     "category": "spell",
     "description": "Освящение оружия для особенно разрушительных ударов по чудовищам и порочным существам.",
     "tags": ["магия", "ближний", "урон", "теургия", "воля"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Усиливает освященное оружие и особенно карает монстров.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -472,6 +510,7 @@
       },
       "adept": {
         "description": "Увеличивает дополнительный урон оружия до d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -490,6 +529,7 @@
       },
       "master": {
         "description": "Доводит усиление оружия до d10 дополнительного урона.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -514,10 +554,12 @@
     "category": "spell",
     "description": "Невидимый святой щит, который повышает броню и карает нападающих.",
     "tags": ["магия", "защита", "урон", "поддержка", "теургия", "воля"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Создает щит до конца боя, повышающий броню и наносящий урон атакующим монстрам.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -527,6 +569,7 @@
       },
       "adept": {
         "description": "Расширяет щит на одного союзника рядом и поднимает оба значения до d6.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -536,6 +579,7 @@
       },
       "master": {
         "description": "Позволяет защищать уже двух союзников рядом и усиливает щит до d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -551,10 +595,12 @@
     "category": "spell",
     "description": "Постоянная аура, которая жжет чудовищ и одновременно поддерживает живых союзников.",
     "tags": ["магия", "урон", "исцеление", "поддержка", "теургия", "воля"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Заполняет пространство вокруг мистика священной аурой, ранящей враждебных монстров.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -564,6 +610,7 @@
       },
       "adept": {
         "description": "Усиливает урон ауры и добавляет исцеление живым существам.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -573,6 +620,7 @@
       },
       "master": {
         "description": "Доводит урон и исцеление ауры до высшего уровня.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -588,10 +636,12 @@
     "category": "spell",
     "description": "Сосредоточенный луч святого света, особенно губительный для чудовищ.",
     "tags": ["магия", "урон", "дальний", "теургия", "воля"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Фокусирует свет души в луч, наносящий больше урона монстрам.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -617,6 +667,7 @@
       },
       "adept": {
         "description": "Превращает луч в площадной эффект и еще сильнее карает монстров.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -642,6 +693,7 @@
       },
       "master": {
         "description": "Добавляет к лучу оглушение всех пораженных монстров.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -674,10 +726,12 @@
       "теургия",
       "воля"
     ],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Снимает Порочность с одной цели и превращает избыток очищения в исцеление.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -687,6 +741,7 @@
       },
       "adept": {
         "description": "Распространяет очищающий эффект на всех видимых союзников.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -696,6 +751,7 @@
       },
       "master": {
         "description": "Ослабляет любые новые эффекты приобретенной Порочности рядом с мистиком.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -717,13 +773,14 @@
       "порочность",
       "теургия",
       "воля",
-      "круг",
       "реакция"
     ],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Сравнивает d20 с Порочностью цели, парализуя ее и обжигая монстров.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -744,6 +801,7 @@
       },
       "adept": {
         "description": "Позволяет сравнивать результат сразу с Порочностью всех видимых целей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -764,6 +822,7 @@
       },
       "master": {
         "description": "Срабатывает реактивно на любое использование или получение Порочности и превращает ее в урон.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -787,10 +846,12 @@
     "category": "spell",
     "description": "Прямое чудесное исцеление через прикосновение, взгляд и очищение от ядов.",
     "tags": ["магия", "исцеление", "поддержка", "теургия", "круг", "воля"],
+    "traditions": ["theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Исцеляет прикосновением d6 Выживаемости.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -800,6 +861,7 @@
       },
       "adept": {
         "description": "Усиливает исцеление и снимает яд с кровотечением.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -809,6 +871,7 @@
       },
       "master": {
         "description": "Позволяет лечить особенно сильно вблизи или лечить на расстоянии одним взглядом.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -832,10 +895,12 @@
       "круг",
       "воля"
     ],
+    "traditions": ["theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет принять на себя вред с другого существа, исцелив его.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -853,6 +918,7 @@
       },
       "adept": {
         "description": "Усиливает исцеление, уменьшает ответный урон и позволяет принимать на себя токсины.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -870,6 +936,7 @@
       },
       "master": {
         "description": "Позволяет отправить оставшийся вред на любое другое существо в поле зрения.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -893,10 +960,12 @@
     "category": "spell",
     "description": "Насильственное превращение жертвы в безобидного зверя.",
     "tags": ["магия", "статус", "трансформация", "круг", "воля"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Превращает одну цель в безобидное животное, пока мистик держит концентрацию.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -906,6 +975,7 @@
       },
       "adept": {
         "description": "Убирает необходимость поддерживать концентрацию на превращении.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -915,6 +985,7 @@
       },
       "master": {
         "description": "Позволяет накладывать превращение сразу на несколько существ.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -930,10 +1001,12 @@
     "category": "spell",
     "description": "Призыв зверей на помощь из самой окружающей природы.",
     "tags": ["магия", "поддержка", "призыв", "круг", "воля"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Призывает одного слабого зверя, естественного для местности.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -943,6 +1016,7 @@
       },
       "adept": {
         "description": "Позволяет вызвать одного сильного зверя или целую свору слабых.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -952,6 +1026,7 @@
       },
       "master": {
         "description": "Открывает призыв могучих зверей и более многочисленных стай.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -975,10 +1050,12 @@
       "круг",
       "воля"
     ],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет стать небольшим животным и резко повысить подвижность и уклонение.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -988,6 +1065,7 @@
       },
       "adept": {
         "description": "Открывает боевую звериную форму с базовыми боевыми свойствами.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -997,6 +1075,7 @@
       },
       "master": {
         "description": "Позволяет принимать большую боевую форму с регенерацией и могучей силой.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1012,10 +1091,12 @@
     "category": "spell",
     "description": "Живой покров из лиан и шипов, защищающий мистика и ранящий нападающих.",
     "tags": ["магия", "защита", "урон", "круг", "воля"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Окружает мистика живыми зарослями, повышая броню, особенно если он стоит на месте.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1025,6 +1106,7 @@
       },
       "adept": {
         "description": "Позволяет растительному плащу защищать и соседних союзников.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1034,6 +1116,7 @@
       },
       "master": {
         "description": "Пробужденная природа начинает автоматически отвечать на вражеские атаки.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1049,10 +1132,12 @@
     "category": "spell",
     "description": "Уход под землю ради неуязвимости, перемещения и скрытого применения сил.",
     "tags": ["магия", "защита", "мобильность", "поддержка", "круг", "воля"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет уйти под землю и скрыться от врагов, но лишает других действий.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1062,6 +1147,7 @@
       },
       "adept": {
         "description": "Разрешает применять мистические силы под землей и убирает проверки на поддержание эффекта.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1071,6 +1157,7 @@
       },
       "master": {
         "description": "Дает обзор поверхности и свободное движение под землей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1094,10 +1181,12 @@
       "колдовство",
       "воля"
     ],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Опутывает одного врага и лишает его подвижности.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1107,6 +1196,7 @@
       },
       "adept": {
         "description": "Позволяет протянуть цепочку опутывания сразу по нескольким врагам.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1116,6 +1206,7 @@
       },
       "master": {
         "description": "Добавляет к лианам шипы, наносящие постоянный урон.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1131,10 +1222,12 @@
     "category": "spell",
     "description": "Зачарование стрел, которые зависают в воздухе и сами находят цель.",
     "tags": ["магия", "дальний", "урон", "круг", "воля"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Подвешивает до пяти стрел рядом с мистиком и позволяет выпускать их без промаха.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1153,6 +1246,7 @@
       },
       "adept": {
         "description": "Усиливает стрелы и позволяет выпускать по две одновременно.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1171,6 +1265,7 @@
       },
       "master": {
         "description": "Поднимает залп до трех стрел за раз.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1195,10 +1290,12 @@
     "category": "spell",
     "description": "Злой глаз мистика, который ломает чужие действия и обращает саму активность жертвы против нее.",
     "tags": ["магия", "статус", "урон", "круг", "колдовство", "воля"],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Заставляет цель добиваться двух успехов во всех действиях против мистика.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1208,6 +1305,7 @@
       },
       "adept": {
         "description": "Распространяет двойную перепроверку вообще на все действия жертвы.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1217,6 +1315,7 @@
       },
       "master": {
         "description": "Превращает проклятье в смертельное -- любое действие начинает ранить цель.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1232,10 +1331,12 @@
     "category": "spell",
     "description": "Призыв духов, которые мучают жертву, срывают концентрацию и подтачивают ее разум.",
     "tags": ["магия", "статус", "урон", "колдовство", "круг", "воля"],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Срывает концентрацию и усложняет все проверки цели.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1245,6 +1346,7 @@
       },
       "adept": {
         "description": "Добавляет постоянное иссушение Воли жертвы.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1254,6 +1356,7 @@
       },
       "master": {
         "description": "Увеличивает темп разрушения Воли до d6 за ход.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1277,10 +1380,12 @@
       "порочность",
       "воля"
     ],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Подсаживает личинок во врага, причиняя постоянный внутренний урон и лишая концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1300,6 +1405,7 @@
       },
       "adept": {
         "description": "Увеличивает урон от личинок до d6 за ход.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1319,6 +1425,7 @@
       },
       "master": {
         "description": "Доводит урон от инвазии до d8 за ход.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1344,10 +1451,12 @@
     "category": "spell",
     "description": "Погружение жертвы в лабиринт ощущений, из-за которого она теряет контроль над поведением.",
     "tags": ["магия", "статус", "круг", "сирены", "воля"],
+    "traditions": ["circle", "sirens"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Смущает одного противника и каждый ход случайно определяет его поведение.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1357,6 +1466,7 @@
       },
       "adept": {
         "description": "Убирает концентрацию и исключает самого мистика из списка вероятных целей.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1366,6 +1476,7 @@
       },
       "master": {
         "description": "Позволяет накладывать замешательство сразу на нескольких врагов.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1381,10 +1492,12 @@
     "category": "spell",
     "description": "Проклятое оружие, которое убивает сильнее обычного и поднимает павших как нежить.",
     "tags": ["магия", "ближний", "урон", "колдовство", "воля"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Окутывает оружие зловещим пламенем и повышает его урон.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1403,6 +1516,7 @@
       },
       "adept": {
         "description": "Поднимает убитых этим оружием живых существ как послушную нежить.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1421,6 +1535,7 @@
       },
       "master": {
         "description": "Увеличивает дополнительный урон проклятого оружия до d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1445,10 +1560,12 @@
     "category": "spell",
     "description": "Аура порочной энергии, вредящая живым и подпитывающая чудовищ.",
     "tags": ["магия", "урон", "исцеление", "порочность", "колдовство", "воля"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Создает вокруг мистика порочную ауру, наносящую живым урон и требующую концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1458,6 +1575,7 @@
       },
       "adept": {
         "description": "Убирает необходимость концентрации и позволяет щадить избранных существ.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1467,6 +1585,7 @@
       },
       "master": {
         "description": "Усиливает ауру и превращает ее в источник исцеления для чудовищ.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1490,10 +1609,12 @@
       "порочность",
       "воля"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Запускает одну черную стрелу, которая ранит и удерживает цель до прерывания концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1513,6 +1634,7 @@
       },
       "adept": {
         "description": "Позволяет удерживать несколько целей сразу одной связанной цепочкой.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1532,6 +1654,7 @@
       },
       "master": {
         "description": "Разрывает общую зависимость и позволяет освобождаться каждой цели отдельно.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1554,10 +1677,12 @@
       "колдовство",
       "воля"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Сравнивает d4 с текущей Порочностью цели, решая между исцелением и добавлением Порочности.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1567,6 +1692,7 @@
       },
       "adept": {
         "description": "Увеличивает силу эффекта до d6.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1576,6 +1702,7 @@
       },
       "master": {
         "description": "Позволяет применять эффект к группе целей, пока цепочка не упрется в первое исцеление.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1598,10 +1725,12 @@
       "колдовство",
       "воля"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет временно стать духом и проходить сквозь стены, врагов и обычное оружие.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1637,6 +1766,7 @@
       },
       "master": {
         "description": "Позволяет атакам самого мистика касаться духовного мира и проходить сквозь броню.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1659,10 +1789,12 @@
       "колдовство",
       "воля"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Переносит мистика на короткую дистанцию, но наносит вред и может впустить существо из Другого мира.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1672,6 +1804,7 @@
       },
       "adept": {
         "description": "Делает переход безопасным и позволяет остановить появление монстра после неудачи.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1681,6 +1814,7 @@
       },
       "master": {
         "description": "Позволяет брать с собой спутника ценой боли и временной Порочности для него.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1696,10 +1830,12 @@
     "category": "spell",
     "description": "Выталкивание врага в Другой мир с риском обратного прорыва чудовища.",
     "tags": ["магия", "статус", "урон", "порочность", "колдовство", "воля"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Отправляет одного врага в Другой мир и возвращает его ослабленным.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1709,6 +1845,7 @@
       },
       "adept": {
         "description": "Позволяет держать цель изгнанной, пока она не выдержит проверку Воли.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1718,6 +1855,7 @@
       },
       "master": {
         "description": "Превращает изгнание в реакцию на атаку по мистику.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1741,10 +1879,12 @@
       "сирены",
       "воля"
     ],
+    "traditions": ["sorcery", "sirens"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Помечает одну цель так, чтобы ее было легче добивать всем союзникам.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1754,6 +1894,7 @@
       },
       "adept": {
         "description": "Создает реактивную губительную связь между мистиком и одним нападающим.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1771,6 +1912,7 @@
       },
       "master": {
         "description": "Позволяет накапливать несколько губительных связей одновременно.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1794,10 +1936,12 @@
     "category": "spell",
     "description": "Яростные огненные потоки, которые жгут врагов волной за волной.",
     "tags": ["магия", "урон", "племя", "дальний", "воля"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Хлещет одного врага огнем, причиняя урон даже при неудаче.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1816,6 +1960,7 @@
       },
       "adept": {
         "description": "Позволяет огненному каскаду перескакивать на следующих врагов.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1834,6 +1979,7 @@
       },
       "master": {
         "description": "Превращает каскады в непрерывное обжигание, прерываемое только серией неудач.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1849,10 +1995,12 @@
     "category": "spell",
     "description": "Стена или купол пламени, который режет пространство и сжигает всякий проход сквозь себя.",
     "tags": ["магия", "статус", "защита", "племя", "воля"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Возводит огненную стену, перекрывающую проходы и наносящую тяжелый урон при пересечении.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1862,6 +2010,7 @@
       },
       "adept": {
         "description": "Позволяет свернуть стену в кольцо вокруг нужной группы существ.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1871,6 +2020,7 @@
       },
       "master": {
         "description": "Дает стене форму полноценного огненного купола.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1886,10 +2036,12 @@
     "category": "spell",
     "description": "Огонь становится для мистика и щитом, и оружием, и даже источником исцеления.",
     "tags": ["магия", "защита", "реакция", "урон", "племя", "воля"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Обжигает нападающих и дает дополнительную защиту от огня.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1908,6 +2060,7 @@
       },
       "adept": {
         "description": "Усиливает ответный урон в ближнем бою и защиту от огня.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1926,6 +2079,7 @@
       },
       "master": {
         "description": "Делает мистика невосприимчивым к огню и превращает пламя в исцеление.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -1964,10 +2118,12 @@
       "сила",
       "аккуратность"
     ],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Поднимает одно выбранное физическое качество каждого союзника.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1977,6 +2133,7 @@
       },
       "adept": {
         "description": "Усиливает сразу все три боевые характеристики союзников.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1986,6 +2143,7 @@
       },
       "master": {
         "description": "Дополняет гимн единоразовым боевым исцелением.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2009,10 +2167,12 @@
       "сноровка",
       "обаяние"
     ],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет каждому союзнику выбрать одно усиливаемое ментальное качество.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2022,6 +2182,7 @@
       },
       "adept": {
         "description": "Поднимает все три качества сразу.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2031,6 +2192,7 @@
       },
       "master": {
         "description": "Позволяет песне один раз за бой предотвратить временную Порочность.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2054,10 +2216,12 @@
     "category": "spell",
     "description": "Оскорбительная гармоника, которая дезориентирует врагов и заставляет их перечеркивать собственные успехи.",
     "tags": ["магия", "статус", "урон", "племя", "воля", "обаяние"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Заставляет раненых врагов повторять даже успешные проверки.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2067,6 +2231,7 @@
       },
       "adept": {
         "description": "Распространяет тот же эффект на всех врагов, а не только на раненых.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2076,6 +2241,7 @@
       },
       "master": {
         "description": "Добавляет к насмешке постоянный игнорирующий броню урон по цели.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2099,10 +2265,12 @@
       "руны",
       "воля"
     ],
+    "traditions": ["tribe", "runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет оружию сражаться вместо мистика, но запрещает использовать другие активные способности.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2112,6 +2280,7 @@
       },
       "adept": {
         "description": "Разрешает колдовать и пользоваться способностями параллельно с танцующим оружием.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2121,6 +2290,7 @@
       },
       "master": {
         "description": "Делает зачарование постоянным и не требующим отдельного действия для запуска.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2161,10 +2331,12 @@
     "category": "spell",
     "description": "Символ, который выталкивает выбранный тип существ из обозначенной области.",
     "tags": ["магия", "статус", "урон", "символизм", "воля", "пробивание"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Прогоняет группу существ выбранного типа за пределы области символа.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2174,6 +2346,7 @@
       },
       "adept": {
         "description": "Наказывает существо, на котором оборвалась цепочка изгнания, если оно медлит уйти.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2183,6 +2356,7 @@
       },
       "master": {
         "description": "Усиливает наказание за сопротивление изгнанию.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2198,10 +2372,12 @@
     "category": "spell",
     "description": "Пробужденный символ высасывает жизненную силу врагов и позже перенаправляет ее союзникам.",
     "tags": ["магия", "урон", "исцеление", "символизм", "воля"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Наносит всем врагам рядом регулярный урон, пока мистик держит концентрацию.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2211,6 +2387,7 @@
       },
       "adept": {
         "description": "Позволяет глифу работать без концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2220,6 +2397,7 @@
       },
       "master": {
         "description": "Начинает перенаправлять украденную жизненную силу в союзников.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2235,10 +2413,12 @@
     "category": "spell",
     "description": "Вспышка света из символа, которая лишает врагов зрения на все более долгий срок.",
     "tags": ["магия", "статус", "символизм", "воля"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Ослепляет группу врагов на один ход.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2248,6 +2428,7 @@
       },
       "adept": {
         "description": "Позволяет поддерживать слепоту концентрацией и повторными проверками Воли.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2257,6 +2438,7 @@
       },
       "master": {
         "description": "Делает слепоту устойчивой к времени и снимаемой только магией или эликсирами.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2272,10 +2454,12 @@
     "category": "spell",
     "description": "Ограждающие руны создают отдельный слой магической брони и отвечают врагу обратным уроном.",
     "tags": ["магия", "защита", "урон", "руны", "символизм", "воля"],
+    "traditions": ["symbolism", "runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Создает рунную броню, которая отдельно проверяется против каждого удара.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2285,6 +2469,7 @@
       },
       "adept": {
         "description": "Добавляет к рунам ответный игнорирующий броню урон.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2294,6 +2479,7 @@
       },
       "master": {
         "description": "Усиливает и защиту, и ответный урон, а также убирает нужду в концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2309,10 +2495,12 @@
     "category": "spell",
     "description": "Вращающееся оружие образует вокруг мистика защитную сферу от физического оружия.",
     "tags": ["магия", "защита", "руны", "воля"],
+    "traditions": ["runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Заменяет обычную защиту Волей, но ограничивает действия движением.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2322,6 +2510,7 @@
       },
       "adept": {
         "description": "Делает защиту от физического оружия автоматической, пока держится концентрация.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2331,6 +2520,7 @@
       },
       "master": {
         "description": "Позволяет защищать соседнего союзника и действовать свободнее без концентрации.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2346,10 +2536,12 @@
     "category": "spell",
     "description": "Посох или иное оружие превращается в самонаводящийся снаряд, который всегда возвращается к хозяину.",
     "tags": ["магия", "дальний", "урон", "руны", "воля"],
+    "traditions": ["runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Позволяет бросать посох Волей вместо Аккуратности и передавать ему уже наложенные эффекты.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2368,6 +2560,7 @@
       },
       "adept": {
         "description": "Позволяет посоху обходить препятствия и усиливает удар.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2386,6 +2579,7 @@
       },
       "master": {
         "description": "Превращает бросок в цепную атаку по нескольким целям с убывающим уроном.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",

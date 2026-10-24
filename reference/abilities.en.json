@@ -4,6 +4,7 @@
     "name": "Acrobatics",
     "category": "ability",
     "description": "Agility, maneuverability, and gymnastic techniques for movement in combat and bypassing opponents.",
+    "startingEquipment": [{ "kind": "weapon", "id": "heels" }],
     "tags": [
       "mobility",
       "defense",
@@ -17,10 +18,12 @@
     "tiers": {
       "novice": {
         "description": "Allows moving past, away from, or toward an enemy without provoking free attacks, and crossing occupied spaces when there is enough room.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
-            "description": "Quick check to prevent an enemy's free attacks when moving away from, past, or toward them.",
+            "check": ["quick"],
+            "description": "Quick check to defend against enemy's free attacks when moving away from, past, or toward them.",
             "target": {
               "kind": "flag",
               "name": "evasion"
@@ -35,6 +38,7 @@
       },
       "adept": {
         "description": "Grants a quick reaction to being knocked prone and removes the unwieldy quality of combat heels.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -48,6 +52,7 @@
           },
           {
             "tier": "C",
+            "check": ["quick"],
             "description": "Quick check to instantly spring to your feet as a reaction after falling prone."
           }
         ],
@@ -62,6 +67,7 @@
       },
       "master": {
         "description": "Allows using an enemy as cover, ending movement on them, and gaining advantage on the next attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -74,6 +80,7 @@
           },
           {
             "tier": "C",
+            "check": ["quick"],
             "description": "Quick check to use an enemy as a shield against incoming attacks they can no longer dodge."
           },
           {
@@ -97,6 +104,7 @@
     "name": "Smoke and Mirrors",
     "category": "ability",
     "description": "A fighting technique with short and precise weapons built on hand speed, deception, and surprise.",
+    "startingEquipment": [{ "kind": "weapon", "id": "stiletto" }],
     "tags": [
       "discreet",
       "short",
@@ -155,6 +163,7 @@
       },
       "master": {
         "description": "Grants an extra free attack during your own turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -179,6 +188,7 @@
     "name": "Intrigues",
     "category": "ability",
     "description": "A tribely combat technique exploiting enemy weaknesses, surprise, and backstabs.",
+    "startingEquipment": [{ "kind": "weapon", "id": "stiletto" }],
     "tags": [
       "advantage",
       "damage",
@@ -192,6 +202,7 @@
     "tiers": {
       "novice": {
         "description": "Unlocks Backstab when you have advantage and allows attacking through Discreet.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -233,6 +244,7 @@
       },
       "adept": {
         "description": "Enhances Backstab with persistent bleeding.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -242,6 +254,7 @@
       },
       "master": {
         "description": "Increases Backstab's direct damage and removes the per-turn limit on such strikes.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -271,11 +284,15 @@
     "name": "Street Fighting",
     "category": "ability",
     "description": "Rough and brutal melee techniques for stunning, knocking down, and countering opponents.",
+    "startingEquipment": [
+      { "kind": "weapon", "id": "short_weapon", "count": 2 }
+    ],
     "tags": ["melee", "status", "reaction", "piercing", "quick"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Unlocks Cheap Shot attack that stuns the target and allows an immediate follow-up attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -299,9 +316,11 @@
       },
       "adept": {
         "description": "Allows converting any successful attack into a knockdown.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["quick"],
             "description": "Quick check to make any successful attack end with a trip or shove that knocks the enemy prone."
           }
         ],
@@ -318,6 +337,7 @@
       },
       "master": {
         "description": "Grants a reactive counterattack against any melee attack made against you.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -342,6 +362,7 @@
     "name": "Knife Mastery",
     "category": "ability",
     "description": "Specialization in short cutting and thrusting weapons with emphasis on speed and close-quarters combat.",
+    "startingEquipment": [{ "kind": "weapon", "id": "short_weapon" }],
     "tags": ["short", "melee", "attack", "status", "quick"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -365,6 +386,7 @@
       },
       "adept": {
         "description": "Grants an extra knife attack each turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -384,6 +406,7 @@
       },
       "master": {
         "description": "Allows forcing close-quarters combat, restrict the enemy's weapon options and worsen their defense.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -411,6 +434,7 @@
     "tiers": {
       "novice": {
         "description": "Allows rerolling failed free attacks against enemies attempting to disengage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -420,6 +444,7 @@
       },
       "adept": {
         "description": "Allows replacing a standard free attack with any other active ability.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -429,6 +454,7 @@
       },
       "master": {
         "description": "Makes free attacks a full platform for active techniques and improves their reliability.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -521,6 +547,7 @@
           },
           {
             "tier": "B",
+            "check": ["quick"],
             "description": "Quick check to draw and make the first attack before the opponent.",
             "target": {
               "kind": "flag",
@@ -553,6 +580,7 @@
       },
       "master": {
         "description": "Removes the action cost from consumables and makes firearms more convenient to handle.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -589,6 +617,7 @@
     "tiers": {
       "novice": {
         "description": "Allows gathering ingredients for simple elixirs, working safely with grenades, and brewing combat oils.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -605,6 +634,7 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to gather ingredients for one dose of a simple elixir."
           },
           {
@@ -615,9 +645,11 @@
       },
       "adept": {
         "description": "Allows preparing more complex elixirs and crafting ammunition and grenades.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to gather herbs and minerals for one dose of a complex elixir or d4 doses of a weak elixir."
           },
           {
@@ -628,9 +660,11 @@
       },
       "master": {
         "description": "Unlocks master-tier recipes and production of heavy weapon ammunition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to gather resources for a master elixir, d4 strong doses, or d8 weak doses."
           },
           {
@@ -661,6 +695,7 @@
     "tiers": {
       "novice": {
         "description": "Allows quickly coating a weapon with poison and activating it with a Cunning check.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -674,12 +709,14 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to activate the poison on a successful hit; the poison lasts for one successful hit."
           }
         ]
       },
       "adept": {
         "description": "Keeps poison on the weapon for the entire battle and speeds up hidden weapon use.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -703,6 +740,7 @@
       },
       "master": {
         "description": "Raises most poisons by one rank, making them considerably harder to resist.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -726,6 +764,7 @@
     "tiers": {
       "novice": {
         "description": "Allows entering a choking grapple when you have advantage, dealing armor-ignoring damage and denying the target's actions.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -733,6 +772,7 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to determine whether the choking grapple is maintained on the next turn."
           }
         ],
@@ -751,6 +791,7 @@
       },
       "adept": {
         "description": "Unlocks suffocating spores against one target for several turns.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -772,6 +813,7 @@
       },
       "master": {
         "description": "Turns the suffocating spores into a grenade that covers an entire room or small area.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -815,6 +857,7 @@
       },
       "adept": {
         "description": "Allows applying oil during the current turn and extends protection to elements and some mystical damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -824,6 +867,7 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to apply oil to yourself during the current turn."
           },
           {
@@ -834,9 +878,11 @@
       },
       "master": {
         "description": "Removes the action cost of applying oil and allows two body oils to be active at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to apply oil to yourself as a free action."
           },
           {
@@ -857,9 +903,11 @@
     "tiers": {
       "novice": {
         "description": "Allows setting and disarming mechanical traps, and quickly improvising them in the field.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to set or disarm a mechanical trap."
           },
           {
@@ -870,9 +918,11 @@
       },
       "adept": {
         "description": "Adds alchemical trap expertise and increases the damage of improvised mechanisms.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to set or disarm an alchemical trap."
           },
           {
@@ -883,6 +933,7 @@
       },
       "master": {
         "description": "Raises all traps by one grade and strengthens improvised constructions.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -906,6 +957,7 @@
     "tiers": {
       "novice": {
         "description": "Allows identifying weaknesses and traits of living creatures at a glance.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -915,12 +967,14 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to understand the special abilities, traits, and physical weaknesses of a person or animal at a glance."
           }
         ]
       },
       "adept": {
         "description": "Allows choosing a favored prey category and sharing knowledge about it with allies.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -1047,6 +1101,7 @@
     "tiers": {
       "novice": {
         "description": "Provides basic healing without supplies and improves it with medicine.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -1056,12 +1111,14 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to heal a patient for d4 Toughness with surgery alone, or d6 with remedies."
           }
         ]
       },
       "adept": {
         "description": "Raises healing caps and adds damage from anatomical knowledge.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -1084,6 +1141,7 @@
       },
       "master": {
         "description": "Further raises healing caps and preserves some effect even on failure.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1091,7 +1149,7 @@
           },
           {
             "tier": "C",
-            "description": "Even failed treatment attempts still restore d4 or d6 damage to the patient."
+            "description": "Even failed treatment attempts still restores d4 or d6 damage to the patient."
           }
         ]
       }
@@ -1107,6 +1165,7 @@
     "tiers": {
       "novice": {
         "description": "Allows identifying artifacts and reading old human languages.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -1116,29 +1175,35 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to identify an artifact's quality and hidden qualities without testing it on yourself."
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to read and speak rare or old human languages fluently; simple phrases require no check."
           }
         ]
       },
       "adept": {
         "description": "Allows activating foreign artifacts and speaking elven and demonic languages fluently.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to activate any artifact instead of the attribute originally required."
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to speak and read elven and demonic languages fluently; simple phrases require no check."
           }
         ]
       },
       "master": {
         "description": "Makes Cunning the key to defending against magic, activating scrolls, and reading ancient non-human languages.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1162,6 +1227,7 @@
     "tiers": {
       "novice": {
         "description": "Unlocks work with light artillery and field fortifications.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -1184,6 +1250,7 @@
       },
       "adept": {
         "description": "Unlocks heavy guns, siege engines, and special ammunition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -1222,6 +1289,7 @@
     "tiers": {
       "novice": {
         "description": "Allows making simple weapons and ammunition, and fitting or repairing armor.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -1231,6 +1299,7 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to craft simple ammunition, polearms, short weapons, and other simple weapons without special modifiers."
           },
           {
@@ -1241,18 +1310,22 @@
       },
       "adept": {
         "description": "Unlocks nearly any non-mystical weapon and items with one extra quality.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to craft any non-mystical item with one extra quality of any complexity."
           }
         ]
       },
       "master": {
         "description": "Allows removing negatives, adding multiple positive qualities, and working with mystical traits.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to remove negative qualities from an item or craft an item with any number of positive qualities."
           },
           {
@@ -1756,6 +1829,7 @@
     "name": "Sixth Sense",
     "category": "ability",
     "description": "Intuitive shooting and orientation without relying on normal vision.",
+    "startingEquipment": [{ "kind": "weapon", "id": "bow" }],
     "tags": ["ranged", "defense", "initiative", "vigilant"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -1784,6 +1858,7 @@
       },
       "adept": {
         "description": "Shifts initiative and Defense to Vigilant.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -1832,6 +1907,7 @@
         "effects": [
           {
             "tier": "B",
+            "check": ["vigilant"],
             "description": "Vigilant check to see the dominant aspect of the true nature of an object, place, or creature, at the cost of one temporary Corruption.",
             "target": {
               "kind": "flag",
@@ -1843,6 +1919,7 @@
       },
       "adept": {
         "description": "Reveals all aspects of a target's Shadow at the cost of d4 temporary Corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1852,6 +1929,7 @@
       },
       "master": {
         "description": "Allows clearly seeing the Shadows and the powers linked to them at the cost of d6 temporary Corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1866,6 +1944,7 @@
     "name": "Marksmanship",
     "category": "ability",
     "description": "Pure specialization in damage and penetrating power with ranged weapons.",
+    "startingEquipment": [{ "kind": "weapon", "id": "bow" }],
     "tags": ["ranged", "damage", "firearms", "bows", "piercing", "accurate"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -1894,9 +1973,11 @@
       },
       "adept": {
         "description": "Adds a crippling shot that can pin the target in place.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to have a shot pin the enemy to the spot and hold them there until the marksman fails a check."
           }
         ],
@@ -1918,6 +1999,7 @@
       },
       "master": {
         "description": "Makes all shots armor-piercing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1932,11 +2014,13 @@
     "name": "Hunter's Instinct",
     "category": "ability",
     "description": "Specialization against one quarry, leaving them little chance to escape alive.",
+    "startingEquipment": [{ "kind": "weapon", "id": "bow" }],
     "tags": ["ranged", "accurate", "reaction", "damage", "free"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows marking one target and rerolling failed ranged attacks against them.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1974,6 +2058,7 @@
       },
       "master": {
         "description": "Punishes any movement by the marked target with free ranged attacks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2003,6 +2088,7 @@
     "tiers": {
       "novice": {
         "description": "Allows responding to a melee hit with a jab from an arrow, bayonet, or barrel.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2022,6 +2108,7 @@
       },
       "adept": {
         "description": "Increases ranged weapon damage when used in melee.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2041,6 +2128,7 @@
       },
       "master": {
         "description": "After a successful ranged strike, allows immediately following up with a second free shot.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2065,11 +2153,13 @@
     "name": "Trick Shooting",
     "category": "ability",
     "description": "Precise shot control for disarming, blinding, and other spectacular techniques.",
+    "startingEquipment": [{ "kind": "weapon", "id": "bow" }],
     "tags": ["ranged", "defense", "status", "reaction", "support", "accurate"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows sacrificing the attack and movement for a precision shot with a powerful secondary effect.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2098,6 +2188,7 @@
       },
       "adept": {
         "description": "Allows hitting by ricochet without direct line of sight against a predictably moving target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2107,9 +2198,11 @@
       },
       "master": {
         "description": "Allows parrying attacks against yourself and allies using a ranged weapon.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to parry with a ranged weapon against a melee attack targeting an ally, or a ranged attack against yourself or an ally; a successful parry negates the damage."
           }
         ],
@@ -2129,11 +2222,13 @@
     "name": "Suppressive Fire",
     "category": "ability",
     "description": "A technique for firing multiple arrows or shots in a single turn.",
+    "startingEquipment": [{ "kind": "weapon", "id": "bow" }],
     "tags": ["ranged", "free", "bows", "firearms", "accurate"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows trading movement for a second shot and quickly reloading firearms.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2165,6 +2260,7 @@
       },
       "adept": {
         "description": "Removes the movement cost from the second arrow and transfers it to the second firearm shot.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2189,6 +2285,7 @@
       },
       "master": {
         "description": "Brings the volley of arrows or shots up to three per turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2218,6 +2315,7 @@
     "name": "Steel Throw",
     "category": "ability",
     "description": "Mastery of thrown weapons and turning almost any object into a projectile.",
+    "startingEquipment": [{ "kind": "weapon", "id": "thrown_weapon" }],
     "tags": ["thrown", "accurate", "damage", "weapons", "ranged"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2246,6 +2344,7 @@
       },
       "adept": {
         "description": "Allows throwing twice in one attack and effectively throwing standard melee weapons.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2274,6 +2373,7 @@
       },
       "master": {
         "description": "Turns a single thrown weapon attack into a triple volley.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2303,6 +2403,7 @@
     "name": "Cloak Dance",
     "category": "ability",
     "description": "A dueling technique using a cloak or other fabric as an active defensive tool.",
+    "startingEquipment": [{ "kind": "weapon", "id": "one_handed_weapon" }],
     "tags": ["defense", "main", "status", "free", "entangling"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2331,6 +2432,7 @@
       },
       "adept": {
         "description": "Allows blinding an enemy with the cloth and immediately continuing the attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2382,6 +2484,7 @@
     "name": "Blessed Swordsman",
     "category": "ability",
     "description": "The highest technique of the balanced sword, focused on counterattacks and pure dueling.",
+    "startingEquipment": [{ "kind": "weapon", "id": "longsword" }],
     "tags": ["weapons", "damage", "main", "free", "reaction"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2410,6 +2513,7 @@
       },
       "adept": {
         "description": "Allows responding with one free attack per turn after a successful Defense.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2429,6 +2533,7 @@
       },
       "master": {
         "description": "Further increases damage and removes the limit on counterattacks after a successful Defense.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2461,6 +2566,7 @@
     "name": "At the Top",
     "category": "ability",
     "description": "A combat heel technique that combines kicks and strikes into one rhythm.",
+    "startingEquipment": [{ "kind": "weapon", "id": "heels" }],
     "tags": ["melee", "free", "weapons", "melee", "heels"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2491,6 +2597,7 @@
       },
       "adept": {
         "description": "Allows adding a free heel kick to other weapon attacks once per turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2527,11 +2634,13 @@
     "name": "Entanglement",
     "category": "ability",
     "description": "Mastery of nets, bolas, whips, and other weapons that first bind, then choke.",
+    "startingEquipment": [{ "kind": "weapon", "id": "whip" }],
     "tags": ["entangling", "status", "melee", "piercing"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows rerolling failed entangle attempts.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2541,6 +2650,7 @@
       },
       "adept": {
         "description": "Allows achieving knockdowns just as reliably.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2550,6 +2660,7 @@
       },
       "master": {
         "description": "Turns every successful entangling weapon hit into a choking throat strike.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2576,6 +2687,7 @@
     "name": "Composite Weapon Mastery",
     "category": "ability",
     "description": "The art of wielding flails, chain swords, and other composite weapons.",
+    "startingEquipment": [{ "kind": "weapon", "id": "flail" }],
     "tags": ["weapons", "entangling", "free", "damage", "composite"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2611,6 +2723,7 @@
       },
       "master": {
         "description": "Allows striking all adjacent enemies with a sweeping blow.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2635,11 +2748,13 @@
     "name": "Axe Patterns",
     "category": "ability",
     "description": "Specialization in axes combining stunning exchanges and powerful cleaving strikes.",
+    "startingEquipment": [{ "kind": "weapon", "id": "two_handed_axe" }],
     "tags": ["weapons", "melee", "free", "axes", "damage"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Unlocks a combo attack: a blunt side strike followed by a normal attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2665,6 +2780,7 @@
       },
       "adept": {
         "description": "Allows making two attacks per turn at the cost of reduced damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2707,6 +2823,7 @@
       },
       "master": {
         "description": "Enhances every single strike per action.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2736,6 +2853,7 @@
     "name": "Polearm",
     "category": "ability",
     "description": "Classic mastery of long weapons that control range and enemy movement.",
+    "startingEquipment": [{ "kind": "weapon", "id": "polearm" }],
     "tags": [
       "polearm",
       "reach",
@@ -2772,6 +2890,7 @@
       },
       "adept": {
         "description": "Allows striking any approaching or retreating enemy with a free attack, as long as they are not armed with a long weapon.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2789,6 +2908,7 @@
       },
       "master": {
         "description": "Turns free attacks with a long weapon into a hard movement stop.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2807,6 +2927,7 @@
     "name": "Staff Mastery",
     "category": "ability",
     "description": "A variant of long weapon mastery that makes the staff simultaneously a defense, a lever, and a striking tool.",
+    "startingEquipment": [{ "kind": "weapon", "id": "staff" }],
     "tags": ["polearm", "defense", "reaction", "free", "reach", "accurate"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -2853,6 +2974,7 @@
       },
       "adept": {
         "description": "Allows responding with the staff's other end after a blocked attack, and counterattacking after a successful Defense.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2884,9 +3006,11 @@
       },
       "master": {
         "description": "Allows knocking the enemy down after a hit and immediately following up with an advantage attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to knock the enemy prone after a successful attack and immediately make a free follow-up attack for d6 with advantage."
           }
         ],
@@ -2914,6 +3038,7 @@
     "tiers": {
       "novice": {
         "description": "Unlocks the basic dual-wield scheme and a Defense bonus from the off-hand.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2964,6 +3089,7 @@
       },
       "adept": {
         "description": "Removes the short weapon requirement from the off-hand.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3081,6 +3207,7 @@
       },
       "master": {
         "description": "Allows replacing the normal bonus with an exceptionally powerful strike once per turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3117,6 +3244,7 @@
     "name": "Behemoth",
     "category": "ability",
     "description": "Specialization in heavy two-handed weapons and their momentum.",
+    "startingEquipment": [{ "kind": "weapon", "id": "heavy_weapon" }],
     "tags": ["weapons", "damage", "piercing", "strong"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -3145,6 +3273,7 @@
       },
       "adept": {
         "description": "Allows using the reverse momentum of a miss to still hit the target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3164,6 +3293,7 @@
       },
       "master": {
         "description": "Makes heavy two-handed strikes armor-piercing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3178,6 +3308,7 @@
     "name": "Shields",
     "category": "ability",
     "description": "A combat style in which the shield becomes not just defense but also a striking weapon.",
+    "startingEquipment": [{ "kind": "weapon", "id": "shield" }],
     "tags": ["shields", "defense", "melee", "status", "main", "strong"],
     "source": "03-reference/abilities",
     "tiers": {
@@ -3224,6 +3355,7 @@
       },
       "adept": {
         "description": "Allows following up every successful hit with a shield strike that may knock the enemy prone.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3231,6 +3363,7 @@
           },
           {
             "tier": "C",
+            "check": ["strong"],
             "description": "Strong check to determine whether the shield bash also knocks the enemy prone."
           }
         ],
@@ -3248,6 +3381,7 @@
       },
       "master": {
         "description": "Raises shield bash damage to a full offensive value.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3301,6 +3435,7 @@
       },
       "adept": {
         "description": "Allows making two unarmed attacks instead of one.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3325,6 +3460,7 @@
       },
       "master": {
         "description": "Adds painful strikes targeting the most vulnerable spots.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3362,9 +3498,11 @@
     "tiers": {
       "novice": {
         "description": "After any successful attack, unlocks a grapple with a choice between throwing and holding.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["strong"],
             "description": "Any successful attack unlocks a grapple: Strong check to throw the enemy for d4 armor-ignoring damage and knock them prone, or hold them without damage, preventing movement and actions."
           }
         ],
@@ -3392,9 +3530,11 @@
       },
       "adept": {
         "description": "Allows counter-grappling after a successful Defense and Quick check.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["quick"],
             "description": "On successful Defense and Quick checks, the Adept may react by counter-grappling, throwing the enemy prone, dealing d4 damage, and interrupting their turn."
           }
         ],
@@ -3413,6 +3553,7 @@
       },
       "master": {
         "description": "Allows preempting an attack with a grapple via a Quick check and immediately following up on the fallen target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3529,15 +3670,18 @@
     "tiers": {
       "novice": {
         "description": "Allows restoring d4 Toughness once per day, retrying until success.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "Resolute check to restore d4 Toughness once per day; you may retry once per turn as an action until success."
           }
         ]
       },
       "adept": {
         "description": "Raises the single-use self-healing cap to d6.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3547,6 +3691,7 @@
       },
       "master": {
         "description": "Raises the healing cap to d8 and allows triggering as a reaction to fresh wounds.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3595,6 +3740,7 @@
       },
       "adept": {
         "description": "If Toughness is reduced to at least half, allows rerolling all failed Strong checks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3604,6 +3750,7 @@
       },
       "master": {
         "description": "If Toughness is reduced to at least half, adds bonus melee damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3618,14 +3765,17 @@
     "name": "Bodyguard",
     "category": "ability",
     "description": "The art of shielding allies and immediately punishing those who strike them.",
+    "startingEquipment": [{ "kind": "weapon", "id": "shield" }],
     "tags": ["resolute", "support", "reaction", "defense", "resolute"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows intercepting even an attack the ally cannot defend against.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "Resolute check to intercept an attack against an ally that they cannot defend against."
           }
         ],
@@ -3640,6 +3790,7 @@
       },
       "adept": {
         "description": "Allows defending effectively against all redirected hits.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3649,6 +3800,7 @@
       },
       "master": {
         "description": "Turns any attack on an ally into an opportunity for a free attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3716,9 +3868,11 @@
       },
       "master": {
         "description": "Allows resisting armor bypass and using mystical powers even in cumbersome armor.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["quick"],
             "description": "Quick check to counter any armor-bypassing or armor-piercing effects."
           },
           {
@@ -3747,6 +3901,7 @@
     "tiers": {
       "novice": {
         "description": "Allows rerolling failed checks to break free from physical restraints.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3756,6 +3911,7 @@
       },
       "adept": {
         "description": "Extends the same reliability to non-physical mental effects.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3765,6 +3921,7 @@
       },
       "master": {
         "description": "Punishes failed mental attacks with a blast of force.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3786,52 +3943,17 @@
     }
   },
   {
-    "id": "mystical-powers",
-    "name": "Mystical Powers",
-    "category": "ability",
-    "description": "The foundational ability to wield spells that increase permanent and temporary Corruption.",
-    "tags": ["magic", "corruption", "tradition", "resolute"],
-    "source": "03-reference/abilities",
-    "tiers": {
-      "novice": {
-        "description": "Unlocks a novice-tier spell.",
-        "effects": [
-          {
-            "tier": "C",
-            "description": "Allows wielding a Novice-tier spell."
-          }
-        ]
-      },
-      "adept": {
-        "description": "Unlocks an adept-tier spell.",
-        "effects": [
-          {
-            "tier": "C",
-            "description": "Allows wielding an Adept-tier spell."
-          }
-        ]
-      },
-      "master": {
-        "description": "Unlocks a master-tier spell.",
-        "effects": [
-          {
-            "tier": "C",
-            "description": "Allows wielding a Master-tier spell."
-          }
-        ]
-      }
-    }
-  },
-  {
     "id": "mystical-tradition-order",
     "name": "Mystical Tradition: Order",
     "category": "ability",
+    "tradition": "order",
     "description": "The academic Order tradition that lowers the cost of learning and using its own spells.",
     "tags": ["magic", "tradition", "order", "resolute", "corruption"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Removes permanent Corruption from novice spells and rituals of the academic tradition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -3847,6 +3969,7 @@
       },
       "adept": {
         "description": "Caps temporary Corruption from academic magic and removes the permanent cost of adept spells.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3860,6 +3983,7 @@
       },
       "master": {
         "description": "Removes the permanent cost of master spells and helps maintain chained and mass magic.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3877,12 +4001,14 @@
     "id": "mystical-tradition-witches-circle",
     "name": "Mystical Tradition: Witches' Circle",
     "category": "ability",
+    "tradition": "circle",
     "description": "The wild witch tradition that reduces Corruption costs for its curses, natural magic, and rituals.",
     "tags": ["magic", "tradition", "circle", "resolute", "corruption"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Removes permanent Corruption from novice spells and rituals of the witch tradition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -3898,6 +4024,7 @@
       },
       "adept": {
         "description": "Caps temporary Corruption from wild magic and removes the cost of learning adept spells.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3911,6 +4038,7 @@
       },
       "master": {
         "description": "Removes the permanent cost of master-tier spells of the wild tradition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3924,6 +4052,7 @@
     "id": "mystical-tradition-theurgy",
     "name": "Mystical Tradition: Theurgy",
     "category": "ability",
+    "tradition": "theurgy",
     "description": "The Apoleata Church tradition that reduces the cost of healing and protective magic and strengthens it against monsters.",
     "tags": [
       "magic",
@@ -3937,6 +4066,7 @@
     "tiers": {
       "novice": {
         "description": "Removes permanent Corruption from novice church spells and rituals.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -3952,6 +4082,7 @@
       },
       "adept": {
         "description": "Caps temporary Corruption from church magic and removes the cost of learning adept spells.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3965,6 +4096,7 @@
       },
       "master": {
         "description": "Removes the cost of learning master-tier church magic and enhances healing and holy damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -3982,12 +4114,14 @@
     "id": "mystical-tradition-tribe",
     "name": "Mystical Tradition: Tribe",
     "category": "ability",
+    "tradition": "tribe",
     "description": "Tribal tradition of fire and battle magic that reduces the cost of its own school.",
     "tags": ["magic", "tradition", "tribe", "corruption", "resolute"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Removes permanent Corruption from novice spells and rituals of the tribe tradition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4006,6 +4140,7 @@
       },
       "adept": {
         "description": "Caps temporary Corruption from tribe magic and removes the cost of learning adept spells.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4019,6 +4154,7 @@
       },
       "master": {
         "description": "Removes the cost of learning master-tier tribe spells and improves elemental reliability.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4036,12 +4172,14 @@
     "id": "mystical-tradition-sorcery",
     "name": "Mystical Tradition: Sorcery",
     "category": "ability",
+    "tradition": "sorcery",
     "description": "A sorcerous tradition that does not shun Corruption but learns to use it as fuel and a weapon.",
     "tags": ["magic", "tradition", "corruption", "sorcery", "resolute"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows minimizing new Corruption to one point through Resolute.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4054,12 +4192,14 @@
           },
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "Resolute check to minimize new Corruption to one point."
           }
         ]
       },
       "adept": {
         "description": "Allows retrying a failed mystical check at the cost of additional temporary Corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4069,9 +4209,11 @@
       },
       "master": {
         "description": "Allows using the target's Corruption to lower their defense against spells.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "The powerful sorcerer can force a corrupted target to defend against their magic with Shadow -- Resolute minus current Corruption; monsters are immune to this."
           }
         ]
@@ -4082,12 +4224,14 @@
     "id": "mystical-tradition-sirens",
     "name": "Mystical Tradition: Sirens",
     "category": "ability",
+    "tradition": "sirens",
     "description": "The song tradition of domination and enchantment, making mind magic especially resilient.",
     "tags": ["magic", "tradition", "sirens", "resolute", "corruption"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Removes permanent Corruption from novice powers and grants a reroll on a single-target mind effect.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4110,6 +4254,7 @@
       },
       "adept": {
         "description": "Removes the permanent cost of adept powers and allows rerolling any one mind effect check.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4123,6 +4268,7 @@
       },
       "master": {
         "description": "Removes the permanent cost of master powers and allows repeating mind effect checks as many times as the effect requires.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4140,12 +4286,14 @@
     "id": "mystical-tradition-symbolism",
     "name": "Mystical Tradition: Symbolism",
     "category": "ability",
+    "tradition": "symbolism",
     "description": "The tradition of magical symbols, preparing and packaging effects in advance without immediate Shadow harm.",
     "tags": ["magic", "tradition", "symbolism", "corruption", "resolute"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Requires physically drawing symbols slowly and allows only one to be prepared.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4164,6 +4312,7 @@
       },
       "adept": {
         "description": "Allows drawing symbols in one turn, storing several, and triggering them with a word or condition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4177,6 +4326,7 @@
       },
       "master": {
         "description": "Allows drawing and activating symbols directly in the air instantly.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4196,6 +4346,7 @@
     "tiers": {
       "novice": {
         "description": "Allows learning one ritual of any tradition.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4214,6 +4365,7 @@
       },
       "adept": {
         "description": "Raises the known ritual limit to three.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4223,6 +4375,7 @@
       },
       "master": {
         "description": "Raises the known ritual limit to six.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4242,6 +4395,7 @@
     "tiers": {
       "novice": {
         "description": "Reduces the temporary Corruption of one chosen spell or ability to one point.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4280,6 +4434,7 @@
       },
       "master": {
         "description": "Unlocks novice-tier powers from all traditions and allows rerolling mystical checks at the cost of a risk.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4303,6 +4458,7 @@
     "tiers": {
       "novice": {
         "description": "Allows absorbing temporary Corruption that was meant to affect a nearby ally.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4320,6 +4476,7 @@
       },
       "adept": {
         "description": "Allows rolling gained Corruption twice and choosing the more desirable outcome.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4329,9 +4486,11 @@
       },
       "master": {
         "description": "Allows directing incoming Corruption toward a visible target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "Resolute check to redirect incoming Corruption to a visible target; on failure the Master takes half and the rest dissipates."
           }
         ],
@@ -4368,6 +4527,7 @@
       },
       "adept": {
         "description": "Allows swapping hands on the move and once per battle redirecting some temporary Corruption into them.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4389,6 +4549,7 @@
       },
       "master": {
         "description": "Removes the binding difficulty, allows freely swapping hands, and maintains one effect for the whole day.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -4426,6 +4587,7 @@
           },
           {
             "tier": "C",
+            "check": ["resolute"],
             "description": "At the start of the day the Master may make a Resolute check to maintain the effect of any one demiurge hand for the entire day, regardless of further hand swaps."
           }
         ],
@@ -4450,6 +4612,7 @@
     "tiers": {
       "novice": {
         "description": "Allows activating tattoos for temporary armor and weather protection.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4463,6 +4626,7 @@
       },
       "adept": {
         "description": "Allows converting Corruption into targeted self-healing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4472,6 +4636,7 @@
       },
       "master": {
         "description": "Allows adding mystical damage to every successful attack at the cost of Corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4502,15 +4667,17 @@
       },
       "adept": {
         "description": "Allows designating one priority target for the whole group.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
-            "description": "The Adept can choose and announce one enemy; all allies do +d4 more damage against that enemy."
+            "description": "The Adept can pick and pronounce one enemy; all allies do +d4 more damage against that enemy."
           }
         ]
       },
       "master": {
         "description": "If a speech was given before battle, shares resistance to magic with listeners.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4553,18 +4720,22 @@
       },
       "adept": {
         "description": "Allows forcing an enemy not to attack the Adept on their next turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["appealing"],
             "description": "Appealing check to make an enemy hesitate on their next turn; they will not attack the Adept but may still strike allies."
           }
         ]
       },
       "master": {
         "description": "Allows breaking the will to continue fighting in an already wounded side.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["appealing"],
             "description": "Appealing check to end combat with an enemy: they may surrender, flee, or agree to negotiate; in an ongoing fight this is possible if someone on their side has been wounded."
           }
         ]
@@ -4575,6 +4746,7 @@
     "id": "mobile-combat",
     "name": "Mobile Combat",
     "category": "ability",
+    "availability": "faction",
     "description": "A mobile fighting style with constant weapon switching and reactive lunges when breaking distance.",
     "tags": [
       "mobility",
@@ -4589,6 +4761,7 @@
     "tiers": {
       "novice": {
         "description": "Allows splitting movement before and after the attack.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4612,6 +4785,7 @@
       },
       "master": {
         "description": "Improves the reliability of disengaging and allows responding to incoming free attacks with free attacks of your own.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4637,12 +4811,14 @@
     "id": "pyrotechnics",
     "name": "Pyrotechnics",
     "category": "ability",
+    "availability": "faction",
     "description": "Spy alchemy for blinding, stunning, and devastating thrown charges.",
     "tags": ["alchemy", "status", "grenades", "piercing", "accurate"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Unlocks blinding powder and safe use of grenades and mines.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -4653,6 +4829,7 @@
           },
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to use blinding powder in melee; on success the target takes d4 armor-ignoring damage and is blinded for d4 rounds."
           }
         ],
@@ -4671,9 +4848,11 @@
       },
       "adept": {
         "description": "Unlocks a smoke canister that damages and blinds an area.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to correctly deploy a smoke canister; all who do not leave the affected area take d4 armor-ignoring damage and cannot see."
           }
         ],
@@ -4692,9 +4871,11 @@
       },
       "master": {
         "description": "Grants a thunder ball with high armor-ignoring damage and blinding.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["accurate"],
             "description": "Accurate check to use a thunder ball that deals up to d12 armor-ignoring damage on success or d6 on failure, and blinds for d4 rounds."
           }
         ],
@@ -4717,12 +4898,14 @@
     "id": "artifact-creation",
     "name": "Artifact Creation",
     "category": "ability",
+    "availability": "faction",
     "description": "Guild mastery of crafting artifacts and reading the mystic qualities already bound to them.",
     "tags": ["crafting", "magic", "knowledge", "cunning"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows creating simple artifacts.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -4735,24 +4918,29 @@
           },
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to create a simple artifact."
           }
         ]
       },
       "adept": {
         "description": "Allows creating powerful artifacts.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to create a powerful artifact."
           }
         ]
       },
       "master": {
         "description": "Allows creating legendary artifacts.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
+            "check": ["cunning"],
             "description": "Cunning check to create a legendary artifact."
           }
         ]
@@ -4763,12 +4951,14 @@
     "id": "armored-mystic",
     "name": "Armored Mystic",
     "category": "ability",
+    "availability": "faction",
     "description": "A templar school that allows casting in heavy armor and enhancing it with mysticism.",
     "tags": ["magic", "armor", "defense"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Removes medium armor interference with mystical powers.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4778,6 +4968,7 @@
       },
       "adept": {
         "description": "Extends the same comfort to heavy armor.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4802,12 +4993,14 @@
     "id": "bloody-combat",
     "name": "Bloody Combat",
     "category": "ability",
+    "availability": "faction",
     "description": "A brutal combat school of fighting through wounds, making the character more dangerous as Toughness falls.",
     "tags": ["melee", "damage", "healing", "corruption"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "When at half Toughness, allows rerolling melee attack checks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4817,6 +5010,7 @@
       },
       "adept": {
         "description": "When at half Toughness, sharply increases melee damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4826,6 +5020,7 @@
       },
       "master": {
         "description": "Converts half of damage dealt into self-healing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4839,12 +5034,16 @@
     "id": "mystical-tradition-rune-magic",
     "name": "Mystical Tradition: Rune Magic",
     "category": "ability",
+    "tradition": "runes",
+    "availability": "faction",
     "description": "The runic tradition that can store Corruption in a phylactery and preserve power in items.",
+    "startingEquipment": [{ "kind": "weapon", "id": "staff" }],
     "tags": ["magic", "tradition", "runes", "corruption", "melee", "damage"],
     "source": "03-reference/abilities",
     "tiers": {
       "novice": {
         "description": "Allows binding the soul to a runic object and redirecting novice-level permanent Corruption into it.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4858,6 +5057,7 @@
       },
       "adept": {
         "description": "Redirects permanent Corruption from adept spells into the phylactery and helps reduce new spikes.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -4871,6 +5071,7 @@
       },
       "master": {
         "description": "Redirects master-level permanent Corruption into the staff and removes the temporary cost of using tradition powers.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",

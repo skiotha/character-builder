@@ -5,10 +5,12 @@
     "category": "spell",
     "description": "Domination of another creature's will and forced obedience.",
     "tags": ["magic", "status", "order", "circle", "sorcery", "resolute"],
+    "traditions": ["order", "circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Allows control over one creature while concentration and Resolute checks hold.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -18,6 +20,7 @@
       },
       "adept": {
         "description": "Maintains control without concentration and frees the mystic to act normally.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -27,6 +30,7 @@
       },
       "master": {
         "description": "Makes the control complete and lets the caster force the target to use its full capabilities.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -42,10 +46,12 @@
     "category": "spell",
     "description": "A twist of perception that lets the mystic replay failed outcomes.",
     "tags": ["magic", "reaction", "defense", "support", "order", "resolute"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic reroll one failed Defense check each turn as a reaction.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -63,6 +69,7 @@
       },
       "adept": {
         "description": "Expands the reroll to any failed check involving the mystic.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -80,6 +87,7 @@
       },
       "master": {
         "description": "Lets the mystic interfere with nearby checks, even those involving others.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -111,10 +119,12 @@
       "theurgy",
       "resolute"
     ],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises the mystic above the ground, but requires concentration and risks a painful fall.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -124,6 +134,7 @@
       },
       "adept": {
         "description": "Lets the mystic levitate one ally with the same risk on collapse.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -133,6 +144,7 @@
       },
       "master": {
         "description": "Lifts the mystic and the whole group, and makes a broken effect end in a safe descent.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -156,10 +168,12 @@
       "order",
       "resolute"
     ],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Allows the mystic to hurl objects at a target or block attacks with them.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -186,6 +200,7 @@
       },
       "adept": {
         "description": "Lets the mystic seize and fling an enemy, knocking them onto their back.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -205,6 +220,7 @@
       },
       "master": {
         "description": "Spreads the telekinetic throw across a whole group until the checks begin to fail.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -238,10 +254,12 @@
       "theurgy",
       "resolute"
     ],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic see through illusions and effects that hide what something truly is.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -251,6 +269,7 @@
       },
       "adept": {
         "description": "Forces a whole group of creatures to reveal their real shape and shed transformations.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -260,6 +279,7 @@
       },
       "master": {
         "description": "Stops a revealed target from changing shape again.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -275,10 +295,12 @@
     "category": "spell",
     "description": "A gentle turn of attention that makes the mystic and allies slip from notice.",
     "tags": ["magic", "mobility", "support", "order", "theurgy", "resolute"],
+    "traditions": ["order", "theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes the mystic from one creature's senses until they take a harmful action.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -288,6 +310,7 @@
       },
       "adept": {
         "description": "Extends the effect to an entire group of observers.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -297,6 +320,7 @@
       },
       "master": {
         "description": "Lets the mystic hide nearby allies as well, each resolving invisibility separately.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -312,10 +336,12 @@
     "category": "spell",
     "description": "Illusory doubles that confuse enemies and take blows in the mystic's place.",
     "tags": ["magic", "defense", "order", "resolute"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates d4 doubles around the mystic that vanish when struck.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -325,6 +351,7 @@
       },
       "adept": {
         "description": "Increases the number of copies and makes them harder to clear with area damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -334,6 +361,7 @@
       },
       "master": {
         "description": "Raises the number of copies to d8 and makes them ignore area damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -349,10 +377,12 @@
     "category": "spell",
     "description": "A mental weapon that reinforces a mundane blow with psychic force.",
     "tags": ["magic", "melee", "damage", "piercing", "order", "resolute"],
+    "traditions": ["order"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a psychic copy of a melee weapon and grants a retry on a miss.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -370,6 +400,7 @@
       },
       "adept": {
         "description": "Paralyzes the target and makes the physical half of the strike hit automatically.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -388,6 +419,7 @@
       },
       "master": {
         "description": "Adds a separate burst of armor-ignoring psychic damage to the strike.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -412,11 +444,13 @@
     "name": "Anathema",
     "category": "spell",
     "description": "Dispelling foreign magic and non-ritual supernatural effects.",
-    "tags": ["magic", "support", "runes", "theurgy", "witchcraft", "resolute"],
+    "tags": ["magic", "support", "runes", "theurgy", "circle", "resolute"],
+    "traditions": ["runes", "theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes an ongoing hostile spell effect from one target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -426,6 +460,7 @@
       },
       "adept": {
         "description": "Lets the mystic dispel effects from a whole group at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -435,6 +470,7 @@
       },
       "master": {
         "description": "Cleanses an entire area of magic, including summons and created phenomena.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -450,10 +486,12 @@
     "category": "spell",
     "description": "Blessed weaponry made especially deadly against monsters and the corrupt.",
     "tags": ["magic", "melee", "damage", "theurgy", "weapons", "resolute"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Empowers a consecrated weapon and punishes monsters even harder.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -472,6 +510,7 @@
       },
       "adept": {
         "description": "Raises the bonus damage of the blessed weapon to d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -490,6 +529,7 @@
       },
       "master": {
         "description": "Raises the bonus damage of the blessed weapon to d10.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -514,10 +554,12 @@
     "category": "spell",
     "description": "An unseen holy shield that raises armor and scorches attackers.",
     "tags": ["magic", "defense", "damage", "support", "theurgy", "resolute"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a shield for the whole battle that improves armor and punishes monster attacks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -527,6 +569,7 @@
       },
       "adept": {
         "description": "Extends the shield to one nearby ally and raises both effects to d6.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -536,6 +579,7 @@
       },
       "master": {
         "description": "Lets the shield cover up to two nearby allies and raises it to d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -551,10 +595,12 @@
     "category": "spell",
     "description": "A lasting aura that burns monsters and sustains the living nearby.",
     "tags": ["magic", "damage", "healing", "support", "theurgy", "resolute"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Fills the area around the mystic with holy power that harms hostile monsters.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -564,6 +610,7 @@
       },
       "adept": {
         "description": "Strengthens the aura's damage and adds healing for living beings.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -573,6 +620,7 @@
       },
       "master": {
         "description": "Raises both the damaging and healing halves of the aura to their peak.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -588,10 +636,12 @@
     "category": "spell",
     "description": "A focused beam of holy light that is especially lethal to monsters.",
     "tags": ["magic", "damage", "ranged", "theurgy", "resolute"],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Focuses the mystic's inner light into a ray that burns monsters harder than anything else.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -617,6 +667,7 @@
       },
       "adept": {
         "description": "Turns the beam into an area effect and hits monsters even harder.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -642,6 +693,7 @@
       },
       "master": {
         "description": "Adds a stun to every monster struck by the light.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -674,10 +726,12 @@
       "theurgy",
       "resolute"
     ],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Removes Corruption from one target and turns excess cleansing into healing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -687,6 +741,7 @@
       },
       "adept": {
         "description": "Spreads the same cleansing effect to all visible allies.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -696,6 +751,7 @@
       },
       "master": {
         "description": "Weakens new Corruption effects in the mystic's presence.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -719,10 +775,12 @@
       "resolute",
       "reaction"
     ],
+    "traditions": ["theurgy"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Compare d20 to the target monster's Corruption. Paralyze them and scorch on a successful roll.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -743,6 +801,7 @@
       },
       "adept": {
         "description": "Lets the mystic compare the result against every visible target at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -763,6 +822,7 @@
       },
       "master": {
         "description": "Triggers reactively whenever Corruption is gained or used and turns it directly into damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -786,10 +846,12 @@
     "category": "spell",
     "description": "Direct miraculous healing through touch, gaze, and cleansing grace.",
     "tags": ["magic", "healing", "support", "theurgy", "circle", "resolute"],
+    "traditions": ["theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Heals d6 Toughness through touch.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -799,6 +861,7 @@
       },
       "adept": {
         "description": "Improves the healing and cleanses poison and bleeding.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -808,6 +871,7 @@
       },
       "master": {
         "description": "Lets the mystic heal powerfully in melee or heal at range with a glance.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -831,10 +895,12 @@
       "circle",
       "resolute"
     ],
+    "traditions": ["theurgy", "circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic take another creature's harm onto themselves and heal that creature.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -852,6 +918,7 @@
       },
       "adept": {
         "description": "Improves the healing, reduces the backlash, and lets the mystic absorb toxins.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -869,6 +936,7 @@
       },
       "master": {
         "description": "Lets the mystic send the remaining harm into any other visible creature.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -892,10 +960,12 @@
     "category": "spell",
     "description": "A forced transformation that reduces the victim to a harmless beast.",
     "tags": ["magic", "status", "transformation", "circle", "resolute"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Turns one target into a harmless animal while the mystic holds concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -905,6 +975,7 @@
       },
       "adept": {
         "description": "Removes the need to keep concentrating on the transformation.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -914,6 +985,7 @@
       },
       "master": {
         "description": "Lets the mystic lay the transformation on multiple nearby creatures.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -929,10 +1001,12 @@
     "category": "spell",
     "description": "Calling natural beasts out of the land itself to fight for the mystic.",
     "tags": ["magic", "support", "summoning", "circle", "resolute"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Summons one weak beast native to the local land.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -942,6 +1016,7 @@
       },
       "adept": {
         "description": "Lets the mystic call either one strong beast or a pack of weaker ones.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -951,6 +1026,7 @@
       },
       "master": {
         "description": "Opens the way to mighty beasts and larger packs.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -974,10 +1050,12 @@
       "circle",
       "resolute"
     ],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic become a small animal and gain exceptional agility and evasiveness.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -987,6 +1065,7 @@
       },
       "adept": {
         "description": "Unlocks a combat beast form with basic battle traits.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -996,6 +1075,7 @@
       },
       "master": {
         "description": "Unlocks a large combat form with regeneration and great might.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1011,10 +1091,12 @@
     "category": "spell",
     "description": "A living mantle of vines and thorns that protects the mystic and wounds attackers.",
     "tags": ["magic", "defense", "damage", "circle", "resolute"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Wraps the mystic in living growth that grants more armor if they hold still.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1024,6 +1106,7 @@
       },
       "adept": {
         "description": "Lets nearby allies share in the protection so long as they stay close.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1033,6 +1116,7 @@
       },
       "master": {
         "description": "Awakened nature begins to strike back automatically at attackers.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1048,10 +1132,12 @@
     "category": "spell",
     "description": "Retreat beneath the ground for safety, movement, and hidden spellcasting.",
     "tags": ["magic", "defense", "mobility", "support", "circle", "resolute"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic sink underground and become unreachable, but unable to act.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1061,6 +1147,7 @@
       },
       "adept": {
         "description": "Lets the mystic use mystical powers underground and removes the upkeep checks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1070,6 +1157,7 @@
       },
       "master": {
         "description": "Gives the mystic sight of the surface and freedom of movement below it.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1093,10 +1181,12 @@
       "piercing",
       "sorcery"
     ],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Entangles one enemy and takes away its mobility.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1106,6 +1196,7 @@
       },
       "adept": {
         "description": "Lets the binding spread through a chain of enemies.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1115,6 +1206,7 @@
       },
       "master": {
         "description": "Adds thorns that keep dealing pain to bound targets.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1130,10 +1222,12 @@
     "category": "spell",
     "description": "Arrows enchanted to hover in the air and fly unerringly to their targets.",
     "tags": ["magic", "ranged", "damage", "circle", "resolute"],
+    "traditions": ["circle"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Suspends up to five arrows beside the mystic and lets them fire without missing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1152,6 +1246,7 @@
       },
       "adept": {
         "description": "Strengthens the arrows and lets the mystic send two at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1170,6 +1265,7 @@
       },
       "master": {
         "description": "Raises the volley to three arrows at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1194,10 +1290,12 @@
     "category": "spell",
     "description": "The evil eye of the mystic that twists actions and turns activity into self-destruction.",
     "tags": ["magic", "status", "damage", "circle", "sorcery", "resolute"],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Forces the target to achieve two successes on actions directed against the mystic.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1207,6 +1305,7 @@
       },
       "adept": {
         "description": "Extends that double-check burden to every action the victim takes.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1216,6 +1315,7 @@
       },
       "master": {
         "description": "Turns the curse into a death sentence that punishes every action with damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1231,10 +1331,12 @@
     "category": "spell",
     "description": "Summoned spirits harry the victim, ruin concentration, and wear away the mind.",
     "tags": ["magic", "status", "damage", "circle", "sorcery", "resolute"],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Breaks concentration and makes all of the target's checks harder.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1244,6 +1346,7 @@
       },
       "adept": {
         "description": "Adds a steady drain on the target's Resolute.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1253,6 +1356,7 @@
       },
       "master": {
         "description": "Increases the pace of Resolute damage to d6 each turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1276,10 +1380,12 @@
       "corruption",
       "resolute"
     ],
+    "traditions": ["circle", "sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Plants larvae in an enemy, dealing ongoing internal damage and ruining concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1299,6 +1405,7 @@
       },
       "adept": {
         "description": "Raises the larvae's damage to d6 each turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1318,6 +1425,7 @@
       },
       "master": {
         "description": "Raises the larvae's damage to d8 each turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1343,10 +1451,12 @@
     "category": "spell",
     "description": "A maze of sensations that makes the victim lose control of their own behavior.",
     "tags": ["magic", "status", "circle", "sirens", "resolute"],
+    "traditions": ["circle", "sirens"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Confuses one opponent and randomly determines what they do each turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1356,6 +1466,7 @@
       },
       "adept": {
         "description": "Removes the need for concentration and keeps the mystic from becoming a random target.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1365,6 +1476,7 @@
       },
       "master": {
         "description": "Lets the mystic spread bewilderment across multiple enemies.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1380,10 +1492,12 @@
     "category": "spell",
     "description": "A cursed weapon that kills more effectively and raises its victims as undead servants.",
     "tags": ["magic", "melee", "damage", "sorcery", "resolute"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Shrouds the weapon in ominous flame and raises its damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1402,6 +1516,7 @@
       },
       "adept": {
         "description": "Raises anything slain by the weapon as obedient undead.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1420,6 +1535,7 @@
       },
       "master": {
         "description": "Raises the weapon's bonus damage to d8.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1444,10 +1560,12 @@
     "category": "spell",
     "description": "An aura of foul energy that harms the living and nourishes monsters.",
     "tags": ["magic", "damage", "healing", "corruption", "sorcery", "resolute"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates a corrupt aura around the mystic that damages the living and requires concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1457,6 +1575,7 @@
       },
       "adept": {
         "description": "Removes the concentration requirement and lets the mystic spare chosen creatures.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1466,6 +1585,7 @@
       },
       "master": {
         "description": "Strengthens the aura and makes it a source of healing for monsters and summons.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1489,10 +1609,12 @@
       "corruption",
       "resolute"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Fires one Black Arrow that hurts and restrains the target until concentration breaks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1512,6 +1634,7 @@
       },
       "adept": {
         "description": "Lets the mystic hold multiple targets in the same linked effect.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1531,6 +1654,7 @@
       },
       "master": {
         "description": "Separates the linked prisoners so each must escape individually.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1553,10 +1677,12 @@
       "sorcery",
       "resolute"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Compares d4 to the target's current Corruption to decide between healing and more corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1566,6 +1692,7 @@
       },
       "adept": {
         "description": "Increases the strength of the effect to d6.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1575,6 +1702,7 @@
       },
       "master": {
         "description": "Lets the effect jump across a group until it finally heals someone.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1590,10 +1718,12 @@
     "category": "spell",
     "description": "A shift into an immaterial spirit state for passage, safety, and armor-piercing attacks.",
     "tags": ["magic", "mobility", "defense", "support", "sorcery", "resolute"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic become a spirit and pass through walls, enemies, and ordinary weapons.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1629,6 +1759,7 @@
       },
       "master": {
         "description": "Lets the mystic's own attacks touch the spirit world and ignore armor.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1651,10 +1782,12 @@
       "sorcery",
       "resolute"
     ],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Moves the mystic a short distance, but deals harm and risks opening the way to something else.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1664,6 +1797,7 @@
       },
       "adept": {
         "description": "Makes the passage safe and gives the mystic a chance to stop a monster from crossing over.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1673,6 +1807,7 @@
       },
       "master": {
         "description": "Lets the mystic bring a nearby companion along at the cost of pain and temporary Corruption.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1688,10 +1823,12 @@
     "category": "spell",
     "description": "Hurling an enemy into the Other World, with the risk of a hostile breach in return.",
     "tags": ["magic", "status", "damage", "corruption", "sorcery", "resolute"],
+    "traditions": ["sorcery"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Sends one enemy into the Other World and returns it weakened.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1701,6 +1838,7 @@
       },
       "adept": {
         "description": "Keeps the victim banished until it can force its way back with Resolute.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1710,6 +1848,7 @@
       },
       "master": {
         "description": "Turns banishment into a reaction against an attacker.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1733,10 +1872,12 @@
       "sirens",
       "resolute"
     ],
+    "traditions": ["sorcery", "sirens"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Marks one target so everyone else can finish it more easily.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1746,6 +1887,7 @@
       },
       "adept": {
         "description": "Creates a reactive harmful link between the mystic and one attacker.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1763,6 +1905,7 @@
       },
       "master": {
         "description": "Lets the mystic maintain several harmful links at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1786,10 +1929,12 @@
     "category": "spell",
     "description": "Violent streams of fire that lash one enemy after another.",
     "tags": ["magic", "damage", "tribe", "ranged", "resolute"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Whips one foe with flame and still hurts them on a failed check.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1808,6 +1953,7 @@
       },
       "adept": {
         "description": "Lets the cascade leap from one enemy to the next.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1826,6 +1972,7 @@
       },
       "master": {
         "description": "Turns the cascade into a sustained burning assault that ends only with repeated failure.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1841,10 +1988,12 @@
     "category": "spell",
     "description": "A wall or dome of flame that divides space and burns anything that crosses it.",
     "tags": ["magic", "status", "defense", "tribe", "resolute"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises a blazing wall that blocks movement and inflicts heavy damage on anything passing through.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1854,6 +2003,7 @@
       },
       "adept": {
         "description": "Lets the wall curl into a ring around chosen creatures.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1863,6 +2013,7 @@
       },
       "master": {
         "description": "Lets the wall become a full dome of flame.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1878,10 +2029,12 @@
     "category": "spell",
     "description": "For the mystic, fire becomes shield, weapon, and source of healing.",
     "tags": ["magic", "defense", "reaction", "damage", "tribe", "resolute"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Scorches attackers and improves resistance against fire.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1900,6 +2053,7 @@
       },
       "adept": {
         "description": "Raises the returned damage in melee and strengthens fire defense further.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1918,6 +2072,7 @@
       },
       "master": {
         "description": "Makes the mystic immune to fire and turns flame into healing.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "B",
@@ -1956,10 +2111,12 @@
       "strong",
       "accurate"
     ],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Raises one chosen physical attribute for each ally.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1969,6 +2126,7 @@
       },
       "adept": {
         "description": "Raises all three battle attributes at once.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -1978,6 +2136,7 @@
       },
       "master": {
         "description": "Adds a single pulse of healing to the hymn once per battle.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2001,10 +2160,12 @@
       "appealing",
       "resolute"
     ],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets each ally choose one mental attribute to improve.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2014,6 +2175,7 @@
       },
       "adept": {
         "description": "Raises all three mental attributes together.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2023,6 +2185,7 @@
       },
       "master": {
         "description": "Lets the song prevent temporary Corruption once per battle.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2046,10 +2209,12 @@
     "category": "spell",
     "description": "A cutting harmony that disorients enemies and makes them overturn their own successes.",
     "tags": ["magic", "status", "damage", "tribe", "appealing", "resolute"],
+    "traditions": ["tribe"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Forces wounded enemies to reroll even their successful checks.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2059,6 +2224,7 @@
       },
       "adept": {
         "description": "Spreads that same humiliation to all enemies, wounded or not.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2068,6 +2234,7 @@
       },
       "master": {
         "description": "Adds ongoing armor-ignoring damage to the effect.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2092,10 +2259,12 @@
       "weapons",
       "resolute"
     ],
+    "traditions": ["tribe", "runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the weapon fight on its own, but forbids other active powers.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2105,6 +2274,7 @@
       },
       "adept": {
         "description": "Allows spellcasting and other abilities alongside the floating weapon.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2114,6 +2284,7 @@
       },
       "master": {
         "description": "Makes the enchantment permanent and removes the action cost to set it in motion.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "A",
@@ -2154,10 +2325,12 @@
     "category": "spell",
     "description": "A symbol that drives a chosen kind of creature out of a marked area.",
     "tags": ["magic", "status", "damage", "symbolism", "resolute", "piercing"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Expels a group of one chosen creature type from the seal's area.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2167,6 +2340,7 @@
       },
       "adept": {
         "description": "Threatens the creature where the chain breaks if it hesitates to leave.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2176,6 +2350,7 @@
       },
       "master": {
         "description": "Raises the punishment for resisting the seal.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2191,10 +2366,12 @@
     "category": "spell",
     "description": "An awakened symbol siphons life from enemies and later redirects it to allies.",
     "tags": ["magic", "damage", "healing", "symbolism", "resolute"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Deals steady damage to all nearby enemies while the mystic concentrates.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2204,6 +2381,7 @@
       },
       "adept": {
         "description": "Lets the glyph continue without concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2213,6 +2391,7 @@
       },
       "master": {
         "description": "Redirects the stolen vitality into nearby allies.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2228,10 +2407,12 @@
     "category": "spell",
     "description": "A burst of light from a symbol that strips sight from enemies for longer and longer spans.",
     "tags": ["magic", "status", "symbolism", "resolute"],
+    "traditions": ["symbolism"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Blinds a group of enemies for one turn.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2241,6 +2422,7 @@
       },
       "adept": {
         "description": "Lets the blinding continue so long as concentration and Resolute hold.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2250,6 +2432,7 @@
       },
       "master": {
         "description": "Makes the blindness last until it is cured by magic or elixirs.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2265,10 +2448,12 @@
     "category": "spell",
     "description": "Guarding runes create a separate layer of magical armor and lash back at attackers.",
     "tags": ["magic", "defense", "damage", "runes", "symbolism", "resolute"],
+    "traditions": ["symbolism", "runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Creates rune-armor that is checked separately against each incoming blow.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2278,6 +2463,7 @@
       },
       "adept": {
         "description": "Adds armor-ignoring return damage to the runes.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2287,6 +2473,7 @@
       },
       "master": {
         "description": "Raises both the protection and the backlash, and removes the need for concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2302,10 +2489,12 @@
     "category": "spell",
     "description": "A spinning weapon forms a defensive sphere against physical arms.",
     "tags": ["magic", "defense", "runes", "weapons", "resolute"],
+    "traditions": ["runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Replaces ordinary Defense with Resolute, but limits the mystic to movement only.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2315,6 +2504,7 @@
       },
       "adept": {
         "description": "Turns the defense against physical weapons into an automatic ward so long as concentration holds.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2324,6 +2514,7 @@
       },
       "master": {
         "description": "Lets the Sphere protect a nearby ally and frees the mystic to act more broadly without concentration.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2339,10 +2530,12 @@
     "category": "spell",
     "description": "A staff or other weapon becomes a self-guiding missile that always returns to its master.",
     "tags": ["magic", "ranged", "damage", "runes", "weapons", "resolute"],
+    "traditions": ["runes"],
     "source": "03-reference/spells",
     "tiers": {
       "novice": {
         "description": "Lets the mystic throw a staff with Resolute instead of Accurate and deliver any existing enchantments through it.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2361,6 +2554,7 @@
       },
       "adept": {
         "description": "Lets the weapon bypass obstacles and increases the impact.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",
@@ -2379,6 +2573,7 @@
       },
       "master": {
         "description": "Turns the throw into a chained attack across multiple targets with descending damage.",
+        "summary": "[placeholder]",
         "effects": [
           {
             "tier": "C",

@@ -5,6 +5,7 @@
     "category": "sin",
     "tags": ["sin", "status", "corruption", "vigilant"],
     "levels": 1,
+    "check": ["vigilant"],
     "description": "If the character, their enemy, or someone nearby has taken damage, the character cannot spare an enemy even if that enemy surrenders. Resisting the effect requires 1 experience and an Vigilant check."
   },
   {
@@ -13,6 +14,7 @@
     "category": "sin",
     "tags": ["sin", "status", "resolute", "corruption"],
     "levels": 1,
+    "check": ["resolute"],
     "description": "The character must receive a daily dose of the chosen substance costing 1 shilling, or half price for an Alchemist. For each day without a dose, they take a cumulative -1 penalty to all checks up to -5 and must pass a Resolute check or spend the day searching for the substance."
   },
   {
@@ -29,6 +31,7 @@
     "category": "sin",
     "tags": ["sin", "transformation", "appealing", "discretion"],
     "levels": 1,
+    "check": ["discreet"],
     "description": "The character has noticeable bestial features. Hiding them requires a Discreet check; after a failed Appealing check, checks related to asking for help or protection must be repeated. Intimidation checks gain an extra attempt on failure."
   },
   {
@@ -53,6 +56,7 @@
     "category": "sin",
     "tags": ["sin", "discreet"],
     "levels": 1,
+    "check": ["discreet"],
     "description": "The character has a secret whose revelation gives them the Pariah or Wanted sin. At least once per chapter, they risk exposure and make a Discreet check with one extra attempt; if both attempts fail, evidence or a witness is left behind."
   },
   {
@@ -84,6 +88,7 @@
     "category": "sin",
     "tags": ["sin", "magic", "discreet", "appealing"],
     "levels": 1,
+    "check": ["discreet", "appealing"],
     "description": "One runic tattoo area is occupied by a mystic mark. In suitable situations, the character must pass a Discreet or Appealing check or draw dangerous attention as a possible monster."
   },
   {
@@ -100,6 +105,7 @@
     "category": "sin",
     "tags": ["sin", "healing", "resolute", "status"],
     "levels": 1,
+    "check": ["resolute"],
     "description": "Each night the character makes a Resolute check. On a failure, they cannot recover health naturally until the next rest."
   },
   {
@@ -124,6 +130,7 @@
     "category": "sin",
     "tags": ["sin", "mobility", "quick"],
     "levels": 1,
+    "check": ["quick"],
     "description": "During a chase, the character takes a -3 penalty to Quick on all related checks."
   },
   {
@@ -132,6 +139,7 @@
     "category": "sin",
     "tags": ["sin", "discreet"],
     "levels": 1,
+    "check": ["discreet"],
     "description": "At least once per chapter, the character must make a Discreet check to avoid being recognized as a wanted criminal. On a failure, they are exposed and risk being taken into custody."
   },
   {

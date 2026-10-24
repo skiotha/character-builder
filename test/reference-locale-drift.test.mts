@@ -13,8 +13,9 @@ import { REFERENCE_DIR } from "#config";
  * deep-equals between the two files **except** for fields in the
  * localized-fields allowlist below.
  *
- * The allowlist is uniform across topics: `name`, `description`, `tags`.
- * Whenever a key in the allowlist is encountered during traversal, its
+ * The allowlist is uniform across topics: `name`, `description`, `tags`,
+ * plus the picker-card prose `summary` (per trait rank). Whenever a key in
+ * the allowlist is encountered during traversal, its
  * value is skipped — comparison neither requires presence on either side
  * nor any structural similarity. This is intentional: those fields are
  * display-only, the engine never reads them, and translators need
@@ -42,6 +43,7 @@ const LOCALIZED_FIELDS: ReadonlySet<string> = new Set([
   "name",
   "description",
   "tags",
+  "summary",
 ]);
 
 interface Entry {

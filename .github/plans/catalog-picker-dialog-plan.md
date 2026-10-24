@@ -2,7 +2,8 @@
 
 **Status:** active (2026-09-19) — direction agreed with the user; the
 second-opinion follow-ups and the XP-transition decision gate below remain
-open for step planning. Nothing implemented yet. Blocks
+open for step planning. Step-0 metadata decisions recorded 2026-10-23
+(see "Step-0 metadata decisions"); nothing implemented yet. Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -126,7 +127,8 @@ does it once, properly, and hands Chunk I a finished picker.
    derived from `primary` effects (verified: only the 8
   `exceptional-attribute-*` abilities raise primaries). A rank's check
   attribute is a separate concept, not supplied by a `setBase` summary;
-  its representation remains to be settled in steps 0 / 3.
+  it is an authored structural `check` field (Step-0 metadata decision
+  S0-2).
 8. **Tier / level choice is "both":** pick the tier / level in the popup
   **and** change it later on the sheet card. Traits allow up / down /
   remove; talents allow level up only. Creation also obeys decision 15.
@@ -206,6 +208,8 @@ sketches remain provisional where a follow-up changes their assumptions.
   summary needs before authoring. Specify cumulative tier effects,
   higher-tier action replacement by ID, and the distinction between
   catalog grants and resolved character effects in formatter coverage.
+  _Metadata half settled 2026-10-23 (S0-2 / S0-3 below); the formatter
+  coverage half stays with step 3._
 6. **Medium — Dialog ownership and failure paths (steps 2 / 4–6).** A
   body-mounted dialog is outside its caller's automatic subtree cleanup.
   Define owner-disconnect / navigation cancellation, settle-once cleanup,
@@ -219,9 +223,70 @@ sketches remain provisional where a follow-up changes their assumptions.
   resolved outputs before claiming the G.2-deferred verification is
   discharged; catalog previews alone do not prove engine application.
 
+## Step-0 metadata decisions (2026-10-23, with the user)
+
+Locked before the authoring sweep, per open item A and review
+follow-ups 3 / 5. Data observations behind them were verified the same day
+against `reference/*.en.json` and `rpg/ru/03-reference/*.md`.
+
+- **S0-1. Tradition keys.** The canonical set is the existing spell-tag
+  spelling: `order`, `circle`, `theurgy`, `tribe`, `sorcery`, `sirens`,
+  `symbolism`, `runes` — one per `mystical-tradition-*` ability
+  (`mystical-tradition-witches-circle` → `circle`,
+  `mystical-tradition-rune-magic` → `runes`). **`witchcraft` is not a
+  tradition:** it is an ordinary magical ability (id `witchcraft`, not a
+  spell) and carries no `tradition` field. The `witchcraft` tag on the
+  spell `anathema` was an authoring mistake: its `traditions` are
+  `["runes", "theurgy", "circle"]`, and its tag should be corrected to
+  match during the sweep. Validation rejects any key outside this set.
+- **S0-2. Check attribute = structural `check` field.** Optional, holds a
+  non-empty array of unique `PrimaryAttributeName`s (`accurate`,
+  `cunning`, `discreet`, `appealing`, `quick`, `resolute`, `vigilant`,
+  `strong`) — alternatives for **one** roll (OR), since the system lets
+  the same activity be tested with different attributes; a single
+  attribute is still a one-element array, so consumers never branch on
+  shape (amended 2026-10-24 from a scalar after boon authoring showed
+  alternatives). **Not localized** (must be identical in en / ru; not on
+  the drift allowlist), validated against the primary keys. Placement
+  (amended 2026-10-24 to follow the user's authoring): `check` on the
+  Tier B / C object in `tiers.<rank>.effects[]` whose description states
+  the rolled mechanic — so a rank with two rolls keeps them apart and a
+  card can show each roll next to its rule; never on Tier A stat math
+  ("X instead of Y" substitutions are `setBase` effects), at rank level
+  or inside actions (spells vault has none today). Boons / sins carry an
+  entry-level `check` (talents have a single description and numeric
+  `levels`).
+  Rank prose is left unchanged; no text parser, no delimiter templating.
+  Siblings read the field directly.
+- **S0-3. `summary` is per rank on traits.** `tiers.<rank>.summary`
+  (localized, drift-allowlisted) is a short line for that rank's
+  prose-only mechanics; the sheet card shows formatter output for
+  mechanized effects / actions plus that rank's `summary`, so mixed tiers
+  (34 of 375 trait ranks; e.g. the Order tradition) lose nothing. No
+  entry-wide or per-effect summary. Whether talents get an entry-level
+  `summary` for the simpler talent card is left to step 5 (13 talents
+  carry `effects` today). Context: every trait rank already encodes at
+  least one effect / action, 269 ranks are Tier C only, and Tier C effects
+  already carry a ~100-char `description`; the summary is the card-sized
+  line, not a replacement for those descriptions. Length (added
+  2026-10-24): aim ≤ 90 characters in English, lint hard cap 140 code
+  points per locale; style rules live in `docs/reference-authoring.md`
+  §0.8.
+- **S0-4. `startingEquipment` = structured catalog references** (settled
+  2026-10-24, resolves open item C). Non-empty array of
+  `{ kind: "weapon" | "armor", id, count? }` on ability entries; each `id`
+  must resolve in the `kind`'s catalog, `count` is a positive integer
+  (default 1), duplicates are rejected. **Not localized** — the picker
+  renders item names from the catalogs. Hand-authored by the user: an
+  item (usually the cheapest variant) for each weapon type, kind or
+  specific weapon the ability names. New `kind`s arrive with new item
+  catalogs. Granting the items into a new character's inventory is out of
+  scope here (Non-goals); the data is shaped so a later consumer can.
+
 ## Open items (settle at the step named)
 
-- **A. Tradition key vocabulary (step 0, user).** Spell tags and ability ids
+- **A. Tradition key vocabulary (step 0, user).** ✅ _Resolved 2026-10-23
+  — see S0-1._ Spell tags and ability ids
   disagree (`circle` vs `witches-circle`, `runes` vs `rune-magic`,
   `witchcraft` has no ability). Pick one key set, author `tradition` on the
   8 abilities and `traditions: []` on spells / rituals with it, and make
@@ -233,9 +298,8 @@ sketches remain provisional where a follow-up changes their assumptions.
   intersects the character's derived `traditions[]`; spells outside it
   carry a small "outside your traditions" badge. Adjust if the user wants
   the default inverted.
-- **C. `startingEquipment` shape (step 0).** Display-only prose string for
-  now (allowlisted in the locale-drift lint); the Phase 8 acquisition
-  model structures it into weapon ids later.
+- **C. `startingEquipment` shape (step 0).** ✅ _Resolved 2026-10-24 — see
+  S0-4 (structured weapon / armor references, not prose)._
 - **D. Unsubmitted talent choices (step 6).** Decision 9 rules out player
   talent refunds. Define when a creation-draft choice becomes committed
   and how cancellation / revision of an unsubmitted draft works; do not
@@ -266,7 +330,8 @@ sketches remain provisional where a follow-up changes their assumptions.
   administrator talent-removal API or editor. Exceptional correction is
   maintenance, not a new picker workflow.
 - Weapon / armor acquisition from ability grants (roadmap acquisition
-  items); `startingEquipment` is display-only here.
+  items); `startingEquipment` is data only here (S0-4) — nothing is
+  granted to a character yet.
 - Corruption computation (sibling apps own it; we only supply keys).
 - Traditions **display** surface beyond what the spell cards show
   (roadmap Phase 8 item stays, narrowed to "display").
@@ -280,23 +345,77 @@ revisited during planning of their owning steps, not deferred to close-out.
 
 - **Step 0 — Authoring sweep (user) + catalog contract (agent).** Agent
   first: extend `docs/reference-authoring.md` with the optional keys
-  `tradition` (abilities; one key), `traditions` (spells, rituals; key
-  array), `startingEquipment` (abilities; prose), `availability`
+  `tradition` (abilities; one S0-1 key), `traditions` (spells, rituals;
+  S0-1 key array), `startingEquipment` (abilities; catalog references —
+  S0-4), `availability`
   (abilities; `"creation"` default when absent, `"faction"` hides at
-  creation), `summary` (prose-only mechanics, including mixed entries;
-  placement / granularity settled under review follow-up 5). Resolve the
-  check-attribute representation and canonical-key validation before the
-  authoring sweep (review follow-ups 3 / 5). Add `startingEquipment` and
+  creation), `check` (on Tier B / C effects in `tiers.<rank>.effects[]`
+  on abilities / spells,
+  entry-level on boons / sins; an array of primary keys, structural — S0-2) and
+  `summary` (`tiers.<rank>.summary` on traits; S0-3). Name the canonical
+  tradition keys and the `check` vocabulary there, and make the catalog
+  lint reject keys outside them (review follow-up 3). Add
   `summary` to the locale-drift
   allowlist (`test/reference-locale-drift.test.mts`); make any catalog-shape
-  lint accept the keys. User then: retire `mystical-powers`, resolve open
-  item A, author `tradition` × 8, `traditions` on spells + rituals,
-  `startingEquipment` where the vault lists it, `availability: "faction"`
-  where the vault says "not at creation", summaries for Tier C mechanics
-  at the agreed granularity — in both locales. **Done when:** the metadata
-  decisions are recorded before authoring; `npm test` green (drift lint proves en/ru
+  lint accept the keys. User then: retire `mystical-powers`, author
+  `tradition` × 8, `traditions` on spells + rituals (fix `anathema`'s
+  `witchcraft` tag per S0-1), `startingEquipment` where an ability names
+  a weapon, `availability: "faction"` where the vault says "not at creation",
+  `check` where a vault rank names its roll, and per-rank
+  `summary` for prose-only mechanics — in both locales. **Done when:**
+  `npm test` green (drift lint proves en/ru
   alignment); a node one-liner lists 8 abilities with `tradition`, 0
   spells without `traditions`, 0 entries named `mystical-powers`.
+
+  > 🔄 **Agent half done 2026-10-23.** Divergences / notes:
+  > - Contract lives in `docs/reference-authoring.md` §0.8 (key table,
+  >   tradition-key table, per-key rules) plus updated §0.1 / §0.6 /
+  >   §1–§5 shapes and the §12 checklist. The §2 "corruption from
+  >   `traditions` vs spell tags" sentence is left for step 1, which
+  >   changes what the character-side `traditions` holds.
+  > - Canonical keys live in `TRADITION_ABILITY_BY_KEY` in
+  >   `test/rules/reference-lint.test.mts` (key → owning ability id);
+  >   `checkPickerMetadata` rejects unknown keys, a key on the wrong
+  >   ability, misplaced keys (entry-level `check` / `summary` on traits,
+  >   `summary` on talents / rituals, `check` on rituals, ability-only
+  >   keys elsewhere) and non-primary `check` values. Unit tests cover
+  >   the failure paths.
+  > - The "done when" one-liner is now a test: `picker metadata is fully
+  >   authored (en)` runs as `todo` (reports gaps without failing; 126 at
+  >   hand-off = 8 abilities + 49 spells + 68 rituals + the placeholder).
+  >   **Drop its `todo` option when the user's sweep lands** — that flip
+  >   closes step 0.
+  > - The vault has no starting-equipment prose and no explicit faction
+  >   heading (the faction / profession group is only described as "at
+  >   the bottom" of `rpg/ru/03-reference/abilities.md`); both are user
+  >   authoring calls. The vault names the tribe tradition "Стихии"
+  >   while the RU catalog says "Племя" — flagged to the user, not a
+  >   key concern.
+  > - **2026-10-24 amendment** (S0-2 / S0-3 / S0-4): `check` became an
+  >   array placed on the rolled effect (the user's 25 boon/sin and 45
+  >   ability-effect scalars per locale were wrapped in place),
+  >   `startingEquipment` became structured catalog references and left
+  >   the drift allowlist, and `summary` gained the 140-code-point cap.
+  >   `checkPickerMetadata` now walks every entry at any depth against a
+  >   per-topic placement table, so a §0.8 key in the wrong object fails
+  >   (the previous top-level-only checks missed effect-level keys). The
+  >   tradition half of the sweep has landed (the completeness test
+  >   reports 0 gaps but stays `todo` until the user finishes `check` /
+  >   `summary` / `startingEquipment` / `availability`, which the lint
+  >   cannot see as missing).
+
+  > ✅ **Step 0 done 2026-10-24.** The completeness test is a regular
+  > gate (0 gaps). Final state, identical in en/ru: 8 `tradition`
+  > abilities; `traditions` on all 49 spells and 68 rituals, each
+  > matching its tradition tags (`anathema` → `["runes", "theurgy",
+  > "circle"]`, stray `witchcraft` / RU `круг` tags fixed); no
+  > `mystical-powers`; 6 `faction` abilities; `check` on 45 ability
+  > effects, 28 boons, 8 sins. Deferred authoring, outside this gate:
+  > - `summary` is `"[placeholder]"` on all 300 ranks per locale that
+  >   carry a Tier C effect (154 ability + 146 spell ranks); real text
+  >   is authored iteratively against the §0.8 style rules.
+  > - `startingEquipment` is on 23 / 75 abilities — weapons / armor
+  >   only; abilities naming other items wait for their catalogs.
 - **Step 1 — Server groundwork: NB-51 defaults + derived traditions.**
   `generateDefaultCharacter` seeds `[]` for every `type: "array"` field
   without an explicit default (NB-51 → resolved, moved to `resolved.md`).
@@ -476,14 +595,17 @@ Every code-side `TODO(<scope>)` that cites this plan is listed here, so the
 cleanup obligation is "follow this checklist", not "remember to grep". An
 empty list is fine — state it explicitly.
 
-- _(none yet)_ — expected candidates: `TODO(trait-recall)` at the dialog's
-  spare column (cites the roadmap item, not this plan, so it will **not**
-  belong here); `TODO(starting-equipment)` at the card line if it cites
-  the acquisition roadmap item (likewise not here).
+- ~~`TODO(picker-metadata)` in `test/rules/reference-lint.test.mts`~~ —
+  swept with step 0 (the completeness test is now a regular gate).
+- Expected candidates that will **not** belong here: `TODO(trait-recall)`
+  at the dialog's spare column (cites the roadmap item, not this plan);
+  `TODO(starting-equipment)` at the card line if it cites the acquisition
+  roadmap item.
 
 ## Progress
 
-- [ ] Step 0 — Authoring sweep (user) + catalog contract (agent)
+- [x] Step 0 — Authoring sweep (user) + catalog contract (agent)
+  _(2026-10-24; summaries are placeholders, authored iteratively)_
 - [ ] Step 1 — Server groundwork: NB-51 defaults + derived traditions
 - [ ] Step 2 — Dialog primitive + API plumbing
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
