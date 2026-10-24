@@ -9,7 +9,8 @@ applyTo: "**/*.ts, **/*.mts"
 - Define interfaces for data shapes (prefer `interface` over `type` for objects)
 - Use `import type` for type-only imports (`verbatimModuleSyntax` enforced)
 - Use Node.js subpath imports (`#config`, `#logger`, `#models`, `#types`, etc.)
-- Use `#models/*` wildcard for direct model sub-module access (e.g. `#models/storage`)
+- Use `#models/*` wildcard for direct model sub-module access (e.g. `#models/validation`). ADR-013 still forbids handlers / middleware from importing `#models/storage`
+- `src/types.mts` re-exports all of `#rpg-types`, but a re-export creates no local binding — a file that uses RPG types still needs its own `import type` from `#rpg-types`
 - Do not use `any` — use `unknown` and narrow
 
 ## Documentation
