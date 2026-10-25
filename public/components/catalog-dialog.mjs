@@ -5,8 +5,9 @@
  * Not a `NagaraElement` and not schema-bound: callers `await
  * openCatalogDialog(...)` and save the result themselves; the dialog never
  * PATCHes. Layout: header (title, optional caller node, ✕), a scrolling
- * card list on the left, a right column with the search box, and a footer
- * with Cancel and the primary commit button.
+ * card list on the left, a right column with search, filter groups, the
+ * selection preview and the (disabled) remember / recall stubs, and a
+ * footer with the commit reason, Cancel and the primary commit button.
  *
  * Lifetime invariants:
  *   - Mounted on `document.body`, not inside the calling host: hosts
@@ -16,22 +17,67 @@
  *   - Because nothing tears it down with the view, it closes itself on
  *     `hashchange` (browser Back) and on the caller's `AbortSignal`.
  *   - Every close path — ✕, Cancel, Escape, outside click, navigation,
- *     abort — funnels through the native `close` event, which settles the
- *     promise exactly once, removes the element and restores focus.
+ *     abort, commit — funnels through the native `close` event, which
+ *     settles the promise exactly once, removes the element and restores
+ *     focus. Only commit resolves non-`null`.
  *   - One dialog at a time: opening while one is open resolves `null`.
- *   - The search input sits outside the `method="dialog"` forms, so Enter
- *     in it can never implicitly submit the ✕ / Cancel buttons; the commit
- *     button is `type="button"` for the same reason.
+ *   - The search input and filter checkboxes sit outside the
+ *     `method="dialog"` forms, so Enter in them can never implicitly submit
+ *     the ✕ / Cancel buttons; the commit button is `type="button"` for the
+ *     same reason.
  *   - `entries` may be a promise: the dialog opens at once with a loader,
  *     and a rejection shows an error with Retry (via the caller's
  *     `reload()`). A load that resolves after close, or after a newer
  *     retry, is dropped.
+ *
+ * Selection model:
+ *   - Cards only select (via the `select(detail)` callback); the primary
+ *     button commits. It is disabled until something is selected and while
+ *     `canCommit(selection)` returns anything but `true`; a string return is
+ *     shown as the reason.
+ *   - The rendered data is frozen at open; a selection change re-renders
+ *     only the previously and newly selected cards, keeping focus on the
+ *     control at the same position in the new card.
+ *   - Search and filters hide list items rather than re-rendering them, and
+ *     the selection survives its card being hidden.
  */
 
+import {
+  excludeEntries,
+  matchesFilters,
+  matchesQuery,
+  parseQuery,
+  searchHaystack,
+} from "../utils/catalog-filter.mjs";
+
 const TITLE_ID = "catalog-dialog-title";
+const PREVIEW_TITLE_ID = "catalog-dialog-preview-title";
+const FOCUSABLE =
+  "a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1'])";
 
 /** @type {HTMLDialogElement|null} */
 let openDialog = null;
+
+/**
+ * @typedef {object} Selection
+ * @property {object} entry - The selected catalog entry (frozen at open)
+ * @property {object} detail - What the card passed to `select()`, e.g.
+ *   `{ tier: "adept" }`; `{}` when it passed nothing
+ */
+
+/**
+ * @typedef {object} FilterOption
+ * @property {string} label - Checkbox caption
+ * @property {(entry: object) => boolean} predicate - Entry passes the option
+ * @property {boolean} [checked] - Initial state
+ */
+
+/**
+ * @typedef {object} FilterGroup
+ * @property {string} legend - Fieldset caption
+ * @property {FilterOption[]} options - OR-ed when checked; an unchecked
+ *   group does not restrict, and groups are AND-ed
+ */
 
 /**
  * @typedef {object} CatalogDialogOptions
@@ -42,21 +88,40 @@ let openDialog = null;
  * @property {() => object[] | Promise<object[]>} [reload] - Called by Retry
  *   after `entries` (or a previous reload) rejects; without it no Retry
  *   button is offered
- * @property {(entry: object, select: (detail?: object) => void, selection: object|null) => Node} renderCard
- *   - Builds one card for the left column
+ * @property {Iterable<string>} [exclude] - Entry ids left out of the list
+ *   (e.g. those already learned)
+ * @property {{ fields: import("../utils/catalog-filter.mjs").SearchField[] }} [search]
+ *   - Searched keys / accessors; defaults to `["name"]`
+ * @property {FilterGroup[]} [filters] - Filter chip groups
+ * @property {(entry: object, select: (detail?: object) => void, selection: Selection|null) => Node} renderCard
+ *   - Builds one card for the left column. `selection` is non-`null` only
+ *   when this card's entry is the selected one; the card is rebuilt when
+ *   that changes
+ * @property {(selection: Selection) => Node} [renderPreview] - Builds the
+ *   preview of the current selection; without it the entry's name is shown
  * @property {string} commitLabel - Primary button caption (e.g. "Learn")
+ * @property {(selection: Selection) => true | string} [canCommit] - `true`
+ *   enables the primary button; a string disables it and is shown as the
+ *   reason
  * @property {AbortSignal} [signal] - Aborting closes the dialog with `null`
  * @property {Element | (() => Element|null)} [returnFocus] - Focus target
  *   on close when the opener is no longer in the document
  */
 
 /**
- * Open the catalog picker. Resolves `null` on every dismissal (✕, Cancel,
- * Escape, outside click, `hashchange`, `signal` abort), and immediately
- * when another catalog dialog is already open or `signal` is already
- * aborted.
+ * @typedef {object} CardRecord
+ * @property {object} entry
+ * @property {HTMLLIElement} item - Stable wrapper; its children are rebuilt
+ * @property {string[]} haystack - Folded search strings, built once
+ */
+
+/**
+ * Open the catalog picker. Resolves `[selection]` when the primary button
+ * commits, `null` on every dismissal (✕, Cancel, Escape, outside click,
+ * `hashchange`, `signal` abort), and `null` immediately when another
+ * catalog dialog is already open or `signal` is already aborted.
  * @param {CatalogDialogOptions} options
- * @returns {Promise<object[] | null>} The committed selections, or `null`
+ * @returns {Promise<Selection[] | null>} The committed selections, or `null`
  */
 export function openCatalogDialog(options) {
   const {
@@ -64,8 +129,13 @@ export function openCatalogDialog(options) {
     header,
     entries,
     reload,
+    exclude,
+    search,
+    filters = [],
     renderCard,
+    renderPreview,
     commitLabel,
+    canCommit,
     signal,
     returnFocus,
   } = options;
@@ -80,14 +150,40 @@ export function openCatalogDialog(options) {
 
   const { promise, resolve } = Promise.withResolvers();
   let settled = false;
+  /** @type {Selection[] | null} */
+  let result = null;
+
+  const fields = search?.fields ?? ["name"];
+  /** @type {boolean[][]} */
+  const checkedState = filters.map((group) =>
+    group.options.map((option) => Boolean(option.checked)),
+  );
 
   const dialog = buildSkeleton(title, header, commitLabel);
   const listRegion = /** @type {HTMLElement} */ (
-    dialog.querySelector("section")
+    dialog.querySelector(":scope > section")
   );
   const searchInput = /** @type {HTMLInputElement} */ (
     dialog.querySelector("input[type=search]")
   );
+  const previewRegion = /** @type {HTMLElement} */ (
+    dialog.querySelector(":scope > aside > section")
+  );
+  const commitButton = /** @type {HTMLButtonElement} */ (
+    dialog.querySelector("button.primary")
+  );
+  const reasonLine = /** @type {HTMLOutputElement} */ (
+    dialog.querySelector("output")
+  );
+
+  /** @type {CardRecord[]} */
+  let records = [];
+  /** @type {HTMLElement | null} */
+  let noMatches = null;
+  /** @type {Selection | null} */
+  let selection = null;
+  /** @type {CardRecord | null} */
+  let selectedRecord = null;
 
   const close = () => dialog.close();
 
@@ -99,8 +195,7 @@ export function openCatalogDialog(options) {
     signal?.removeEventListener("abort", close);
     dialog.remove();
     restoreFocus(opener, returnFocus);
-    // TODO(catalog-dialog-selection): resolve the committed selections.
-    resolve(null);
+    resolve(result);
   });
 
   // `closedby="any"` handles outside clicks natively; browsers without it
@@ -122,6 +217,154 @@ export function openCatalogDialog(options) {
   window.addEventListener("hashchange", close);
   signal?.addEventListener("abort", close);
 
+  /** Hide the cards the current query and filters rule out. */
+  const applyVisibility = () => {
+    const tokens = parseQuery(searchInput.value);
+    const groups = filters.map((group, g) =>
+      group.options
+        .filter((_, o) => checkedState[g]?.[o])
+        .map((option) => option.predicate),
+    );
+    let shown = 0;
+    for (const record of records) {
+      const visible =
+        matchesQuery(record.haystack, tokens) &&
+        matchesFilters(record.entry, groups);
+      record.item.hidden = !visible;
+      if (visible) shown++;
+    }
+    if (noMatches) noMatches.hidden = shown > 0;
+  };
+
+  /**
+   * (Re)build one card from the current selection.
+   * @param {CardRecord} record
+   */
+  const renderRecord = (record) => {
+    const own = record === selectedRecord ? selection : null;
+    if (own) record.item.setAttribute("aria-current", "true");
+    else record.item.removeAttribute("aria-current");
+    record.item.replaceChildren(
+      renderCard(record.entry, (detail) => select(record, detail), own),
+    );
+  };
+
+  /**
+   * Rebuild a card, keeping focus on the control at the same position when
+   * focus was inside it.
+   * @param {CardRecord} record
+   */
+  const rerender = (record) => {
+    const before = focusables(record.item);
+    const index = before.findIndex((el) => el === document.activeElement);
+    renderRecord(record);
+    if (index < 0) return;
+
+    const after = focusables(record.item);
+    after[Math.min(index, after.length - 1)]?.focus();
+    if (!record.item.contains(document.activeElement)) {
+      const fallback = after.find(
+        (el) => !(/** @type {HTMLButtonElement} */ (el).disabled),
+      );
+      (fallback ?? searchInput).focus();
+    }
+  };
+
+  /**
+   * Make `record` the selection with `detail`.
+   * @param {CardRecord} record
+   * @param {object | undefined} detail
+   */
+  const select = (record, detail) => {
+    if (settled || !records.includes(record)) return;
+    const previous = selectedRecord;
+    selection = { entry: record.entry, detail: { ...detail } };
+    selectedRecord = record;
+    if (previous && previous !== record) rerender(previous);
+    rerender(record);
+    showPreview();
+    updateCommit();
+  };
+
+  const showPreview = () => {
+    const heading = /** @type {HTMLElement} */ (
+      previewRegion.querySelector("h3")
+    );
+    let content;
+    if (!selection) {
+      content = document.createElement("p");
+      content.textContent = "Select an entry to preview it here.";
+    } else if (renderPreview) {
+      content = renderPreview(selection);
+    } else {
+      content = document.createElement("p");
+      const { entry } = /** @type {{ entry: { name?: string, id?: string } }} */ (
+        selection
+      );
+      content.textContent = entry.name ?? entry.id ?? "";
+    }
+    previewRegion.replaceChildren(heading, content);
+  };
+
+  const updateCommit = () => {
+    const verdict = selection
+      ? canCommit
+        ? canCommit(selection)
+        : true
+      : false;
+    commitButton.disabled = verdict !== true;
+    reasonLine.textContent = typeof verdict === "string" ? verdict : "";
+  };
+
+  commitButton.addEventListener("click", () => {
+    if (!selection || commitButton.disabled) return;
+    result = [selection];
+    close();
+  });
+
+  searchInput.addEventListener("input", applyVisibility);
+  /** @type {HTMLElement} */ (searchInput.closest("search")).after(
+    ...buildFilters(filters, (g, o, checked) => {
+      const group = checkedState[g];
+      if (group) group[o] = checked;
+      applyVisibility();
+    }),
+  );
+
+  /**
+   * Render the card list for a loaded catalog.
+   * @param {object[]} items
+   */
+  const showEntries = (items) => {
+    listRegion.removeAttribute("aria-busy");
+    const visible = excludeEntries(items, exclude);
+
+    if (visible.length === 0) {
+      records = [];
+      noMatches = null;
+      const empty = document.createElement("p");
+      empty.textContent = "Nothing to choose from.";
+      listRegion.replaceChildren(empty);
+      return;
+    }
+
+    const list = document.createElement("ul");
+    records = visible.map((entry) => {
+      const item = document.createElement("li");
+      /** @type {CardRecord} */
+      const record = { entry, item, haystack: searchHaystack(entry, fields) };
+      list.append(item);
+      return record;
+    });
+    for (const record of records) renderRecord(record);
+
+    noMatches = document.createElement("p");
+    noMatches.setAttribute("role", "status");
+    noMatches.textContent = "No matches.";
+    listRegion.replaceChildren(list, noMatches);
+    applyVisibility();
+  };
+
   let loadToken = 0;
 
   /**
@@ -132,15 +375,17 @@ export function openCatalogDialog(options) {
   const load = (source) => {
     const token = ++loadToken;
     if (Array.isArray(source)) {
-      showEntries(listRegion, source, renderCard);
+      showEntries(source);
       return;
     }
 
+    records = [];
+    noMatches = null;
     showLoading(listRegion);
     Promise.resolve(source).then(
       (items) => {
         if (settled || token !== loadToken) return;
-        showEntries(listRegion, Array.isArray(items) ? items : [], renderCard);
+        showEntries(Array.isArray(items) ? items : []);
       },
       () => {
         if (settled || token !== loadToken) return;
@@ -161,6 +406,8 @@ export function openCatalogDialog(options) {
     load(next);
   };
 
+  showPreview();
+  updateCommit();
   document.body.append(dialog);
   openDialog = dialog;
   load(entries);
@@ -183,6 +430,8 @@ function buildSkeleton(title, header, commitLabel) {
   dialog.setAttribute("closedby", "any");
   dialog.setAttribute("aria-labelledby", TITLE_ID);
 
+  // TODO(trait-recall): Remember / Recall are inert placeholders for the
+  // roadmap "Catalog picker: remember / recall to compare" item.
   dialog.innerHTML = `
     <header>
       <h2 id="${TITLE_ID}"></h2>
@@ -198,9 +447,17 @@ function buildSkeleton(title, header, commitLabel) {
           <input type="search" autocomplete="off" autofocus />
         </label>
       </search>
+      <section aria-labelledby="${PREVIEW_TITLE_ID}">
+        <h3 id="${PREVIEW_TITLE_ID}">Preview</h3>
+      </section>
+      <menu aria-label="Compare">
+        <li><button type="button" disabled>Remember</button></li>
+        <li><button type="button" disabled>Recall</button></li>
+      </menu>
     </aside>
     <footer>
       <form method="dialog">
+        <output></output>
         <button value="cancel">Cancel</button>
         <button type="button" class="primary" disabled></button>
       </form>
@@ -211,7 +468,6 @@ function buildSkeleton(title, header, commitLabel) {
   heading.textContent = title;
   if (header) heading.after(header);
 
-  // TODO(catalog-dialog-selection): enable once a card selection exists.
   const commit = /** @type {HTMLButtonElement} */ (
     dialog.querySelector("button.primary")
   );
@@ -221,35 +477,43 @@ function buildSkeleton(title, header, commitLabel) {
 }
 
 /**
- * Render the card list.
- * @param {HTMLElement} region
- * @param {object[]} items
- * @param {CatalogDialogOptions["renderCard"]} renderCard
+ * Build one `<fieldset>` of checkboxes per filter group. Caller strings are
+ * set as text.
+ * @param {FilterGroup[]} groups
+ * @param {(group: number, option: number, checked: boolean) => void} onToggle
+ * @returns {HTMLFieldSetElement[]}
  */
-function showEntries(region, items, renderCard) {
-  region.removeAttribute("aria-busy");
+function buildFilters(groups, onToggle) {
+  return groups.map((group, g) => {
+    const fieldset = document.createElement("fieldset");
+    const legend = document.createElement("legend");
+    legend.textContent = group.legend;
+    fieldset.append(legend);
 
-  if (items.length === 0) {
-    const empty = document.createElement("p");
-    empty.textContent = "Nothing to choose from.";
-    region.replaceChildren(empty);
-    return;
-  }
+    group.options.forEach((option, o) => {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = Boolean(option.checked);
+      input.addEventListener("change", () => onToggle(g, o, input.checked));
+      label.append(input, option.label);
+      fieldset.append(label);
+    });
 
-  const list = document.createElement("ul");
-  for (const entry of items) {
-    const item = document.createElement("li");
-    item.append(renderCard(entry, selectNothing, null));
-    list.append(item);
-  }
-  region.replaceChildren(list);
+    return fieldset;
+  });
 }
 
 /**
- * Placeholder `select` callback handed to card renderers.
- * TODO(catalog-dialog-selection): replace with real selection state.
+ * Keyboard-focusable candidates inside `root`, in tree order. Disabled
+ * controls are included so positions stay stable across a rebuild that
+ * toggles `disabled`.
+ * @param {Element} root
+ * @returns {HTMLElement[]}
  */
-function selectNothing() {}
+function focusables(root) {
+  return /** @type {HTMLElement[]} */ ([...root.querySelectorAll(FOCUSABLE)]);
+}
 
 /**
  * Show the pending-load state.

@@ -5,7 +5,9 @@ second-opinion follow-ups and the XP-transition decision gate below remain
 open for step planning. Step-0 metadata decisions recorded 2026-10-23
 (see "Step-0 metadata decisions"); step 0 done 2026-10-24. Step-1
 decisions recorded 2026-10-24 (see "Step-1 decisions"). Step-2
-decisions recorded 2026-10-24 (see "Step-2 decisions"). Blocks
+decisions recorded 2026-10-24 (see "Step-2 decisions"); step 2a done
+2026-10-25. Step-2b decisions recorded 2026-10-25 (see "Step-2b
+decisions"); step 2b done 2026-10-25. Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -406,6 +408,53 @@ for the dialog primitive and replace the provisional API sketch.
   in this step), not the weapons catalog. Search / filter / exclude
   logic lives in a pure module so `node:test` covers it.
 
+## Step-2b decisions (2026-10-25, with the user)
+
+Settled at the step-2b readiness review, after 2a landed. They fill the
+contract gaps the step-2 sketch left open and amend its `filters` /
+`exclude` / `search` shapes (the sketch under step 2 is updated to match).
+
+- **S2b-1. Selection shape.** A `Selection` is `{ entry, detail }`:
+  the frozen catalog entry plus the object the card passed to
+  `select(detail)` (e.g. `{ tier: "adept" }`, `{ level: 2 }`; `{}` when
+  omitted). Identity is `entry.id`. Selecting again replaces the
+  selection (same entry with a new detail, or another entry); there is no
+  click-again-to-deselect (Cancel covers backing out). Commit resolves
+  `[selection]`.
+- **S2b-2. Re-render only the affected cards.** On a selection change the
+  dialog calls `renderCard` again for the previously selected card and
+  the newly selected one (with the new `selection`) and swaps them in
+  place; the rest of the list is untouched. Focus is restored to the
+  control at the same position among the new card's focusable elements,
+  so a keyboard user stays on the rank block they activated. The
+  dialog marks the selected card's `<li>` itself; the renderer marks the
+  selected rank from `selection`. The 2a `renderCard` signature is
+  unchanged.
+- **S2b-3. Search fields and matching.** `search: { fields }` where each
+  field is an entry key **or** an accessor `(entry) => string | string[]`
+  (step 4 needs derived summary text, which is not a stored key). Array
+  values (e.g. `tags`) are searched element-wise. Matching: the query is
+  split on whitespace and **every** token must occur in some field;
+  case-insensitive and diacritic-insensitive (NFD, combining marks
+  stripped) on both sides. Empty query matches everything.
+- **S2b-4. Filter groups.** `filters: [{ legend, options: [{ label,
+  predicate, checked? }] }]`, one `<fieldset>` of checkboxes per group.
+  Options are **OR**-ed within a group, groups are **AND**-ed, and a
+  group with nothing checked does not restrict (same composition rule as
+  ADR-015 conditions). `checked` sets the initial state. Data note: in all
+  four trait / talent catalogs `category` equals the stamped `source`, so
+  step 4 needs no separate category group; tags (62 distinct on
+  abilities) stay in search, not chips.
+- **S2b-5. `exclude` is ids.** `exclude?: Iterable<string>` of entry ids,
+  removed from the list entirely (decision 13). Other entry-level
+  restrictions — e.g. hiding `availability: "faction"` in create mode
+  (step 6) — are applied by the caller to `entries` / `reload()` before
+  the dialog sees them (`.then(filter)` on a promise).
+- **Agent's calls (not user decisions).** Search and filters toggle
+  `hidden` on list items rather than re-rendering; a "No matches" line
+  shows when everything is hidden; the `canCommit` reason sits in a
+  footer status line; the chips stay outside the dismiss forms (S2-10).
+
 ## Open items (settle at the step named)
 
 - **A. Tradition key vocabulary (step 0, user).** ✅ _Resolved 2026-10-23
@@ -611,12 +660,15 @@ revisited during planning of their owning steps, not deferred to close-out.
   > - `deferred-tasks.md` orphan note on `traditions` updated (no longer
   >   curated ability ids).
   > - Dev characters wiped (S1-2).
-- **Step 2 — Dialog primitive + API plumbing.** Applies S2-1 … S2-11.
+- **Step 2 — Dialog primitive + API plumbing.** Applies S2-1 … S2-11
+  and S2b-1 … S2b-5.
   `public/components/catalog-dialog.mjs`: `openCatalogDialog({ title,
-  header?, entries, reload?, exclude, search: { fields }, filters: [{
-  label, predicate }], renderCard(entry, select, selection) → Node,
-  renderPreview?(selection) → Node, commitLabel, canCommit?(selection) →
-  true | string, signal?, returnFocus? }) → Promise<Selection[] | null>`.
+  header?, entries, reload?, exclude?: Iterable<id>, search: { fields:
+  (key | (entry) → string | string[])[] }, filters: [{ legend, options:
+  [{ label, predicate, checked? }] }], renderCard(entry, select,
+  selection) → Node, renderPreview?(selection) → Node, commitLabel,
+  canCommit?(selection) → true | string, signal?, returnFocus? }) →
+  Promise<Selection[] | null>`, `Selection = { entry, detail }`.
   Split into three sub-steps (user, 2026-10-24), each its own commit and
   confirmation stop; the in-browser checks run per S2-9.
   - **Step 2a — Shell.** Native `<dialog>` appended to `document.body`,
@@ -682,6 +734,29 @@ revisited during planning of their owning steps, not deferred to close-out.
     `canCommit` returns a reason (shown), and commits `[selection]`
     otherwise; the stubs are present and disabled; the 2a paths still
     pass; `npm test` green.
+
+    > ✅ **Completed 2026-10-25.** Divergences from the text above:
+    >
+    > - `renderCard` receives the selection only when it belongs to that
+    >   card's entry (`null` otherwise), so "re-render only the old and
+    >   new cards" (S2b-2) stays sound — no other card can depend on it.
+    > - Hiding is a `hidden` toggle on the cards' `<li>`, not a
+    >   re-render; when nothing is visible a "No matches." status line
+    >   appears. The `canCommit` reason shows in the footer `<output>`,
+    >   and the filter `<fieldset>`s sit outside the dismiss forms, after
+    >   the `<search>` element.
+    > - Without `renderPreview` the preview shows the entry's name.
+    > - Region rules moved to `:scope > header | section | aside |
+    >   footer`, so caller cards may use those elements freely.
+    > - More global leaks neutralized inside the `@scope` block: the
+    >   reset's `input { all: unset }` erases checkboxes
+    >   (`input[type="checkbox"] { all: revert }`), the page's `output`
+    >   and `h3` type, and the drop cap's accent colour
+    >   (`p::first-letter { color: inherit }`). The search field still
+    >   takes the global focus background — left for 2c.
+    > - In Chrome, the first Escape in a non-empty search field clears
+    >   it (native `type=search`, which fires `input`, so the list
+    >   resets); the second Escape cancels the dialog.
   - **Step 2c — Dialog CSS pass.** Brings the dialog chrome to the
     redesign now instead of waiting for Chunk I step 5 (which keeps
     the rest of the sheet). Tokens from Figma per the
@@ -747,8 +822,9 @@ revisited during planning of their owning steps, not deferred to close-out.
 - **Step 4 — Traits picker (view mode).** `trait-list.mjs` becomes a real
   editor on `createCatalogCache(api.getTraits)`: vacant card opens
   `openCatalogDialog` with all traits minus learned ids (decision 13),
-  filters `source` (ability / spell), `category`, tradition (open item B),
-  search over `name` + `tags` + derived summary text; card = name,
+  filter groups `source` (ability / spell) and tradition (open item B) —
+  no `category` group, it duplicates `source` (S2b-4) — search over
+  `name` + `tags` + derived summary text; card = name,
   `startingEquipment`, derived enhanced-attribute line, description, three
   rank blocks with check attribute, **full** effect / specialAttack /
   reaction detail per rank, each rank block selecting that rank (S2-1)
@@ -846,9 +922,8 @@ empty list is fine — state it explicitly.
 
 - ~~`TODO(picker-metadata)` in `test/rules/reference-lint.test.mts`~~ —
   swept with step 0 (the completeness test is now a regular gate).
-- `TODO(catalog-dialog-selection)` × 3 in
-  `public/components/catalog-dialog.mjs` (commit resolution, primary
-  button enablement, the placeholder `select`) — step 2b removes them.
+- ~~`TODO(catalog-dialog-selection)` × 3 in
+  `public/components/catalog-dialog.mjs`~~ — swept with step 2b.
 - Expected candidates that will **not** belong here: `TODO(trait-recall)`
   at the dialog's spare column (cites the roadmap item, not this plan);
   `TODO(starting-equipment)` at the card line if it cites the acquisition
@@ -862,7 +937,7 @@ empty list is fine — state it explicitly.
   _(2026-10-24)_
 - [ ] Step 2 — Dialog primitive + API plumbing
   - [x] Step 2a — Shell _(2026-10-25)_
-  - [ ] Step 2b — Contents
+  - [x] Step 2b — Contents _(2026-10-25)_
   - [ ] Step 2c — Dialog CSS pass
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
 - [ ] Step 3 — XP model + compact formatter
