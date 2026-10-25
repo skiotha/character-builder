@@ -218,20 +218,36 @@ export async function validateToken(playerId) {
   }
 }
 
+/**
+ * Fetch the traits catalog at `CATALOG_LOCALE`.
+ * Throws on a non-2xx response so pickers can render an
+ * "unavailable" state.
+ * @returns {Promise<object[]>} Raw catalog entries
+ */
 export async function getTraits() {
-  try {
-    const response = await fetch(`${API_BASE}/traits`);
-
-    return await response.json();
-  } catch (error) {
-    console.log("Error getting traits from the server:", error);
-    return false;
+  const response = await fetch(`${API_BASE}/traits?locale=${CATALOG_LOCALE}`);
+  if (!response.ok) {
+    throw new Error(`Traits catalog fetch failed: ${response.status}`);
   }
+  return await response.json();
 }
 
 /**
- * Fetch the weapons catalog at `CATALOG_LOCALE`. Unlike `getTraits()` this
- * throws on a non-2xx response so pickers can render an "unavailable" state.
+ * Fetch the talents catalog at `CATALOG_LOCALE`.
+ * Throws on a non-2xx response.
+ * @returns {Promise<object[]>} Raw catalog entries
+ */
+export async function getTalents() {
+  const response = await fetch(`${API_BASE}/talents?locale=${CATALOG_LOCALE}`);
+  if (!response.ok) {
+    throw new Error(`Talents catalog fetch failed: ${response.status}`);
+  }
+  return await response.json();
+}
+
+/**
+ * Fetch the weapons catalog at `CATALOG_LOCALE`. Throws on a non-2xx
+ * response so pickers can render an "unavailable" state.
  * @returns {Promise<object[]>} Raw catalog entries
  */
 export async function getWeapons() {
@@ -243,8 +259,8 @@ export async function getWeapons() {
 }
 
 /**
- * Fetch the armor catalog at `CATALOG_LOCALE` (both `body` and `plug`
- * pieces in one array). Throws on a non-2xx response like `getWeapons()`.
+ * Fetch the armor catalog at `CATALOG_LOCALE`.
+ * Throws on a non-2xx response.
  * @returns {Promise<object[]>} Raw catalog entries
  */
 export async function getArmor() {

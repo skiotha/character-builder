@@ -1800,6 +1800,117 @@
   }
 }
 
+@layer layout {
+  /* CATALOG PICKER DIALOG */
+  @scope (dialog.catalog-dialog) {
+    :scope {
+      inline-size: min(75rem, 100vw - 2rem);
+      block-size: min(37.5rem, 100dvh - 2rem);
+      max-inline-size: none;
+      max-block-size: none;
+      margin: auto;
+      padding: 1rem;
+
+      border: var(--border-width) var(--border-style) var(--color-main);
+      background: var(--color-black);
+      color: var(--color-white);
+
+      &[open] {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 26rem;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+          "header header"
+          "list aside"
+          "footer footer";
+        gap: 1rem;
+      }
+
+      &::backdrop {
+        background: oklch(0% 0 0 / 60%);
+      }
+    }
+
+    /* The page header is `position: fixed` and `row-reverse` globally */
+    header {
+      grid-area: header;
+      position: static;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+
+      h2 {
+        flex: 1;
+        font-size: var(--header-36);
+      }
+    }
+
+    section {
+      grid-area: list;
+      overflow-y: auto;
+
+      li + li {
+        margin-block-start: 0.5rem;
+      }
+    }
+
+    aside {
+      grid-area: aside;
+      overflow-y: auto;
+      padding-inline-start: 1rem;
+      border-inline-start: var(--border-width) var(--border-style)
+        var(--color-main);
+    }
+
+    footer {
+      grid-area: footer;
+
+      form {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+    }
+
+    p::first-letter {
+      float: none;
+      margin: 0;
+      font: inherit;
+    }
+
+    input[type="search"] {
+      display: block;
+      box-sizing: border-box;
+      inline-size: 100%;
+      block-size: auto;
+      padding: 0.5rem;
+      background: transparent;
+      color: var(--color-white);
+      border-block-end: var(--border-width) var(--border-style)
+        var(--color-main);
+    }
+
+    button {
+      inline-size: auto;
+      block-size: auto;
+      padding: 0.25rem 1rem;
+      border: var(--border-width) var(--border-style) var(--color-main);
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    :focus-visible {
+      outline: 0.2rem solid var(--color-accent);
+      outline-offset: 0.2rem;
+    }
+  }
+}
+
 @layer animations {
   @keyframes mark-input-invalid {
     from {

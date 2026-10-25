@@ -622,8 +622,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   - **Step 2a — Shell.** Native `<dialog>` appended to `document.body`,
     `showModal()`, with the frame's regions as empty containers: header
     (title, caller `header` node such as the XP balance, ✕); left column
-    (scrollable list); vertical divider; right column; footer (Cancel +
-    primary commit button, disabled until 2b wires selection). Dismissal
+    (scrollable list); vertical divider; right column holding the
+    `<input type="search">` (present for focus and the Enter guard, not
+    yet filtering — 2b wires it); footer (Cancel + primary commit button,
+    disabled until 2b wires selection). Dismissal
     (S2-2), close on `hashchange` / `signal` (S2-3), settle-once +
     removal on close, one instance (S2-7), focus in / out (S2-6), Enter
     handling (S2-10), loader / error + Retry for a promised `entries`
@@ -641,6 +643,28 @@ revisited during planning of their owning steps, not deferred to close-out.
     focus starts in search and returns to the opener (or `returnFocus`
     when the opener is gone); `document.querySelector("dialog")` is
     `null` after every path; `npm test` green.
+
+    > ✅ **Completed 2026-10-25.** Divergences from the text above:
+    >
+    > - `returnFocus` accepts an element **or** a function returning one,
+    >   so a host that rebuilds its subtree while the dialog is open can
+    >   hand back the fresh button at close time.
+    > - The 2b-only options (`exclude`, `search`, `filters`,
+    >   `renderPreview`, `canCommit`) are accepted but ignored; the commit
+    >   button stays disabled and `renderCard` receives a no-op `select`
+    >   and a `null` selection. The three sites carry
+    >   `TODO(catalog-dialog-selection)`, which 2b removes.
+    > - "Only the CSS needed to see the regions" also had to neutralize
+    >   global layout-layer rules that leak into the dialog: the fixed
+    >   `header` (`position: fixed`, `row-reverse`), the 12rem × 5rem
+    >   `button`, the reset's `input { all: unset }` (loses
+    >   `box-sizing`), and the `p:first-of-type::first-letter` drop cap.
+    >   The rules live in an `@scope (dialog.catalog-dialog)` block at the
+    >   end of the `layout` layer in `public/common/styles.css`; 2c may
+    >   move them into their own sheet.
+    > - With no `closedby` support, a backdrop-click fallback (target is
+    >   the dialog itself and the point lies outside its box) provides the
+    >   outside-click dismissal.
   - **Step 2b — Contents.** Pure search / filter / exclude logic in
     `public/utils/catalog-filter.mjs`, tested in
     `test/client-catalog-filter.test.mts`. Right column: search
@@ -648,8 +672,9 @@ revisited during planning of their owning steps, not deferred to close-out.
     preview slot with an empty-state hint, disabled **Remember** /
     **Recall** stubs (S2-8). Selection state, selected-card marking,
     primary button enablement and the `canCommit` reason line (S2-1).
-    CSS stays functional: columns, scroll, divider, a visible selected
-    state.
+    The search input already exists from 2a; 2b wires it to the filter
+    module. CSS stays functional: columns, scroll, divider, a visible
+    selected state.
     **Done when:** search narrows the list; a filter chip toggles;
     `exclude` hides entries; clicking a card selects it and updates the
     preview; the selection survives a search that hides its card; the
@@ -821,6 +846,9 @@ empty list is fine — state it explicitly.
 
 - ~~`TODO(picker-metadata)` in `test/rules/reference-lint.test.mts`~~ —
   swept with step 0 (the completeness test is now a regular gate).
+- `TODO(catalog-dialog-selection)` × 3 in
+  `public/components/catalog-dialog.mjs` (commit resolution, primary
+  button enablement, the placeholder `select`) — step 2b removes them.
 - Expected candidates that will **not** belong here: `TODO(trait-recall)`
   at the dialog's spare column (cites the roadmap item, not this plan);
   `TODO(starting-equipment)` at the card line if it cites the acquisition
@@ -833,7 +861,7 @@ empty list is fine — state it explicitly.
 - [x] Step 1 — Server groundwork: NB-51 defaults + derived traditions
   _(2026-10-24)_
 - [ ] Step 2 — Dialog primitive + API plumbing
-  - [ ] Step 2a — Shell
+  - [x] Step 2a — Shell _(2026-10-25)_
   - [ ] Step 2b — Contents
   - [ ] Step 2c — Dialog CSS pass
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
