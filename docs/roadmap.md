@@ -27,7 +27,7 @@ touching code.
 - [x] `docs/decisions/012-standards-first-html-css.md`
 - [x] `docs/roadmap.md` — this file
 - [x] `.github/ROADMAP.md` — summary
-- [x] `.github/copilot-instructions.md` — agent configuration
+- [x] `AGENTS.md` — agent configuration (`.github/copilot-instructions.md` is a pointer to it)
 
 **Deliverable:** Complete reference documentation. Every subsequent phase
 has a written basis for its decisions.

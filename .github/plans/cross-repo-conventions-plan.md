@@ -19,8 +19,8 @@ rules, without per-repo drift.
 ## Locked decisions (from Pass F brainstorm, 2026-06-22)
 
 - **The bundle is the unit of sharing.** It is written project-agnostic (no
-  character-builder-specific filenames); each repo's own
-  `copilot-instructions.md` supplies the concrete cite targets.
+  character-builder-specific filenames); each repo's root agent
+  instructions (`AGENTS.md`) supply the concrete cite targets.
 - **In-repo visibility is required** — CI and non-local agents must see the
   conventions, so user-level VS Code instructions are out; the shared
   content must be committed in each repo.
@@ -81,4 +81,4 @@ completes). Parked here so they live in a plan, not only in agent memory.
 
 - The conventions bundle is present and current in addon and malizia (full
   or agreed subset); a drift-guard keeps the copies aligned; each sibling's
-  `copilot-instructions.md` points at it; the chosen mechanism is documented.
+  `AGENTS.md` points at it; the chosen mechanism is documented.

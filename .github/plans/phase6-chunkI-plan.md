@@ -424,7 +424,7 @@ in-browser pass over the touched view (Playwright MCP, per the
   values, flags, specialAttacks, reactions) populate — completes the manual
   verification deferred from Chunk G.2. Author `docs/client-pickers.md`
   as-built (per component: endpoint, entry shape, PATCH shape, validation
-  relied on). Update `.github/copilot-instructions.md` + `AGENTS.md` where
+  relied on). Update `AGENTS.md` where
   touched surfaces changed; refresh repo memory. Roadmap Chunk I row → ✅;
   flip the pointer note in `phase6-plan.md`; re-confirm sibling parity
   (decision 12); sweep the references list below.

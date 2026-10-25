@@ -299,7 +299,7 @@ against `reference/*.en.json` and `rpg/ru/03-reference/*.md`.
 ## Step-1 decisions (2026-10-24, with the user)
 
 Settled at the step-1 readiness review. The project is **pre-launch**
-(recorded in `.github/copilot-instructions.md` / `AGENTS.md` "Project
+(recorded in `AGENTS.md` "Project
 Status"): no production data exists, development characters are
 disposable, and the cross-project contract docs are provisional drafts.
 

@@ -106,6 +106,20 @@ The project-agnostic three-scale comment ladder (module header → function doc-
 
 Each scoped rule ships as two mirrored copies with identical bodies: `.cursor/rules/<name>.mdc` (Cursor; attached via `globs` / `alwaysApply`) and `.github/instructions/<name>.instructions.md` (GitHub Copilot; attached via `applyTo`). **When editing one mirror, apply the same edit to the other in the same commit.**
 
+| Scoped rule | GitHub Copilot mirror | Cursor mirror |
+| --- | --- | --- |
+| **conventions** | [`conventions.instructions.md`](.github/instructions/conventions.instructions.md) | [`conventions.mdc`](.cursor/rules/conventions.mdc) |
+| **typescript** | [`typescript.instructions.md`](.github/instructions/typescript.instructions.md) | [`typescript.mdc`](.cursor/rules/typescript.mdc) |
+| **javascript** | [`javascript.instructions.md`](.github/instructions/javascript.instructions.md) | [`javascript.mdc`](.cursor/rules/javascript.mdc) |
+| **hypertext** | [`hypertext.instructions.md`](.github/instructions/hypertext.instructions.md) | [`hypertext.mdc`](.cursor/rules/hypertext.mdc) |
+| **styling** | [`styling.instructions.md`](.github/instructions/styling.instructions.md) | [`styling.mdc`](.cursor/rules/styling.mdc) |
+| **ui-figma-source** | [`ui-figma-source.instructions.md`](.github/instructions/ui-figma-source.instructions.md) | [`ui-figma-source.mdc`](.cursor/rules/ui-figma-source.mdc) |
+| **ui-browser-verify** | [`ui-browser-verify.instructions.md`](.github/instructions/ui-browser-verify.instructions.md) | [`ui-browser-verify.mdc`](.cursor/rules/ui-browser-verify.mdc) |
+| **ui-navigation-playbook** | [`ui-navigation-playbook.instructions.md`](.github/instructions/ui-navigation-playbook.instructions.md) | [`ui-navigation-playbook.mdc`](.cursor/rules/ui-navigation-playbook.mdc) |
+| **rpg-engine-semantics** | [`rpg-engine-semantics.instructions.md`](.github/instructions/rpg-engine-semantics.instructions.md) | [`rpg-engine-semantics.mdc`](.cursor/rules/rpg-engine-semantics.mdc) |
+
+This file (`AGENTS.md`) is the single source of truth for root agent instructions. `.github/copilot-instructions.md` is a one-line pointer here — do not add content to it.
+
 ### Commands
 
 ```bash

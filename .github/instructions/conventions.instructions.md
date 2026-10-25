@@ -5,7 +5,7 @@ applyTo: "**"
 # Engineering conventions — comments, citations & plan bookkeeping
 
 These conventions are project-agnostic and shared across our repositories.
-Each repo's own `copilot-instructions.md` supplies the concrete bindings —
+Each repo's root agent instructions (`AGENTS.md`) supply the concrete bindings —
 which decision records, which docs, which bug tracker, which enforcing tests —
 while this file states the rules those bindings instantiate.
 
