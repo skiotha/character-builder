@@ -1,5 +1,5 @@
 ---
-description: Canonical Figma UI source (Ahani.Base) — fileKey, view frames, and MCP workflow for tokens/screens when working under public/.
+description: Canonical Figma UI source (Ahani.Base) — fileKey, view frames, MCP read workflow / budget for tokens/screens, and write policy when working under public/.
 globs: public/**/*.css,public/**/*.html,public/**/*.mjs
 alwaysApply: false
 ---
@@ -18,23 +18,39 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
 
 - File: https://www.figma.com/design/n61wtRUXEaxhSc2gnL640J/Ahani.Base
 - `fileKey`: `n61wtRUXEaxhSc2gnL640J`
-- Page: `Webpage` (`0:1`)
+- Page: `Nagara Character Builder` (`1017:14`) — holds the canonical
+  view frames below
 
 Parse share URLs as `fileKey` + `node-id` (hyphens → colons for MCP
 `nodeId`). Ignore `t=` query params. Local Variables only — no published
-library / Code Connect.
+library / Code Connect (not available on the file's plan).
+
+Figma skills (`figma-design-to-code`, `figma-use`, …) are served by the
+Figma MCP server; if one is not installed locally, read
+`skill://figma/<name>/SKILL.md` via `get_figma_skill`.
+
+**Read budget.** The account is on a Starter plan with a View seat:
+Figma caps the MCP **read** tools at ~20 calls per month (write tools
+are exempt — see Figma's MCP rate-limits doc). Fetch only the frames the
+task needs, prefer one `get_design_context` per frame over repeated
+probes, and reuse results within a session instead of re-fetching.
 
 ## Canonical view frames
 
-| App view          | Figma frame | `node-id` | MCP `nodeId` |
-| ----------------- | ----------- | --------- | ------------ |
-| Welcome / initial | `initial`   | `1021-58` | `1021:58`    |
-| Dashboard         | `menu`      | `1021-4`  | `1021:4`     |
-| Creation form     | `creation`  | `1021-62` | `1021:62`    |
-| Character view    | `view`      | `1021-66` | `1021:66`    |
+| App view                  | Figma frame | `node-id` | MCP `nodeId` |
+| ------------------------- | ----------- | --------- | ------------ |
+| Welcome / initial         | `initial`   | `1021-58` | `1021:58`    |
+| Dashboard                 | `menu`      | `1021-4`  | `1021:4`     |
+| Creation form             | `creation`  | `1021-62` | `1021:62`    |
+| Character view            | `view`      | `1021-66` | `1021:66`    |
+| Catalog picker (approved) | `picker`    | `1389-14` | `1389:14`    |
+
+Picker design rounds (drafts, rejected options, the original
+`ability-select-popup`) live in the `picker — explorations` section
+(`1389:15`) to the right of `picker`.
 
 To explore further: Figma MCP `get_metadata` on `fileKey` (omit `nodeId`
-for page list) or on `0:1`.
+for page list) or on `1017:14`.
 
 ## How to read design
 
@@ -48,3 +64,17 @@ On UI work that should match the redesign:
 4. Map tokens into CSS custom properties under `:root` when landing them
    in code; keep Figma as the design-side source. Do not dump the full
    token table into this rule or into comments — fetch live.
+
+## Writing to Figma
+
+The MCP can edit the file (`use_figma`), but Figma stays the user's
+design surface:
+
+- Write **only when the user asks** for a specific change; never sync
+  code changes back to Figma on your own initiative.
+- Load `figma-use` before the first `use_figma` call.
+- Touch only the nodes / page the request names — no incidental
+  restyling, renaming, or reorganizing.
+- Verify the result with a follow-up read and report what changed
+  (node ids + names). Remove any temporary or test nodes before handing
+  back.

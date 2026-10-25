@@ -7,7 +7,9 @@ open for step planning. Step-0 metadata decisions recorded 2026-10-23
 decisions recorded 2026-10-24 (see "Step-1 decisions"). Step-2
 decisions recorded 2026-10-24 (see "Step-2 decisions"); step 2a done
 2026-10-25. Step-2b decisions recorded 2026-10-25 (see "Step-2b
-decisions"); step 2b done 2026-10-25. Blocks
+decisions"); step 2b done 2026-10-25. The dialog's visual design runs in
+[`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md)
+(2026-10-25) and feeds step 2c. Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -774,7 +776,9 @@ revisited during planning of their owning steps, not deferred to close-out.
     description, rank row of three blocks as in the frame, selected rank)
     so the real cards land pre-styled. Re-check the frame first: it is
     an early draft, so settle open visual questions with the user before
-    styling them.
+    styling them. Those questions are worked in
+    [`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md);
+    2c implements from its approved Figma `picker` frames.
     **Done when:** screenshots at desktop and narrow widths reviewed by
     the user against the frame; keyboard-only run through every control
     shows focus; reduced motion disables the animation; the 2a / 2b
