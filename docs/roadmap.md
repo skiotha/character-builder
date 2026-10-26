@@ -818,6 +818,9 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
 ### Asset & Delivery Optimization
 
 - [ ] Strip unnecessary metadata from SVG icons (Illustrator export bloat)
+- [ ] Split `public/common/icons/` by role: icons, decorations (isle,
+      keep, ship, cannon, name background) and button borders — borders
+      and decorations are not icons
 - [ ] Optimize font files (subset to used glyphs if applicable)
 - [ ] Add Brotli/gzip `Content-Encoding` for static assets and API responses
       (precompressed files or on-the-fly compression via `node:zlib`)

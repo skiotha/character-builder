@@ -48,13 +48,13 @@ one-line decisions and one-line rejections; don't keep transcripts.
 ## Workflow
 
 1. **Draft** — agent builds 2–4 options for the round's question in the
-   round's section (Figma writes don't count against the read budget).
+   round's section and screenshots them as a self-check before handing
+   over (ui-figma-source call budget).
 2. **Review** — user reviews on the canvas, picks one, tweaks it by hand
    if wanted, and tells the agent which frame won.
 3. **Record** — agent reads the winning frame once (`get_design_context`)
-   and logs the decision here. Reads are budgeted (ui-figma-source
-   rule), so the agent does not screenshot its own drafts by default —
-   the user's review is the visual check.
+   and logs the decision here. The user's review is the deciding visual
+   check; the agent's screenshots only catch build errors.
 4. **Code** — once a catalog's layout is settled, it goes to CSS (parent
    step 2c), iterated in the browser against a specimen page (see open
    item S below); results are captured back into `picker`.
@@ -148,6 +148,21 @@ imports the same file into Figma.
   may introduce new tokens (on the 4px scale, added to `Primitives` /
   `Semantic` and the `Foundations` sheet) whenever the old ones don't
   fit — groundwork for the roadmap's design-token rework (Phase 8).
+- D5 (2026-10-26): icons. Originals stay the source
+  (`public/common/icons/`); the user drops them into empty, labelled
+  slots on the `Components` Icons sheet, and the agent scales them,
+  binds the fills and derives variants. Colour comes from variables,
+  never baked hexes: `Icon/Default` (→ Main), `Icon/Secondary`
+  (→ Accent), and the grade pairs `Grade/Ability` (Main disc, Black
+  letter — learned ability), `Grade/Spell` (Accent disc, White letter —
+  learned spell), `Grade/Unlearned` (Grey disc, Black letter). The stray
+  `#f1c724` yellow is unified to Main. All four pluses are distinct and
+  in use at the same time: one per UI component, never substituted. Both
+  up arrows stay until one is chosen; the picker uses neither, because
+  upgrading happens on the sheet. ✕ (Dialog 24 / Clear 16), tick (16) and search (24) are
+  placeholders until hand-drawn. Slots are bounding boxes on the 4px grid:
+  grade 40, plus 48, up 32 × 36 / 36, and the asymmetric art sits centred.
+  Borders are not icons; they get placeholders at the Button step.
 
 ## Steps
 
@@ -159,9 +174,15 @@ outcome, not on a commit.
   `Semantic` / `Primitives` variables. ★ = needed before round 1; the rest
   can follow its step.
   - **Foundations** ✅ (D2).
-  - **Icons:** ★ close ✕ (placeholder until drawn), ★ grade marks
-    novice / adept / master (`public/common/icons/`), plus, up; search
-    glyph and checkbox tick if those controls are custom-styled.
+  - **Icons** (D5): ★ close ✕ Dialog / Clear (placeholder until drawn),
+    ★ grade marks novice / adept / master × ability / spell / unlearned,
+    plus 1–4, up 1–2; search glyph and checkbox tick (placeholders).
+    Aliases and the slot sheet (`1416:2`) are done.
+    ⏳ **Pending (user):** drop the originals into the Grade Ability row,
+    Plus 1–4 and Up 1–2. ⏳ **Then (agent):** scale and centre the art,
+    remove the dashed outlines, bind the fills and derive the Spell /
+    Unlearned grade rows. Not blocking: later components use *instances*
+    of the `Icons/*` sets, so they pick up the art when it lands.
   - **Atoms:** ★ Button (primary / secondary / stub × default, hover,
     focus, pressed, disabled; placeholder border until open item A),
     ★ Icon button, ★ Text input (from the `inputs` drafts: empty,
@@ -180,7 +201,8 @@ outcome, not on a commit.
     Talent card (Step 2), Ritual card (Step 2), ★ Compact sheet card +
     vacant "+" card, Dialog shell (list | aside + header / footer slots).
 
-  **Done when:** every ★ item is a component on `Components`.
+  **Done when:** every ★ item is a component on `Components` and the
+  icon art pass above is finished.
 
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
@@ -191,8 +213,12 @@ outcome, not on a commit.
 - **Step 3 — Breakpoints.** Settle open item B; narrow (and middle)
   frames for each catalog. **Done when:** the matrix is all ✅.
 - **Step 4 — Assets.** User draws; agent cleans, imports into Figma and
-  checks them in the approved frames. **Done when:** all three assets are
-  in the repo and placed in `picker`.
+  checks them in the approved frames. Code-side colour (D5): the icon
+  SVGs swap their baked `style="fill: #…"` for `currentColor` /
+  `var(--icon-secondary)` (grade discs: disc + letter custom
+  properties); custom properties inherit into `<use>` shadow trees, so
+  one file serves every colour and disabled state. **Done when:** all
+  three assets are in the repo and placed in `picker`.
 - **Step 5 — Hand-off to code.** Settle open item S; parent step 2c
   implements from `picker`. **Done when:** parent step 2c's gate passes;
   this plan moves to `done/`.

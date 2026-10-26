@@ -20,26 +20,33 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
   view frames below
 - Page: `Components` (`944:15`) — the reusable component library, one
   section per layer: `Foundations` (`1403:14`, a token / type sheet),
-  `Icons`, `Atoms`, `Molecules`, `Organisms`. Variables: `Primitives`
+  `Icons` (`1403:224`, slot sheet `1416:2`), `Atoms`, `Molecules`,
+  `Organisms`. Variables: `Primitives`
   (colours hidden from pickers) and `Semantic` (aliases components bind
   to); every variable carries its CSS name as WEB code syntax.
-- Starter-plan limits: no new pages (3-page cap; the file is over it), and
-  the MCP cannot load the TorukSC font (Display) — clone an existing
-  TorukSC text node instead of creating one.
+- The MCP cannot load the TorukSC font (Display; it is installed only on
+  the user's machine) — clone an existing TorukSC text node instead of
+  creating one.
 
 Parse share URLs as `fileKey` + `node-id` (hyphens → colons for MCP
 `nodeId`). Ignore `t=` query params. Local Variables only — no published
-library / Code Connect (not available on the file's plan).
+library; Code Connect needs an Organization plan.
 
 Figma skills (`figma-design-to-code`, `figma-use`, …) are served by the
 Figma MCP server; if one is not installed locally, read
 `skill://figma/<name>/SKILL.md` via `get_figma_skill`.
 
-**Read budget.** The account is on a Starter plan with a View seat:
-Figma caps the MCP **read** tools at ~20 calls per month (write tools
-are exempt — see Figma's MCP rate-limits doc). Fetch only the frames the
-task needs, prefer one `get_design_context` per frame over repeated
-probes, and reuse results within a session instead of re-fetching.
+**Call budget.** The account holds a Professional plan with a Full seat
+(since 2026-10-26, kept for the design work and likely dropped after it):
+Figma allows 200 MCP calls per day and 10 per minute (Figma's MCP
+rate-limits doc). Within that there is no per-call rationing: screenshot
+your own builds and drafts to check them, and read frames, metadata and
+variables whenever the task benefits. The write-only-on-request rule below
+still applies. **If a call fails with a plan or rate-limit error,** the seat
+has probably lapsed to Starter (about 20 calls a month for every MCP tool,
+`use_figma` included). Stop, tell the user, and switch to frugal mode: no
+screenshots of your own work, one `get_design_context` per frame, and reuse
+results instead of re-fetching.
 
 ## Canonical view frames
 
