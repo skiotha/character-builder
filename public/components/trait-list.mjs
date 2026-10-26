@@ -167,7 +167,7 @@ function renderAddSlot(index) {
   icon.setAttribute("role", "img");
   icon.setAttribute("aria-hidden", "true");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", "/common/icons/icon-plus-3.svg");
+  use.setAttribute("href", "/common/icons/icon-plus-trait.svg");
   icon.appendChild(use);
   button.appendChild(icon);
 

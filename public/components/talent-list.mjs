@@ -77,7 +77,7 @@ function renderTalentItem(talent, index, writable) {
     icon.setAttribute("role", "presentation");
     icon.setAttribute("aria-label", "Increase talent level");
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    use.setAttribute("href", "/common/icons/icon-up-2.svg");
+    use.setAttribute("href", "/common/icons/icon-up-talent.svg");
     icon.appendChild(use);
     button.appendChild(icon);
 
@@ -110,7 +110,7 @@ function renderAddSlot(index) {
   icon.setAttribute("role", "img");
   icon.setAttribute("aria-hidden", "true");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", "/common/icons/icon-plus-2.svg");
+  use.setAttribute("href", "/common/icons/icon-plus-talent.svg");
   icon.appendChild(use);
   button.appendChild(icon);
 

@@ -22,7 +22,7 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
   view frames below
 - Page: `Components` (`944:15`) — the reusable component library, one
   section per layer: `Foundations` (`1403:14`, a token / type sheet),
-  `Icons` (`1403:224`, slot sheet `1416:2`), `Atoms`, `Molecules`,
+  `Icons` (`1403:224`, sheet `1416:2`), `Atoms`, `Molecules`,
   `Organisms`. Variables: `Primitives`
   (colours hidden from pickers) and `Semantic` (aliases components bind
   to); every variable carries its CSS name as WEB code syntax.

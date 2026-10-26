@@ -56,7 +56,7 @@ export function createNewCharacterCard() {
   svg.setAttribute("aria-label", "Icon with a plus sign");
 
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", "/common/icons/icon-plus-1.svg");
+  use.setAttribute("href", "/common/icons/icon-plus-character.svg");
   svg.appendChild(use);
 
   button.appendChild(svg);

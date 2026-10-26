@@ -141,7 +141,7 @@ class PortraitElement extends NagaraElement {
       "http://www.w3.org/2000/svg",
       "use",
     );
-    plusUse.setAttribute("href", "/common/icons/icon-plus-2.svg");
+    plusUse.setAttribute("href", "/common/icons/icon-plus-talent.svg");
     plusIcon.appendChild(plusUse);
     placeholder.appendChild(plusIcon);
 

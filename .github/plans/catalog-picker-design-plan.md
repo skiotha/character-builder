@@ -92,7 +92,9 @@ not fully predictable, so these are briefs, not specs):
 | Asset | Role | Brief | Status |
 | --- | --- | --- | --- |
 | Button border | footer primary / Cancel, maybe chips | Must survive different button widths — see open item A | open |
-| Close ✕ | header dismiss | Visual mass centered (it rotates on hover); reads at ~20–28 px; clearly not a "+" | not drawn |
+| Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 16) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
+| Tick | checkbox check mark (`Icons/Tick`, 16) | Reads at 16 px; style decided with the Checkbox atom | placeholder in Figma |
+| Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
 
 **Hand-off:** Illustrator *Export As → SVG* (presentation attributes,
@@ -156,12 +158,20 @@ imports the same file into Figma.
   (→ Accent), and the grade pairs `Grade/Ability` (Main disc, Black
   letter — learned ability), `Grade/Spell` (Accent disc, White letter —
   learned spell), `Grade/Unlearned` (Grey disc, Black letter). The stray
-  `#f1c724` yellow is unified to Main. All four pluses are distinct and
-  in use at the same time: one per UI component, never substituted. Both
-  up arrows stay until one is chosen; the picker uses neither, because
-  upgrading happens on the sheet. ✕ (Dialog 24 / Clear 16), tick (16) and search (24) are
-  placeholders until hand-drawn. Slots are bounding boxes on the 4px grid:
-  grade 40, plus 48, up 32 × 36 / 36, and the asymmetric art sits centred.
+  `#f1c724` yellow and Plus Item's original grey are unified to Main.
+  Pluses and up arrows are named by job, in files
+  (`icon-plus-<use>.svg`, `icon-up-<use>.svg`) and in Figma
+  (`Use=<Use>`): plus Character (dashboard new-character card), Talent
+  (talent add, shared with portrait upload), Trait (trait add), Item
+  (reserved for the future weapon / armour pickers); up Talent (talent
+  upgrade) and Spare (unused). Pluses are distinct and never
+  substituted. Both up arrows stay until one is chosen; the picker uses
+  neither, because upgrading happens on the sheet. ✕ (Dialog 24 /
+  Clear 16), tick (16)
+  and search (24) are placeholders until hand-drawn. Slots are bounding
+  boxes on the 4px grid: grade 40, plus 48, up 32 × 36 / 36, and the
+  asymmetric art sits centred and scales with the component. Grade rows
+  share one drawing per grade; the layers are named `Disc` / `Letter`.
   Borders are not icons; they get placeholders at the Button step.
 
 ## Steps
@@ -174,15 +184,13 @@ outcome, not on a commit.
   `Semantic` / `Primitives` variables. ★ = needed before round 1; the rest
   can follow its step.
   - **Foundations** ✅ (D2).
-  - **Icons** (D5): ★ close ✕ Dialog / Clear (placeholder until drawn),
-    ★ grade marks novice / adept / master × ability / spell / unlearned,
-    plus 1–4, up 1–2; search glyph and checkbox tick (placeholders).
-    Aliases and the slot sheet (`1416:2`) are done.
-    ⏳ **Pending (user):** drop the originals into the Grade Ability row,
-    Plus 1–4 and Up 1–2. ⏳ **Then (agent):** scale and centre the art,
-    remove the dashed outlines, bind the fills and derive the Spell /
-    Unlearned grade rows. Not blocking: later components use *instances*
-    of the `Icons/*` sets, so they pick up the art when it lands.
+  - **Icons** ✅ (D5) — sheet `1416:2`: grade marks novice / adept /
+    master × ability / spell / unlearned, plus Character / Talent /
+    Trait / Item, up Talent / Spare, all from the
+    originals and bound to `Icon/*` / `Grade/*`. ✕ Dialog / Clear, tick
+    and search glyph are placeholder components; the hand-drawn versions
+    are Step 4 assets (table under "Motion & assets") and replace the
+    vector inside each component, so instances update by themselves.
   - **Atoms:** ★ Button (primary / secondary / stub × default, hover,
     focus, pressed, disabled; placeholder border until open item A),
     ★ Icon button, ★ Text input (from the `inputs` drafts: empty,
@@ -201,8 +209,7 @@ outcome, not on a commit.
     Talent card (Step 2), Ritual card (Step 2), ★ Compact sheet card +
     vacant "+" card, Dialog shell (list | aside + header / footer slots).
 
-  **Done when:** every ★ item is a component on `Components` and the
-  icon art pass above is finished.
+  **Done when:** every ★ item is a component on `Components`.
 
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
@@ -217,8 +224,9 @@ outcome, not on a commit.
   SVGs swap their baked `style="fill: #…"` for `currentColor` /
   `var(--icon-secondary)` (grade discs: disc + letter custom
   properties); custom properties inherit into `<use>` shadow trees, so
-  one file serves every colour and disabled state. **Done when:** all
-  three assets are in the repo and placed in `picker`.
+  one file serves every colour and disabled state. **Done when:** every
+  asset in the "Motion & assets" table is in the repo and placed in
+  `picker` (glyphs swapped into their `Icons/*` components).
 - **Step 5 — Hand-off to code.** Settle open item S; parent step 2c
   implements from `picker`. **Done when:** parent step 2c's gate passes;
   this plan moves to `done/`.
@@ -237,7 +245,7 @@ outcome, not on a commit.
 
 - [x] Workspace — Figma `picker` / explorations areas, `r0` baseline
   _(2026-10-25)_
-- [ ] Step 0 — Component library (foundations done 2026-10-26)
+- [ ] Step 0 — Component library (foundations and icons done 2026-10-26)
 - [ ] Step 1 — Round 1: traits layout, desktop
 - [ ] Step 2 — Talents and rituals variants
 - [ ] Step 3 — Breakpoints
