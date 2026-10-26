@@ -36,6 +36,10 @@ one-line decisions and one-line rejections; don't keep transcripts.
     heading in the log below says what won.
   - `r0 — original draft (was in view)` (`1389:16`) — holds the original
     `ability-select-popup` (`1166:237`), moved out of `view` 2026-10-25.
+- **Figma page** `Components` (`944:15`, was the empty `In-game`) — the
+  reusable component library (see Step 0). Older loose drafts (`fonts`
+  `1021:70`, `inputs` `1055:17659` on `1017:14`) stay where they are and
+  are superseded as components land.
 - **Decisions** — this file. **Screenshots** — not in git.
 - **SVG sources** — the user's `.ai` files stay with the user; the
   cleaned SVG in the repo is the one shipped copy, and Figma imports that
@@ -115,6 +119,10 @@ imports the same file into Figma.
 - **D. Early-draft gaps.** Re-check `r0` against the fixed inputs (it
   predates S2-1's footer status line, S2-8's preview slot and the filter
   fieldsets) — round 1 input.
+- **P. Spacing review.** The CSS spacing steps (8 / 15 / 20 / 30 / 48 /
+  75) were mirrored as-is in Step 0; the user asked for an opinion on
+  whether to keep them or move to a regular scale (which would change
+  the CSS too). Settle before Step 0's molecules.
 
 ## Rounds
 
@@ -122,12 +130,49 @@ imports the same file into Figma.
 
 ## Decisions log
 
-_(none yet — one line each: `D<n> (date): decision — frame`)_
+- D1 (2026-10-26): component library before round 1 — Step 0; page
+  `Components`, one section per layer, slash names by layer
+  (`Atoms/Button`) + variant properties.
+- D2 (2026-10-26): foundations — `Primitives` + `Semantic` collections,
+  one mode (`Dark`). No light / inverted mode now: components bind only
+  to `Semantic`, so an "Inverted" mode can be added later without
+  redrawing. Spacing mirrors the CSS names / values (review pending,
+  open item P). `Fonts/Menu-22`, `Fonts/Body-12` added;
+  `Navigation-36` dropped (unused; removed from the CSS too) —
+  `Foundations` sheet `1403:15`.
 
 ## Steps
 
 Design rounds are iterative; each step closes when the user approves its
 outcome, not on a commit.
+
+- **Step 0 — Component library.** Discuss and build the reusable pieces
+  one by one on `Components` before drafting layouts, binding them to the
+  `Semantic` / `Primitives` variables. ★ = needed before round 1; the rest
+  can follow its step.
+  - **Foundations** ✅ (D2).
+  - **Icons:** ★ close ✕ (placeholder until drawn), ★ grade marks
+    novice / adept / master (`public/common/icons/`), plus, up; search
+    glyph and checkbox tick if those controls are custom-styled.
+  - **Atoms:** ★ Button (primary / secondary / stub × default, hover,
+    focus, pressed, disabled; placeholder border until open item A),
+    ★ Icon button, ★ Text input (from the `inputs` drafts: empty,
+    filled, focus, invalid, read-only), ★ Search input, ★ Checkbox +
+    label (may look like a chip; S2b-4), ★ Tag / badge (XP cost, check
+    attribute, tradition, outside-traditions, learned), ★ Divider
+    (h / v), Scrollbar, Loader.
+  - **Molecules:** ★ Section heading (+ counter), ★ Dialog header (title,
+    XP left, ✕), ★ Filter group (fieldset), ★ Rank block (grade, name,
+    cost, prose, check; default / hover / selected / unavailable),
+    ★ Action line (special attack / reaction), ★ Meta line (equipment,
+    boosted attribute), ★ Dialog footer (status, Cancel, primary),
+    Message block (no matches / error + Retry / preview hint),
+    Remember / Recall stubs.
+  - **Organisms:** ★ Trait card full (default / selected / learned),
+    Talent card (Step 2), Ritual card (Step 2), ★ Compact sheet card +
+    vacant "+" card, Dialog shell (list | aside + header / footer slots).
+
+  **Done when:** every ★ item is a component on `Components`.
 
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
@@ -158,6 +203,7 @@ outcome, not on a commit.
 
 - [x] Workspace — Figma `picker` / explorations areas, `r0` baseline
   _(2026-10-25)_
+- [ ] Step 0 — Component library (foundations done 2026-10-26)
 - [ ] Step 1 — Round 1: traits layout, desktop
 - [ ] Step 2 — Talents and rituals variants
 - [ ] Step 3 — Breakpoints

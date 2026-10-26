@@ -107,7 +107,6 @@
 
     /* TYPOGRAPHY */
     /* DISPLAY: TorukSC 96 */
-    /* NAVIGATION: TorukSC 64 */
     /* HEADER-64: Zen-Kurenaido 64 */
     /* HEADER-36: Zen-Kurenaido 36 */
     /* MENU-20: Zen-Kurenaido 20 */
@@ -159,7 +158,6 @@
 
     /* FONT-SIZES */
     --display: 9.6rem;
-    --navigation-36: 3.6rem;
     --header-64: 6.4rem;
     --header-36: 3.6rem;
     --menu-20: 2rem;
@@ -2051,7 +2049,6 @@
     @layer page {
       body {
         --display: 8.8rem;
-        --navigation-36: 3.6rem;
         --header-64: 6.4rem;
         --header-36: 3.6rem;
         --menu-20: 2.8rem;

@@ -18,6 +18,14 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
 - `fileKey`: `n61wtRUXEaxhSc2gnL640J`
 - Page: `Nagara Character Builder` (`1017:14`) — holds the canonical
   view frames below
+- Page: `Components` (`944:15`) — the reusable component library, one
+  section per layer: `Foundations` (`1403:14`, a token / type sheet),
+  `Icons`, `Atoms`, `Molecules`, `Organisms`. Variables: `Primitives`
+  (colours hidden from pickers) and `Semantic` (aliases components bind
+  to); every variable carries its CSS name as WEB code syntax.
+- Starter-plan limits: no new pages (3-page cap; the file is over it), and
+  the MCP cannot load the TorukSC font (Display) — clone an existing
+  TorukSC text node instead of creating one.
 
 Parse share URLs as `fileKey` + `node-id` (hyphens → colons for MCP
 `nodeId`). Ignore `t=` query params. Local Variables only — no published

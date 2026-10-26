@@ -36,10 +36,3 @@
   font-family: "Nagara Display";
   src: url("/assets/fonts/adisplay-nagara.ttf") format("truetype");
 }
-
-/* NAVIGATION: TorukSC 64 */
-@font-face {
-  font-family: "Ahani Navigation";
-  src: url("/assets/fonts/adisplay-en.ttf") format("truetype");
-  font-size: 36px;
-}
