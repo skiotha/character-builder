@@ -115,38 +115,38 @@
     /* INITIAL-64: Philospher refular 64 / 86 */
 
     /* CORNERS */
-    --sm-crns: 0.8rem;
-    --md-crns: 3rem;
-    --lg-crns: 6rem;
+    --sm-crns: 0.5rem;
+    --md-crns: 1.875rem;
+    --lg-crns: 3.75rem;
 
-    /* PADDING */
-    --sm-pad: 2rem;
-    --md-pad: 4.8rem;
-    --lg-pad: 7.5rem;
+    /* PADDING — the named steps sit on a 4px (0.25rem) scale */
+    --sm-pad: 1.5rem;
+    --md-pad: 3rem;
+    --lg-pad: 5rem;
 
-    --first-letter-pad-bstart: -1.5rem;
-    --first-letter-pad-istart: -2rem;
+    --first-letter-pad-bstart: -0.9375rem;
+    --first-letter-pad-istart: -1.25rem;
 
-    --block-align-pad: 0.8rem;
-    --block-inner-pad: 1.5rem;
-    --block-outer-pad: 3rem;
+    --block-align-pad: 0.5rem;
+    --block-inner-pad: 1rem;
+    --block-outer-pad: 2rem;
 
-    --md-dc-midpad: 3.5rem;
-    --md-dc-gap: 13.8rem;
-    --h2-pad: 8.5rem;
+    --md-dc-midpad: 2.1875rem;
+    --md-dc-gap: 8.625rem;
+    --h2-pad: 5.3125rem;
 
-    --cards-pad: 8rem;
-    --asides-pads: 5.7rem 2.6rem 1.7rem;
-    --sections-pad: 7.7rem;
+    --cards-pad: 5rem;
+    --asides-pads: 3.5625rem 1.625rem 1.0625rem;
+    --sections-pad: 4.8125rem;
 
     /* WIDTHS */
-    --main-content-width: 144rem;
+    --main-content-width: 90rem;
 
-    --section-desc-width: 60rem;
-    --main-image-width: 90rem;
+    --section-desc-width: 37.5rem;
+    --main-image-width: 56.25rem;
 
-    --md-paragraph-width: 32.5rem;
-    --lg-paragraph-width: 72.5rem;
+    --md-paragraph-width: 20.3125rem;
+    --lg-paragraph-width: 45.3125rem;
 
     --appearance-windows-top-margin: calc(
       anchor(--main-character start) + 0.4 * var(--main-image-width)
@@ -157,23 +157,23 @@
     );
 
     /* FONT-SIZES */
-    --display: 9.6rem;
-    --header-64: 6.4rem;
-    --header-36: 3.6rem;
-    --menu-20: 2rem;
-    --menu-22: 2.2rem;
-    --body-14: 1.4rem;
+    --display: 6rem;
+    --header-64: 4rem;
+    --header-36: 2.25rem;
+    --menu-20: 1.25rem;
+    --menu-22: 1.375rem;
+    --body-14: 0.875rem;
     --body-64: var(--header-64);
 
     /* LINE-HEIGHTS */
 
     /* BORDERS */
-    --border-width: 0.1rem;
+    --border-width: 1px;
     --border-style: solid;
 
     /* SCREEN QUERIES */
-    /* medium: 144rem; */
-    /* small: 92rem; */
+    /* medium: 90rem; */
+    /* small: 57.5rem; */
 
     /* FILTERS */
     --blur: blur(4px);
@@ -227,7 +227,7 @@
     &:first-of-type:first-letter {
       font-family: "Ahani First Letter";
       font-size: var(--body-64);
-      line-height: 3.2rem;
+      line-height: 2rem;
 
       float: left;
       margin-block-start: var(--first-letter-pad-bstart);
@@ -480,7 +480,7 @@
       align-self: flex-end;
       background-image: url(/common/icons/icon-button-border-1.svg);
 
-      margin-block-end: 1rem;
+      margin-block-end: 0.625rem;
 
       span {
         rotate: z -2.6deg;
@@ -491,8 +491,8 @@
   button {
     cursor: pointer;
 
-    inline-size: 12rem;
-    block-size: 5rem;
+    inline-size: 7.5rem;
+    block-size: 3.125rem;
 
     span {
       display: inline-block;
@@ -522,7 +522,7 @@
     margin-inline-end: var(--md-pad);
 
     svg {
-      inline-size: calc(10rem);
+      inline-size: calc(6.25rem);
       aspect-ratio: 10 / 7.3;
     }
   }
@@ -536,12 +536,12 @@
     flex-direction: column;
     justify-content: flex-end;
 
-    min-inline-size: 7rem;
+    min-inline-size: 4.375rem;
 
     label {
       margin-inline-start: var(--block-align-pad);
 
-      transform: translateY(2.3rem);
+      transform: translateY(1.4375rem);
 
       cursor: text;
     }
@@ -558,7 +558,7 @@
     border-block-width: var(--border-width);
     border-block-style: var(--border-style);
 
-    block-size: 3.2rem;
+    block-size: 2rem;
     padding-inline-start: var(--sm-pad);
 
     &::placeholder {
@@ -571,7 +571,7 @@
     }
 
     &:focus:not(:read-only) {
-      block-size: 5rem;
+      block-size: 3.125rem;
 
       &::placeholder {
         visibility: visible;
@@ -610,7 +610,7 @@
     label {
       margin-inline-start: var(--block-align-pad);
 
-      transform: translate(var(--offset), 3.6rem);
+      transform: translate(var(--offset), 2.25rem);
 
       cursor: text;
     }
@@ -618,7 +618,7 @@
     &:focus-within,
     &:has(textarea:not(:placeholder-shown)) {
       label {
-        transform: translate(2rem, 0);
+        transform: translate(1.25rem, 0);
       }
     }
   }
@@ -627,8 +627,8 @@
     :scope {
       background-image: url(/common/icons/icon-isle.svg);
       background-repeat: no-repeat;
-      background-size: auto min(67.8rem, 73%);
-      background-position: right 5.5rem bottom 3rem;
+      background-size: auto min(42.375rem, 73%);
+      background-position: right 3.4375rem bottom 1.875rem;
     }
 
     article {
@@ -694,7 +694,7 @@
           }
 
           dd {
-            transform: translateY(0.1rem);
+            transform: translateY(0.0625rem);
             grid-column: definition;
             justify-self: center;
           }
@@ -707,11 +707,11 @@
             grid-column: -2 / -1;
             grid-row: 1 / -1;
 
-            @media screen and (width <= 144rem) {
+            @media screen and (width <= 90rem) {
               justify-self: center;
             }
 
-            @media screen and (width <= 92rem) {
+            @media screen and (width <= 57.5rem) {
               justify-self: end;
             }
           }
@@ -722,8 +722,8 @@
     menu {
       position-anchor: --main;
       position: fixed;
-      inset-inline-end: calc(anchor(center) - 15rem);
-      inset-block-start: calc(anchor(center) + 10rem);
+      inset-inline-end: calc(anchor(center) - 9.375rem);
+      inset-block-start: calc(anchor(center) + 6.25rem);
 
       display: flex;
       column-gap: var(--md-dc-midpad);
@@ -754,8 +754,8 @@
     :scope {
       background-image: url(/common/icons/icon-ship.svg);
       background-repeat: no-repeat;
-      background-size: auto min(63.6rem, 65%);
-      background-position: left 4.8rem bottom 1.8rem;
+      background-size: auto min(39.75rem, 65%);
+      background-position: left 3rem bottom 1.125rem;
     }
 
     article {
@@ -778,8 +778,8 @@
     }
 
     ul {
-      inline-size: 90rem;
-      block-size: 60rem;
+      inline-size: 56.25rem;
+      block-size: 37.5rem;
 
       position: absolute;
       inset-block-end: var(--md-pad);
@@ -789,8 +789,8 @@
       grid: auto-flow / repeat(3, 1fr);
 
       li {
-        inline-size: 30rem;
-        block-size: 30rem;
+        inline-size: 18.75rem;
+        block-size: 18.75rem;
 
         display: grid;
         grid-template-areas:
@@ -854,8 +854,8 @@
           grid-template-columns: 1fr;
 
           button {
-            inline-size: 15rem;
-            block-size: 15rem;
+            inline-size: 9.375rem;
+            block-size: 9.375rem;
             place-self: center;
 
             svg {
@@ -890,8 +890,8 @@
     :scope {
       background-image: url(/common/icons/icon-cannon.svg);
       background-repeat: no-repeat;
-      background-size: auto min(35.7rem, 38%);
-      background-position: right 5rem bottom 2.2rem;
+      background-size: auto min(22.3125rem, 38%);
+      background-position: right 3.125rem bottom 1.375rem;
     }
 
     article {
@@ -984,7 +984,7 @@
           flex: 0 0 calc(100% / 6);
           /* max-block-size: calc(100% / 6); */
 
-          /* inline-size: 20rem; */
+          /* inline-size: 12.5rem; */
 
           display: grid;
           grid-template-areas:
@@ -1020,8 +1020,8 @@
               aspect-ratio: 1;
 
               svg {
-                max-block-size: 2rem;
-                max-inline-size: 2rem;
+                max-block-size: 1.25rem;
+                max-inline-size: 1.25rem;
               }
             }
           }
@@ -1040,8 +1040,8 @@
             grid-template-rows: 1fr;
 
             button {
-              max-inline-size: 3rem;
-              max-block-size: 3rem;
+              max-inline-size: 1.875rem;
+              max-block-size: 1.875rem;
 
               svg {
                 max-block-size: 100%;
@@ -1073,12 +1073,12 @@
       }
 
       div.input {
-        max-inline-size: 8.2rem;
+        max-inline-size: 5.125rem;
       }
     }
 
     div.input {
-      block-size: 5.8rem;
+      block-size: 3.625rem;
     }
 
     input {
@@ -1109,8 +1109,8 @@
       display: grid;
       place-content: center;
 
-      inline-size: 30rem;
-      block-size: 45rem;
+      inline-size: 18.75rem;
+      block-size: 28.125rem;
 
       border-width: var(--border-width);
       border-style: var(--border-style);
@@ -1131,7 +1131,7 @@
         svg {
           flex: 1 0 0%;
 
-          padding-block: 9rem 12rem;
+          padding-block: 5.625rem 7.5rem;
         }
       }
 
@@ -1201,7 +1201,7 @@
         inset-block-end: anchor(end, 5%);
         inset-inline-end: anchor(end, 10%);
         display: flex;
-        gap: 0.5rem;
+        gap: 0.3125rem;
         z-index: 10;
       }
 
@@ -1210,8 +1210,8 @@
         color: white;
         border: var(--border-width) var(--border-style) var(--color-main);
         border-radius: 50%;
-        inline-size: 2.5rem;
-        block-size: 2.5rem;
+        inline-size: 1.5625rem;
+        block-size: 1.5625rem;
         cursor: pointer;
         display: grid;
         place-items: center;
@@ -1244,14 +1244,14 @@
       }
 
       ul {
-        max-inline-size: 90rem;
+        max-inline-size: 56.25rem;
         margin-block-start: var(--sm-pad);
 
         display: flex;
 
         li.trait {
-          inline-size: 15rem;
-          block-size: 18rem;
+          inline-size: 9.375rem;
+          block-size: 11.25rem;
 
           display: flex;
           flex-direction: column;
@@ -1308,13 +1308,13 @@
               align-items: center;
 
               p {
-                line-height: 2rem;
+                line-height: 1.25rem;
               }
 
               svg {
-                block-size: 3rem;
-                inline-size: 3rem;
-                margin-inline: 0.6rem;
+                block-size: 1.875rem;
+                inline-size: 1.875rem;
+                margin-inline: 0.375rem;
               }
 
               &.inactive {
@@ -1336,7 +1336,7 @@
               place-content: center;
 
               svg {
-                inline-size: 6rem;
+                inline-size: 3.75rem;
               }
             }
           }
@@ -1379,10 +1379,10 @@
         padding-block-start: var(--block-align-pad);
 
         div.input {
-          max-inline-size: 6rem;
+          max-inline-size: 3.75rem;
 
           &:last-of-type {
-            max-inline-size: 10rem;
+            max-inline-size: 6.25rem;
           }
         }
       }
@@ -1391,14 +1391,14 @@
         grid-area: equipment;
 
         margin-block-start: var(--sm-pad);
-        max-inline-size: calc(4 * 9rem);
+        max-inline-size: calc(4 * 5.625rem);
 
         ul {
           display: flex;
 
           li {
-            block-size: 9rem;
-            inline-size: 9rem;
+            block-size: 5.625rem;
+            inline-size: 5.625rem;
 
             button {
               all: unset;
@@ -1413,7 +1413,7 @@
             }
 
             svg {
-              inline-size: 4.5rem;
+              inline-size: 2.8125rem;
             }
           }
 
@@ -1427,7 +1427,7 @@
         nagara-equipment-list {
           ul {
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.25rem;
 
             li {
               block-size: auto;
@@ -1436,7 +1436,7 @@
               display: flex;
               flex-wrap: wrap;
               align-items: baseline;
-              gap: 0.6rem;
+              gap: 0.375rem;
 
               &.empty {
                 color: var(--color-grey);
@@ -1456,9 +1456,9 @@
                 cursor: pointer;
                 font: inherit;
                 font-size: 0.85em;
-                padding: 0.1rem 0.6rem;
+                padding: 0.0625rem 0.375rem;
                 border: 1px solid currentColor;
-                border-radius: 0.3rem;
+                border-radius: 0.1875rem;
                 color: var(--color-grey);
                 transition:
                   color 120ms ease,
@@ -1475,8 +1475,8 @@
 
           .weapon-slot-badge {
             font-size: 0.8em;
-            padding: 0.05rem 0.5rem;
-            border-radius: 1rem;
+            padding: 0.03125rem 0.3125rem;
+            border-radius: 0.625rem;
             color: var(--color-black);
             background-color: var(--color-main);
           }
@@ -1485,16 +1485,16 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.6rem;
-            margin-block-start: 0.6rem;
+            gap: 0.375rem;
+            margin-block-start: 0.375rem;
 
             select {
               font: inherit;
               color: inherit;
               background-color: transparent;
               border: 1px solid var(--color-grey);
-              border-radius: 0.3rem;
-              padding: 0.1rem 0.4rem;
+              border-radius: 0.1875rem;
+              padding: 0.0625rem 0.25rem;
 
               &:focus-visible {
                 border-color: var(--color-main);
@@ -1505,9 +1505,9 @@
             button {
               inline-size: auto;
               block-size: auto;
-              padding: 0.1rem 0.8rem;
+              padding: 0.0625rem 0.5rem;
               border: 1px solid var(--color-main);
-              border-radius: 0.3rem;
+              border-radius: 0.1875rem;
               color: var(--color-main);
               transition:
                 background-color 120ms ease,
@@ -1549,16 +1549,16 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.6rem;
-            margin-block-start: 0.6rem;
+            gap: 0.375rem;
+            margin-block-start: 0.375rem;
 
             select {
               font: inherit;
               color: inherit;
               background-color: transparent;
               border: 1px solid var(--color-grey);
-              border-radius: 0.3rem;
-              padding: 0.1rem 0.4rem;
+              border-radius: 0.1875rem;
+              padding: 0.0625rem 0.25rem;
 
               &:focus-visible {
                 border-color: var(--color-main);
@@ -1583,8 +1583,8 @@
           .armor-slot-derived {
             display: grid;
             grid-template-columns: max-content 1fr;
-            column-gap: 0.6rem;
-            margin-block: 0.2rem 0;
+            column-gap: 0.375rem;
+            margin-block: 0.125rem 0;
             font-size: 0.85em;
 
             dt {
@@ -1611,12 +1611,12 @@
         }
 
         div.textarea {
-          --offset: 7rem;
+          --offset: 4.375rem;
           padding-block-start: calc(1.5 * var(--block-align-pad));
         }
 
         div.input {
-          max-inline-size: 20rem;
+          max-inline-size: 12.5rem;
         }
       }
 
@@ -1629,9 +1629,9 @@
       }
 
       div.textarea {
-        --offset: 6rem;
+        --offset: 3.75rem;
         align-self: center;
-        inline-size: 20rem;
+        inline-size: 12.5rem;
 
         padding-block-start: calc(1.5 * var(--block-align-pad));
       }
@@ -1641,11 +1641,11 @@
       position: fixed;
       position-anchor: --main;
 
-      inset-block-start: calc(anchor(start) + 7.5rem);
-      inset-inline-end: calc(anchor(end) + 20rem);
+      inset-block-start: calc(anchor(start) + 4.6875rem);
+      inset-inline-end: calc(anchor(end) + 12.5rem);
 
-      inline-size: 45rem;
-      block-size: 15rem;
+      inline-size: 28.125rem;
+      block-size: 9.375rem;
 
       background-image: url("/common/icons/icon-name-background.svg");
       background-size: contain;
@@ -1689,10 +1689,10 @@
         content: url(/common/icons/icon-keep.svg);
 
         position: absolute;
-        inline-size: 43.1rem;
-        block-size: min(50.1rem, 54%);
-        inset-inline-end: 26rem;
-        inset-block-end: -9.7rem;
+        inline-size: 26.9375rem;
+        block-size: min(31.3125rem, 54%);
+        inset-inline-end: 16.25rem;
+        inset-block-end: -6.0625rem;
 
         user-select: none;
         pointer-events: none;
@@ -1735,8 +1735,8 @@
 
     section#portrait {
       div#portrait-preview:only-child {
-        inline-size: 30rem;
-        block-size: 45rem;
+        inline-size: 18.75rem;
+        block-size: 28.125rem;
 
         position: relative;
       }
@@ -1793,7 +1793,7 @@
     }
 
     input {
-      padding-inline-start: calc(var(--sm-pad) - 0.6rem);
+      padding-inline-start: calc(var(--sm-pad) - 0.375rem);
     }
   }
 }
@@ -1957,8 +1957,8 @@
     }
 
     :focus-visible {
-      outline: 0.2rem solid var(--color-accent);
-      outline-offset: 0.2rem;
+      outline: 0.125rem solid var(--color-accent);
+      outline-offset: 0.125rem;
     }
   }
 }
@@ -2035,25 +2035,15 @@
 }
 
 @layer media {
-  :root {
-    @media (width > 900px) {
-      font-size: clamp(8px, calc(100dvw / (120 * 1.6)), 10px);
-    }
-
-    @media (width <= 900px) {
-      font-size: clamp(8px, calc(100dvw / (28 * 1.6)), 10px);
-    }
-  }
-
   @media (width <= 900px) {
     @layer page {
       body {
-        --display: 8.8rem;
-        --header-64: 6.4rem;
-        --header-36: 3.6rem;
-        --menu-20: 2.8rem;
-        --menu-22: 2.2rem;
-        --body-14: 1.6rem;
+        --display: 5.5rem;
+        --header-64: 4rem;
+        --header-36: 2.25rem;
+        --menu-20: 1.75rem;
+        --menu-22: 1.375rem;
+        --body-14: 1rem;
         --body-64: var(--header-64);
       }
     }
@@ -2076,8 +2066,8 @@
       }
 
       button {
-        inline-size: 15rem;
-        block-size: 7.5rem;
+        inline-size: 9.375rem;
+        block-size: 4.6875rem;
 
         background-repeat: no-repeat;
         background-position: center;
@@ -2115,8 +2105,8 @@
 
       @scope (main#initial-view) {
         :scope {
-          background-position: right -19.3rem bottom 8rem;
-          background-size: auto min(47rem, 53%);
+          background-position: right -12.0625rem bottom 5rem;
+          background-size: auto min(29.375rem, 53%);
         }
 
         article {

@@ -798,6 +798,18 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
 
 ### Responsive Design & Styling
 
+- [ ] **Design-token system rework.** The `:root` custom properties in
+      `public/common/styles.css` (spacing, corners, widths, font sizes,
+      page-level paddings such as `--cards-pad` / `--h2-pad`) were tuned
+      by eye against Figma, not derived from a convention. Reassess every
+      value during the page redesign; the old values are not binding.
+      Target: a structured system — primitives on a 4px (`0.25rem`) scale
+      plus role aliases, a type scale, and the same tokens mirrored as
+      Figma variables (`Primitives` / `Semantic` collections, `Foundations`
+      sheet on the `Components` page). Groundwork already in place:
+      `1rem` = browser default (the root `font-size` clamp was removed
+      2026-10-26) and the six named spacing steps sit on the 4px scale.
+      The catalog-picker component library adds tokens as it goes.
 - [ ] Audit CSS for small-screen support (mobile, tablet breakpoints)
 - [ ] Add responsive layout for character form sections
 - [ ] Review dashboard card grid on narrow viewports

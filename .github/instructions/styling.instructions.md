@@ -14,3 +14,5 @@ applyTo: "**/*.css"
 - Interactive elements must be visually distinct (hover/focus states, color-coding, cursor) with clean microanimations
 - All interactive elements must be keyboard-operable with visible focus styles
 - Existing stylesheets predate ADR-012 and are not reference implementations — do not assume current patterns are correct
+- The `:root` custom-property values (spacing, corners, widths, font sizes, page paddings) were tuned by eye, not derived from a system — do not preserve, extend or match them. New values follow the Figma `Foundations` sheet (see **ui-figma-source**); the full token rework is a roadmap item (Phase 8, Responsive Design & Styling)
+- `1rem` is the browser default (16px): never set a root `font-size`. Sizes and spacing in `rem`; hairline borders in `px`; spacing steps on the 4px (`0.25rem`) scale

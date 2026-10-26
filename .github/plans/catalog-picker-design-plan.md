@@ -119,10 +119,6 @@ imports the same file into Figma.
 - **D. Early-draft gaps.** Re-check `r0` against the fixed inputs (it
   predates S2-1's footer status line, S2-8's preview slot and the filter
   fieldsets) — round 1 input.
-- **P. Spacing review.** The CSS spacing steps (8 / 15 / 20 / 30 / 48 /
-  75) were mirrored as-is in Step 0; the user asked for an opinion on
-  whether to keep them or move to a regular scale (which would change
-  the CSS too). Settle before Step 0's molecules.
 
 ## Rounds
 
@@ -136,10 +132,22 @@ imports the same file into Figma.
 - D2 (2026-10-26): foundations — `Primitives` + `Semantic` collections,
   one mode (`Dark`). No light / inverted mode now: components bind only
   to `Semantic`, so an "Inverted" mode can be added later without
-  redrawing. Spacing mirrors the CSS names / values (review pending,
-  open item P). `Fonts/Menu-22`, `Fonts/Body-12` added;
+  redrawing. `Fonts/Menu-22`, `Fonts/Body-12` added;
   `Navigation-36` dropped (unused; removed from the CSS too) —
   `Foundations` sheet `1403:15`.
+- D3 (2026-10-26): 1rem = the browser default (16px) — the root
+  `font-size` clamp (10px rem scaled by viewport width) is gone, as it
+  ignored the reader's font-size setting and damped zoom. Old 10px-rem
+  literals in `styles.css` were divided by 1.6 (same px); the
+  catalog-dialog block was already authored in 16px rem and now renders
+  at the S2-8 1200 × 600. Spacing tokens moved to a 4px scale: 8 / 16 /
+  24 / 32 / 48 / 80 (were 8 / 15 / 20 / 30 / 48 / 75), Figma
+  `Space/*` likewise; `--border-width` is `1px`. Drift outside the
+  picker is left to the later in-depth CSS pass.
+- D4 (2026-10-26): the old CSS values are not binding. Step 0 components
+  may introduce new tokens (on the 4px scale, added to `Primitives` /
+  `Semantic` and the `Foundations` sheet) whenever the old ones don't
+  fit — groundwork for the roadmap's design-token rework (Phase 8).
 
 ## Steps
 
