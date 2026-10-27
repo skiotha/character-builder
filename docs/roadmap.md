@@ -765,7 +765,10 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       pickers fetch catalogs at `CATALOG_LOCALE = "en"` (`public/api.mjs`)
       and store EN display strings (`equipment.weapons[].name`, …) in the
       character, so RU display must resolve names by `id` from the catalog,
-      never from the stored string.
+      never from the stored string. English is the primary language. The
+      served fonts (`public/assets/fonts/*-en.ttf`) are Latin-only subsets,
+      cut by hand in FontForge; RU needs matching Cyrillic cuts from the
+      original fonts (user TODO).
 - [ ] Deduplicate `getNestedValue` — four independent copies exist in
       `state.mjs`, `section-renderer.mjs`, `validation/engine.mjs` (×2).
       Extract a single version into `public/utils/object.mjs` and import

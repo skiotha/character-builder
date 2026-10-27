@@ -84,14 +84,18 @@ Breakpoints are open item B.
 
 **Motion preference (user, 2026-10-25):** SVG assets do not change color
 on state. Hover / focus → rotation and / or scale; activation → a wobble.
-All of it off under `prefers-reduced-motion`.
+All of it off under `prefers-reduced-motion`. Exceptions (D6): disabled
+buttons turn grey and swap to a "broken" border; keyboard focus adds a
+static underline stroke, so focus stays visible with motion off.
 
 **Assets** (user draws in Illustrator with artistic brushes; outlines are
 not fully predictable, so these are briefs, not specs):
 
 | Asset | Role | Brief | Status |
 | --- | --- | --- | --- |
-| Button border | footer primary / Cancel, maybe chips | Must survive different button widths — see open item A | open |
+| Button border | primary button only (Learn) | Draw at 128 × 48; stretches a little for longer captions (D6) | placeholder in Figma |
+| Button border, broken | disabled primary | Same 128 × 48 frame as the border, visibly broken / interrupted; shown grey (D6) | placeholder in Figma |
+| Focus underline | `:focus-visible` on every text button | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6) | placeholder in Figma |
 | Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 16) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
 | Tick | checkbox check mark (`Icons/Tick`, 16) | Reads at 16 px; style decided with the Checkbox atom | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
@@ -104,12 +108,10 @@ imports the same file into Figma.
 
 ## Open items
 
-- **A. Button border technique.** Brush strokes don't stretch cleanly.
-  Options: (a) a fixed set of button widths, one SVG each; (b) 9-slice
-  `border-image` — corners drawn as distinct ornaments, edges that can
-  repeat or stretch; (c) one SVG stretched with
-  `preserveAspectRatio="none"` (distorts the brush). Settle in round 1
-  with a mock of each.
+- **A. Button border technique.** ✅ _Resolved 2026-10-27 (D6): (c),
+  one SVG stretched with `preserveAspectRatio="none"` — the sketched
+  brush tolerates a little distortion, and the button's min-width
+  matches the drawing, so today's captions don't stretch it at all._
 - **B. Breakpoints.** Desktop is the 1200 × 600 frame (S2-8); step 2c
   requires a narrow fallback (columns stack, list scrolls). Decide the
   widths and whether a middle layout exists.
@@ -173,6 +175,38 @@ imports the same file into Figma.
   asymmetric art sits centred and scales with the component. Grade rows
   share one drawing per grade; the layers are named `Disc` / `Letter`.
   Borders are not icons; they get placeholders at the Button step.
+- D6 (2026-10-27): text buttons. The picker has five, captions
+  uppercase in Zen Kurenaido 20 (`menu-20`; colour may differ per
+  button): **Learn** (primary commit; one caller label for all three
+  catalogs, as the picker only adds), **Cancel**, **Remember** /
+  **Recall** (disabled stubs) and **Retry** (load-error line). The ✕ is
+  an icon button whose accessible name is "Close", not a text button.
+  Only the primary has a hand-drawn border; the rest are plain text.
+  Widths at 20 px (EN / RU, measured from the fonts): LEARN 58 /
+  ИЗУЧИТЬ 85, CANCEL 69 / ОТМЕНА 75, REMEMBER 97 / ЗАПОМНИТЬ 111,
+  RECALL 67 / ВСПОМНИТЬ 110, RETRY 59 / ПОВТОРИТЬ 108 — so the border is
+  drawn at 128 × 48 (ИЗУЧИТЬ plus padding, on the 4px grid) and the
+  primary's min-width is 128; it stretches only for longer future
+  captions (open item A). Captions in different languages should stay
+  close in length. States: hover → rotate / scale; pressed → wobble;
+  focus → a hand-drawn underline stroke under the caption (static, so it
+  survives reduced motion); disabled → caption and border turn grey
+  (`Text/Disabled`-style token, added at the build) and the border swaps
+  to a "broken" drawing. Each button carries its own tilt, a rotation in
+  −3°…+3°, with separate angles for caption and border, fixed per button
+  (in code: `--tilt-caption` / `--tilt-border` derived from the button's
+  id, so re-renders don't change it), not tied to kind or state. English
+  is the primary language; the served font files are Latin-only subsets
+  and the Cyrillic cuts are a user TODO (roadmap l10n item). Built on
+  the Atoms sheet `1440:9`: `Atoms/Button` (`1439:74`; Kind × State,
+  TEXT property `Caption`, default "Learn" — the property is set-wide,
+  so every variant shows the same caption), `Decor/Button border`
+  (`1439:67`, Whole / Broken) and `Decor/Focus underline` (`1439:72`) as
+  placeholder components whose `Art` layer the drawings replace; new
+  tokens `Text/Disabled`, `Border/Disabled` (→ Grey) and text style
+  `Fonts/Button-20` (Menu-20, uppercase). Figma cannot rotate layers
+  inside an instance, so drafts tilt the whole button; the separate
+  caption / border angles exist only in code.
 
 ## Steps
 
@@ -191,8 +225,9 @@ outcome, not on a commit.
     and search glyph are placeholder components; the hand-drawn versions
     are Step 4 assets (table under "Motion & assets") and replace the
     vector inside each component, so instances update by themselves.
-  - **Atoms:** ★ Button (primary / secondary / stub × default, hover,
-    focus, pressed, disabled; placeholder border until open item A),
+  - **Atoms:** ★ Button — built, awaiting review (D6: primary
+    (bordered) / plain × default, hover, focus, pressed, disabled;
+    placeholder border, broken border and focus underline until drawn),
     ★ Icon button, ★ Text input (from the `inputs` drafts: empty,
     filled, focus, invalid, read-only), ★ Search input, ★ Checkbox +
     label (may look like a chip; S2b-4), ★ Tag / badge (XP cost, check
@@ -213,8 +248,7 @@ outcome, not on a commit.
 
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
-  chrome) plus open item A's border mocks. **Done when:** a winner is
-  logged and open item A is decided.
+  chrome). **Done when:** a winner is logged.
 - **Step 2 — Talents and rituals variants.** Adapt the winner to levelled
   and untiered entries. **Done when:** both rows approved at desktop.
 - **Step 3 — Breakpoints.** Settle open item B; narrow (and middle)
