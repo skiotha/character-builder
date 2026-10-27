@@ -97,10 +97,13 @@ not fully predictable, so these are briefs, not specs):
 | --- | --- | --- | --- |
 | Button border | primary button only (Learn) | Draw at 128 × 48; stretches a little for longer captions (D6) | placeholder in Figma |
 | Button border, broken | disabled primary | Same 128 × 48 frame as the border, visibly broken / interrupted; shown grey (D6) | placeholder in Figma |
-| Focus underline | `:focus-visible` on every text button | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6) | placeholder in Figma |
-| Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 16) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
-| Tick | checkbox check mark (`Icons/Tick`, 16) | Reads at 16 px; style decided with the Checkbox atom | placeholder in Figma |
+| Focus underline | `:focus-visible` on every text button and filter chip | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6, D10) | placeholder in Figma |
+| Chip stroke, unchecked / checked | filter chip fill (`Decor/Chip stroke`) | A single wide brush stroke, at S 64 / M 96 / L 128 × 32 — 6 drawings; the checked one differs in **shape and angle**, not just colour; tilt lives inside the canvas; colours come from CSS (grey / yellow) (D10) | placeholder in Figma |
+| Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 24, mirrors the search glyph) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
+| Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
+| Outside-traditions mark | spell badge (D11) | Small red hand-drawn mark, readable at ~16 px, meaning "not your tradition"; may stand alone | not drawn |
+| Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
 
 **Hand-off:** Illustrator *Export As → SVG* (presentation attributes,
@@ -171,7 +174,8 @@ imports the same file into Figma.
   upgrade) and Spare (unused). Pluses are distinct and never
   substituted. Both up arrows stay until one is chosen; the picker uses
   neither, because upgrading happens on the sheet. ✕ (Dialog 24 /
-  Clear 16), tick (16)
+  Clear 24 — was 16; enlarged to mirror the search glyph, user
+  2026-10-27), tick (16)
   and search (24) are placeholders until hand-drawn. Slots are bounding
   boxes on the 4px grid: grade 40, plus 48, up 32 × 36 / 36, and the
   asymmetric art sits centred and scales with the component. Grade rows
@@ -199,7 +203,10 @@ imports the same file into Figma.
   to a "broken" drawing. Each button carries its own tilt, a rotation in
   −3°…+3°, with separate angles for caption and border, fixed per button
   (in code: `--tilt-caption` / `--tilt-border` derived from the button's
-  id, so re-renders don't change it), not tied to kind or state. English
+  id, so re-renders don't change it), not tied to kind or state. The two
+  are deliberately disjoint (user, 2026-10-27): caption and border may
+  lean at different angles, even in opposite directions, and hover /
+  pressed motion may move them by different amounts and directions. English
   is the primary language; the served font files are Latin-only subsets
   and the Cyrillic cuts are a user TODO (roadmap l10n item). Built on
   the Atoms sheet `1440:9`: `Atoms/Button` (`1439:74`; Kind × State,
@@ -217,18 +224,30 @@ imports the same file into Figma.
   area). The scale is a static end state, so it stays under
   `prefers-reduced-motion` (only the transition drops). No underline,
   and hover doesn't scale, so focus can't be mistaken for hover. Click area: dialog ✕
-  32 × 32 around its 24 px glyph. The search-clear ✕ is **not** an icon
-  button: it is the native `type=search` cancel control, restyled with
-  the Clear drawing via `::-webkit-search-cancel-button` (24 × 24, the
-  WCAG 2.5.8 minimum). Accepted trade-offs: it can't be reached with
-  Tab (Escape clears the field instead, in Chrome / Safari), and
-  Firefox shows **no** clear ✕ at all — its native one has sat behind
-  the off-by-default pref `layout.forms.input-type-search.enabled`
-  since Firefox 81 (bug 558594), so there is nothing to style.
-  **Preferred fix (user, 2026-10-27):** a real clear button shown only
-  where `@supports selector(::-webkit-search-cancel-button)` fails, so
-  Chrome / Safari keep the native control; implemented with the Search
-  input atom. So the Icon button atom serves the
+  32 × 32 around its 24 px glyph. The search-clear ✕ (24 × 24, the
+  WCAG 2.5.8 minimum) is **open until implementation**; two options:
+  - *Native control — on shaky ground (user, 2026-10-27).* The native
+    `type=search` cancel control, restyled with the Clear drawing via
+    `::-webkit-search-cancel-button`. Trade-offs: it can't be reached
+    with Tab (Escape clears the field instead, in Chrome / Safari);
+    Firefox shows **no** clear ✕ at all — its native one has sat behind
+    the off-by-default pref `layout.forms.input-type-search.enabled`
+    since Firefox 81 (bug 558594), so there is nothing to style — and
+    the earlier preferred fix was a real button shown only where
+    `@supports selector(::-webkit-search-cancel-button)` fails. Worse,
+    the control lives inside the input box, so the lines and fill would
+    have to become background gradients that stop short of it (D9): the
+    workaround outweighs the "don't rebuild what the browser gives"
+    benefit.
+  - *Scripted button — now favoured.* A standalone `Atoms/Icon button`
+    beside the input, outside the lines, with the native control hidden
+    (`::-webkit-search-cancel-button { appearance: none; display: none }`).
+    It is reachable with Tab, looks and behaves the same in every
+    browser, and the field keeps plain borders. Costs: a little script
+    (show while the field has text; clear, fire `input`, return focus to
+    the field). This also drops the `@supports` fork.
+
+  So the Icon button atom serves the
   dialog ✕ now and the sheet's plus / up buttons later. Built on the
   Atoms sheet: `Atoms/Icon button` (`1448:23`; State × 4, an
   instance-swap property `Icon` defaulting to Icons/Close Dialog, with
@@ -263,6 +282,110 @@ imports the same file into Figma.
   Read-only; TEXT properties Label, Value, Placeholder; 160 × 56, the
   focused field overflows 16 px upward like the CSS; value and caret
   share an auto-layout row so the caret follows the text).
+- D9 (2026-10-27): search input. The Text input (D8) between a
+  **search glyph on the left** (`Icons/Search`, 24; recognition at a
+  glance; 8 px gap) and the **clear ✕ on the right** (Clear drawing, 24,
+  mirroring the glyph's size and 8 px gap; it may move closer to the
+  field once the real drawings exist), both **outside** the lines and
+  the yellow fill, on
+  the dark background, so a yellow icon stays visible (10.4 : 1; a red ✕
+  on yellow would be 2.5 : 1, under the 3 : 1 icon minimum). The ✕
+  shows whenever the field has text, focused or not. Both icons stay
+  `Icon/Default` yellow: red is **not** adopted as "interactive",
+  because it already means focus (top line, caret), alert / invalid and
+  spells; interactivity is carried by shape, hover motion and cursor.
+  Code is open (D7): if the ✕ stays the native cancel control, it lives
+  inside the input box, so the lines and fill must be background
+  gradients that stop short of its area instead of borders — the reason
+  that option is shaky; the favoured scripted button sits outside and
+  leaves plain borders. The label reads
+  "Search"; the placeholder hint names what is matched ("Name or tag"
+  in the draft, per catalog `search.fields`). Built on the Atoms sheet:
+  `Atoms/Search input` (`1460:31`; State = Empty / Focused / Focused
+  filled / Filled; 320 × 56; the field is an exposed nested Text input
+  instance, so Label / Placeholder / Value are edited on it).
+- D10 (2026-10-27): filter chips (replace the plain checkbox look for
+  S2b-4 groups). A chip is a toggle, not an action, so it looks unlike
+  a button: 32 tall, ~12 px side padding, caption `Fonts/Body-14`, not
+  uppercase, no border. Code: each chip is a native checkbox inside its
+  `<label>`, the box visually hidden but focusable, groups stay a
+  `<fieldset>` + `<legend>` (ADR-012); styled with `:has(:checked)`.
+  Look: a hand-drawn single wide brush stroke fills behind the caption —
+  **unchecked a grey stroke** (`Surface/Muted` → Grey), **checked a
+  yellow stroke** (`Surface/Active`) of a **different shape and angle**,
+  so the state reads by shape, not colour alone (WCAG 1.4.1; yellow vs
+  grey is only 1.95 : 1). Caption black (`Text/Inverse`) on both: 5.3 : 1
+  on grey, 10.4 : 1 on yellow (white on grey would be 3.3). Grey also
+  means disabled elsewhere; accepted, since the picker has no disabled
+  chips and hover motion plus the pointer show interactivity. The swap
+  is animated: both strokes are stacked layers; on check the grey one
+  fades while the yellow one is revealed by a left-to-right
+  `clip-path: inset(0 100% 0 0) → inset(0)` wipe (freshly brushed), and
+  the reverse on uncheck; under `prefers-reduced-motion` the swap is
+  instant. If the wipe looks wrong, other cues get explored. Sizes:
+  three drawings per state, **S 64 / M 96 / L 128 × 32** (6 drawings),
+  picked by caption width (≤ 40 / ≤ 72 / ≤ 104 px at Body-14: Spell,
+  Ability and the traditions except Symbolism → S; Symbolism,
+  Заклинание → M; My traditions, Способность, Мои традиции → L);
+  captions should stay short and of similar length. Tilt: the strokes
+  carry their tilt inside their own canvases; the caption gets a slight
+  per-chip CSS tilt, disjoint from the stroke's (as in D6). Focus: the
+  shared `Decor/Focus underline` under the chip; pressed: the button
+  wobble. Hover: **open** — a small rotation or a very small caption-only
+  scale; no translucent / faint strokes (the palette stays solid).
+  Built on the Atoms sheet: `Atoms/Chip` (`1467:65`, block `1467:177`;
+  Size S / M / L × Checked × State Default / Hover / Focus; TEXT
+  property `Caption`; the focus underline overhangs the 32 px frame) with
+  placeholder `Decor/Chip stroke` (`1466:66`, Size × Checked) until
+  drawn; new token `Surface/Muted` → Grey.
+- D11 (2026-10-27): small labels, built as **trial atoms**. The final card
+  layout is unknown, so all four are built and any that find no place
+  or add noise are deprecated later. None are interactive, and none may
+  look like a chip (filled stroke) or a button (border).
+  - *Tradition tag* — spells only (no ability or talent carries one):
+    plain small text, `Text/Muted`, several keys joined by " · " (a spell
+    may belong to several, e.g. anathema: Runes · Theurgy · Circle). No
+    fill, border or hover.
+  - *Outside-traditions badge* (parent open item B) — the full phrase
+    likely won't fit, so options are explored: a red hand-drawn mark
+    (`Icon/Alert`-style; marks need only 3 : 1, red on black is 4.11)
+    with short yellow or white text, or the mark alone with an
+    accessible name / tooltip. Red text alone is out (4.11 : 1 < 4.5 for
+    small text). The mark is one more drawing.
+  - *XP cost* — the rank's cumulative cost ("10 XP"); default plus an
+    unavailable (grey) look, though the rank block's own unavailable
+    state may make that redundant.
+  - *Check attribute* — the italic word that opens a rank text in the
+    vault (Cunning, Resolute…), kept as an inline italic word.
+  - *Learned* is dropped: the picker hides learned entries (parent
+    decision 13) and the sheet shows learned state with grade discs.
+    Catalog `tags` stay searchable but are not shown.
+  - Built on the Atoms sheet (block `1475:116`): `Atoms/Tradition tag`
+    (`1475:92`), `Atoms/Badge` (`1475:94`; Style = Mark + yellow / Mark
+    + white / Mark only), `Atoms/XP cost` (`1475:106`; State = Default /
+    Unavailable), `Atoms/Check attribute` (`1475:111`); each has a TEXT
+    property. Placeholder `Icons/Outside traditions` (`1475:90`, 16, in
+    the Drawings block) and new token `Icon/Alert` → Accent.
+- D12 (2026-10-27): divider and scrollbar. **Scrollbar:** standard
+  properties only — `scrollbar-width: thin`, `scrollbar-color: <yellow>
+  transparent` (Chrome / Edge 121+, Firefox 64+, Safari 26.2+), plus
+  `scrollbar-gutter: stable` so the list doesn't shift when filtering
+  stops it scrolling. No `::-webkit-scrollbar` (non-standard, ignored by
+  Chrome once the standard properties are set, and absent in Firefox /
+  iOS). Measured in Chrome on Windows: gutter 10 px, thumb ~6 px with
+  rounded ends; the browser owns the thumb shape and, with classic
+  scrollbars, small arrow buttons in the thumb colour (the user's Chrome
+  may not show them — overlay / Fluent scrollbars). **Divider:** a
+  straight 1 px `Border/Default` line, vertical or horizontal; may go
+  unused. **Divider as rail (trial):** the list | aside divider is drawn
+  through the list's scrollbar gutter (in code a 1 px background
+  gradient on the list showing through the transparent track), so the
+  thumb rides on it; compared against a separate divider in Figma
+  before deciding. Built on the Atoms sheet (block `1479:145`):
+  `Atoms/Divider` (`1479:92`; Orientation), `Atoms/Scrollbar`
+  (`1479:95`; Orientation × Rail), examples A (rail, `1479:108`) and B
+  (separate, `1479:125`); loader placeholder `Decor/Loader` (`1479:106`,
+  48 × 48) in the Drawings block.
 
 ## Steps
 
@@ -287,11 +410,16 @@ outcome, not on a commit.
     ★ Icon button — built, awaiting review (D7: dialog ✕ only;
     default / hover / focus / pressed), ★ Text input — built, awaiting review (D8: empty,
     focused, focused + value, filled, invalid, read-only), ★ Search
-    input (carries the native clear ✕ plus the `@supports` fallback
-    button, D7), ★ Checkbox +
-    label (may look like a chip; S2b-4), ★ Tag / badge (XP cost, check
-    attribute, tradition, outside-traditions, learned), ★ Divider
-    (h / v), Scrollbar, Loader.
+        input — built, awaiting review (D9: glyph left, clear ✕ right, both
+        24 and outside the lines; native vs scripted ✕ open, scripted
+        favoured, D7), ★ Chip — built, awaiting review (D10: S / M / L ×
+    unchecked / checked × default, hover, focus; placeholder strokes;
+    hover open; replaces the planned Checkbox + label), ★ Tag / badge —
+        built, awaiting review (D11: tradition tag, outside-traditions badge
+        options, XP cost, check attribute as trial atoms; learned dropped),         ★ Divider
+            (h / v) and Scrollbar — built, awaiting review (D12: standard thin
+            scrollbar, 1 px divider; divider-as-rail on trial vs separate),
+            Loader (user draws; placeholder `Decor/Loader`).
   - **Molecules:** ★ Section heading (+ counter), ★ Dialog header (title,
     XP left, ✕), ★ Filter group (fieldset), ★ Rank block (grade, name,
     cost, prose, check; default / hover / selected / unavailable),
