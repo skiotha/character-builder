@@ -208,7 +208,8 @@ imports the same file into Figma.
   lean at different angles, even in opposite directions, and hover /
   pressed motion may move them by different amounts and directions. English
   is the primary language; the served font files are Latin-only subsets
-  and the Cyrillic cuts are a user TODO (roadmap l10n item). Built on
+  and the Cyrillic cuts come from the originals in `fonts-src/` in the
+  Step 4 font pass (roadmap l10n item). Built on
   the Atoms sheet `1440:9`: `Atoms/Button` (`1439:74`; Kind × State,
   TEXT property `Caption`, default "Learn" — the property is set-wide,
   so every variant shows the same caption), `Decor/Button border`
@@ -380,12 +381,39 @@ imports the same file into Figma.
   unused. **Divider as rail (trial):** the list | aside divider is drawn
   through the list's scrollbar gutter (in code a 1 px background
   gradient on the list showing through the transparent track), so the
-  thumb rides on it; compared against a separate divider in Figma
-  before deciding. Built on the Atoms sheet (block `1479:145`):
+  thumb rides on it. Both A (rail) and B (separate) are kept and tried
+  in the complete dialog design before choosing (user, 2026-10-27).
+  Built on the Atoms sheet (block `1479:145`):
   `Atoms/Divider` (`1479:92`; Orientation), `Atoms/Scrollbar`
   (`1479:95`; Orientation × Rail), examples A (rail, `1479:108`) and B
   (separate, `1479:125`); loader placeholder `Decor/Loader` (`1479:106`,
   48 × 48) in the Drawings block.
+- D13 (2026-10-27): headings and the dialog header. **Title** = the
+  catalog's name, like the sheet panel ("Abilities", "Spells", "Boons",
+  "Rituals"), in `Fonts/Header-36`, `Text/Heading`; not a verb phrase.
+  **Aside headings:** only one, above the preview ("On your sheet"), in
+  `Fonts/Menu-22`, `Text/Heading`; search, filter legends and Recall
+  speak for themselves. **Counter** = the XP balance as a bare number in
+    `Fonts/Header-36`, `Text/Default` — same size as the title; the sheet
+    panel's 64 is too big in the dialog (user, 2026-10-27) (no visible
+    "XP" label; in code an `<output>` with a visually hidden "XP left").
+  While a rank is selected it **projects** the balance after the pick:
+  old balance `Text/Muted`, a `Header-36` arrow, new balance
+  `Text/Default`, or `Text/Alert` with an ASCII hyphen ("-5") when it
+  would go negative — the font's "−" reads as a long dash. **Dialog
+  header** = title and counter on a shared baseline, counter pushed
+  right, ✕ (`Atoms/Icon button`) in the top-right corner, 24 px after
+  the counter; the counter can be hidden for callers without a balance.
+  Implementation notes: the parent plan's `header` option is a static
+  node, so projecting needs the dialog to re-render it on selection
+  change (e.g. `header?: Node | (selection) → Node`) — settle in parent
+  step 2c or the abilities caller step. The served Header subset
+  (`amenu-en*.ttf`) lacks "→"; the original `zenkurenaido.ttf` has it,
+  so add it when re-subsetting (Step 4 font pass). Built on the Molecules sheet:
+  `Molecules/Section heading` (`1485:128`; Level = Title / Aside; TEXT
+  Title), `Molecules/Counter` (`1485:123`; Projection = None /
+  Projected / Over; TEXT Balance, After), `Molecules/Dialog header`
+  (`1485:129`; BOOLEAN Counter; exposes the nested title and counter).
 
 ## Steps
 
@@ -404,24 +432,29 @@ outcome, not on a commit.
     and search glyph are placeholder components; the hand-drawn versions
     are Step 4 assets (table under "Motion & assets") and replace the
     vector inside each component, so instances update by themselves.
-  - **Atoms:** ★ Button — built, awaiting review (D6: primary
-    (bordered) / plain × default, hover, focus, pressed, disabled;
-    placeholder border, broken border and focus underline until drawn),
-    ★ Icon button — built, awaiting review (D7: dialog ✕ only;
-    default / hover / focus / pressed), ★ Text input — built, awaiting review (D8: empty,
-    focused, focused + value, filled, invalid, read-only), ★ Search
-        input — built, awaiting review (D9: glyph left, clear ✕ right, both
-        24 and outside the lines; native vs scripted ✕ open, scripted
-        favoured, D7), ★ Chip — built, awaiting review (D10: S / M / L ×
-    unchecked / checked × default, hover, focus; placeholder strokes;
-    hover open; replaces the planned Checkbox + label), ★ Tag / badge —
-        built, awaiting review (D11: tradition tag, outside-traditions badge
-        options, XP cost, check attribute as trial atoms; learned dropped),         ★ Divider
-            (h / v) and Scrollbar — built, awaiting review (D12: standard thin
-            scrollbar, 1 px divider; divider-as-rail on trial vs separate),
-            Loader (user draws; placeholder `Decor/Loader`).
-  - **Molecules:** ★ Section heading (+ counter), ★ Dialog header (title,
-    XP left, ✕), ★ Filter group (fieldset), ★ Rank block (grade, name,
+  - **Atoms** ⏳ Partial (approved by the user 2026-10-27; built on the
+    Atoms sheet `1440:9`): ★ Button (D6: primary (bordered) / plain ×
+    default, hover, focus, pressed, disabled), ★ Icon button (D7: dialog
+    ✕; default / hover / focus / pressed), ★ Text input (D8: empty,
+    focused, focused + value, filled, invalid, read-only), ★ Search input
+    (D9: glyph left, clear ✕ right, both 24 and outside the lines),
+    ★ Chip (D10: S / M / L × unchecked / checked × default, hover, focus;
+    replaces the planned Checkbox + label), ★ Tag / badge (D11: tradition
+    tag, outside-traditions badge options, XP cost, check attribute as
+    trial atoms; learned dropped), ★ Divider (h / v) and Scrollbar (D12).
+    Deferred, with where each lands:
+    - User drawings replacing the placeholders — button border (whole /
+      broken), focus underline, 6 chip strokes, ✕ Dialog / Clear, search
+      glyph, outside-traditions mark, loader → Step 4 (Assets).
+    - Chip hover (rotation vs caption-only scale, D10) → Step 1, tried
+      in the round-1 layouts.
+    - Scrollbar A (divider as rail) vs B (separate), D12 → Step 1.
+    - Outside-traditions badge option (D11) → Step 3 with open item B.
+    - Trial atoms that find no place (D11) are deprecated → Step 1.
+    - Native vs scripted search clear ✕ (D7) → implementation (parent
+      plan step 2c).
+  - **Molecules** (sheet `1481:111`): ★ Section heading (+ counter) and
+    ★ Dialog header (title, XP left, ✕) built (D13), ★ Filter group (fieldset), ★ Rank block (grade, name,
     cost, prose, check; default / hover / selected / unavailable),
     ★ Action line (special attack / reaction), ★ Meta line (equipment,
     boosted attribute), ★ Dialog footer (status, Cancel, primary),
@@ -445,7 +478,13 @@ outcome, not on a commit.
   SVGs swap their baked `style="fill: #…"` for `currentColor` /
   `var(--icon-secondary)` (grade discs: disc + letter custom
   properties); custom properties inherit into `<use>` shadow trees, so
-  one file serves every colour and disabled state. **Done when:** every
+  one file serves every colour and disabled state. **Font pass:**
+  re-cut the served fonts from the originals in `fonts-src/` with
+  fontTools' `pyftsubset` (Python; fontTools 4.67 is installed, add
+  `brotli` for WOFF2 output) instead of by hand in FontForge — a
+  scripted, re-runnable command per font, Latin and Cyrillic files
+  split by `unicode-range`, plus the extra symbols the design uses ("→"
+  in the counter, D13). **Done when:** every
   asset in the "Motion & assets" table is in the repo and placed in
   `picker` (glyphs swapped into their `Icons/*` components).
 - **Step 5 — Hand-off to code.** Settle open item S; parent step 2c

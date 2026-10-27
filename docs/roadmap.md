@@ -768,7 +768,7 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       never from the stored string. English is the primary language. The
       served fonts (`public/assets/fonts/*-en.ttf`) are Latin-only subsets,
       cut by hand in FontForge; RU needs matching Cyrillic cuts from the
-      original fonts (user TODO).
+      originals in `fonts-src/` (not served; see the font item below).
 - [ ] Deduplicate `getNestedValue` — four independent copies exist in
       `state.mjs`, `section-renderer.mjs`, `validation/engine.mjs` (×2).
       Extract a single version into `public/utils/object.mjs` and import
@@ -824,7 +824,12 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
 - [ ] Split `public/common/icons/` by role: icons, decorations (isle,
       keep, ship, cannon, name background) and button borders — borders
       and decorations are not icons
-- [ ] Optimize font files (subset to used glyphs if applicable)
+- [ ] Optimize font files: re-cut the served subsets from the originals
+      in `fonts-src/` with fontTools' `pyftsubset` (scripted and
+      re-runnable, replacing hand cuts in FontForge), Latin / Cyrillic
+      split by `unicode-range`, WOFF2 output (needs the `brotli` Python
+      package). `ElMessiri-VariableFont_wght.ttf` is served but unused —
+      keep or drop.
 - [ ] Add Brotli/gzip `Content-Encoding` for static assets and API responses
       (precompressed files or on-the-fly compression via `node:zlib`)
 - [ ] Set `Cache-Control` headers for static assets (fonts, icons, CSS)

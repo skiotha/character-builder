@@ -21,8 +21,8 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
 - Page: `Components` (`944:15`) — the reusable component library, one
   section per layer: `Foundations` (`1403:14`, a token / type sheet),
   `Icons` (`1403:224`, sheet `1416:2`), `Atoms` (`1403:225`, sheet
-  `1440:9`), `Molecules`,
-  `Organisms`. Variables: `Primitives`
+  `1440:9`), `Molecules` (`1403:226`, sheet `1481:111`),
+  `Organisms` (`1403:227`). Variables: `Primitives`
   (colours hidden from pickers) and `Semantic` (aliases components bind
   to); every variable carries its CSS name as WEB code syntax.
 - The MCP cannot load the TorukSC font (Display; it is installed only on

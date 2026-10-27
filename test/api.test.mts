@@ -1305,7 +1305,7 @@ describe("static files", () => {
   });
 
   it("GET /assets/fonts/... serves with correct MIME type", async () => {
-    const res = await fetch(`${BASE}/assets/fonts/philosopher.ttf`);
+    const res = await fetch(`${BASE}/assets/fonts/abody-en.ttf`);
 
     assert.equal(res.status, 200);
     const ct = res.headers.get("content-type") ?? "";
