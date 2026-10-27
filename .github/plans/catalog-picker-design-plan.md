@@ -86,7 +86,9 @@ Breakpoints are open item B.
 on state. Hover / focus → rotation and / or scale; activation → a wobble.
 All of it off under `prefers-reduced-motion`. Exceptions (D6): disabled
 buttons turn grey and swap to a "broken" border; keyboard focus adds a
-static underline stroke, so focus stays visible with motion off.
+static underline stroke, so focus stays visible with motion off; focused
+icon buttons grow their glyph instead (D7), a static end state that stays
+with motion off too.
 
 **Assets** (user draws in Illustrator with artistic brushes; outlines are
 not fully predictable, so these are briefs, not specs):
@@ -190,7 +192,9 @@ imports the same file into Figma.
   captions (open item A). Captions in different languages should stay
   close in length. States: hover → rotate / scale; pressed → wobble;
   focus → a hand-drawn underline stroke under the caption (static, so it
-  survives reduced motion); disabled → caption and border turn grey
+  survives reduced motion; it may sit off-centre and run past the
+  primary's border, which the user approved on the Figma draft as part
+  of the sketched look); disabled → caption and border turn grey
   (`Text/Disabled`-style token, added at the build) and the border swaps
   to a "broken" drawing. Each button carries its own tilt, a rotation in
   −3°…+3°, with separate angles for caption and border, fixed per button
@@ -207,6 +211,58 @@ imports the same file into Figma.
   `Fonts/Button-20` (Menu-20, uppercase). Figma cannot rotate layers
   inside an instance, so drafts tilt the whole button; the separate
   caption / border angles exist only in code.
+- D7 (2026-10-27): icon buttons. States follow D6 and the motion
+  preference: no colour change; hover → rotate, pressed → wobble,
+  focus → the glyph grows (24 → 30 px, ×1.25, inside the 32 × 32 click
+  area). The scale is a static end state, so it stays under
+  `prefers-reduced-motion` (only the transition drops). No underline,
+  and hover doesn't scale, so focus can't be mistaken for hover. Click area: dialog ✕
+  32 × 32 around its 24 px glyph. The search-clear ✕ is **not** an icon
+  button: it is the native `type=search` cancel control, restyled with
+  the Clear drawing via `::-webkit-search-cancel-button` (24 × 24, the
+  WCAG 2.5.8 minimum). Accepted trade-offs: it can't be reached with
+  Tab (Escape clears the field instead, in Chrome / Safari), and
+  Firefox shows **no** clear ✕ at all — its native one has sat behind
+  the off-by-default pref `layout.forms.input-type-search.enabled`
+  since Firefox 81 (bug 558594), so there is nothing to style.
+  **Preferred fix (user, 2026-10-27):** a real clear button shown only
+  where `@supports selector(::-webkit-search-cancel-button)` fails, so
+  Chrome / Safari keep the native control; implemented with the Search
+  input atom. So the Icon button atom serves the
+  dialog ✕ now and the sheet's plus / up buttons later. Built on the
+  Atoms sheet: `Atoms/Icon button` (`1448:23`; State × 4, an
+  instance-swap property `Icon` defaulting to Icons/Close Dialog, with
+  the Close / Plus / Up icons as preferred values).
+- D8 (2026-10-27): text input, from the existing sheet CSS (the
+  `div.input` pattern). Two horizontal lines (top and bottom borders,
+  `Border/Default`); the label (Body-14, `Text/Heading`, 8 px in) sits
+  between them while empty and unfocused, and above the top line once
+  focused or filled; the value is Menu-20, 24 px in, so label and value
+  are deliberately offset. Field height 32 unfocused → **48** focused
+  (was 50; on the 4 px grid, matches the button). Focus: the field grows
+  upward, the top line turns `State/Focus` red, the field fills
+  `Surface/Active` yellow, typed text turns **black** (`Text/Inverse`,
+  10.4 : 1 on yellow; white was 1.7 : 1), and the caret is a static red
+  bar (`caret-shape: bar; caret-animation: manual` — it doesn't blink).
+  The placeholder shows only while focused, as black **Italic-14**
+  (trial), so a hint can never be mistaken for an entered value — this
+  matters once SSE patches values after blur; the old red-on-yellow hint
+  was 2.5 : 1. Unfocused filled text is `Text/Default` white. Invalid
+  (filled only): label and lines pulse yellow ↔ red (2 s, endless);
+  under `prefers-reduced-motion` they hold steady red. Read-only: lines,
+  label and value grey, text not selectable (as today). No separate
+  disabled state. Every human-entered field shows its text capitalized
+  (user, 2026-10-27), search included: `text-transform: capitalize` is
+  visual only, and matching stays case-insensitive (parent S2b-3). The
+  global rule covers `textarea, input[type="text"]` today, so code must
+  add `input[type="search"]`. Selection is red with white text. The
+  picker uses only
+  empty / focused / filled (via the Search input); the rest serve the
+  sheet. Built on the Atoms sheet: `Atoms/Text input` (`1454:31`;
+  State = Empty / Focused / Focused filled / Filled / Invalid /
+  Read-only; TEXT properties Label, Value, Placeholder; 160 × 56, the
+  focused field overflows 16 px upward like the CSS; value and caret
+  share an auto-layout row so the caret follows the text).
 
 ## Steps
 
@@ -228,8 +284,11 @@ outcome, not on a commit.
   - **Atoms:** ★ Button — built, awaiting review (D6: primary
     (bordered) / plain × default, hover, focus, pressed, disabled;
     placeholder border, broken border and focus underline until drawn),
-    ★ Icon button, ★ Text input (from the `inputs` drafts: empty,
-    filled, focus, invalid, read-only), ★ Search input, ★ Checkbox +
+    ★ Icon button — built, awaiting review (D7: dialog ✕ only;
+    default / hover / focus / pressed), ★ Text input — built, awaiting review (D8: empty,
+    focused, focused + value, filled, invalid, read-only), ★ Search
+    input (carries the native clear ✕ plus the `@supports` fallback
+    button, D7), ★ Checkbox +
     label (may look like a chip; S2b-4), ★ Tag / badge (XP cost, check
     attribute, tradition, outside-traditions, learned), ★ Divider
     (h / v), Scrollbar, Loader.
