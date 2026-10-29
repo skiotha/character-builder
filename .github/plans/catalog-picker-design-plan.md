@@ -97,12 +97,16 @@ not fully predictable, so these are briefs, not specs):
 | --- | --- | --- | --- |
 | Button border | primary button only (Learn) | Draw at 128 × 48; stretches a little for longer captions (D6) | placeholder in Figma |
 | Button border, broken | disabled primary | Same 128 × 48 frame as the border, visibly broken / interrupted; shown grey (D6) | placeholder in Figma |
-| Focus underline | `:focus-visible` on every text button and filter chip | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6, D10) | placeholder in Figma |
+| Focus underline | `:focus-visible` on every text button and filter chip | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6, D10). Several shapes (three placeholders for now, count open) to vary per caption; red by default, yellow under red captions (D17) | placeholder in Figma |
 | Chip stroke, unchecked / checked | filter chip fill (`Decor/Chip stroke`) | A single wide brush stroke, at S 64 / M 96 / L 128 × 32 — 6 drawings; the checked one differs in **shape and angle**, not just colour; tilt lives inside the canvas; colours come from CSS (grey / yellow) (D10) | placeholder in Figma |
 | Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 24, mirrors the search glyph) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
 | Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
 | Outside-traditions mark | spell badge (D11) | Small red hand-drawn mark, readable at ~16 px, meaning "not your tradition"; may stand alone | not drawn |
+| Special attack / reaction marks | action line kind (`Icons/Special attack`, `Icons/Reaction`, 16) | Two small marks, told apart by shape, readable at 16 px beside Body-14 text; colour from CSS (D15) | placeholder in Figma |
+| Spell / ability kind marks | entry kind (D15) | A sibling pair (mark, edge or ornament) differing in shape, colour or place; neither kind louder than the other | candidate, round 1 |
+| Equipment / attributes / traditions icons | meta line labels (D15) | Small icons that may replace the text labels (e.g. a sword for equipment) | candidate, round 1 |
+| Swap hint mark | entry head (D15) | Small mark hinting that a rank lets the character swap an attribute | candidate, round 1 |
 | Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
 
@@ -325,9 +329,11 @@ imports the same file into Figma.
   the reverse on uncheck; under `prefers-reduced-motion` the swap is
   instant. If the wipe looks wrong, other cues get explored. Sizes:
   three drawings per state, **S 64 / M 96 / L 128 × 32** (6 drawings),
-  picked by caption width (≤ 40 / ≤ 72 / ≤ 104 px at Body-14: Spell,
-  Ability and the traditions except Symbolism → S; Symbolism,
-  Заклинание → M; My traditions, Способность, Мои традиции → L);
+  picked by caption width (≤ 40 / ≤ 72 / ≤ 104 px at Body-14, measured
+  in Figma: Spell, Ability, Boon, Sin, Order, Circle, Tribe, Sirens,
+  Runes → S; Theurgy (50), Sorcery (47), Symbolism (65) → M; My
+  traditions (80), Способность (82), Заклинание (74), Мои традиции (91)
+  → L); captions are centred on the stroke;
   captions should stay short and of similar length. Tilt: the strokes
   carry their tilt inside their own canvases; the caption gets a slight
   per-chip CSS tilt, disjoint from the stroke's (as in D6). Focus: the
@@ -414,6 +420,179 @@ imports the same file into Figma.
   Title), `Molecules/Counter` (`1485:123`; Projection = None /
   Projected / Over; TEXT Balance, After), `Molecules/Dialog header`
   (`1485:129`; BOOLEAN Counter; exposes the nested title and counter).
+- D14 (2026-10-28): filter group. One `<fieldset>` of `Atoms/Chip`
+  checkboxes per S2b-4 group, chips 8 px apart. **Legend visually
+  hidden** (still read by screen readers): with groups this small
+  (Ability / Spell, Boon / Sin) the chips speak for themselves. **One
+  wrapping row** for all groups, 24 px between groups, 16 px between
+  rows (a group longer than the column wraps inside itself). **Start
+  unchecked**: nothing checked already shows everything (S2b-4), so a
+  click narrows ("only spells") instead of hiding. **No match counts**
+  on chips (they lengthen captions, push chips into bigger strokes and
+  change while typing). **Tradition chips:** both the single "My
+  traditions" chip and one chip per tradition (8, two rows at 410 px)
+  are kept for the round-1 layouts; the final choice stays with open
+  item B. Built on the Molecules sheet (block `1493:231`):
+  `Molecules/Filter group` (`1493:230`; Kind = Source / Talent source /
+  My traditions / Traditions; hidden `Legend` layer) and four example
+  rows at the 410 px right-column width. Chip captions were re-centred
+  on the stroke in `Atoms/Chip` along the way; a slightly off-centre
+  caption is acceptable later as part of the hand-drawn feel, but not
+  pursued deliberately now (user, 2026-10-28). Which chips the picker
+  actually uses is still open (round-1 layouts).
+- D15 (2026-10-28, revised the same day): meta and action lines — the
+  lines a picker **entry** is made of. *Entry* is the word for a list
+  item in the picker (traits now, talents later); *card* stays for the
+  sheet. **The entry tells everything useful for play:** the picker is
+  the only place a player learns what a trait does, so an entry carries
+  every rules-relevant fact, as clearly as possible; which facts earn
+  their space is explored and A/B-tested in the round-1 layouts.
+  Bookkeeping (tags, `source`, ids) is never shown. **Names in full:**
+  entries have room for "Mystical Tradition: Order", so the name is not
+  cut and no kind line repeats its prefix (the cut is reserved for the
+  narrow preview cards, if they need it). **Meta line:** a *label +
+  value pair* — labels `Text/Muted` (5.3 : 1; the old red labels failed
+  AA at 14 px and red is not "interactive", D7) in a right-aligned 88 px
+  column, values `Text/Default`, as in the old sheet card's grid (in
+  code a `<dl>` whose rows share one grid). Facts:
+  - *Equipment* ("Equipment — Stiletto", 23 abilities): text now; a
+    hand-drawn icon (a sword) in place of the label is tried in round 1.
+  - *Attributes* ("Attributes — Discreet"): the attributes the entry's
+    effects roll against (`check`, 27 abilities) or let the character
+    swap to (`setBase`, 8 abilities), so players can steer towards
+    their strong attributes. Written in full ("Discreet");
+    abbreviations ("Dis") stay for the compact sheet card. The swap
+    itself is an **effect** and stays in the rank text as authored — no
+    extra line restating it, and no entry ever asserts a *default*
+    attribute ("attacks use Accurate"), since another trait may swap
+    it (the engine takes the highest, ES §setbase). A small hint mark
+    that a swap hides in the ranks is a candidate for round 1.
+  - *Traditions* (spells; "Traditions — Runes, Theurgy, Circle"); this
+    makes the D11 tradition-tag atom a likely deprecation.
+
+  Icons in place of labels (equipment, attributes, traditions) are an
+  option to test, not a commitment; text may be just right. Longer
+  labels are another option for the entry tests: "Starting equipment"
+  for *Equipment*, and "Base attribute" or "Default attribute" for
+  *Attributes* (clearer, but they widen the label column from 88 px to
+  about 130; "default" must not read as the engine default the entry
+  never asserts).
+  **Spells vs abilities:** the two must be told apart at a glance —
+  buying spells makes a character a mystic, which players pursue — but
+  neither kind is more important. Whatever marks a spell (a hand-drawn
+  mark, edge or ornament; red is still available for marks and edges,
+  which need only 3 : 1) has a sibling of a different shape, colour or
+  place on abilities. Colour never works alone (WCAG 1.4.1); the shape
+  or the traditions line carries it too. Explored in round 1.
+  **Tooltips** are a candidate element: if the muted text is not
+  enough, purely mechanical detail (numbers, conditions) may move into
+  tooltips later. Not needed for now — the examples read well inline;
+  the generic component is D17.
+  **Action line:** one paragraph per special attack / reaction, after
+  the rank's effects: a 16 px hand-drawn **mark** for the kind (two new
+  drawings: special attack, reaction), the name `Text/Heading`, the
+  conditions `Text/Muted` in parentheses (reaction trigger, "free",
+  weapon restriction from `appliesTo`), then the description
+  `Text/Default` — "Feint (free; precise or short weapons): Perform a
+  Feint attack." Implementation note: the 14 trigger keys (`onHit`,
+  `onAttacked`, `onProne`, …) and `appliesTo` need human phrases in
+  both locales (a small lookup table, parent step 4). Built on the
+  Molecules sheet (block `1504:311`): `Molecules/Meta line` (`1504:299`;
+  Kind = Pair; TEXT Label, Value; the Kind line variant was removed in
+  the revision),
+  `Molecules/Action line` (`1504:310`; Kind = Special attack /
+  Reaction; the paragraph is one text node with coloured ranges, so it
+  is edited directly, not through a property), placeholders
+  `Icons/Special attack` (`1504:290`) and `Icons/Reaction` (`1504:292`)
+  in the Atoms Drawings block, plus example entry heads (Smoke and
+  Mirrors, Mystical Tradition: Order, Acrobatics, Anathema) and the
+  longest action description.
+- D16 (2026-10-28): rank block — one rank of a picker entry. **Layout:**
+  the three ranks stack (novice, adept, master) at full entry width; a
+  row of three columns would wrap effects of up to 185 characters too
+  hard. **Head:** grade disc (`Icons/Grade`, 32 px) + rank name
+  (`Menu-20`, `Text/Heading`) + **step** cost (`Body-14`, `Text/Muted`:
+  "10 XP", "+20 XP", "+30 XP"), on one baseline. The disc's colour
+  doubles as the spell / ability sibling marker D15 asks for: yellow
+  for abilities, red for spells. **Body**, indented under the name:
+  effects (`Body-14`), then action lines (D15). **No rank description
+  in the picker:** it restates the effects listed below it. The
+  `description` field stays in the data for siblings that want a
+  briefer list.
+  **Check attribute:** every effect with a `check` already names the
+  attribute in its text (45 of 45; 41 open with it, four name it
+  mid-sentence — Wrestling novice and adept, Sorcery master, Demiurge
+  Hands master), so the word is emphasised **wherever it stands**
+  (`Text/Heading`, matched from the localized attribute name; RU
+  follows the same "Attribute, чтобы…" pattern) instead of being
+  repeated as a prefix. No authoring rule is needed. The D11
+  check-attribute atom is a likely deprecation, and so is the D11
+  XP-cost atom, which the head now carries. **Control:** a `<button>`
+  may hold only phrasing content, so the **head** is the button (in the
+  entry's tab order); the whole block shows hover and passes clicks to
+  it. **Selection and focus are independent:** selecting happens on
+  activation (click, Enter, Space), while Tab / arrows only move focus.
+  A selected rank may keep focus (keyboard, and the S2b-2 re-render
+  restores it) or not (focus moved on, selection restored on reopen or
+  Recall). A mouse click doesn't match `:focus-visible`. So the
+  component has two properties. **Selection:** None; Selected (4 px
+  bar along the block); **Included** (the same 4 px bar: the ranks
+  below the selection, since choosing Adept buys Novice too, so the bar
+  runs from the first rank to the selected one; any extra "selected"
+  effect, if one is added, marks the selected rank only); Unavailable
+  (too expensive, or master at creation: the head greys to
+  `Text/Disabled` with the unlearned grey disc; it is
+  `aria-disabled`, so it stays focusable and keyboard users reach it;
+  the body stays readable and the footer gives the reason, S2-1).
+  **Interaction:** Default; Hover (the disc rotates — motion, not
+  colour, as for other controls; none on Unavailable); Focus
+  (`Decor/Focus underline` under the rank name). The bars are **final
+  CSS lines**, not placeholders (like dividers and scrollbars, D12).
+  **Spell colour** (also D15's sibling marker): spells turn red only
+  where red stays legible — the entry name (`Text/Spell` → Accent,
+  large text only: 4.11 : 1 passes the 3 : 1 large-text bar), the grade
+  discs and the bars (`Grade/Spell`, 3 : 1 for non-text). Small text
+  (rank names, action names, emphasised attributes) stays yellow, so
+  there is no new "text red" token. A focus underline under a caption
+  that is itself red turns yellow (`State/Focus on accent` → Main);
+  otherwise it stays red. Data note: some ranks state a reaction twice,
+  as a prose effect and as the typed reaction (Acrobatics adept: "Quick
+  check to instantly spring to your feet…" and *Bounce Back*); an
+  authoring pass may drop the prose copy, or a tooltip (D17) may carry
+  it. Built on the Molecules sheet (block `1514:457`):
+  `Molecules/Rank block` (`1514:456`; Selection = None / Selected /
+  Included / Unavailable × Interaction = Default / Hover / Focus, 12
+  variants; TEXT Name, Cost; INSTANCE_SWAP Grade; hidden optional slots
+  Effect 3 and Action line 2 that instances switch on; the cost sits at
+  the right end of the head), with Acrobatics (ability) and Anathema
+  (spell: red name, discs and bars) stacks as examples. Revised the
+  same day: Included bar 2 → 4 px, State split into Selection ×
+  Interaction, rank description and its BOOLEAN removed, cost moved
+  right, spell colour added.
+- D17 (2026-10-28): tooltip — one generic molecule (its content can be
+  a whole action line, so it is not an atom). **No pointer**; rounded
+  corners (`Radius/sm`, 8 px); it opens 8 px from its trigger. **Surface**, two on trial until the
+  full-entry tests: Outlined (`Surface/Base` + 1 px `Border/Default`,
+  like dividers) and Glass (`Surface/Glass` + background blur, no
+  border; it shows only where it covers content, so check it over
+  dense text). **Content:** Text (one `Body-14` paragraph — a quality
+  or term explained, a mechanical aside) or Rich (a slot holding
+  molecules — e.g. the effect behind an action line; the data links
+  special attacks / reactions to their rank only, not yet to one
+  effect, so per-effect links need a data change first). **Behaviour**
+  (WCAG 1.4.13): opens on hover **and** focus, stays while the pointer
+  is over it, Esc closes it; touch has no hover, so a tap opens it —
+  the trigger must be a real control. Native route: Popover API + CSS
+  anchor positioning (`popover="hint"` / `interestfor` are newer —
+  check support at implementation). What actually moves into tooltips
+  is decided in the full-entry tests (D15). Built on the Molecules
+  sheet (block `1527:535`): `Molecules/Tooltip` (`1527:636`; Surface =
+  Outlined / Glass × Content = Text / Rich) with both shown in place
+  over an Acrobatics Adept + Master stack. Also from this discussion:
+  `Decor/Focus underline` (`1526:504`) became a set — Shape 1 / 2 / 3
+  (placeholder strokes; varying them per caption may look livelier;
+  the count stays open) × Tone = Default (`State/Focus`) / On accent
+  (`State/Focus on accent`).
 
 ## Steps
 
@@ -454,14 +633,19 @@ outcome, not on a commit.
     - Native vs scripted search clear ✕ (D7) → implementation (parent
       plan step 2c).
   - **Molecules** (sheet `1481:111`): ★ Section heading (+ counter) and
-    ★ Dialog header (title, XP left, ✕) built (D13), ★ Filter group (fieldset), ★ Rank block (grade, name,
-    cost, prose, check; default / hover / selected / unavailable),
-    ★ Action line (special attack / reaction), ★ Meta line (equipment,
-    boosted attribute), ★ Dialog footer (status, Cancel, primary),
+    ★ Dialog header (title, XP left, ✕) built (D13), ★ Filter group
+    (fieldset) built (D14), ★ Rank block (grade, name, cost, effects,
+    check; selection none / selected / included / unavailable ×
+    default / hover / focus) built (D16), Tooltip (outlined / glass ×
+    text / rich) built (D17),
+    ★ Action line (special attack / reaction) and ★ Meta line
+    (equipment, attributes, traditions) built (D15),
+    ★ Dialog footer (status, Cancel, primary),
     Message block (no matches / error + Retry / preview hint),
     Remember / Recall stubs.
-  - **Organisms:** ★ Trait card full (default / selected / learned),
-    Talent card (Step 2), Ritual card (Step 2), ★ Compact sheet card +
+  - **Organisms:** ★ Trait entry (the full picker list item, D15;
+    default / selected / learned), Talent entry (Step 2), Ritual entry
+    (Step 2), ★ Compact sheet card +
     vacant "+" card, Dialog shell (list | aside + header / footer slots).
 
   **Done when:** every ★ item is a component on `Components`.
