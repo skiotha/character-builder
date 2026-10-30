@@ -102,12 +102,14 @@ not fully predictable, so these are briefs, not specs):
 | Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 24, mirrors the search glyph) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
 | Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
+| Alert mark | footer status, before a blocked reason (`Icons/Alert`, 16; D18) | Small red hand-drawn "blocked / attention" mark, readable at 16 px beside Body-14 text; distinct from the outside-traditions mark; colour from CSS | placeholder in Figma |
 | Outside-traditions mark | spell badge (D11) | Small red hand-drawn mark, readable at ~16 px, meaning "not your tradition"; may stand alone | not drawn |
 | Special attack / reaction marks | action line kind (`Icons/Special attack`, `Icons/Reaction`, 16) | Two small marks, told apart by shape, readable at 16 px beside Body-14 text; colour from CSS (D15) | placeholder in Figma |
 | Spell / ability kind marks | entry kind (D15) | A sibling pair (mark, edge or ornament) differing in shape, colour or place; neither kind louder than the other | candidate, round 1 |
 | Equipment / attributes / traditions icons | meta line labels (D15) | Small icons that may replace the text labels (e.g. a sword for equipment) | candidate, round 1 |
 | Swap hint mark | entry head (D15) | Small mark hinting that a rank lets the character swap an attribute | candidate, round 1 |
-| Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
+| Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`. It shows **alone** (the text is for screen readers only, D19), so the static frame must still read as "loading"; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
+| Details marker | `Atoms/Details toggle` (D17) | Small mark beside Body-14, ~12 px; points right when closed and turns (or is redrawn) to point down when open | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
 
 **Hand-off:** Illustrator *Export As → SVG* (presentation attributes,
@@ -543,7 +545,10 @@ imports the same file into Figma.
   (too expensive, or master at creation: the head greys to
   `Text/Disabled` with the unlearned grey disc; it is
   `aria-disabled`, so it stays focusable and keyboard users reach it;
-  the body stays readable and the footer gives the reason, S2-1).
+  the body stays readable and the head gives the reason after the
+  cost, "+30 XP · 5 short" / "+30 XP · not at creation", tied to the
+  head by `aria-describedby`; not the footer, which describes the
+  current selection only, D18).
   **Interaction:** Default; Hover (the disc rotates — motion, not
   colour, as for other controls; none on Unavailable); Focus
   (`Decor/Focus underline` under the rank name). The bars are **final
@@ -562,7 +567,8 @@ imports the same file into Figma.
   it. Built on the Molecules sheet (block `1514:457`):
   `Molecules/Rank block` (`1514:456`; Selection = None / Selected /
   Included / Unavailable × Interaction = Default / Hover / Focus, 12
-  variants; TEXT Name, Cost; INSTANCE_SWAP Grade; hidden optional slots
+  variants; TEXT Name, Cost, Reason (the last only on Unavailable,
+  after the cost); INSTANCE_SWAP Grade; hidden optional slots
   Effect 3 and Action line 2 that instances switch on; the cost sits at
   the right end of the head), with Acrobatics (ability) and Anathema
   (spell: red name, discs and bars) stacks as examples. Revised the
@@ -587,12 +593,146 @@ imports the same file into Figma.
   check support at implementation). What actually moves into tooltips
   is decided in the full-entry tests (D15). Built on the Molecules
   sheet (block `1527:535`): `Molecules/Tooltip` (`1527:636`; Surface =
-  Outlined / Glass × Content = Text / Rich) with both shown in place
-  over an Acrobatics Adept + Master stack. Also from this discussion:
+  Outlined / Glass × Content = Term / Text / Rich; TEXT Term,
+  Definition) with both surfaces shown in place over an Acrobatics
+  Adept + Master stack. **Term** (240 px): the term's name in
+  `Text/Heading` above its catalogue definition — the small tooltip
+  for marked words (below). Also from this discussion:
   `Decor/Focus underline` (`1526:504`) became a set — Shape 1 / 2 / 3
   (placeholder strokes; varying them per caption may look livelier;
   the count stays open) × Tone = Default (`State/Focus`) / On accent
   (`State/Focus on accent`).
+  **Revised 2026-10-29 — lighter entries.** Making entries lighter (so
+  the list is easier to scroll and scan) is a direction to explore, not
+  a requirement. Four **densities** are mocked as full entries in round
+  1:
+  - **Full:** everything inline (today's rank block).
+  - **Middle:** effects inline; each special attack / reaction keeps
+    its mark, name and conditions, and its description moves into a
+    Term tooltip on the name.
+  - **A:** effects inline; special attacks / reactions sit behind
+    Details.
+  - **B:** the rank `description` inline; effects, special attacks and
+    reactions sit behind Details.
+
+  **Long content never goes into a hover tooltip.** In A and B the
+  hidden content is what the player chooses by. Hover-reading it means
+  comparing from memory, a tap per rank on touch, poor screen-reader
+  support, a pop-up on every Tab through the rank heads, and a panel
+  covering the neighbouring ranks. So it sits behind a **Details
+  toggle** (native `<details>` / `<summary>`) and opens **in place**:
+  the list grows instead of being covered. Find-in-page opens a closed
+  one by itself. Hover tooltips stay for short things only: a term, or
+  an action's one-line description (Middle).
+  **Term tooltips:** a word in authored text that names a catalogue
+  entry gets a dotted underline and a Term tooltip with that entry's
+  name and definition. Eventually that means anything in the catalogues
+  with an id; implementation starts with **qualities** only. The words
+  are linked by **markers in the authored text**, not by matching
+  names. Matching fails on inflection: the RU quality is "Неудобное",
+  but the effects say "качество неудобного". Normalizing the text to
+  one noun form wouldn't fix it either, because a parser can't tell a
+  term from the same word used plainly. **Marker shape:**
+  `{kind:id}` or `{kind:id|text}`. `kind` names the catalogue
+  (`quality`, `status`, `weapon`, `armor`, `ability`, `spell`, `ritual`,
+  `attribute`) and `id` is the entry's id. `text`, after the pipe, is
+  the word exactly as it stands in the sentence; without it the
+  localized catalogue name is shown, which suits English and
+  nominative Russian. No catalogue text uses `{`, `}` or `|` today, so
+  no escaping is needed. The lint test checks three things:
+  - every marker's kind is known and its id exists in that catalogue;
+  - `text` is not empty;
+  - EN and RU carry the same set of markers per description (the
+    locale-drift lint's job).
+
+  It can also use the structured data to warn when an effect targets a
+  quality its text doesn't mark. The **highlighted attribute word**
+  (D16) moves to the same markers (`{attribute:quick|Quick}`), which
+  fixes its RU inflection too. This needs a
+  `docs/reference-authoring.md` rule and an authoring pass over both
+  locales: a **non-blocking** task in the parent plan, step 4.
+  **Tab stops (decided, if tooltips survive the tests):** marked terms
+  are tabbable only inside the **current entry**, the one holding
+  focus. Elsewhere they carry `tabindex="-1"`, so Tab walks rank head →
+  that rank's terms → next rank head within the entry, then jumps to
+  the next entry's head.
+  Built: `Atoms/Details toggle` on the Atoms sheet (`1538:750`, block
+  `1538:641`; Open = false / true × Interaction = Default / Hover /
+  Focus; TEXT Caption "Details" / RU «Подробнее»; Body-14
+  `Text/Muted`; the marker points right when closed and down when open,
+  hover nudges it, focus draws the focus underline). `Molecules/Action
+  line` gained Form = Full / Name (Name: mark, name with a dotted
+  underline, conditions). `Molecules/Rank block` gained hidden slots,
+  BOOLEAN each: Summary (the rank description), Toggle before effects
+  (B) and Toggle before actions (A). An **Entry densities** block on
+  the Molecules sheet (`1539:673`) shows Acrobatics Adept at Full,
+  Middle (with Bounce Back's tooltip), A closed / open and B closed /
+  open (with the Unwieldy tooltip).
+- D18 (2026-10-28): dialog footer — status `<output>` + **Cancel**
+  (plain, in the dismiss form, S2-2) + primary **Learn** last (S2-1).
+  **The footer describes the selection only.** An unavailable rank
+  can't be selected, so its reason would sit in the footer while Learn
+  still buys the earlier selection, and the message would come and go.
+  So the reason moved to the rank head (D16), and the status `<output>`
+  (a live region, so every change is announced) has three states:
+  **Empty** — muted hint "Select a rank to learn.", Learn disabled;
+  **Ready** — muted summary of what Learn buys, "Acrobatics, Adept —
+  30 XP" (RU «Акробатика, Адепт — 30 опыта»), Learn enabled;
+  **Blocked** — the `canCommit` reason (rare once unavailable ranks are
+  unselectable: talents, stale data) in `Text/Default` after a small
+  red alert mark (`Icons/Alert`, placeholder; red text fails AA at
+  14 px), Learn disabled with the broken border (D6). **Layout:** Row
+  (status left, buttons right; a full-width footer) and Stacked (status
+  above, buttons right-aligned; a right-column footer of ~410 px, where
+  two buttons leave too little room beside a reason) — the Dialog shell
+  picks in round 1. The divider above the footer is optional (BOOLEAN,
+  on trial). Built on the Molecules sheet (block `1547:1169`):
+  `Molecules/Dialog footer` (`1547:1168`; Layout = Row / Stacked ×
+  Status = Empty / Ready / Blocked; BOOLEAN Divider; Cancel and Learn
+  are exposed `Atoms/Button` instances, so captions override; the
+  status text is a plain per-variant layer, overridden on instances),
+  with RU Stacked Blocked, RU Row Ready and a no-divider Stacked Ready
+  as examples. `Icons/Alert` (`1547:838`) sits on the Atoms sheet beside
+  the other small marks.
+- D19 (2026-10-29): message — one molecule for the dialog's
+  non-content states, a visual on top, one line of text, an optional
+  plain button below. **Loading** (list column): the loader alone,
+  shown after ~300 ms so a cached catalog never flashes it; "Loading…"
+  is for screen readers only (`role="status"`, list `aria-busy`).
+  **Error**: alert mark + `Body-14` `Text/Default` "Couldn't load the
+  list." (RU «Не удалось загрузить список.») + **Retry** («Повторить»;
+  `role="alert"`). **Empty**: "Nothing left to learn here." («Здесь
+  больше нечему учиться.»), everything learned or excluded. **No
+  matches**: "Nothing matches." («Ничего не найдено.») + **Clear
+  filters** («Сбросить фильтры»), which empties the search and unchecks
+  every chip (an addition to the parent's step 2c). **Hint** (preview
+  slot, start-aligned): "Select a rank to see it here." («Выберите
+  ранг, чтобы увидеть его здесь.»); untiered catalogs need their own
+  word. Quiet states (Empty, No matches, Hint) are `Italic-14`
+  `Text/Muted`, so they read as remarks, not content. List-column
+  states sit centred in the column. Built on the Molecules sheet (block
+  `1553:1063`): `Molecules/Message` (`1553:953`; State = Loading /
+  Error / Empty / No matches / Hint; text per variant, overridden on
+  instances; Retry / Clear filters are exposed `Atoms/Button` Plain
+  instances), with RU examples and a 700 × 320 list-column mock.
+- D20 (2026-10-30): Remember / Recall stubs — placeholders for the
+  roadmap "remember / recall to compare" item (S2-8), which gets its
+  own design together with multi-pick. Two plain text buttons,
+  **natively disabled** (grey, skipped by Tab, no tooltip: they are
+  temporary, and an `aria-disabled` + "Coming later" tooltip would add
+  two tab stops that do nothing), in the existing
+  `<menu aria-label="Compare">` below the preview. One row, left-aligned
+  with the preview, 32 px apart (RU ~253 of ~410 px); the plain
+  buttons' padding insets the captions ~16 px, so code may pull the row
+  back with a negative inline margin for optical alignment. No heading
+  (D13). Optional divider above (BOOLEAN, on trial). A dashed
+  **reserved tray** (design-only, never shipped) keeps ~410 × 196 px,
+  room for two ~150 × 180 compact cards, so round-1 layouts leave the
+  space the compare feature will need. Built on the Molecules sheet
+  (block `1567:968`): `Molecules/Compare stubs` (`1567:955`; BOOLEAN
+  Divider and Reserved tray, both on by default; Remember / Recall are
+  exposed `Atoms/Button` Plain Disabled instances), with RU and the
+  shipped shape (no tray, no divider) as examples.
 
 ## Steps
 
@@ -620,11 +760,13 @@ outcome, not on a commit.
     ★ Chip (D10: S / M / L × unchecked / checked × default, hover, focus;
     replaces the planned Checkbox + label), ★ Tag / badge (D11: tradition
     tag, outside-traditions badge options, XP cost, check attribute as
-    trial atoms; learned dropped), ★ Divider (h / v) and Scrollbar (D12).
+    trial atoms; learned dropped), ★ Divider (h / v) and Scrollbar (D12),
+    Details toggle (D17, added with the entry densities).
     Deferred, with where each lands:
     - User drawings replacing the placeholders — button border (whole /
       broken), focus underline, 6 chip strokes, ✕ Dialog / Clear, search
-      glyph, outside-traditions mark, loader → Step 4 (Assets).
+      glyph, outside-traditions mark, alert mark (D18), loader → Step 4
+      (Assets).
     - Chip hover (rotation vs caption-only scale, D10) → Step 1, tried
       in the round-1 layouts.
     - Scrollbar A (divider as rail) vs B (separate), D12 → Step 1.
@@ -636,13 +778,19 @@ outcome, not on a commit.
     ★ Dialog header (title, XP left, ✕) built (D13), ★ Filter group
     (fieldset) built (D14), ★ Rank block (grade, name, cost, effects,
     check; selection none / selected / included / unavailable ×
-    default / hover / focus) built (D16), Tooltip (outlined / glass ×
-    text / rich) built (D17),
+    default / hover / focus) built (D16), Tooltip (outlined
+    / glass × term / text / rich) built (D17),
     ★ Action line (special attack / reaction) and ★ Meta line
     (equipment, attributes, traditions) built (D15),
-    ★ Dialog footer (status, Cancel, primary),
-    Message block (no matches / error + Retry / preview hint),
-    Remember / Recall stubs.
+    ★ Dialog footer (status, Cancel, primary; row / stacked ×
+    empty / ready / blocked) built (D18),
+    Message block (no matches + Clear filters / error + Retry / empty /
+    loading / preview hint) built (D19),
+    Remember / Recall stubs (+ reserved compare tray) built (D20).
+    All built 2026-10-30, awaiting the user's approval. Trials left
+    open, all for Step 1 (round-1 layouts): tooltip surface (outlined
+    vs glass, D17), entry density (Full / Middle / A / B, D17), footer
+    layout (row vs stacked) and both divider BOOLEANs (D18, D20).
   - **Organisms:** ★ Trait entry (the full picker list item, D15;
     default / selected / learned), Talent entry (Step 2), Ritual entry
     (Step 2), ★ Compact sheet card +

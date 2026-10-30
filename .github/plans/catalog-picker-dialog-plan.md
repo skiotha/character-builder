@@ -779,6 +779,14 @@ revisited during planning of their owning steps, not deferred to close-out.
     styling them. Those questions are worked in
     [`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md);
     2c implements from its approved Figma `picker` frames.
+    Behaviour the design adds (design D19, the Message molecule): the
+    loader shows only after ~300 ms of pending `entries`, with
+    "Loading…" announced but not shown; No matches gains a
+    **Clear filters** button that empties the search and unchecks every
+    chip (focus moves to the search field, as Retry does); the message
+    texts change to "Couldn't load the list." / "Nothing left to learn
+    here." / "Nothing matches." / "Select a rank to see it here." (the
+    last is caller-tunable for untiered catalogs).
     **Done when:** screenshots at desktop and narrow widths reviewed by
     the user against the frame; keyboard-only run through every control
     shows focus; reduced motion disables the animation; the 2a / 2b
@@ -833,8 +841,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   rank blocks with check attribute, **full** effect / specialAttack /
   reaction detail per rank, each rank block selecting that rank (S2-1)
   and labelled with its cumulative cost; `canCommit` reports unaffordable
-  / ineligible selections; the preview slot shows `traitCardLines` for
-  the selection. Commit → one PATCH
+  / ineligible selections (design D16 / D18: such ranks are
+  `aria-disabled` and carry the reason in their head, so `canCommit` is
+  the backstop; the footer status describes the selection); the preview
+  slot shows `traitCardLines` for the selection. Commit → one PATCH
   `[{ field: "traits", value }, { field: "experience.unspent", value }]`;
   422 → inline error, no state change. Sheet card: compact lines from
   `traitCardLines`, N/A/M control as up / down buttons, remove button,
@@ -843,6 +853,24 @@ revisited during planning of their owning steps, not deferred to close-out.
   scroll of cards (interim CSS only). Reassess mutation freshness and
   dialog lifecycle (review follow-ups 2 / 6); choose display locations and
   fixtures for resolved outputs under follow-up 7.
+  - **Term markers — non-blocking.** A separate authoring task (design
+    plan D17); step 4 does not wait for it.
+    - Add the `{kind:id}` / `{kind:id|text}` rule to
+      `docs/reference-authoring.md`.
+    - Mark both locales: qualities first, plus the `check` attribute
+      words.
+    - Add a lint test: every marker resolves to a known id, and EN and
+      RU carry the same marker set.
+    - Teach the renderer to turn markers into Term tooltip triggers and
+      highlighted attribute words.
+
+    Until the task lands, the text renders plain and the attribute
+    word is highlighted by exact match on the localized name. That
+    matches all 45 English check effects; inflected Russian forms stay
+    unhighlighted.
+  - The entry density (full / middle / A / B) is chosen in the design
+    rounds.
+
   **Done when:** in-browser: add `polearm` (novice) → unspent −10 and
   +2 bonus damage on a carried long-quality weapon; upgrade to adept →
   −20 more and Reach Strike appears; downgrade → +20; remove → back to
