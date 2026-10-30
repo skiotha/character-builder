@@ -73,7 +73,7 @@ round.
 
 | Catalog | Entry shape | Desktop | Narrow | (middle?) |
 | --- | --- | --- | --- | --- |
-| Traits (abilities + spells) | 3 tiers, rank blocks | — | — | — |
+| Traits (abilities + spells) | 3 tiers, rank blocks | r1 | — | — |
 | Talents (boons + sins) | levels | — | — | — |
 | Rituals (Chunk I step 4) | untiered | — | — | — |
 
@@ -99,7 +99,7 @@ not fully predictable, so these are briefs, not specs):
 | Button border, broken | disabled primary | Same 128 × 48 frame as the border, visibly broken / interrupted; shown grey (D6) | placeholder in Figma |
 | Focus underline | `:focus-visible` on every text button and filter chip | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6, D10). Several shapes (three placeholders for now, count open) to vary per caption; red by default, yellow under red captions (D17) | placeholder in Figma |
 | Chip stroke, unchecked / checked | filter chip fill (`Decor/Chip stroke`) | A single wide brush stroke, at S 64 / M 96 / L 128 × 32 — 6 drawings; the checked one differs in **shape and angle**, not just colour; tilt lives inside the canvas; colours come from CSS (grey / yellow) (D10) | placeholder in Figma |
-| Close ✕ | header dismiss (`Icons/Close` Dialog, 24) and search clear (Clear, 24, mirrors the search glyph) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the two may be distinct drawings | placeholder in Figma |
+| Close ✕ | header dismiss (`Icons/Close` Dialog, 24), search clear (Clear, 24, mirrors the search glyph) and sheet-card remove (Remove, 24, D22) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the three may be distinct drawings | placeholder in Figma |
 | Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
 | Alert mark | footer status, before a blocked reason (`Icons/Alert`, 16; D18) | Small red hand-drawn "blocked / attention" mark, readable at 16 px beside Body-14 text; distinct from the outside-traditions mark; colour from CSS | placeholder in Figma |
@@ -108,6 +108,7 @@ not fully predictable, so these are briefs, not specs):
 | Spell / ability kind marks | entry kind (D15) | A sibling pair (mark, edge or ornament) differing in shape, colour or place; neither kind louder than the other | candidate, round 1 |
 | Equipment / attributes / traditions icons | meta line labels (D15) | Small icons that may replace the text labels (e.g. a sword for equipment) | candidate, round 1 |
 | Swap hint mark | entry head (D15) | Small mark hinting that a rank lets the character swap an attribute | candidate, round 1 |
+| Applied-by-sheet mark | effect line (D21) | Tells "the sheet applies this for you" (Tier A / B) from "remember this at the table" (Tier C); one mark on one side, or a sibling pair | candidate, round 1 |
 | Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`. It shows **alone** (the text is for screen readers only, D19), so the static frame must still read as "loading"; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
 | Details marker | `Atoms/Details toggle` (D17) | Small mark beside Body-14, ~12 px; points right when closed and turns (or is redrawn) to point down when open | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
@@ -123,7 +124,8 @@ imports the same file into Figma.
   one SVG stretched with `preserveAspectRatio="none"` — the sketched
   brush tolerates a little distortion, and the button's min-width
   matches the drawing, so today's captions don't stretch it at all._
-- **B. Breakpoints.** Desktop is the 1200 × 600 frame (S2-8); step 2c
+- **B. Breakpoints.** Desktop is now up to 1200 wide × viewport − 64
+  tall (D23; was the 1200 × 600 frame, S2-8); step 2c
   requires a narrow fallback (columns stack, list scrolls). Decide the
   widths and whether a middle layout exists.
 - **S. Specimen page.** A dev-only page rendering the picker for every
@@ -131,13 +133,60 @@ imports the same file into Figma.
   covers the whole matrix. Parent S2-9 chose "no harness file" for the
   step-2 check; this would be a new dev surface. Decide where it lives
   and how it stays out of production before the code phase.
-- **D. Early-draft gaps.** Re-check `r0` against the fixed inputs (it
-  predates S2-1's footer status line, S2-8's preview slot and the filter
-  fieldsets) — round 1 input.
+- **D. Early-draft gaps.** ✅ _Resolved 2026-10-31._ `r0` (1200 × 600,
+  frame `1166:237`) shows a title, one entry head, search, a preview
+  card and remember / recall captions. Against the fixed inputs it lacks:
+  - the header ✕ (S2-2);
+  - the whole footer: Cancel, the primary button, the status line
+    (S2-1, S2-2);
+  - full-detail entries with rank blocks (S2-8);
+  - filter fieldsets (S2b-4);
+  - the empty-preview hint and disabled stubs (S2-8);
+  - the XP counter (D13).
+
+  Step 0 covers all of these as components, and the dialog shell
+  example (D23) already assembles them. S2-10 (search outside the
+  dismiss form) is DOM order, not layout. **Round-1 checklist:** every
+  option must show, or have a sibling frame for:
+  1. nothing selected: footer empty, preview hint;
+  2. a rank selected: entry Selected, preview filled, footer ready,
+     counter projected;
+  3. a blocked selection: an unaffordable rank, footer blocked with
+     its reason (S2-1, D18);
+  4. a selection hidden by search or filters: the preview and footer
+     keep it (S2-1);
+  5. the list's loading, error, no-matches and empty states (S2-4, D19);
+  6. the aside scrolling at a common viewport height (D23).
+
+  Nothing in `r0` carries over beyond what the components already took
+  (meta labels → D15, the red divider → D12 / D26).
+- **P. Palette roles.** ✅ _Resolved 2026-10-31 (D26): one owner per
+  role, one category pair reused, red lifted. Values provisional until
+  seen in the full designs._
 
 ## Rounds
 
 - **r0 — baseline** (`1389:16`): the original popup, kept for reference.
+- **r1 — traits layout** (`1629:4122`, drafted 2026-10-31; winner
+  pending). Four 1200 × 800 options, one row each:
+  - `r1-a` "as built" — density Full · footer Row · divider Rail ·
+    tooltip Outlined · grey empty ✕.
+  - `r1-b` "aside owns the action" — Middle · Stacked · Separate ·
+    Glass · no empty ✕.
+  - `r1-c` "lightest list" — B (Acrobatics Adept opened) · Row · Rail ·
+    Glass · grey empty ✕.
+  - `r1-d` — A (Acrobatics Adept opened) · Stacked · Separate ·
+    Outlined · no empty ✕.
+
+  Pairings are not binding; any axis can be mixed into the winner.
+  Each row also carries 50 % copies of states 1 (nothing selected),
+  3 (blocked) and 4 (selection hidden by search) from the open-item-D
+  checklist; state 5 (Loading / Error / No matches / Empty) is drawn
+  once in r1-a chrome below the rows; state 6 (aside scroll) shows in
+  the 800-tall frames. The shells are detached copies of the
+  Dialog shell example so the list could be "scrolled" (Acrobatics
+  first); entries, rank blocks and chrome stay linked instances. Chip
+  hover is left to the browser.
 
 ## Decisions log
 
@@ -400,14 +449,14 @@ imports the same file into Figma.
   catalog's name, like the sheet panel ("Abilities", "Spells", "Boons",
   "Rituals"), in `Fonts/Header-36`, `Text/Heading`; not a verb phrase.
   **Aside headings:** only one, above the preview ("On your sheet"), in
-  `Fonts/Menu-22`, `Text/Heading`; search, filter legends and Recall
+  `Fonts/Header-28` (was `Menu-22`; D24), `Text/Heading`; search, filter legends and Recall
   speak for themselves. **Counter** = the XP balance as a bare number in
-    `Fonts/Header-36`, `Text/Default` — same size as the title; the sheet
+    `Fonts/Header-36` — same size as the title; the sheet
     panel's 64 is too big in the dialog (user, 2026-10-27) (no visible
     "XP" label; in code an `<output>` with a visually hidden "XP left").
-  While a rank is selected it **projects** the balance after the pick:
-  old balance `Text/Muted`, a `Header-36` arrow, new balance
-  `Text/Default`, or `Text/Alert` with an ASCII hyphen ("-5") when it
+  While a rank is selected it **projects** the balance after the pick
+  (colours and motion revised by D24): old balance → new balance, with
+  an ASCII hyphen ("-5") when it
   would go negative — the font's "−" reads as a long dash. **Dialog
   header** = title and counter on a shared baseline, counter pushed
   right, ✕ (`Atoms/Icon button`) in the top-right corner, 24 px after
@@ -454,8 +503,8 @@ imports the same file into Figma.
   cut and no kind line repeats its prefix (the cut is reserved for the
   narrow preview cards, if they need it). **Meta line:** a *label +
   value pair* — labels `Text/Muted` (5.3 : 1; the old red labels failed
-  AA at 14 px and red is not "interactive", D7) in a right-aligned 88 px
-  column, values `Text/Default`, as in the old sheet card's grid (in
+  AA at 14 px and red is not "interactive", D7) in a right-aligned
+  column (88 px at first; sized to the longest label since D27), values `Text/Default`, as in the old sheet card's grid (in
   code a `<dl>` whose rows share one grid). Facts:
   - *Equipment* ("Equipment — Stiletto", 23 abilities): text now; a
     hand-drawn icon (a sword) in place of the label is tried in round 1.
@@ -513,8 +562,9 @@ imports the same file into Figma.
   the three ranks stack (novice, adept, master) at full entry width; a
   row of three columns would wrap effects of up to 185 characters too
   hard. **Head:** grade disc (`Icons/Grade`, 32 px) + rank name
-  (`Menu-20`, `Text/Heading`) + **step** cost (`Body-14`, `Text/Muted`:
-  "10 XP", "+20 XP", "+30 XP"), on one baseline. The disc's colour
+  (`Menu-20`, `Text/Heading`) + **cumulative** cost (`Body-14`,
+  `Text/Muted`: "10 XP", "30 XP", "60 XP"; revised by D21 from step
+  costs, since the picker always buys from nothing), on one baseline. The disc's colour
   doubles as the spell / ability sibling marker D15 asks for: yellow
   for abilities, red for spells. **Body**, indented under the name:
   effects (`Body-14`), then action lines (D15). **No rank description
@@ -546,7 +596,7 @@ imports the same file into Figma.
   `Text/Disabled` with the unlearned grey disc; it is
   `aria-disabled`, so it stays focusable and keyboard users reach it;
   the body stays readable and the head gives the reason after the
-  cost, "+30 XP · 5 short" / "+30 XP · not at creation", tied to the
+  cost, "60 XP · 5 short" / "60 XP · not at creation", tied to the
   head by `aria-describedby`; not the footer, which describes the
   current selection only, D18).
   **Interaction:** Default; Hover (the disc rotates — motion, not
@@ -727,12 +777,263 @@ imports the same file into Figma.
   back with a negative inline margin for optical alignment. No heading
   (D13). Optional divider above (BOOLEAN, on trial). A dashed
   **reserved tray** (design-only, never shipped) keeps ~410 × 196 px,
-  room for two ~150 × 180 compact cards, so round-1 layouts leave the
+  room for two ~150 × 180 compact cards (410 × 236 since D28: two
+  192 × 236 cards, 16 apart), so round-1 layouts leave the
   space the compare feature will need. Built on the Molecules sheet
   (block `1567:968`): `Molecules/Compare stubs` (`1567:955`; BOOLEAN
   Divider and Reserved tray, both on by default; Remember / Recall are
   exposed `Atoms/Button` Plain Disabled instances), with RU and the
   shipped shape (no tray, no divider) as examples.
+- D21 (2026-10-30): trait entry — the full picker list item (`<li>`),
+  for abilities and spells. **Every entry is bought from nothing:**
+  learned traits never reach the picker (parent decision 13) and
+  upgrades happen on the sheet card, so the rank heads show the
+  **cumulative** cost, "10 XP / 30 XP / 60 XP", which is what the click
+  costs. It matches the bar running from Novice to the chosen rank, and
+  "5 short" is measured against it (D16 revised). Step costs stay on the
+  sheet card. **States:** Default and Selected (the `<li>` the dialog
+  marks, S2b-2). Selected is shown by the rank bars only, so there is
+  one selection signal. There is no Learned state. **Order:** name
+  (`<h3>` under the dialog's `<h2>`, so screen-reader users jump between
+  entries; `Header-28` (D24; was `Header-36`, which matched the dialog
+  title and flattened the hierarchy; red for spells,
+  D16),
+  then the description (~85 characters, `Italic-14`, `Text/Default`: an
+  introduction, kept apart from the effects and the muted labels), then
+  the meta lines (equipment, attributes, traditions; D15), then the
+  three rank blocks. **Between entries:** a horizontal divider with
+  32 px of space on each side, because entries are tall and the line
+  shows where one ends while scrolling. **Hidden slots** in the head
+  for the round-1 candidates: the spell / ability kind mark and the
+  swap hint mark (D15). **Candidate, recorded only:** a mark on each
+  effect telling "the sheet applies this" (Tier A / B,
+  `docs/reference-authoring.md` §0.4) from "remember this at the table"
+  (Tier C). The entry is drawn at 700 px and fills its parent; the
+  Dialog shell sets the real width. Densities (Full / Middle / A / B,
+  D17) stay as switches on the rank blocks inside the entry, used in
+  round 1. Built on the new **Organisms sheet** (`1573:977`, block
+  `1573:978`): `Organisms/Trait entry` (`1573:2144`; Kind = Ability /
+  Spell × State = Default / Selected; BOOLEAN Equipment (ability
+  variants), Attributes (both kinds; spell variants show "Resolute",
+  the implied casting roll, since 2026-10-31, reference-authoring
+  §0.8), Traditions (spell variants), Divider (on), Kind
+  mark and Swap hint (dashed placeholder slots, off); name and
+  description are plain per-variant layers, overridden on instances;
+  rank blocks Novice / Adept / Master and the meta lines are exposed
+  instances), with a two-entry list (Anathema above Acrobatics, Adept
+  selected, Master "60 XP · 5 short") and the longest RU name
+  (Исключительный Атрибут: Сообразительность; no meta lines, Master
+  "· не при создании") as examples. Grade letters N / A / M are the
+  same in every locale (they are drawings, not text). An Unavailable rank keeps a fixed
+  grey disc, so instances swap in the grey disc of their own grade.
+  Built alongside: the rank block's Summary, Effect 3 and Action line 2
+  now fill the width (they were fixed at 424 px), and every rank
+  example now shows cumulative costs.
+- D22 (2026-10-30): compact card — the sheet's trait card and the
+  picker preview (S2-8), **one component, two contexts**. *Sheet:* the
+  grade **discs are the control** (decision 8): each is a `<button>`;
+  a later disc raises to that rank, a lower learned disc lowers to it
+  (one PATCH, symmetric refund); the disc tooltip names the action and
+  cost ("Raise to Master · 30 XP"; unaffordable discs are
+  `aria-disabled` with the reason) and carries the full rank line. ✕
+  (`Atoms/Icon button`, placeholder `Icons/Close` Remove, grey: new
+  token `Icon/Muted` → Grey, since a yellow ✕ on every card is too
+  loud; hover stays motion only) removes the
+  trait after an **inline confirmation** in the card ("Remove
+  Acrobatics? You get 30 XP back." · Remove / Keep, plain buttons).
+  Read-only sheets hide ✕ and leave the discs inert. *Preview:* inert;
+  the picked rank and those below are drawn learned. **Name** drops its
+  "Prefix:" part ("Cunning", not "Exceptional Attribute: Cunning"; the
+  kind shows in the colour), `Menu-22`, yellow / red (D16). **Meta
+  lines** (D15 grid; label column sized to the longest label, D27): Attributes on both
+    (abbreviated, "Qck"; on spells always "Res", the implied casting roll,
+    reference-authoring §0.8), Traditions on spells, Equipment in the preview
+  only (starting equipment is in the inventory once the character
+  exists). **Rank lines:** 32 px disc + `Body-14` formatter line
+  (decision 6), learned `Text/Default` with the attribute emphasised,
+  unlearned `Text/Muted`; **clamped to two lines** (`line-clamp`), the
+  full text in the disc tooltip; in the preview the full entry sits in
+  the list beside it, so no tooltip there. The authored rank `summary`
+  fields are all still placeholders (2026-10-30), so the examples show
+  formatter-style lines only. Hover rotates the disc, focus underlines
+  it (as the rank block, D16). Cards in a row stretch to the tallest
+  (flex). **Vacant card:** a card-sized `<button aria-label="Add
+  trait">` with Plus Trait centred; hover rotates the plus, focus
+  underlines it; hidden on read-only sheets. **Width: 192 px** (150,
+  from the old one-screen sheet drawing, cut almost every line and the
+  RU card worst; 224 was not needed). How the sheet shows traits is
+  rethought in the later full redesign. Built on the
+  Organisms sheet (block `1579:1763`): `Organisms/Compact card`
+  (`1579:1762`; Kind × Context = Sheet / Preview × State = Default /
+  Confirm remove; BOOLEAN Equipment, Attributes, Traditions, Remove
+  button; Novice / Adept / Master exposed instances of
+  `Organisms/Compact rank` (`1578:1559`; State = Learned / Unlearned ×
+  Interaction = Default / Hover / Focus)), `Organisms/Vacant card`
+  (`1579:1978`; Interaction), and examples `1581:1750`: a sheet row
+  (EN ability, spell, RU, "Cunning", vacant), the preview in a 410 px
+  aside, and the disc-hover tooltip
+  beside the confirm state. Figma: set `maxLines` after
+  `textTruncation`, or it resets.
+- D23 (2026-10-30): dialog shell — native `<dialog>`, **width
+  min(1200 px, viewport − 64), height viewport − 64** (32 px above and
+  below; not tied to r0's 1200 × 600). Surface/Base, `Radius/md` (30,
+  `--md-crns`; the agreed 32 was rounded to the existing token rather
+  than adding one), 1 px `Border/Muted` edge (`Border/Decor` since
+  D26), padding 32
+  (`Space/block-outer`) everywhere. **Backdrop:** new token
+  `Surface/Backdrop` → Color/Black-50 plus an 8 px background blur on
+  `::backdrop`. **Layout:** the Dialog header (D13) spans the top; the
+  body is list (fills) | divider | aside (410, S2-8); the aside holds
+  search, filters, "On your sheet" heading, then the preview card (or
+  the Hint message, D19), then Remember / Recall (D20). Header and
+  footer stay put; the **list and the aside scroll on their own** (the
+  aside's content needs ~765 px, so it scrolls even at 880 tall — the
+  compare stubs sit below the fold on a 1080p / 125 % screen; round 1
+  may trim the aside). Footer **Row** (full width, under the body) vs
+  **Stacked** (bottom of the aside) and divider **Rail** vs
+  **Separate** (D12) are kept as variants for round 1. A hidden,
+  dashed **Squiggle** layer marks where the background decoration
+  goes. Narrow layout stays with open item B. Built on the Organisms
+  sheet (block `1588:3320`): `Organisms/Dialog shell` (`1588:3184`;
+  Footer = Row / Stacked × Divider = Rail / Separate, drawn 1200 ×
+  880; BOOLEAN Entries, List message, Filters, Preview card, Preview
+  hint, Compare stubs, Squiggle; header, entries, search, filters,
+  preview, stubs and footer are exposed instances) and an example: a
+  1536 × 864 viewport (1080p at 125 %) with the dialog at 1200 × 800
+  over the dimmed, blurred old sheet. Its state is consistent since
+  2026-10-31: Acrobatics Adept selected, counter Projected "70 → 40",
+  footer Ready "Acrobatics, Adept — 30 XP". Built alongside:
+  `Atoms/Scrollbar`'s rail now stretches with the instance (it was
+  fixed at 240), and a Foundations swatch for `Surface/Backdrop`.
+- D24 (2026-10-30): type ladder and counter colours. **Entry names
+  drop to a new `Fonts/Header-28`** (`--header-28`, 1.75rem), so the
+  shell reads title 36 → entry name 28 → rank name 20; the title stays
+  `Header-36` (a bigger title, both changes, or TorukSC for the title
+  were the alternatives). Applied to `Organisms/Trait entry` and the
+  D15 example heads, with a specimen row on the Foundations type ramp.
+  **The aside heading** ("On your sheet", `Molecules/Section heading`
+  Level = Aside) moves from `Menu-22` to `Header-28` too, so it
+  outranks the preview card's `Menu-22` name instead of matching it
+  (the user preferred a bigger heading over a smaller card). Ladder:
+  title 36 → aside heading / entry name 28 → card name 22 → rank
+  name 20.
+  **Counter colours:** the idle balance is `Text/Muted` (no need to
+  draw the eye; let players explore). While a rank is selected: old
+  balance and arrow muted → new balance `Text/Heading` (yellow, pale
+  gold since D26: make the player aware of the choice) when
+  affordable, or `Text/Alert`
+  (red, "-5") when not. **Over is kept** for the one case that still
+  reaches it after D16: the balance drops while the dialog is open (DM
+  edit, another tab) and the held selection becomes unaffordable,
+  paired with the Blocked footer (D18). **Motion:** nothing appears
+  instantly. Either the balance element cross-fades to the new value
+  while its colour shifts and "15 →" fades in to its left (one element
+  for the number), or the old "15" slides left and "→ 5" fades in
+  where it stood (separate elements); the reverse on deselect.
+  Instant under `prefers-reduced-motion`. The choice follows the
+  markup, settled in parent step 2c or the abilities caller step.
+- D25 (2026-10-31): search clear ✕ when empty — **trial**. Instead of
+  an empty slot, the ✕ stays in place as an inert grey mark while the
+  field has no text (Empty, Focused) and turns yellow (`Icon/Default`)
+  once there is text; the colour change is a CSS transition, instant
+  under `prefers-reduced-motion`. New token `Icon/Disabled` → Grey
+  (beside `Text/Disabled` / `Border/Disabled`; grey already reads as
+  "disabled" on buttons and the D20 stubs). The empty ✕ is a natively
+  `disabled` button: skipped by Tab, no hover motion, nothing to
+  announce. The sheet card's ✕ (D22) is also grey but live — a
+  different context, watch for confusion in round 1. A persistent ✕
+  rules out the native cancel control (it appears only with text), so
+  adopting this settles D9's code question for the scripted button.
+  Built on `Atoms/Search input` (`1460:31`): BOOLEAN `Empty clear`
+  (on by default while on trial; off restores D9's empty slot), with
+  a Foundations swatch for `Icon/Disabled`. Since D26 `Icon/Disabled`
+  is the dimmer `Grey-dim`, so the inert ✕ no longer matches the live
+  grey sheet-card ✕.
+- D26 (2026-10-31): palette roles — **one owner per role**. The
+  inherited five-colour palette (from the character's personal site)
+  overloaded every hue: yellow was headings + decoration + interactive
+  + abilities, red was focus + alert + spells, grey was muted +
+  disabled. The identity colours stay; the roles split:
+  - **Yellow** (`Color/Main`) = interactive only: buttons, rank
+    names, XP costs, field lines, scrollbar thumb, live icons
+    (`Text/Interactive`, `Border/Default`, `Icon/Default`).
+  - **Pale gold** (`Color/Pale-gold`, oklch(90% .06 88), 13.3:1) =
+    headings (`Text/Heading`; the D24 projected balance follows it),
+    and non-interactive status marks: the special attack and reaction
+    icons (new `Icon/Marker`; they were yellow and read as clickable).
+  - **Ochre** (`Color/Ochre`, oklch(62% .12 80), 4.9:1) = design:
+    dialog frame and squiggle (were `Border/Muted`, D23), dividers,
+    scrollbar rail, loader, tooltip outline (`Border/Decor`).
+  - **Red** (`Color/Accent`) = attention only: focus and alerts.
+    Lifted to oklch(64% .21 30) (#f14634, 4.8:1; was 4.1:1) so small
+    alert text passes AA.
+  - **Grey** = don't-look-at-me (`Text/Muted` etc.); **Grey-dim**
+    (oklch(45% .012 46), 2.4:1, contrast-exempt) = disabled
+    (`Text/`, `Border/`, `Icon/Disabled`).
+  - **Category pair, reused across catalogs** (option 1 of the
+    board): Kind A = verdigris oklch(74% .11 185) (abilities, boons),
+    Kind B = amethyst oklch(74% .11 300) (spells, sins) — equal
+    lightness and chroma so neither outranks the other, 7.5–8.2:1.
+    Tokens `Text/Kind A` (new), `Text/Kind B` (was `Text/Spell`),
+    `Grade/Kind A|B` and `Grade/On-kind A|B` (were Ability / Spell;
+    both badges now carry black glyphs).
+  Rejected: two pairs (abilities/spells + sky/rose boons/sins) — four
+  new primitives for lists that never sit side by side in the picker.
+  The sheet-card ✕ stays grey despite being live (D22: the user did
+  not want it yellow). The Cancel caption stays white
+  (`Text/Default`): the quieter of the two footer buttons, by choice.
+  Applied by remapping Semantic aliases and
+  rebinding the nodes whose role differed from their old token
+  (button captions, rank names, XP cost → `Text/Interactive`; ability
+  names → `Text/Kind A`; dividers, rail, loader, tooltip outline →
+  `Border/Decor`). The candidate board and today-vs-proposal mocks
+  stay in the **Explorations** section (`1601:3358`). The user will
+  judge the palette in the full designs; the values are provisional
+  until then. CSS: the new primitives are added to `styles.css` and
+  `--color-accent` is lifted; usages are not remapped until the CSS
+  pass.
+- D27 (2026-10-31): meta-line spacing. The indent before a fact label
+  was never padding or reserved space: labels sat right-aligned in a
+  fixed column (88 px in entries, 72 px in compact cards), so the
+  indent was just the column's unused width — and with a single row
+  (sheet card: Attributes only) it aligned with nothing. "Снаряжение"
+  (77 px at Body-14) also overflowed the 72 px column. Now **the label
+  column is as wide as the group's longest label** (CSS: one `<dl>`
+  grid, `grid-template-columns: max-content 1fr`), labels stay
+  right-aligned: a single row has no indent, and a shorter label is
+  indented only to line its value up with the others. Applied to
+  entries and compact cards alike. **Rows in a group sit 4 px apart**
+  (new token `Space/block-tight`, `--block-tight-pad: 0.25rem`; was 8,
+  or 6 in the D15 examples) so they read as one block; the gap from
+  the name or description above stays 8. In Figma the rows are wrapped
+  in a `Meta` frame and `Molecules/Meta line`'s label hugs its text;
+  groups set every label to the longest one's width. (Compact card
+  gaps changed since: D28.)
+- D28 (2026-10-31): compact card — **fixed head, tighter spacing, 32 px
+  discs**. The card's gaps had never been decided; they were scale
+  defaults taken during the build and left the card loose. Nothing was
+  reserved in them. **No head text wraps**: the name, Equipment,
+  Attributes and Traditions stay on one line. Values that are too long
+  get shortened (smaller icons, rewording, dropping the less important
+  word); for now they truncate. Only rank lines wrap, to two lines
+  (D22). By the data, a head holds at most **the name plus two meta
+  rows**: abilities have Equipment (preview only) + Attributes, spells
+  have Attributes + Traditions, and spells never carry starting
+  equipment, so that row was dropped from the spell preview. So the
+  **head has a fixed height of name + two meta rows** on every card
+  (`min-height`; a missing row leaves a blank). Likewise **every rank
+  line reserves two lines** (`min-height`; a one-line text is centred
+  beside its disc). So sheet cards are equal in height, preview cards
+  are too, and the two contexts match. Gaps: name → meta **4**
+  (`Space/block-tight`, was 8); meta rows **0** (was 4, D27; the
+  21 px line height separates them); head → ranks **8**
+  (`Space/block`, was 16); between ranks still 12. **Disc: 32 × 32**,
+  the trait-entry size (was a 40 × 40 icon overflowing a 32 slot);
+  the rank text stays at x 40, so the freed 8 px is breathing room
+  around the disc. A card is now 236 tall (was 227–298). Figma:
+  `Organisms/Compact card` Head has `minHeight` 78, and
+  `Organisms/Compact rank` has `minHeight` 42; meta values have
+  `textTruncation` Ending, `maxLines` 1.
 
 ## Steps
 
@@ -773,7 +1074,9 @@ outcome, not on a commit.
     - Outside-traditions badge option (D11) → Step 3 with open item B.
     - Trial atoms that find no place (D11) are deprecated → Step 1.
     - Native vs scripted search clear ✕ (D7) → implementation (parent
-      plan step 2c).
+      plan step 2c); scripted if the D25 empty ✕ is kept.
+    - Empty-field clear ✕ (D25: grey placeholder vs empty slot) →
+      Step 1.
   - **Molecules** (sheet `1481:111`): ★ Section heading (+ counter) and
     ★ Dialog header (title, XP left, ✕) built (D13), ★ Filter group
     (fieldset) built (D14), ★ Rank block (grade, name, cost, effects,
@@ -787,16 +1090,27 @@ outcome, not on a commit.
     Message block (no matches + Clear filters / error + Retry / empty /
     loading / preview hint) built (D19),
     Remember / Recall stubs (+ reserved compare tray) built (D20).
-    All built 2026-10-30, awaiting the user's approval. Trials left
+    All built 2026-10-30 and approved by the user 2026-10-31. Trials left
     open, all for Step 1 (round-1 layouts): tooltip surface (outlined
     vs glass, D17), entry density (Full / Middle / A / B, D17), footer
     layout (row vs stacked) and both divider BOOLEANs (D18, D20).
-  - **Organisms:** ★ Trait entry (the full picker list item, D15;
-    default / selected / learned), Talent entry (Step 2), Ritual entry
-    (Step 2), ★ Compact sheet card +
-    vacant "+" card, Dialog shell (list | aside + header / footer slots).
+  - **Organisms** (sheet `1573:977`): ★ Trait entry (the full picker
+    list item, D15, D21; default / selected) built (D21), Talent entry (Step 2), Ritual entry
+    (Step 2), ★ Compact sheet card + vacant "+" card built (D22; width
+    192 px), ★ Dialog shell (list | aside + header / footer; row /
+    stacked footer × rail / separate divider) built (D23).
 
   **Done when:** every ★ item is a component on `Components`.
+
+  > ✅ **Completed 2026-10-31.** Divergences from the text above:
+  > the palette was reworked into one owner per role (D26) and the
+  > meta-line and compact-card spacing was settled (D27, D28) during
+  > the step. Work deferred out of Step 0, each with its home: hand-drawn
+  > assets → Step 4; Talent and Ritual entries → Step 2; the open A/B
+  > trials (chip hover, scrollbar, empty clear ✕, tooltip surface, entry
+  > density, footer layout, dividers, trial atoms) → Step 1; the
+  > outside-traditions badge → Step 3; native vs scripted clear ✕ →
+  > implementation.
 
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
@@ -837,7 +1151,7 @@ outcome, not on a commit.
 
 - [x] Workspace — Figma `picker` / explorations areas, `r0` baseline
   _(2026-10-25)_
-- [ ] Step 0 — Component library (foundations and icons done 2026-10-26)
+- [x] Step 0 — Component library _(2026-10-31)_
 - [ ] Step 1 — Round 1: traits layout, desktop
 - [ ] Step 2 — Talents and rituals variants
 - [ ] Step 3 — Breakpoints

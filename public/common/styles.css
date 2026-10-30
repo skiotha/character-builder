@@ -102,8 +102,13 @@
     --color-main: oklch(82.378% 0.16777 90.3); /* #efbf04; */
     --color-black: oklch(20.545% 0.009 42.945); /* #1b1614; */
     --color-white: oklch(99.461% 0.00274 285.738); /* #fdfdff; */
-    --color-accent: oklch(60.442% 0.2391 30.175); /* #ef1a04; */
+    --color-accent: oklch(64% 0.21 30); /* #f14634; */
     --color-grey: oklch(63.827% 0.01517 45.947); /* #948984; */
+    --color-pale-gold: oklch(90% 0.06 88); /* #efdcb1; */
+    --color-ochre: oklch(62% 0.12 80); /* #ac7d1b; */
+    --color-grey-dim: oklch(45% 0.012 46); /* #5b5350; */
+    --color-verdigris: oklch(74% 0.11 185); /* #45c1b4; */
+    --color-amethyst: oklch(74% 0.11 300); /* #b59be6; */
 
     /* TYPOGRAPHY */
     /* DISPLAY: TorukSC 96 */
@@ -127,6 +132,7 @@
     --first-letter-pad-bstart: -0.9375rem;
     --first-letter-pad-istart: -1.25rem;
 
+    --block-tight-pad: 0.25rem;
     --block-align-pad: 0.5rem;
     --block-inner-pad: 1rem;
     --block-outer-pad: 2rem;
@@ -160,6 +166,7 @@
     --display: 6rem;
     --header-64: 4rem;
     --header-36: 2.25rem;
+    --header-28: 1.75rem;
     --menu-20: 1.25rem;
     --menu-22: 1.375rem;
     --body-14: 0.875rem;
@@ -2041,6 +2048,7 @@
         --display: 5.5rem;
         --header-64: 4rem;
         --header-36: 2.25rem;
+        --header-28: 1.75rem;
         --menu-20: 1.75rem;
         --menu-22: 1.375rem;
         --body-14: 1rem;

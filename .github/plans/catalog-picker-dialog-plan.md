@@ -391,7 +391,9 @@ for the dialog primitive and replace the provisional API sketch.
   **Remember** / **Recall** — open item E). Space check
   against the 1200 × 600 frame: the right column is ~410 px wide, search
   + filters take ~180 px of height, the compact card ~150 × 180 px, the
-  stubs one row — it fits; on short viewports the column scrolls.
+  stubs one row — it fits; on short viewports the column scrolls
+  (design D23: the dialog is now viewport − 64 tall and the card 192 px
+  wide, so the column scrolls at common heights too).
   Step 2 ships the slot; step 4 fills it once the step-3 formatter
   exists. If the preview proves cramped in practice, it is dropped
   without touching callers (the option is optional).
@@ -847,8 +849,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   slot shows `traitCardLines` for the selection. Commit → one PATCH
   `[{ field: "traits", value }, { field: "experience.unspent", value }]`;
   422 → inline error, no state change. Sheet card: compact lines from
-  `traitCardLines`, N/A/M control as up / down buttons, remove button,
-  each a single atomic PATCH with symmetric refund; `experience.unspent`
+  `traitCardLines`, the grade discs as the N/A/M control (design D22:
+  a later disc raises, a lower learned disc lowers), a remove button with
+  an inline confirmation, each a single atomic PATCH with symmetric
+  refund; `experience.unspent`
   shown in the panel heading; `deps = ["traits", "experience"]`. Horizontal
   scroll of cards (interim CSS only). Reassess mutation freshness and
   dialog lifecycle (review follow-ups 2 / 6); choose display locations and
@@ -868,6 +872,14 @@ revisited during planning of their owning steps, not deferred to close-out.
     word is highlighted by exact match on the localized name. That
     matches all 45 English check effects; inflected Russian forms stay
     unhighlighted.
+  - **Spell check attribute — implied Resolute** (decided 2026-10-31).
+    Every spell is cast with Resolute, a system rule rather than
+    per-spell data, so the spell data carries no `check` for it. The
+    entry and card Attributes line for a spell is Resolute plus any
+    `check` authored on its effects, deduplicated. Implement it in
+    `traitCardLines` (one place for the entry, preview and sheet card).
+    The rule is documented in `docs/reference-authoring.md` §0.8
+    (`check`), so the sibling apps derive the same line.
   - The entry density (full / middle / A / B) is chosen in the design
     rounds.
 

@@ -225,6 +225,10 @@ and rolls stay out of `target` / `modifier` (§0.5).
   math is never rolled, and the lint rejects `check` there, at rank level,
   and inside `specialAttacks` / `reactions`.
 - Boons / sins: once per entry, `check` (talents have one description).
+- Spells: every spell is cast with Resolute, so the casting roll is
+  **implied** and never authored. Consumers show Resolute for every spell
+  and add the attributes from any `check` on its effects. Author `check` on a
+  spell effect only for a further roll its rule names.
 
 ```jsonc
 "effects": [
