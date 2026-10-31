@@ -899,6 +899,10 @@ revisited during planning of their owning steps, not deferred to close-out.
   No player downgrade, remove or refund controls; exceptional correction
   remains DM / administrator maintenance (decision 9). Reassess freshness
   and failure handling under review follow-ups 2 / 6.
+  Settle the talent card's summary line here (S0-3): the design
+  (design plan D30) reserves one line for it and draws a placeholder.
+  Either add an entry-level `summary` to boons / sins (the lint's
+  140-code-point cap, both locales), or derive it from `effects`.
   Boon PATCH carries `talents` + `experience.unspent`; sin PATCH carries
   `talents` + `experience.unspent` + `experience.total`. **Done when:**
   in-browser: add a boon level 1 → −5; level up → −5; add a sin level 2 →

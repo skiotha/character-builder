@@ -73,8 +73,8 @@ round.
 
 | Catalog | Entry shape | Desktop | Narrow | (middle?) |
 | --- | --- | --- | --- | --- |
-| Traits (abilities + spells) | 3 tiers, rank blocks | r1 | — | — |
-| Talents (boons + sins) | levels | — | — | — |
+| Traits (abilities + spells) | 3 tiers, rank blocks | ✅ | — | — |
+| Talents (boons + sins) | levels | ✅ | — | — |
 | Rituals (Chunk I step 4) | untiered | — | — | — |
 
 Cells: `—` not started · `rN` in exploration · `✅` approved in `picker`.
@@ -167,8 +167,10 @@ imports the same file into Figma.
 ## Rounds
 
 - **r0 — baseline** (`1389:16`): the original popup, kept for reference.
-- **r1 — traits layout** (`1629:4122`, drafted 2026-10-31; winner
-  pending). Four 1200 × 800 options, one row each:
+- **r1 — traits layout** (`1629:4122`, drafted 2026-10-31). **Winner:
+  `r1-e`, a mix — r1-b's Middle list with Glass tooltips in r1-a's
+  chrome (D29).** `r1-e` sits in its own row below the others, with
+  its state 1 / 3 / 4 copies. Four 1200 × 800 options, one row each:
   - `r1-a` "as built" — density Full · footer Row · divider Rail ·
     tooltip Outlined · grey empty ✕.
   - `r1-b` "aside owns the action" — Middle · Stacked · Separate ·
@@ -187,6 +189,14 @@ imports the same file into Figma.
   Dialog shell example so the list could be "scrolled" (Acrobatics
   first); entries, rank blocks and chrome stay linked instances. Chip
   hover is left to the browser.
+- **r2 — talents** (`1656:10124`, drafted and approved 2026-10-31;
+  D30). **Winner: `r2-a`** (`1656:10126`), the only option, cloned
+  from the approved `traits / 1200`:
+  title "Talents", Talent source filter, Cartographer selected at
+  level II (70 → 60), then Contacts (one level), Damage (sin) and
+  Deceiver; Talent card in the preview; the action tooltip removed
+  (talents have no actions). A 50 % copy `r2-a · sin selected`
+  (`1656:10742`) shows the Gain projection (70 → 75, "Damage — +5 XP").
 
 ## Decisions log
 
@@ -396,7 +406,9 @@ imports the same file into Figma.
   property `Caption`; the focus underline overhangs the 32 px frame) with
   placeholder `Decor/Chip stroke` (`1466:66`, Size × Checked) until
   drawn; new token `Surface/Muted` → Grey.
-- D11 (2026-10-27): small labels, built as **trial atoms**. The final card
+- D11 (2026-10-27): small labels, built as **trial atoms** (outcome:
+  D29 — tradition tag, XP cost and check attribute deprecated; badge
+  open for Step 3). The final card
   layout is unknown, so all four are built and any that find no place
   or add noise are deprecated later. None are interactive, and none may
   look like a chip (filled stroke) or a button (border).
@@ -435,7 +447,7 @@ imports the same file into Figma.
   scrollbars, small arrow buttons in the thumb colour (the user's Chrome
   may not show them — overlay / Fluent scrollbars). **Divider:** a
   straight 1 px `Border/Default` line, vertical or horizontal; may go
-  unused. **Divider as rail (trial):** the list | aside divider is drawn
+  unused. **Divider as rail (trial; rail chosen, D29):** the list | aside divider is drawn
   through the list's scrollbar gutter (in code a 1 px background
   gradient on the list showing through the transparent track), so the
   thumb rides on it. Both A (rail) and B (separate) are kept and tried
@@ -447,7 +459,7 @@ imports the same file into Figma.
   48 × 48) in the Drawings block.
 - D13 (2026-10-27): headings and the dialog header. **Title** = the
   catalog's name, like the sheet panel ("Abilities", "Spells", "Boons",
-  "Rituals"), in `Fonts/Header-36`, `Text/Heading`; not a verb phrase.
+  "Rituals"; talents became "Talents", D30), in `Fonts/Header-36`, `Text/Heading`; not a verb phrase.
   **Aside headings:** only one, above the preview ("On your sheet"), in
   `Fonts/Header-28` (was `Menu-22`; D24), `Text/Heading`; search, filter legends and Recall
   speak for themselves. **Counter** = the XP balance as a bare number in
@@ -627,7 +639,7 @@ imports the same file into Figma.
   right, spell colour added.
 - D17 (2026-10-28): tooltip — one generic molecule (its content can be
   a whole action line, so it is not an atom). **No pointer**; rounded
-  corners (`Radius/sm`, 8 px); it opens 8 px from its trigger. **Surface**, two on trial until the
+  corners (`Radius/sm`, 8 px); it opens 8 px from its trigger. **Surface** (Glass chosen and density Middle, D29), two on trial until the
   full-entry tests: Outlined (`Surface/Base` + 1 px `Border/Default`,
   like dividers) and Glass (`Surface/Glass` + background blur, no
   border; it shows only where it covers content, so check it over
@@ -735,7 +747,7 @@ imports the same file into Figma.
   (status left, buttons right; a full-width footer) and Stacked (status
   above, buttons right-aligned; a right-column footer of ~410 px, where
   two buttons leave too little room beside a reason) — the Dialog shell
-  picks in round 1. The divider above the footer is optional (BOOLEAN,
+  picks in round 1 (Row, divider on — D29). The divider above the footer is optional (BOOLEAN,
   on trial). Built on the Molecules sheet (block `1547:1169`):
   `Molecules/Dialog footer` (`1547:1168`; Layout = Row / Stacked ×
   Status = Empty / Ready / Blocked; BOOLEAN Divider; Cancel and Learn
@@ -775,7 +787,7 @@ imports the same file into Figma.
   with the preview, 32 px apart (RU ~253 of ~410 px); the plain
   buttons' padding insets the captions ~16 px, so code may pull the row
   back with a negative inline margin for optical alignment. No heading
-  (D13). Optional divider above (BOOLEAN, on trial). A dashed
+  (D13). Optional divider above (BOOLEAN, on trial; kept on, D29). A dashed
   **reserved tray** (design-only, never shipped) keeps ~410 × 196 px,
   room for two ~150 × 180 compact cards (410 × 236 since D28: two
   192 × 236 cards, 16 apart), so round-1 layouts leave the
@@ -948,7 +960,7 @@ imports the same file into Figma.
   (on by default while on trial; off restores D9's empty slot), with
   a Foundations swatch for `Icon/Disabled`. Since D26 `Icon/Disabled`
   is the dimmer `Grey-dim`, so the inert ✕ no longer matches the live
-  grey sheet-card ✕.
+  grey sheet-card ✕. Kept by round 1 (D29).
 - D26 (2026-10-31): palette roles — **one owner per role**. The
   inherited five-colour palette (from the character's personal site)
   overloaded every hue: yellow was headings + decoration + interactive
@@ -1034,6 +1046,88 @@ imports the same file into Figma.
   `Organisms/Compact card` Head has `minHeight` 78, and
   `Organisms/Compact rank` has `minHeight` 42; meta values have
   `textTruncation` Ending, `maxLines` 1.
+- D29 (2026-10-31): round 1 winner — **traits at 1200, a mix of r1-b's
+  list and r1-a's chrome** (`traits / 1200 / r1-e`; approved copy
+  `traits / 1200` in `picker`). It settles the Step 1 trials:
+  - **Density Middle** (D17): effects inline, no rank description
+    (D16), each special attack / reaction keeps its mark, name and
+    conditions, and its description moves into a **Term** tooltip on
+    the name (name as the term, description as the definition).
+  - **Tooltip surface Glass** (D17), for both Term uses (actions and
+    marked words).
+  - **Footer Row** (D18) with its divider on; the Compare stubs
+    divider (D20) stays on too.
+  - **Divider as rail** (D12 A): the list's scrollbar rides on the
+    list | aside divider.
+  - **Empty clear ✕ kept** (D25): grey and inert while the field is
+    empty. This settles D9 / D7's code question for the scripted
+    button.
+  - **List states** (D19) as drawn: Loading, Error, No matches, Empty.
+
+  **Nothing is deleted from the components.** The losing variants are
+  **parked** as narrow-screen candidates for Step 3, where a single
+  column may need the Stacked footer, a separate scrollbar or Details.
+  Parked: Tooltip Surface = Outlined, Dialog footer Layout = Stacked,
+  Dialog shell (every variant except Row / Rail), Scrollbar Rail =
+  false, the Rank block's Summary / Toggle before effects / Toggle
+  before actions slots (densities A / B), `Atoms/Details toggle`.
+  **Deprecated**, with no foreseen use: the D11 trial atoms
+  `Atoms/Tradition tag` (the Traditions meta line replaced it),
+  `Atoms/XP cost` (the rank head carries it) and `Atoms/Check
+  attribute` (inline emphasis, D16). `Atoms/Badge` stays open for
+  Step 3 (outside traditions). Each is marked in its component
+  description and with a small "Parked" / "Deprecated" label beside
+  it on its sheet. The r1-a…d frames stay in their round, labelled
+  "not chosen (D29)".
+  Still open: chip hover (D10), left to the browser in parent step 2c.
+- D30 (2026-10-31): **talents adaptation** (Step 2). Talents have 1 or 3
+  levels (not ranks), one entry-wide description, an entry-level
+  `check`, and sins *grant* XP. So:
+  - **Title** "Talents" (amends D13's "Boons"): boons and sins share the
+    dialog, split by the Talent source filter (parent decision 9).
+  - **Level pick in the list row**: level discs I · II · III; the
+    chosen one carries the cumulative cost (5 / 10 / 15 XP). A
+    single-level talent (31 boons, every sin) shows **one disabled
+    disc**, for consistency, with its cost beside it.
+  - **XP gain**: sins write their cost with a "+" ("+5 XP"), and the
+    counter gains a **Gain** projection (70 → 80) in Kind B amethyst
+    beside None / Projected / Over.
+  - **Talent compact card**: a new, smaller set (name, level, one
+    summary line, like the old sheet panel). Its sizes only need to
+    match the other talent cards (form cards are equal per section).
+    The summary line is a placeholder; a talent `summary` field is
+    parent step 5's call (S0-3).
+  - **Draft**: one talents layout adapted from r1-e, with no rival
+    options unless something turns out unclear.
+
+  **Built:**
+  - `Icons/Level` (`1652:3443`, beside `Icons/Grade`): the grade disc
+    with a Philosopher Bold numeral, a placeholder until Step 4. Status
+    is Boon / Sin / Unlearned / Disabled, and Level is I / II / III.
+  - `Molecules/Level pick` (`1653:3471`): Kind × Levels × Chosen, with
+    32 px discs and a right-aligned cost.
+    - With nothing chosen, the cost reads "5 / 10 / 15 XP".
+    - Levels above the pick turn Unlearned.
+  - `Organisms/Talent entry` (`1654:3535`): Kind × State, plus
+    BOOLEAN Attributes and Divider.
+    - The name sits above a bar-marked block: the Level pick as its
+      head, then the description in Body-14 / Text/Default and the
+      check attributes.
+    - The effects (all flags) aren't listed, because the
+      description already says what they do.
+  - `Organisms/Talent card` (`1654:3605`): 192 × 60. Kind ×
+    Context, plus BOOLEAN Level up. The current level is a 24 px disc,
+    and the summary is one truncated line.
+  - The counter's Projection = Gain (`1654:3607`).
+
+  **Approved 2026-10-31** (r2-a, nothing changed in it). Also settled:
+  - The primary button reads **"Take"** for talents. Its RU wording
+    is still open, alongside the "On your sheet" RU caption.
+  - The empty-preview hint reads "Select a talent to see it here."
+  - The single-level disc stays grey.
+
+  The approved copy is `talents / 1200` (`1658:10175`), with the sin
+  selected copy (`1658:10202`), in `picker`.
 
 ## Steps
 
@@ -1115,8 +1209,19 @@ outcome, not on a commit.
 - **Step 1 — Round 1: traits layout, desktop.** 2–4 options for the
   overall composition (S2-8 column split, card density, header / footer
   chrome). **Done when:** a winner is logged.
+
+  > ✅ **Completed 2026-10-31.** Divergences from the text above:
+  > the winner is a mix rather than one of the drafted options (r1-e,
+  > D29). The losing trial variants are parked as narrow-screen
+  > candidates for Step 3 instead of being removed, and three D11 trial
+  > atoms are deprecated (marked, not deleted). Chip hover (D10) was
+  > not drawn; it moves to the browser in parent step 2c.
 - **Step 2 — Talents and rituals variants.** Adapt the winner to levelled
   and untiered entries. **Done when:** both rows approved at desktop.
+  > ⏳ **Partial.** The talents row was approved 2026-10-31 (D30, r2-a).
+  > Deferred:
+  > - the rituals row (untiered; Chunk I step 4), which lands in this
+  >   step.
 - **Step 3 — Breakpoints.** Settle open item B; narrow (and middle)
   frames for each catalog. **Done when:** the matrix is all ✅.
 - **Step 4 — Assets.** User draws; agent cleans, imports into Figma and
@@ -1152,7 +1257,7 @@ outcome, not on a commit.
 - [x] Workspace — Figma `picker` / explorations areas, `r0` baseline
   _(2026-10-25)_
 - [x] Step 0 — Component library _(2026-10-31)_
-- [ ] Step 1 — Round 1: traits layout, desktop
+- [x] Step 1 — Round 1: traits layout, desktop _(2026-10-31)_
 - [ ] Step 2 — Talents and rituals variants
 - [ ] Step 3 — Breakpoints
 - [ ] Step 4 — Assets
