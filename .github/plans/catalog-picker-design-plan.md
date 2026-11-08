@@ -75,7 +75,7 @@ round.
 | --- | --- | --- | --- | --- |
 | Traits (abilities + spells) | 3 tiers, rank blocks | ✅ | — | — |
 | Talents (boons + sins) | levels | ✅ | — | — |
-| Rituals (Chunk I step 4) | untiered | — | — | — |
+| Rituals (Chunk I step 4) | untiered | ✅ | — | — |
 
 Cells: `—` not started · `rN` in exploration · `✅` approved in `picker`.
 Breakpoints are open item B.
@@ -163,6 +163,13 @@ imports the same file into Figma.
 - **P. Palette roles.** ✅ _Resolved 2026-10-31 (D26): one owner per
   role, one category pair reused, red lifted. Values provisional until
   seen in the full designs._
+- **F. Tradition chips.** Dropped for now from traits (spells) and
+  rituals (D31): tradition tags plus search already narrow by
+  tradition, and the traits aside has no room for eight more chips.
+  Revisit once the picker is laid out in code (parent step 2c), with
+  the real space and a feel for how search alone works.
+  `Molecules/Filter group` keeps its My traditions / Traditions kinds
+  until then.
 
 ## Rounds
 
@@ -197,6 +204,20 @@ imports the same file into Figma.
   Deceiver; Talent card in the preview; the action tooltip removed
   (talents have no actions). A 50 % copy `r2-a · sin selected`
   (`1656:10742`) shows the Gain projection (70 → 75, "Damage — +5 XP").
+- **r3 — rituals** (`1673:10822`, drafted and approved 2026-11-08;
+  D31). **Winner: `r3-a`, shipped without its chip** (no tradition
+  filters, open item F). Two options, cloned from `r2-a`, which differ
+  only in the filters:
+  - `r3-a` (`1673:10824`): a single "My traditions" chip.
+  - `r3-b` (`1673:11137`): "My traditions" above the eight tradition
+    chips.
+
+  Both have the title "Rituals", the counter 1 → 2 / 3, Fata Morgana
+  selected, then Fire Stories, Fleshcraft, Foresight and Form, the
+  Ritual card in the preview, and "Fata Morgana — free" with "Learn".
+  A 50 % copy `r3-a · at the limit` (`1673:11369`) shows the Over
+  counter (3 → 4 / 3) and the Blocked footer "An Adept Ritualist may
+  know up to three rituals."
 
 ## Decisions log
 
@@ -495,7 +516,7 @@ imports the same file into Figma.
   change while typing). **Tradition chips:** both the single "My
   traditions" chip and one chip per tradition (8, two rows at 410 px)
   are kept for the round-1 layouts; the final choice stays with open
-  item B. Built on the Molecules sheet (block `1493:231`):
+  item B (since D31: neither is used for now; open item F). Built on the Molecules sheet (block `1493:231`):
   `Molecules/Filter group` (`1493:230`; Kind = Source / Talent source /
   My traditions / Traditions; hidden `Legend` layer) and four example
   rows at the 410 px right-column width. Chip captions were re-centred
@@ -1121,13 +1142,58 @@ imports the same file into Figma.
   - The counter's Projection = Gain (`1654:3607`).
 
   **Approved 2026-10-31** (r2-a, nothing changed in it). Also settled:
-  - The primary button reads **"Take"** for talents. Its RU wording
-    is still open, alongside the "On your sheet" RU caption.
+  - The primary button reads **"Take"** for talents, RU «Выбрать»
+    (user, 2026-11-08). The "On your sheet" caption is RU «В чарлисте»
+    for now; it may change in development, and no replacement is
+    expected to be longer in either locale.
   - The empty-preview hint reads "Select a talent to see it here."
   - The single-level disc stays grey.
 
   The approved copy is `talents / 1200` (`1658:10175`), with the sin
   selected copy (`1658:10202`), in `picker`.
+- D31 (2026-11-08): **rituals adaptation** (Step 2). Rituals are free,
+  untiered, and capped by the Ritualist ability (Novice 1 / Adept 3 /
+  Master 6 known; `rpg/ru/01-core/magic.md`). So:
+  - **Title** "Rituals" (D13). **Primary button "Learn"**, as for
+    traits; the Ready footer reads "Form — free".
+  - **Counter: known against the limit**, "1 → 2 / 3", no XP. At the
+    limit the button is disabled and the footer explains it (Blocked).
+  - **Ritual entry**: the name above a bar-marked block with the
+    description and a **Traditions** meta line. The whole entry is the
+    click target (no rank to pick). No Attributes line: not every ritual
+    has a check, and the description names the Will check where one
+    exists.
+  - **Ritual card**: 192 × 60, as the talent card. The name (truncated
+    if needed) and a Traditions line ("Order · Circle"), from existing
+    data; no new field.
+  - **Filters**: none. Two exploration variants were drawn (a single
+    "My traditions" chip, or every tradition chip plus "My traditions");
+    neither was chosen. Every spell and ritual already carries its
+    traditions as localized tags, which search matches (parent S2b-3),
+    so the chips would mostly repeat what search does. The traits
+    picker, where the same chips would serve spells, has no room for
+    them either. Revisit with the real layout (open item F).
+  - The compare tray keeps 410 × 236 in every dialog, the largest card
+    it will hold (two trait cards); its note no longer names a card
+    size.
+  - Implementation notes (drop the stored `level`, enforce the limit)
+    went to Chunk I step 4.
+
+  **Built:**
+  - `Organisms/Ritual entry` (`1672:3599`): State = Default /
+    Selected, plus BOOLEAN Divider. The name is in Text/Kind B (the
+    spell ink, since rituals are the spells' family), above a bar-marked
+    block with the description and the Traditions meta line.
+  - `Organisms/Ritual card` (`1672:3756`): one component, no variants.
+  - `Molecules/Counter`: TEXT Limit ("/ 3", Text/Muted) and BOOLEAN
+    Show limit (off by default) on every Projection.
+  - The tray note in `Molecules/Compare stubs` no longer names a card
+    size.
+
+  **Approved 2026-11-08** (r3-a, without its "My traditions" chip; the
+  aside goes straight from search to "On your sheet"). The approved
+  copy is `rituals / 1200` (`1675:10868`), with the at-the-limit copy
+  (`1675:10896`), in `picker`. r3-b is labelled "not chosen".
 
 ## Steps
 
@@ -1218,10 +1284,11 @@ outcome, not on a commit.
   > not drawn; it moves to the browser in parent step 2c.
 - **Step 2 — Talents and rituals variants.** Adapt the winner to levelled
   and untiered entries. **Done when:** both rows approved at desktop.
-  > ⏳ **Partial.** The talents row was approved 2026-10-31 (D30, r2-a).
-  > Deferred:
-  > - the rituals row (untiered; Chunk I step 4), which lands in this
-  >   step.
+  > ✅ **Completed 2026-11-08.** Divergences from the text above:
+  > - Talents were approved 2026-10-31 (D30, r2-a), rituals 2026-11-08
+  >   (D31, r3-a).
+  > - Rituals dropped the filter chips altogether, and tradition chips
+  >   are parked for traits too (open item F).
 - **Step 3 — Breakpoints.** Settle open item B; narrow (and middle)
   frames for each catalog. **Done when:** the matrix is all ✅.
 - **Step 4 — Assets.** User draws; agent cleans, imports into Figma and
@@ -1258,7 +1325,7 @@ outcome, not on a commit.
   _(2026-10-25)_
 - [x] Step 0 — Component library _(2026-10-31)_
 - [x] Step 1 — Round 1: traits layout, desktop _(2026-10-31)_
-- [ ] Step 2 — Talents and rituals variants
+- [x] Step 2 — Talents and rituals variants _(2026-11-08)_
 - [ ] Step 3 — Breakpoints
 - [ ] Step 4 — Assets
 - [ ] Step 5 — Hand-off to code

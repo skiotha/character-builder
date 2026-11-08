@@ -370,6 +370,11 @@ in-browser pass over the touched view (Playwright MCP, per the
   notes and affiliations.
   **Done when:** in-browser: add a ritual; add/edit/remove note and
   affiliation rows; PATCH round-trips + SSE live update.
+  Design (catalog-picker design plan D31): the picker counts known
+  rituals against the Ritualist limit (Novice 1 / Adept 3 / Master 6)
+  and blocks Learn at the limit. Two data changes follow: drop `level`
+  from the stored ritual (rituals are untiered; pre-launch, so no
+  migration, just wipe), and enforce the limit on the server as well.
 - **Step 4½ — Portrait re-crop on the sheet + crop / pan-zoom math fix.**
   Registered 2026-09-11 from lifecycle-plan step 3, which shipped view-mode
   portrait upload (`<nagara-portrait>` → `api.uploadPortrait` → six-leaf
