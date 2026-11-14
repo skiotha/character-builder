@@ -102,6 +102,7 @@ not fully predictable, so these are briefs, not specs):
 | Close ✕ | header dismiss (`Icons/Close` Dialog, 24), search clear (Clear, 24, mirrors the search glyph) and sheet-card remove (Remove, 24, D22) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the three may be distinct drawings | placeholder in Figma |
 | Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
 | Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
+| Filter glyph | filter toggle at the end of the search row, one column, 360 and below (`Icons/Filter`, 24; r4) | Reads at ~20–24 px as "filter", not "menu"; drawn on the Icon button | placeholder in Figma (three shrinking lines) |
 | Alert mark | footer status, before a blocked reason (`Icons/Alert`, 16; D18) | Small red hand-drawn "blocked / attention" mark, readable at 16 px beside Body-14 text; distinct from the outside-traditions mark; colour from CSS | placeholder in Figma |
 | Outside-traditions mark | spell badge (D11) | Small red hand-drawn mark, readable at ~16 px, meaning "not your tradition"; may stand alone | not drawn |
 | Special attack / reaction marks | action line kind (`Icons/Special attack`, `Icons/Reaction`, 16) | Two small marks, told apart by shape, readable at 16 px beside Body-14 text; colour from CSS (D15) | placeholder in Figma |
@@ -112,6 +113,7 @@ not fully predictable, so these are briefs, not specs):
 | Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`. It shows **alone** (the text is for screen readers only, D19), so the static frame must still read as "loading"; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
 | Details marker | `Atoms/Details toggle` (D17) | Small mark beside Body-14, ~12 px; points right when closed and turns (or is redrawn) to point down when open | placeholder in Figma |
 | Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
+| Aside artwork | fills the aside's free space (D33) | Decorative. Two areas: beside the preview card in the 410 aside (~202 wide, as tall as the heading and card: 293 for traits, 117 for talents and rituals), and below the card in the slim aside (192 wide, height from 0 to several hundred px). These areas only place the drawing's centre: it may overflow anywhere (under other elements, out of the dialog or the window); sizes settle once it's drawn. Never adds height | placeholder in Figma |
 
 **Hand-off:** Illustrator *Export As → SVG* (presentation attributes,
 outlined text, no embedded images, 2 decimals, Responsive on). The agent
@@ -127,7 +129,31 @@ imports the same file into Figma.
 - **B. Breakpoints.** Desktop is now up to 1200 wide × viewport − 64
   tall (D23; was the 1200 × 600 frame, S2-8); step 2c
   requires a narrow fallback (columns stack, list scrolls). Decide the
-  widths and whether a middle layout exists.
+  widths and whether a middle layout exists. Approach (user,
+  2026-11-13):
+  - **Widths are found by drawing**, where the design breaks, not
+    taken from device sizes. The app's current breakpoints (1440, 920,
+    900 px) are ad hoc and are ignored.
+  - **Devices are test points**, not breakpoints: a 360 px phone, a
+    phone held sideways, a tablet in both orientations, a small laptop,
+    and 320 px (WCAG 1.4.10 Reflow, a 1280 px screen at 400 % zoom,
+    which makes the narrow layout mandatory). Touch, height and the
+    on-screen keyboard get their own queries (`hover`, `pointer`,
+    height), separate from width.
+  - **One column dissolves the aside** rather than switching panes
+    (list–detail or tabs): tools go above the list, the action stays
+    pinned, and the preview card moves or goes (round r4).
+  - **Usage profile** (user, 2026-11-14): phones and tablets will be
+    very rare: a quick check or a look at a character, perhaps browsing
+    the catalogs. Play happens at a desktop. Small screens must never
+    look broken, and informative features (reading entries, hints,
+    search and filters) must work there; involved actions (comparing
+    with Remember / Recall) may be left out. This keeps r4 part 4 light.
+  - **Body text stays 14 on narrow screens for now** (user, 2026-11-14:
+    postponed; revisit after release if it reads too small). Today's
+    900 px 14 → 16 rule goes with the old breakpoints. The search field
+    still uses at least 16 px on touch screens, or iOS zooms in when it
+    gets focus.
 - **S. Specimen page.** A dev-only page rendering the picker for every
   catalog at every breakpoint side by side, so one CSS edit + one look
   covers the whole matrix. Parent S2-9 chose "no harness file" for the
@@ -218,6 +244,228 @@ imports the same file into Figma.
   A 50 % copy `r3-a · at the limit` (`1673:11369`) shows the Over
   counter (3 → 4 / 3) and the Blocked footer "An Adept Ritualist may
   know up to three rituals."
+- **r4 — breakpoints** (planned 2026-11-13; open item B). Traits
+  first; talents and rituals follow once traits settles. In order:
+  1. Shrink the approved two-column `traits / 1200` step by step until
+     it breaks (the list too narrow for rank blocks). That width is the
+     first breakpoint.
+     > Drawn 2026-11-13 in section `r4 — breakpoints` (`1682:11097`):
+     > `traits / 1100 · 1000 · 900 · 800 / r4-shrink`, the aside fixed
+     > at 410. Nothing clips or spills at any width; the layout fails
+     > on proportion and line length instead. Rank text runs ~70
+     > characters a line at 1100, ~56 at 1000, ~42 at 900 and ~28 at
+     > 800. At 900 the list is no wider than the aside, which is mostly
+     > empty space, so the list stops leading; 800 is plainly broken.
+     > **The full two-column layout holds down to ~960–1000.**
+  2. Draw the one-column layout, which **dissolves the aside**: search
+     and a Filters button above the list, the footer pinned, the
+     preview card placed per the variants below, Remember / Recall
+     dropped. Shrink it to 320 px; if it breaks on the way, that is a
+     second breakpoint (a separate phone layout).
+     > Settled before drawing (user, 2026-11-13): **no Filters
+     > button**. The chips sit beside the search when they fit and
+     > wrap under it when they don't (every catalog has at most two).
+     > **Shell:** a floating dialog at 700; full-screen with 16 px
+     > padding at phone widths (480 and below). **Footer:** Row at 700,
+     > Stacked at 480 and below. **Card toggle:** drawn both ways, as
+     > its own "On your sheet" line and as the status line itself;
+     > either way a `<details>` in the footer that grows upward, so the
+     > list shrinks and nothing overlaps.
+     > Drawn 2026-11-13 (section `1682:11097`, rows 3–5):
+     > `traits / 700 · 480 · 360 · 320 / r4-one-dropped`, then
+     > `r4-one-toggle` (own "On your sheet" line) and `r4-one-status`
+     > (the status line is the summary), each at 700 open, 360 closed,
+     > 360 open and 320 open. Phone sizes: 480 × 800, 360 × 740,
+     > 320 × 568. Findings:
+     > - **The one column holds from 700 down to 320.** Rank text runs
+     >   ~76 characters a line at 700 (capped later by the line-length
+     >   rule), ~52 at 480, ~36 at 360 and ~29 at 320; no second
+     >   (phone) layout is needed for width.
+     > - **Header on phones:** title and counter need ~284 px; at 360
+     >   and below the counter wraps under the title (`flex-wrap`).
+     >   At 480 they share a line.
+     > - **Tools:** the chips sit beside the search at 700 and 480 and
+     >   wrap under it at 360 and below.
+     > - **Height is the real limit on phones.** Header (two lines),
+     >   tools (two lines) and the Stacked footer take ~450 of 740 px at
+     >   360, leaving the list ~290 px closed.
+     > - **The status-line toggle** costs no extra row; the own toggle
+     >   costs ~40 px and repeats "On your sheet" next to a status that
+     >   already names the pick.
+     > - **An in-flow card doesn't work on phones.** Opening it leaves
+     >   the list 37–74 px at 360 and breaks at 320 × 568 (no room;
+     >   the chips overlap the card). At 700 it halves the list but
+     >   works.
+     >
+     > Settled with Skiotha 2026-11-13, after the drawings:
+     > - **The card toggle is the status line** (row 5): its text is the
+     >   `<summary>`. The own-line toggle (row 4) is dropped.
+     > - **The card opens as a popover** anchored above the footer, over
+     >   the list (native `popover`, light dismiss). The list keeps its
+     >   height and scroll position. Replaces the in-flow card for every
+     >   one-column width.
+     > - **The header and tools never wrap onto a second line.** The
+     >   counter under the title and the chips under the search are both
+     >   rejected; the header gets more compact on phones instead, and
+     >   the chips show only on demand.
+     > - **The Stacked footer stays on phones.** The status line carries
+     >   the toggle, so it can't share a row with the buttons; accepted.
+     > - **Compact phone header:** the counter shows only the result,
+     >   arrow kept ("→ 40"; colour is not the only cue, WCAG 1.4.1),
+     >   and the title steps down to `Fonts/Header-28`, so both share
+     >   one line down to 320. The header stays **pinned** (~56 px): the
+     >   counter is the live feedback while choosing.
+     > - **Chips on demand where they don't fit beside the search** (360
+     >   and below): a filter icon button ends the search row and
+     >   shows / hides the chip row below it (a disclosure,
+     >   `aria-expanded`), with a count badge while any chip is on.
+     >   480 and wider keep the chips inline. Not tied to search focus:
+     >   on phones focus opens the keyboard, and tapping a chip would
+     >   blur it. Reverses the earlier "no Filters button".
+     >
+     > Drawn 2026-11-13, row 6 `r4-one-final` (y 5340): 700 × 800 card
+     > open; 360 × 740 closed, chips shown (1 on), card open; 320 × 568
+     > card open. Notes from the drawing:
+     > - The compact header gives the list back ~150 px: **437 px at
+     >   360 × 740** (was ~290) and 265 at 320 × 568, which now works.
+     > - The counter steps down to `Header-28` with the title, keeping
+     >   D13's "same size as the title".
+     > - **The popover uses the Outlined surface** (`Surface/Base` +
+     >   `Border/Decor`, radius token, 16 padding), not glass: glass at
+     >   50 % let the list text show through the card and was
+     >   unreadable. Glass stays for tooltips.
+     > - **New `Icons/Filter`** (`1702:16071`, beside `Icons/Search`; on
+     >   the Icon button's swap list). Expanded = the Icon button's
+     >   Pressed look (D7's +8° tilt, held static while the chip row is
+     >   shown; hover tilts the other way, −12°). The search row has no
+     >   gap: the filter button follows the clear ✕ directly, so ✕ →
+     >   filter reads the same ~15 px as the field line → ✕ (user,
+     >   2026-11-13). The count badge is a 16 px `Surface/Active` dot
+     >   with `Text/Inverse` digits, drawn ad hoc for now.
+  3. Preview-card placement variants (user, 2026-11-13):
+     - **Footer**: an "On your sheet" toggle (`Atoms/Details toggle`)
+       in the pinned footer opens the card just above it.
+     - **Dropped**: no card on narrow screens; the footer status line
+       is the confirmation.
+     - **Slim aside** (middle range only): search and filters above
+       the list, a ~240 px right column holding only the card.
+       > Drawn 2026-11-13 as `traits / 900 · 800 · 700 · 600 /
+       > r4-slim`: a Tools row (search fills, chips bottom-aligned to
+       > the search line) over the list, and the aside at the card's
+       > own 192 px (not 240) holding the "On your sheet" heading and
+       > card. Compare stubs dropped. Rank text runs ~62 characters a
+       > line at 900, ~52 at 800, ~44 at 700 and ~30 at 600, where the
+       > search field also shrinks to 150 px. **The slim aside holds
+       > from ~1000 down to ~720–760.** It earns its place: a single
+       > column at 900 would run rank lines past 100 characters unless
+       > capped.
+       > Remember / Recall restored 2026-11-13 (user): `Compare stubs`
+       > Layout = Stacked under the card in all four frames (D32).
+       > Removed again the same day (D33): compare lives in the
+       > two-column layout only, and the slim aside keeps the heading,
+       > the card and the aside artwork below it.
+  4. Touch and height: hints that open on tap (the action tooltips
+     need hover today), tap-target sizes, a phone held sideways
+     (~360–430 px tall), the on-screen keyboard over search.
+     > Touch hints, settled 2026-11-14 (user):
+     > - **A tap opens the same tooltip** (D15: each trigger is a real
+     >   button; popover with anchor positioning, flipping to stay on
+     >   screen). A tap outside or on the trigger again closes it.
+     > - **A tap on a hint trigger only opens the hint**; a tap
+     >   anywhere else in the rank block selects the rank. The block
+     >   passes clicks on to its head only when they didn't land on
+     >   another control.
+     > - **Hover motion only where hover is real**
+     >   (`@media (hover: hover)`); touch browsers fake a sticky hover
+     >   after a tap.
+     > - Dotted term words keep their size: WCAG 2.5.8 exempts targets
+     >   inside running text.
+     > - Drawn: `traits / 360 / r4-touch-hint` (row 6, x 2620), the
+     >   Glass Text tooltip opened by a tap on "Bounce Back". At 320 px
+     >   wide it fits inside the 360 dialog with 24 px either side, so
+     >   phones need no separate tooltip size.
+
+     > Tap targets, settled 2026-11-14 (user):
+     > - **Measured at 360 / 320:** Learn / Cancel 48 tall, the rank
+     >   blocks (whole block is the target, ≥ 125 tall) and the popover
+     >   rank rows (42) are already comfortable. The dialog ✕ and the
+     >   filter button (32 × 32), the search-clear ✕ (24 × 24, touching
+     >   the filter button), the chips (64 × 32, 8 apart) and the
+     >   status line (full width, 21 tall) meet WCAG 2.5.8 (24 px, AA)
+     >   but fall short of 44 px (2.5.5 AAA, Apple's guideline).
+     > - **Invisible 44 px tap zones on touch screens**
+     >   (`@media (pointer: coarse)`): the controls keep their drawn
+     >   size; the zone grows with padding or a transparent pseudo-
+     >   element. Mouse users see no change.
+     > - **Clear ✕ beside the filter button, split at the seam:** the
+     >   gap stays at 0. The clear zone reaches left over the field's
+     >   empty end (x 260–304 at 360); the filter zone reaches right
+     >   and up / down (304–348). The field's text must stop at the
+     >   clear zone (`padding-inline-end`), so typed text never runs
+     >   under it.
+     > - **Chips keep their size:** the zone grows to 44 tall and into
+     >   half of the 8 px gap on each side (72 × 44), so neighbouring
+     >   zones meet without overlapping.
+     > - The status line's zone grows to 44 tall; 4 px are left above
+     >   the footer buttons.
+     > - Drawn: `traits / 360 / r4-tap-zones` (row 6, x 3060), a copy of
+     >   the chips-shown frame with a magenta annotation layer
+     >   (`Tap zones (annotation)`) showing each zone. Not part of the
+     >   design; it is there for the hand-off (open item S).
+
+     > Short windows, settled 2026-11-14 (user):
+     > - **A rule by height, whatever the width:** below **500 px**
+     >   tall (`@media (max-height: 500px)`) the picker uses the short
+     >   layout. Phones held sideways (320–430 tall) land there; a
+     >   1280 × 720 laptop (1920 × 1080 at 150 %, ~550–600 px of page
+     >   under the browser bars and taskbar) keeps its width layout and
+     >   Remember / Recall. 600 was the alternative, so the slim aside
+     >   would never scroll; rejected for that laptop case.
+     > - **One top bar:** title with the compact counter, the search
+     >   field, the filter button and the dialog ✕ in one row; the chips
+     >   sit behind the filter button (as on phones). No aside: the
+     >   status line opens the "On your sheet" card as a popover, as in
+     >   one column; a popover taller than the room above the footer
+     >   scrolls inside itself. Compare is unavailable, as in one
+     >   column.
+     > - **One-row footer:** status line on the left, Cancel / Learn on
+     >   the right.
+     > - **Measured list heights** (844 wide): slim aside 273 / 173 / 63
+     >   at 600 / 500 / 390 tall; short layout 299 at 500 and 189 at
+     >   390. With the switch at 500, the shortest list either side is
+     >   ~175–190 px.
+     > - Drawn: row 7 of the breakpoints section, `r4-short-slim` at
+     >   844 × 600 / 500 / 390 and `r4-short-bar` at 844 × 500 / 390.
+
+     > On-screen keyboard, settled 2026-11-14 (user):
+     > - **The keyboard covers the footer; the layout stays still.**
+     >   This is the default in iOS Safari and Android Chrome
+     >   (`interactive-widget=resizes-visual`), so no code is needed.
+     >   The search field sits at the top, so it stays in view, with
+     >   ~300 px of results under it at 360 × 740. Learn is out of
+     >   reach only while typing, and nothing jumps when the keyboard
+     >   closes. Rejected: shrinking the dialog above the keyboard
+     >   (list ~200 px, needs `visualViewport` script on iOS, which
+     >   ignores `interactive-widget`, and the layout jumps).
+     > - **No autofocus on touch screens:** the picker opens without
+     >   focusing the search field when `(pointer: coarse)` matches, so
+     >   the keyboard appears only when someone taps the field. Desktop
+     >   keeps `autofocus` (today's `catalog-dialog.mjs` sets it
+     >   unconditionally).
+     > - **The "Search" key moves focus to the first result**
+     >   (`enterkeyhint="search"`): focus only, no selection. On touch
+     >   it closes the keyboard; on desktop it jumps to the results.
+     >   Enter still can't submit, because the field sits outside the
+     >   `method="dialog"` forms.
+     > - Drawn: `traits / 360 / r4-keyboard` (row 6, x 3500), the
+     >   search field focused with "bounce" typed, and a grey
+     >   annotation box where the ~290 px keyboard sits.
+
+     > ✅ **Completed 2026-11-14.** Divergences from the text above:
+     > the short-window rule switches at 500 px tall, above the
+     > 360–430 named here, so the slim aside just above it keeps a
+     > list as tall as the short layout's at 390; tap sizes are met
+     > with invisible zones, not bigger controls.
 
 ## Decisions log
 
@@ -816,7 +1064,10 @@ imports the same file into Figma.
   (block `1567:968`): `Molecules/Compare stubs` (`1567:955`; BOOLEAN
   Divider and Reserved tray, both on by default; Remember / Recall are
   exposed `Atoms/Button` Plain Disabled instances), with RU and the
-  shipped shape (no tray, no divider) as examples.
+  shipped shape (no tray, no divider) as examples. _Since D32 a
+  variant set (`1688:3514`): Layout = Row (`1567:955`, the 410 aside)
+  / Stacked (`1688:3507`, the 192 slim aside). Stacked has no instances
+  since D33 and is kept in case a narrow compare needs it._
 - D21 (2026-10-30): trait entry — the full picker list item (`<li>`),
   for abilities and spells. **Every entry is bought from nothing:**
   learned traits never reach the picker (parent decision 13) and
@@ -1194,6 +1445,89 @@ imports the same file into Figma.
   aside goes straight from search to "On your sheet"). The approved
   copy is `rituals / 1200` (`1675:10868`), with the at-the-limit copy
   (`1675:10896`), in `picker`. r3-b is labelled "not chosen".
+- D32 (2026-11-13, in progress with round r4): **breakpoints** (Step 3,
+  open item B). Settled so far:
+  - **Three layouts by width**, found by drawing (r4): two columns
+    (list | 410 aside) from 1200 down to ~1000; a **slim aside** from
+    ~1000 down to ~750; one column below. The exact switch points
+    settle in CSS.
+  - **Slim aside**: search and the filter chips move into a Tools row
+    above the list (chips bottom-aligned to the search line); the
+    aside narrows to the card's own 192 px and holds the "On your
+    sheet" heading, the preview card and the aside artwork below it
+    (D33).
+  - ~~**Remember / Recall stay wherever an aside exists**~~ (user,
+    2026-11-13; superseded the same day by D33). The slim aside had the
+    buttons one per row and the tray as a vertical stack of two
+    192 × 236 cards. `Molecules/Compare stubs` became a variant set
+    (`1688:3514`) with Layout = Row / Stacked for it; the existing
+    instances stay on Row.
+  - **One column** (r4 step 2, user, 2026-11-13): a floating dialog
+    down to ~480, full-screen (16 padding, no radius) below. The header
+    and tools never wrap: on phones the title and counter step down to
+    `Header-28` and the counter shows only the result ("→ 40"); the
+    header stays pinned. The chips sit beside the search where they
+    fit; below that (360 and under) a filter button ends the search row
+    and shows / hides the chip row, with a count badge while a chip is
+    on. The footer is Row at 700 and Stacked on phones. The status line
+    is the `<summary>` for the "On your sheet" card, which opens as a
+    popover above the footer, over the list (Outlined surface).
+  - **Touch:** a tap opens the same hint tooltip as hover; on
+    `pointer: coarse` the small controls get invisible 44 px tap zones
+    and keep their drawn size (r4 item 4).
+  - **Short windows** (below 500 px tall, any width): one top bar
+    (title, counter, search, filter, ✕), chips behind the filter
+    button, no aside (the card is a popover), a one-row footer
+    (r4 item 4).
+  - **Keyboard:** it covers the footer and the layout stays still; no
+    autofocus on touch screens; the "Search" key moves focus to the
+    first result (r4 item 4). Part 4 is complete.
+    Compare below the two-column layout is settled by D33.
+  - **Slim aside height:** its content (heading and card) is ~293 px.
+    The dialog body is its height minus ~247 px of fixed parts
+    (padding, header, footer, gaps), so the aside needs no scroll down
+    to a dialog ~540 tall (a window ~600 tall); below that it scrolls
+    on its own (D23). The artwork only fills what's left. **A phone held
+    sideways** (~850 × 390) falls in the slim width range but leaves
+    the body ~80 px: short windows have their own rule, independent of
+    width (the short layout above).
+- D33 (2026-11-13): **aside artwork; Remember / Recall in the
+  two-column layout only** (user).
+  - **The aside's free space is the user's artwork**, not empty room.
+    In the 410 aside it's the area right of the 192 preview card
+    (~202 wide, as tall as the heading and card); in the slim aside it's
+    everything below the card. The drawing (or parts of it) is anchored
+    there. It is decorative: hidden from assistive tech (`alt=""` / CSS
+    background), never focusable, never takes pointer events, and never
+    adds height or makes the aside scroll.
+  - **The artwork is unbounded** (user, 2026-11-13). It may be loose
+    line squiggles, and it may overflow anywhere: past the area, under
+    other elements, out of the dialog, out of the window. The area only
+    says where the drawing's centre sits; its sizes adapt once the
+    drawing exists. In CSS that means an out-of-flow layer (absolute
+    position, `pointer-events: none`, behind the content) on a box that
+    doesn't clip it.
+  - In Figma a dashed design-only placeholder `Artwork (design-only)`
+    marks that centre area, like D20's reserved tray: absolutely placed right
+    of the card in the approved `traits` / `talents` / `rituals / 1200`
+    frames and the r4 shrink frames (202 × 293 for trait cards,
+    202 × 117 for the shorter talent and ritual cards), and filling
+    the rest of the slim aside in the four r4-slim frames.
+  - **Remember / Recall are a two-column feature.** The slim aside
+    drops the stubs, and the artwork takes their place. The desktop
+    tray stays below the buttons (D20); the preview's right side is the
+    artwork, not a compare slot.
+  - **Narrow layouts get a fallback, designed with the feature
+    (Phase 8).** Losing a feature at narrow widths fails WCAG 1.4.10
+    Reflow, which covers zoom: a 1920 px screen at 200 % is ~960 CSS px,
+    i.e. the slim aside. Compare doesn't need two cards side by side
+    there: e.g. Recall swaps the preview to the remembered card and
+    back, one at a time, with no space reserved now. Kept after the
+    usage note (user, 2026-11-14): it serves desktop users who zoom
+    in, not phones.
+  - Remembered entries live in picker state, not the layout. A resize
+    or rotation (tablet: two columns sideways, slim aside upright) hides
+    the compare UI but never clears it.
 
 ## Steps
 
