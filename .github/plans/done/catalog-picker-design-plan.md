@@ -1,12 +1,15 @@
 # Plan — Catalog picker: visual design (Figma rounds → code)
 
-**Status:** active (2026-10-25) — Steps 0–3 closed; Step 4 partial (font
-pass and SVG pipeline done, drawings deferred to the roadmap's Phase 8);
-Step 5 (hand-off to code) next. Companion to
-[`catalog-picker-dialog-plan.md`](./catalog-picker-dialog-plan.md): that
+**Status:** closed 2026-11-15, archived. Steps 0–3 and 5 done; Step 4
+partial (font pass and SVG pipeline done; the drawings are owned by the
+roadmap's Phase 8 "Visual redesign" item). The code half (the parent's
+step 2c) moved to
+[`catalog-picker-styling-plan.md`](../catalog-picker-styling-plan.md);
+the lasting rules live in
+[`docs/design-system.md`](../../../docs/design-system.md). Companion to
+[`catalog-picker-dialog-plan.md`](../catalog-picker-dialog-plan.md): that
 plan owns **what the dialog does** (behavior, data, API — its S2 / S2b
-decisions are fixed inputs here); this one owns **how it looks** and
-feeds its step 2c (dialog CSS pass).
+decisions are fixed inputs here); this one owned **how it looks**.
 **Owner:** user (design authority, final visual calls, SVG art in
 Illustrator) + agent (Figma drafts, decision log, SVG cleanup, CSS)
 **Session note:** sessions start cold. This file + the Figma areas below
@@ -57,8 +60,9 @@ one-line decisions and one-line rejections; don't keep transcripts.
    and logs the decision here. The user's review is the deciding visual
    check; the agent's screenshots only catch build errors.
 4. **Code** — once a catalog's layout is settled, it goes to CSS (parent
-   step 2c), iterated in the browser against a specimen page (see open
-   item S below); results are captured back into `picker`.
+   step 2c, now the styling plan), iterated in the browser against a
+   check page (styling plan, open item S); results are captured back
+   into `picker`.
 
 ## Fixed inputs (do not relitigate here)
 
@@ -83,7 +87,7 @@ Breakpoints are open item B.
 
 ## Motion & assets
 
-Moved to [`docs/design-system.md`](../../docs/design-system.md)
+Moved to [`docs/design-system.md`](../../../docs/design-system.md)
 (2026-11-15): the motion rules are DS §motion and DS §focus; the asset
 briefs, their states and the hand-off pipeline are DS §assets. The
 decisions below keep the picker-specific reasoning.
@@ -124,11 +128,11 @@ decisions below keep the picker-specific reasoning.
     900 px 14 → 16 rule goes with the old breakpoints. The search field
     still uses at least 16 px on touch screens, or iOS zooms in when it
     gets focus.
-- **S. Specimen page.** A dev-only page rendering the picker for every
+- **S. Specimen page.** ➡️ _Moved 2026-11-15 to the styling plan (open
+  item S, "check page")._ A dev-only page rendering the picker for every
   catalog at every breakpoint side by side, so one CSS edit + one look
   covers the whole matrix. Parent S2-9 chose "no harness file" for the
-  step-2 check; this would be a new dev surface. Decide where it lives
-  and how it stays out of production before the code phase.
+  step-2 check; this would be a new dev surface.
 - **D. Early-draft gaps.** ✅ _Resolved 2026-10-31._ `r0` (1200 × 600,
   frame `1166:237`) shows a title, one entry head, search, a preview
   card and remember / recall captions. Against the fixed inputs it lacks:
@@ -159,13 +163,10 @@ decisions below keep the picker-specific reasoning.
 - **P. Palette roles.** ✅ _Resolved 2026-10-31 (D26): one owner per
   role, one category pair reused, red lifted. Values provisional until
   seen in the full designs._
-- **F. Tradition chips.** Dropped for now from traits (spells) and
-  rituals (D31): tradition tags plus search already narrow by
-  tradition, and the traits aside has no room for eight more chips.
-  Revisit once the picker is laid out in code (parent step 2c), with
-  the real space and a feel for how search alone works.
-  `Molecules/Filter group` keeps its My traditions / Traditions kinds
-  until then.
+- **F. Tradition chips.** ➡️ _Moved 2026-11-15 to the styling plan
+  (open item F, decided in its part 2)._ Dropped for now from traits
+  (spells) and rituals (D31): tradition tags plus search already narrow
+  by tradition, and the traits aside has no room for eight more chips.
 
 ## Rounds
 
@@ -1918,15 +1919,29 @@ outcome, not on a commit.
   implements from `picker`. Before the plan is archived, one Figma pass
   repoints component descriptions that cite this plan's D-numbers to
   `DS §anchor`s (user, 2026-11-15), and any durable rule still only in
-  the log is lifted into [`docs/design-system.md`](../../docs/design-system.md).
+  the log is lifted into [`docs/design-system.md`](../../../docs/design-system.md).
   **Done when:** parent step 2c's gate passes;
   this plan moves to `done/`.
+
+  > ✅ **Completed 2026-11-15.** Divergences from the text above:
+  > - Closed before the code work, by the user's choice: the parent's
+  >   step 2c outgrew one step and became its own plan,
+  >   [`catalog-picker-styling-plan.md`](../catalog-picker-styling-plan.md),
+  >   which owns open items S and F, the leftovers for the browser
+  >   (D10 chip hover, D13 / D24 counter, D17 tooltip route, D34 long
+  >   Traditions value) and the step-2c gate.
+  > - Rules lifted into DS: DS §controls (new: kinds of control, labels,
+  >   scrollbars, label / value groups) and additions to DS §motion
+  >   (loader delay) and DS §focus (text-field invalid and read-only
+  >   states, one selection signal, the live status).
+  > - The Figma pass touched more than descriptions: 58 component
+  >   descriptions and 41 sheet labels on `Components` now cite
+  >   `DS §anchor`s or nothing; provenance stays in this log.
 
 ## Verification
 
 - Design steps: user approval on the canvas, logged above.
-- Code phase: the parent plan's step-2c gate (screenshots at desktop and
-  narrow widths, keyboard focus run, reduced motion, `npm test` green).
+- Code phase: the step-2c gate, now owned by the styling plan.
 
 ## References to sweep on completion
 
@@ -1942,4 +1957,5 @@ outcome, not on a commit.
 - [x] Step 3 — Breakpoints _(2026-11-15)_
 - [ ] Step 4 — Assets — ⏳ partial _(2026-11-15)_: font pass and SVG
   pipeline done; drawings deferred to roadmap Phase 8 (D35)
-- [ ] Step 5 — Hand-off to code
+- [x] Step 5 — Hand-off to code _(2026-11-15; code work moved to the
+  styling plan)_

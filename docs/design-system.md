@@ -154,6 +154,9 @@ mark, text) always carries it too.
   move by different amounts.
 - **Nothing important appears instantly.** Value changes cross-fade or
   slide.
+- **Loading indicators wait ~300 ms** before showing, so a fast or cached
+  load never flashes them. The "Loading…" text is for screen readers
+  only (`role="status"`, `aria-busy` on the region).
 - **`prefers-reduced-motion`:** every transition and animation stops.
   Static end states (a grown glyph, an underline) stay, so no state
   depends on motion.
@@ -167,13 +170,43 @@ mark, text) always carries it too.
     doesn't scale, so focus can't be mistaken for hover;
   - text fields → the field grows, its top line turns red, and it fills
     yellow with black text.
+- **Invalid** text fields (filled only) pulse yellow ↔ red; under
+  reduced motion they hold steady red. **Read-only** fields draw lines,
+  label and value in grey; text fields have no separate disabled state.
 - **Disabled** controls are natively `disabled` (skipped by Tab, no hover
   motion) and drawn in Grey-dim.
+- **Selection has one signal** (e.g. the picker's rank bars), not
+  several that could disagree. A live status (`<output>`) describes the
+  current selection only. A reason that blocks a choice sits beside
+  that choice, not in the status, so the status message doesn't come and go.
 - **Tooltips carry short things only:** a term, a quality, a one-line
   aside. They open on hover **and** focus, stay while hovered, close on
   Esc, and open on tap on touch, so their trigger is a real control.
   **Long content that a choice depends on** goes behind a native
   `<details>` toggle that opens in place, never into a hover tooltip.
+
+### DS §controls — kinds of control and labels
+
+- **Actions, toggles and labels look different by shape**, not colour:
+  - **actions** are text buttons with uppercase captions. Only the
+    primary action carries a hand-drawn border; the others are plain
+    text. A glyph-only action is an icon button with an accessible name
+    (e.g. "Close");
+  - **toggles** (filter chips) have no border: a brush stroke fills
+    behind a sentence-case caption, and checked differs from unchecked
+    in the stroke's shape and angle. In code each is a native checkbox
+    inside its `<label>`, groups are a `<fieldset>` + `<legend>`, and a
+    legend may be hidden visually but stays for screen readers;
+  - **labels and tags** are plain text: no fill, no border, no hover, so
+    they never pass for a toggle or an action.
+- **Red never means "clickable"**: it already means focus and alert.
+  Interactivity shows through shape, hover motion and the pointer.
+- **Scrollbars use the standard properties only** (`scrollbar-width:
+  thin`, a yellow thumb on a transparent track, `scrollbar-gutter:
+  stable` so content doesn't shift), never `::-webkit-scrollbar`.
+- **Label / value groups** are one `<dl>` grid whose label column is as
+  wide as the group's longest label (`max-content`), labels right-aligned,
+  rows 4 px apart, so a single row has no stray indent.
 
 ### DS §responsive — sizes, touch and short windows
 

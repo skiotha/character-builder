@@ -7,9 +7,11 @@ open for step planning. Step-0 metadata decisions recorded 2026-10-23
 decisions recorded 2026-10-24 (see "Step-1 decisions"). Step-2
 decisions recorded 2026-10-24 (see "Step-2 decisions"); step 2a done
 2026-10-25. Step-2b decisions recorded 2026-10-25 (see "Step-2b
-decisions"); step 2b done 2026-10-25. The dialog's visual design runs in
-[`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md)
-(2026-10-25) and feeds step 2c. Blocks
+decisions"); step 2b done 2026-10-25. The dialog's visual design ran in
+[`catalog-picker-design-plan.md`](./done/catalog-picker-design-plan.md)
+(2026-10-25 – 2026-11-15); step 2c runs in
+[`catalog-picker-styling-plan.md`](./catalog-picker-styling-plan.md)
+(2026-11-15). Blocks
 [`phase6-chunkI-plan.md`](./phase6-chunkI-plan.md) step 3, which is now a
 pointer here.
 **Owner:** user (design authority + catalog authoring) + agent
@@ -764,41 +766,13 @@ revisited during planning of their owning steps, not deferred to close-out.
     > - In Chrome, the first Escape in a non-empty search field clears
     >   it (native `type=search`, which fires `input`, so the list
     >   resets); the second Escape cancels the dialog.
-  - **Step 2c — Dialog CSS pass.** Brings the dialog chrome to the
-    redesign now instead of waiting for Chunk I step 5 (which keeps
-    the rest of the sheet). The source is the approved Figma `picker`
-    frames and the `Components` library (**ui-figma-source** rule), under
-    the rules in [`docs/design-system.md`](../../docs/design-system.md).
-    Tokens come from the library's variables (`get_variable_defs`; every
-    variable carries its CSS name), mapped to `:root` custom properties —
-    no hex / fonts from memory. Per the **styling**
-    rule: an `@layer`ed, `@scope`d dialog stylesheet with native nesting;
-    surface, `::backdrop`, header / title type, columns and divider,
-    search and chips, preview frame, stubs, footer buttons (primary vs
-    Cancel), hover / `:focus-visible` / selected / disabled states,
-    open / close motion with `@starting-style` honoring
-    `prefers-reduced-motion`, and the narrow layouts of design D32 (slim
-    aside, one column, short windows; they replace the earlier "columns
-    stack, list scrolls" fallback). Also the **card contract** the step-4 / 5
-    renderers fill: a styled card skeleton (name, attribute lines,
-    description, the rank row as drawn per catalog — three tiers for
-    traits, levels for talents, none for rituals — and the selected rank)
-    so the real cards land pre-styled. The visual questions were settled
-    in [`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md)
-    (all three catalogs approved at every layout); the few it left to the
-    browser are settled here with the user.
-    Behaviour the design adds (design D19, the Message molecule): the
-    loader shows only after ~300 ms of pending `entries`, with
-    "Loading…" announced but not shown; No matches gains a
-    **Clear filters** button that empties the search and unchecks every
-    chip (focus moves to the search field, as Retry does); the message
-    texts change to "Couldn't load the list." / "Nothing left to learn
-    here." / "Nothing matches." / "Select a rank to see it here." (the
-    last is caller-tunable for untiered catalogs).
-    **Done when:** screenshots at desktop and narrow widths reviewed by
-    the user against the `picker` frames; keyboard-only run through every control
-    shows focus; reduced motion disables the animation; the 2a / 2b
-    paths still pass; `npm test` green.
+  - **Step 2c — Dialog CSS pass.** Brings the dialog chrome and the
+    styled card skeleton (all three catalogs) to the approved Figma
+    `picker` frames now, instead of waiting for Chunk I step 5. Split
+    out on 2026-11-15 into its own plan,
+    [`catalog-picker-styling-plan.md`](./catalog-picker-styling-plan.md),
+    which owns the scope, the behaviour the design adds and the gate.
+    **Done when:** that plan closes.
 - **Step 2½ — Existing-character XP transition (decision gate).** Lock
   the policy with the user before implementing the XP model or enabling
   spending / refunds. Review current totals against potentially unpaid
@@ -992,7 +966,7 @@ empty list is fine — state it explicitly.
 - [ ] Step 2 — Dialog primitive + API plumbing
   - [x] Step 2a — Shell _(2026-10-25)_
   - [x] Step 2b — Contents _(2026-10-25)_
-  - [ ] Step 2c — Dialog CSS pass
+  - [ ] Step 2c — Dialog CSS pass → `catalog-picker-styling-plan.md`
 - [ ] Step 2½ — Existing-character XP transition (decision gate)
 - [ ] Step 3 — XP model + compact formatter
 - [ ] Step 4 — Traits picker (view mode)
