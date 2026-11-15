@@ -21,12 +21,22 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
 - Page: `Nagara Character Builder` (`1017:14`) — holds the canonical
   view frames below
 - Page: `Components` (`944:15`) — the reusable component library, one
-  section per layer: `Foundations` (`1403:14`, a token / type sheet),
-  `Icons` (`1403:224`, sheet `1416:2`), `Atoms` (`1403:225`, sheet
-  `1440:9`), `Molecules` (`1403:226`, sheet `1481:111`),
-  `Organisms` (`1403:227`). Variables: `Primitives`
+  section per layer: `Foundations` (`1403:14`, sheet `1403:15`, a token /
+  type sheet), `Icons` (`1403:224`, sheet `1416:2`), `Atoms` (`1403:225`,
+  sheet `1440:9`), `Molecules` (`1403:226`, sheet `1481:111`),
+  `Organisms` (`1403:227`, sheet `1573:977`), plus `Explorations`
+  (`1601:3358`, boards comparing options for the library itself, e.g.
+  palette candidates). Variables: `Primitives`
   (colours hidden from pickers) and `Semantic` (aliases components bind
   to); every variable carries its CSS name as WEB code syntax.
+- **Not sources:** the loose `fonts` (`1021:70`) and `inputs`
+  (`1055:17659`) frames on `1017:14` (superseded by the library), and
+  the file's other pages (`Webpage`, `Charsheet`, `List`).
+- **Design rules** — how the library is named, extended and drafted in
+  rounds, tokens, palette roles, motion, focus, responsive layouts and
+  the hand-drawn asset briefs — live in
+  [`docs/design-system.md`](../../docs/design-system.md) (`DS §anchor`
+  cites). This rule only maps the file.
 - The MCP cannot load the TorukSC font (Display; it is installed only on
   the user's machine) — clone an existing TorukSC text node instead of
   creating one.

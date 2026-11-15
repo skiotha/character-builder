@@ -813,6 +813,17 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       `1rem` = browser default (the root `font-size` clamp was removed
       2026-10-26) and the six named spacing steps sit on the 4px scale.
       The catalog-picker component library adds tokens as it goes.
+- [ ] **Visual redesign.** Redesign the app's pages in Figma and bring
+      the client up to them, beyond the style clean-ups listed here. It
+      continues the catalog picker's design: the same Figma file and
+      component library (**ui-figma-source** rule), extended with
+      whatever the pages lack, under the rules in
+      [`design-system.md`](design-system.md). This item also owns the
+      **hand-drawn assets** still marked placeholder or not drawn in
+      DS §assets, including the side-column artwork. The user draws
+      them; each replaces its placeholder SVG at the same slot size,
+      followed by one check round in Figma and the browser. Expected
+      before launch, though launch is not strictly gated on them.
 - [ ] Audit CSS for small-screen support (mobile, tablet breakpoints)
 - [ ] Add responsive layout for character form sections
 - [ ] Review dashboard card grid on narrow viewports

@@ -82,43 +82,10 @@ Breakpoints are open item B.
 
 ## Motion & assets
 
-**Motion preference (user, 2026-10-25):** SVG assets do not change color
-on state. Hover / focus → rotation and / or scale; activation → a wobble.
-All of it off under `prefers-reduced-motion`. Exceptions (D6): disabled
-buttons turn grey and swap to a "broken" border; keyboard focus adds a
-static underline stroke, so focus stays visible with motion off; focused
-icon buttons grow their glyph instead (D7), a static end state that stays
-with motion off too.
-
-**Assets** (user draws in Illustrator with artistic brushes; outlines are
-not fully predictable, so these are briefs, not specs):
-
-| Asset | Role | Brief | Status |
-| --- | --- | --- | --- |
-| Button border | primary button only (Learn) | Draw at 128 × 48; stretches a little for longer captions (D6) | placeholder in Figma |
-| Button border, broken | disabled primary | Same 128 × 48 frame as the border, visibly broken / interrupted; shown grey (D6) | placeholder in Figma |
-| Focus underline | `:focus-visible` on every text button and filter chip | A brush stroke under the caption; draw at 112 × 12 (longest caption, ЗАПОМНИТЬ); squeezes for shorter ones — if LEARN (58 px) looks wrong, add a short version (D6, D10). Several shapes (three placeholders for now, count open) to vary per caption; red by default, yellow under red captions (D17) | placeholder in Figma |
-| Chip stroke, unchecked / checked | filter chip fill (`Decor/Chip stroke`) | A single wide brush stroke, at S 64 / M 96 / L 128 × 32 — 6 drawings; the checked one differs in **shape and angle**, not just colour; tilt lives inside the canvas; colours come from CSS (grey / yellow) (D10) | placeholder in Figma |
-| Close ✕ | header dismiss (`Icons/Close` Dialog, 24), search clear (Clear, 24, mirrors the search glyph) and sheet-card remove (Remove, 24, D22) | Visual mass centered (it rotates on hover); reads at ~16–28 px; clearly not a "+"; the three may be distinct drawings | placeholder in Figma |
-| Tick | check mark (`Icons/Tick`, 16) | Reads at 16 px. The picker no longer needs it — filter chips mark "checked" by stroke shape (D10); keep for a later sheet checkbox or drop | placeholder in Figma |
-| Search glyph | search-field icon (`Icons/Search`, 24) | Reads at ~20–24 px | placeholder in Figma |
-| Filter glyph | filter toggle at the end of the search row, one column, 360 and below (`Icons/Filter`, 24; r4) | Reads at ~20–24 px as "filter", not "menu"; drawn on the Icon button | placeholder in Figma (three shrinking lines) |
-| Alert mark | footer status, before a blocked reason (`Icons/Alert`, 16; D18) | Small red hand-drawn "blocked / attention" mark, readable at 16 px beside Body-14 text; distinct from the outside-traditions mark; colour from CSS | placeholder in Figma |
-| Outside-traditions mark | spell badge (D11) | Small red hand-drawn mark, readable at ~16 px, meaning "not your tradition"; may stand alone | not drawn |
-| Special attack / reaction marks | action line kind (`Icons/Special attack`, `Icons/Reaction`, 16) | Two small marks, told apart by shape, readable at 16 px beside Body-14 text; colour from CSS (D15) | placeholder in Figma |
-| Spell / ability kind marks | entry kind (D15) | A sibling pair (mark, edge or ornament) differing in shape, colour or place; neither kind louder than the other | candidate, round 1 |
-| Equipment / attributes / traditions icons | meta line labels (D15) | Small icons that may replace the text labels (e.g. a sword for equipment) | candidate, round 1 |
-| Swap hint mark | entry head (D15) | Small mark hinting that a rank lets the character swap an attribute | candidate, round 1 |
-| Applied-by-sheet mark | effect line (D21) | Tells "the sheet applies this for you" (Tier A / B) from "remember this at the table" (Tier C); one mark on one side, or a sibling pair | candidate, round 1 |
-| Loader | list loading state (parent: pending `entries`) | Hand-drawn; animated (frames or a rotating / drawing stroke), with a static frame for `prefers-reduced-motion`. It shows **alone** (the text is for screen readers only, D19), so the static frame must still read as "loading"; placeholder `Decor/Loader`, 48 × 48 | placeholder in Figma |
-| Details marker | `Atoms/Details toggle` (D17) | Small mark beside Body-14, ~12 px; points right when closed and turns (or is redrawn) to point down when open | placeholder in Figma |
-| Background squiggle | dialog surface decoration | Decorative, behind content; must tolerate cropping at narrow widths | not drawn |
-| Aside artwork | fills the aside's free space (D33) | Decorative. Two areas: beside the preview card in the 410 aside (~202 wide, as tall as the heading and card: 293 for traits, 117 for talents and rituals), and below the card in the slim aside (192 wide, height from 0 to several hundred px). These areas only place the drawing's centre: it may overflow anywhere (under other elements, out of the dialog or the window); sizes settle once it's drawn. Never adds height | placeholder in Figma |
-
-**Hand-off:** Illustrator *Export As → SVG* (presentation attributes,
-outlined text, no embedded images, 2 decimals, Responsive on). The agent
-strips editor ids / metadata, checks the viewBox, wires it into CSS, and
-imports the same file into Figma.
+Moved to [`docs/design-system.md`](../../docs/design-system.md)
+(2026-11-15): the motion rules are DS §motion and DS §focus; the asset
+briefs, their states and the hand-off pipeline are DS §assets. The
+decisions below keep the picker-specific reasoning.
 
 ## Open items
 
@@ -1719,6 +1686,36 @@ imports the same file into Figma.
     truncates it, keeping the mark). The list's mark showing beside
     the open card popover on phones is expected; it reads as a stray
     dot only while the mark is a placeholder.
+- D35 (2026-11-15): **the drawings come later** (user). Skiotha's
+  drawings depend on inspiration, so the work goes on without them.
+  - **Placeholders ship.** The Figma placeholders are exported as SVG
+    and go through the same pipeline as the drawings (DS §assets,
+    hand-off). Each drawing later replaces its file at
+    the same slot size. Design-only placeholders (the dashed
+    `Artwork (design-only)` box) ship as nothing. The background
+    squiggle has no placeholder.
+  - **Step 4 splits.** The agent's part goes ahead now: the font pass
+    and the SVG pipeline run on the placeholders. The drawings are
+    deferred to the roadmap's Phase 8 "Visual redesign" item, which
+    points to the briefs (DS §assets). They are expected
+    before launch, but launch is not strictly gated on them.
+  - **Known costs:**
+    - A few CSS techniques depend on the drawing and may need
+      redoing: how the button border stretches, the loader's
+      animation (spin or frames), the Details marker (rotate or a
+      second drawing), and the artwork's position and size.
+    - Decisions that rely on a drawing to carry meaning are only
+      proven once it exists: checked chip shape (D10), broken border
+      (D6), alert vs outside-traditions mark (D18, D34), special attack
+      vs reaction (D15), the loader's still frame (D19), and a filter
+      glyph that doesn't read as "menu". Until then the code keeps
+      the other cues: chip colour, grey disabled state, tooltips and
+      accessible names.
+    - The interim look is plainer: the red dot for the outside-
+      traditions mark, an empty bottom in the slim aside, and no
+      background squiggle.
+    - When the drawings land, they get one check round, in Figma and
+      in the browser at desktop and narrow widths.
 
 ## Steps
 
@@ -1735,7 +1732,7 @@ outcome, not on a commit.
     Trait / Item, up Talent / Spare, all from the
     originals and bound to `Icon/*` / `Grade/*`. ✕ Dialog / Clear, tick
     and search glyph are placeholder components; the hand-drawn versions
-    are Step 4 assets (table under "Motion & assets") and replace the
+    are Step 4 assets (DS §assets) and replace the
     vector inside each component, so instances update by themselves.
   - **Atoms** ⏳ Partial (approved by the user 2026-10-27; built on the
     Atoms sheet `1440:9`): ★ Button (D6: primary (bordered) / plain ×
@@ -1844,10 +1841,17 @@ outcome, not on a commit.
   scripted, re-runnable command per font, Latin and Cyrillic files
   split by `unicode-range`, plus the extra symbols the design uses ("→"
   in the counter, D13). **Done when:** every
-  asset in the "Motion & assets" table is in the repo and placed in
-  `picker` (glyphs swapped into their `Icons/*` components).
+  asset in the DS §assets briefs is in the repo and placed in
+  `picker` (glyphs swapped into their `Icons/*` components). _Split by
+  D35: the font pass and the SVG pipeline run on the placeholders now
+  (the step closes ⏳ Partial with them); the drawings themselves are
+  owned by the roadmap's Phase 8 "Visual redesign" item._
 - **Step 5 — Hand-off to code.** Settle open item S; parent step 2c
-  implements from `picker`. **Done when:** parent step 2c's gate passes;
+  implements from `picker`. Before the plan is archived, one Figma pass
+  repoints component descriptions that cite this plan's D-numbers to
+  `DS §anchor`s (user, 2026-11-15), and any durable rule still only in
+  the log is lifted into [`docs/design-system.md`](../../docs/design-system.md).
+  **Done when:** parent step 2c's gate passes;
   this plan moves to `done/`.
 
 ## Verification
