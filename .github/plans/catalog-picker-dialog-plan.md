@@ -473,7 +473,10 @@ contract gaps the step-2 sketch left open and amend its `filters` /
   a "my traditions" chip restricts to spells whose `traditions[]`
   intersects the character's derived `traditions[]`; spells outside it
   carry a small "outside your traditions" badge. Adjust if the user wants
-  the default inverted.
+  the default inverted. _Design status 2026-11-15: all spells are shown;
+  the badge is settled (design D34: a red mark ending the Traditions
+  line, for rituals too, hidden for a character with no tradition); the
+  tradition chips are dropped for now (design D31, open item F)._
 - **C. `startingEquipment` shape (step 0).** ✅ _Resolved 2026-10-24 — see
   S0-4 (structured weapon / armor references, not prose)._
 - **D. Unsubmitted talent choices (step 6).** Decision 9 rules out player
@@ -772,8 +775,9 @@ revisited during planning of their owning steps, not deferred to close-out.
     search and chips, preview frame, stubs, footer buttons (primary vs
     Cancel), hover / `:focus-visible` / selected / disabled states,
     open / close motion with `@starting-style` honoring
-    `prefers-reduced-motion`, and a narrow-viewport fallback (columns
-    stack, list scrolls). Also the **card contract** the step-4 / 5
+    `prefers-reduced-motion`, and the narrow layouts of design D32 (slim
+    aside, one column, short windows; they replace the earlier "columns
+    stack, list scrolls" fallback). Also the **card contract** the step-4 / 5
     renderers fill: a styled card skeleton (name, attribute lines,
     description, rank row of three blocks as in the frame, selected rank)
     so the real cards land pre-styled. Re-check the frame first: it is

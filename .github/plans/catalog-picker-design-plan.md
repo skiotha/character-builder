@@ -73,9 +73,9 @@ round.
 
 | Catalog | Entry shape | Desktop | Narrow | (middle?) |
 | --- | --- | --- | --- | --- |
-| Traits (abilities + spells) | 3 tiers, rank blocks | ✅ | — | — |
-| Talents (boons + sins) | levels | ✅ | — | — |
-| Rituals (Chunk I step 4) | untiered | ✅ | — | — |
+| Traits (abilities + spells) | 3 tiers, rank blocks | ✅ | ✅ | ✅ |
+| Talents (boons + sins) | levels | ✅ | ✅ | ✅ |
+| Rituals (Chunk I step 4) | untiered | ✅ | ✅ | ✅ |
 
 Cells: `—` not started · `rN` in exploration · `✅` approved in `picker`.
 Breakpoints are open item B.
@@ -126,7 +126,9 @@ imports the same file into Figma.
   one SVG stretched with `preserveAspectRatio="none"` — the sketched
   brush tolerates a little distortion, and the button's min-width
   matches the drawing, so today's captions don't stretch it at all._
-- **B. Breakpoints.** Desktop is now up to 1200 wide × viewport − 64
+- **B. Breakpoints.** ✅ _Resolved 2026-11-15 (D32): three layouts by
+  width plus a short-window layout, approved for all three catalogs._
+  Desktop is now up to 1200 wide × viewport − 64
   tall (D23; was the 1200 × 600 frame, S2-8); step 2c
   requires a narrow fallback (columns stack, list scrolls). Decide the
   widths and whether a middle layout exists. Approach (user,
@@ -466,6 +468,108 @@ imports the same file into Figma.
      > 360–430 named here, so the slim aside just above it keeps a
      > list as tall as the short layout's at 390; tap sizes are met
      > with invisible zones, not bigger controls.
+  5. Talents and rituals at the r4 layouts.
+     > Talents, drawn 2026-11-15 in section `r4 — talents`
+     > (`1735:19085`), each a copy of the traits frame with talent
+     > content swapped in:
+     > - `talents / 800 / r4-slim`: Cartographer at II, 70 → 60;
+     > - `talents / 360 / r4-one`: the sin Damage selected, the Gain
+     >   counter "→ 75" and the card popover open;
+     > - `talents / 320 / r4-one`: Shadow Creation at III, the
+     >   longest English status line;
+     > - `talents / 844x390 / r4-short-bar`: the short layout;
+     > - `talents / 360 / r4-tap-zones`: the level-disc zones.
+     >
+     > Findings:
+     > - The traits layouts hold for talents unchanged. The level pick
+     >   (discs and cost) uses ~215 of the ~250 px at 320; names wrap
+     >   in the list.
+     > - The talent card (192 × 60) is shorter than a trait card, so
+     >   the slim aside needs no scroll.
+     > - Status lines: the longest talent lines are "Shadow Creation,
+     >   level III — 15 XP" (203 px) and «Совершенное тело, уровень
+     >   III — 15 XP» (241 px), both within the 270 px the line has at
+     >   320. Every name longer than these has a single level, so no
+     >   talent line overflows. Traits do overflow, e.g. «Исключительный
+     >   Атрибут: Сообразительность, Мастер — 60 XP» and "Mystical
+     >   Tradition: Witches' Circle, Master — 60 XP".
+     >
+     > Settled 2026-11-15 (user):
+     > - **Level discs get invisible 40 × 44 tap zones** on
+     >   `pointer: coarse`, split at the seam (each disc takes half of
+     >   the 8 px gap on either side), like the chips.
+     > - **The compact counter for a sin** shows "→ 75" in amethyst
+     >   (Projection Gain), the same rule as the full counter.
+     > - **A status line too long for its row truncates the name** with
+     >   "…" and keeps the level and cost. Talents never reach it; it
+     >   is for traits' long names.
+     > - **The card popover works as in traits.**
+     >
+     > Rituals, settled 2026-11-15 (user):
+     > - **The traits layouts hold.** The ritual card is 192 × 60, so
+     >   the slim aside needs no scroll; the whole entry is the click
+     >   target, so there are no small controls to give tap zones.
+     > - **Status lines** (14 px, 270 px available at 320): the
+     >   longest English line, "Rite of Opening and Rite of Sealing —
+     >   free", is 249 px. Russian names truncate by the D32 rule: a
+     >   likely «Обряд Открытия и Обряд Запечатывания — бесплатно» is
+     >   344 px and «Призыв Мстительного Демона — бесплатно» 275 px (the
+     >   RU wording doesn't exist yet).
+     > - **The limit reason wraps to two lines on phones**; the footer
+     >   grows one line while it's Blocked. The alert mark leaves ~246 px
+     >   at 320 and ~286 at 360. "An Adept Ritualist may know up to
+     >   three rituals." is 285 px (Novice / Master 262–269), and a
+     >   likely Russian wording 324–370. A sentence can't truncate.
+     > - **The compact counter keeps the limit**: "→ 2 / 3", and
+     >   "→ 4 / 3" in red when over.
+     > - **No filters, so no filter button**: on phones and in the short
+     >   layout the search takes the whole row; in the slim layout the
+     >   Tools row holds the search alone, where it sits for traits and
+     >   talents.
+     > - Fixed in the approved at-the-limit copy (`1675:10896`): the
+     >   counter read "3 → -5 / 3", now "3 → 4 / 3"; added the aside
+     >   artwork placeholder (D33). The cause was in the component:
+     >   `Molecules/Counter`'s `Projection=Over` After text wasn't bound
+     >   to the After property, so every Over counter showed "-5". It is
+     >   bound now. The r1 "state 3" frames and the Molecules sheet
+     >   sample still show "-5" because that is their After value; r3-a
+     >   now shows its own "4".
+     > - Frames, section `r4 — rituals` (`1748:19716`):
+     >   - `rituals / 800 / r4-slim` (`1748:19911`): Fata Morgana,
+     >     1 → 2 / 3; the search alone in the Tools row.
+     >   - `rituals / 360 / r4-one` (`1748:20178`): the longest English
+     >     ritual, card popover open. The name wraps in the entry and
+     >     truncates in the card; the status line fits. At 360 the Adept
+     >     reason fits on one line (285 of 286 px), so the wrap is shown
+     >     at 320.
+     >   - `rituals / 320 / r4-one-limit` (`1748:20442`): at the limit,
+     >     "→ 4 / 3" in red, the Adept reason on two lines, Learn
+     >     disabled.
+     >   - `rituals / 844x390 / r4-short-bar` (`1748:20899`): the search
+     >     fills the bar after the title and counter.
+- **r5 — outside traditions** (`1757:22686`, drafted and approved
+  2026-11-15;
+  D34). One option, drawn from the agreed choices; the character
+  follows Order:
+  - `traits / 1200 / r5` (`1757:22828`): Anathema (Runes, Theurgy,
+    Circle) selected at Adept, with the mark and its tooltip; Break
+    Will (Order, Circle, Sorcery) below it has none. Spell compact card
+    in the preview: its Traditions value truncates and the mark stays.
+  - `traits / 320 / r5` (`1757:22856`): the popover closed; a tap on
+    the mark opens the tooltip (288 wide, inside the screen).
+  - `traits / 320 / r5-card` (`1757:24245`): the card popover open,
+    with the mark in the card.
+  - `rituals / 1200 / r5` (`1757:22890`): Fire Stories (Tribe)
+    selected, Fleshcraft (Sorcery) also marked; Fata Morgana, Foresight
+    and Form (Order) are not. The Ritual card carries the mark.
+
+  Components: a BOOLEAN "Outside traditions" (off by default) on
+  `Molecules/Meta line`, `Organisms/Compact card` (spell variants) and
+  `Organisms/Ritual card` (its Traditions text now sits in a row, and
+  every instance kept its text). Each shows `Atoms/Badge` Mark only
+  in a 16 × 21 slot after the value. With the mark on, the value hugs
+  its text in Figma (CSS: the mark is inline after the last name).
+  `Atoms/Badge`'s Mark + yellow / white styles are labelled deprecated.
 
 ## Decisions log
 
@@ -1350,7 +1454,8 @@ imports the same file into Figma.
   Step 3 (outside traditions). Each is marked in its component
   description and with a small "Parked" / "Deprecated" label beside
   it on its sheet. The r1-a…d frames stay in their round, labelled
-  "not chosen (D29)".
+  "not chosen (D29)". The parked variants were settled with the
+  breakpoints (D32): two came back into use, the rest are deprecated.
   Still open: chip hover (D10), left to the browser in parent step 2c.
 - D30 (2026-10-31): **talents adaptation** (Step 2). Talents have 1 or 3
   levels (not ranks), one entry-wide description, an entry-level
@@ -1379,7 +1484,8 @@ imports the same file into Figma.
   - `Molecules/Level pick` (`1653:3471`): Kind × Levels × Chosen, with
     32 px discs and a right-aligned cost.
     - With nothing chosen, the cost reads "5 / 10 / 15 XP".
-    - Levels above the pick turn Unlearned.
+    - Levels above the pick turn Unlearned (and, since 2026-11-15,
+      all of them before a pick; see the amendment below).
   - `Organisms/Talent entry` (`1654:3535`): Kind × State, plus
     BOOLEAN Attributes and Divider.
     - The name sits above a bar-marked block: the Level pick as its
@@ -1398,10 +1504,27 @@ imports the same file into Figma.
     for now; it may change in development, and no replacement is
     expected to be longer in either locale.
   - The empty-preview hint reads "Select a talent to see it here."
-  - The single-level disc stays grey.
+  - ~~The single-level disc stays grey.~~ (Amended 2026-11-15, below.)
 
   The approved copy is `talents / 1200` (`1658:10175`), with the sin
   selected copy (`1658:10202`), in `picker`.
+
+  **Amended 2026-11-15** (user): **a disc is grey until its level is
+  picked.** Before, nothing chosen and level III chosen both showed
+  three coloured discs, so the discs didn't show a pick.
+  - Level pick: unpicked discs are `Unlearned` grey; a pick lights its
+    level and the ones below it in the kind colour (teal for boons,
+    amethyst for sins).
+  - A single-level disc stays the darker `Disabled` grey while its
+    talent isn't picked. It isn't a control of its own; the entry is.
+    When its talent is picked, it lights up in the kind colour (new
+    variants Levels = One, Chosen = I).
+  - Talent card: the 24 px disc is always in the kind colour,
+    single-level talents included, because the card only shows a
+    talent you hold or are taking.
+  - **Talents only.** Trait rank discs keep their grade colour, which
+    marks spell vs ability (D15, D16). A grey trait disc still means
+    Unavailable there.
 - D31 (2026-11-08): **rituals adaptation** (Step 2). Rituals are free,
   untiered, and capped by the Ritualist ability (Novice 1 / Adept 3 /
   Master 6 known; `rpg/ru/01-core/magic.md`). So:
@@ -1445,8 +1568,8 @@ imports the same file into Figma.
   aside goes straight from search to "On your sheet"). The approved
   copy is `rituals / 1200` (`1675:10868`), with the at-the-limit copy
   (`1675:10896`), in `picker`. r3-b is labelled "not chosen".
-- D32 (2026-11-13, in progress with round r4): **breakpoints** (Step 3,
-  open item B). Settled so far:
+- D32 (2026-11-13, approved 2026-11-15, round r4): **breakpoints**
+  (Step 3, open item B). Settled:
   - **Three layouts by width**, found by drawing (r4): two columns
     (list | 410 aside) from 1200 down to ~1000; a **slim aside** from
     ~1000 down to ~750; one column below. The exact switch points
@@ -1482,6 +1605,16 @@ imports the same file into Figma.
   - **Keyboard:** it covers the footer and the layout stays still; no
     autofocus on touch screens; the "Search" key moves focus to the
     first result (r4 item 4). Part 4 is complete.
+  - **Status line:** when it doesn't fit its row, the name truncates
+    with "…" and the level and cost stay (r4 item 5; traits' long
+    names need it, talents don't).
+  - **Talents** (r4 item 5): the traits layouts hold unchanged; the
+    level discs get 40 × 44 tap zones split at the seam; a sin's
+    compact counter shows the Gain projection ("→ 75").
+  - **Rituals** (r4 item 5): the traits layouts hold; the compact
+    counter keeps the limit ("→ 2 / 3"); with no chips, the search
+    takes the filter button's place; a Blocked reason wraps to two
+    lines rather than truncating.
     Compare below the two-column layout is settled by D33.
   - **Slim aside height:** its content (heading and card) is ~293 px.
     The dialog body is its height minus ~247 px of fixed parts
@@ -1491,6 +1624,35 @@ imports the same file into Figma.
     sideways** (~850 × 390) falls in the slim width range but leaves
     the body ~80 px: short windows have their own rule, independent of
     width (the short layout above).
+  - **Approved 2026-11-15** (user), for traits, talents and rituals.
+    The Russian ritual strings measured in r4 item 5 are placeholder
+    copy; the user adapts them if they don't fit.
+  - **The parked D29 variants, settled.** In use since D32: Dialog
+    footer Layout = Stacked (phones) and `Atoms/Details toggle` (the
+    status line that opens the card popover). Deprecated, as nothing
+    in the approved layouts uses them: Tooltip Surface = Outlined,
+    Dialog shell (every variant except Row / Rail), Scrollbar Rail =
+    false and the Rank block's A / B slots. Labels and component
+    descriptions on `Components` say so.
+  - **New components** for pieces r4 drew by hand:
+    `Atoms/Count badge` (`1752:3515`, the filter button's chip count,
+    `Body-12` on Surface/Active; aria-hidden, the button's name carries
+    the count) and `Molecules/Card popover` (`1752:3517`, block
+    `1752:3554`; Surface/Base, Border/Decor, a Card instance-swap slot
+    for the Compact, Talent and Ritual cards).
+  - **Copies in `picker`**, at full size and built from those
+    components, right of the desktop copies:
+    - traits: `traits / 800` (`1753:20147`), `/ 700` (`1753:20435`),
+      `/ 360` (`1753:20791`), `/ 320` (`1753:21148`), `/ 844x390`
+      (`1753:21505`);
+    - talents: `talents / 800` (`1754:21361`), `/ 360` (`1754:21532`),
+      `/ 320` (`1754:21743`), `/ 844x390` (`1754:21977`);
+    - rituals: `rituals / 800` (`1754:22134`), `/ 360` (`1754:22269`),
+      `/ 320` (`1754:22441`), `/ 844x390` (`1754:22644`).
+
+    The touch, keyboard and shrink frames stay in their r4 sections.
+  - The outside-traditions badge (D11) was settled separately, in its
+    own Step 3 round (r5, D34).
 - D33 (2026-11-13): **aside artwork; Remember / Recall in the
   two-column layout only** (user).
   - **The aside's free space is the user's artwork**, not empty room.
@@ -1528,6 +1690,35 @@ imports the same file into Figma.
   - Remembered entries live in picker state, not the layout. A resize
     or rotation (tablet: two columns sideways, slim aside upright) hides
     the compare UI but never clears it.
+- D34 (2026-11-15, round r5): **outside-traditions badge** (D11,
+  parent open item B) (user).
+  - **What it says:** membership only. A spell or ritual whose
+    `traditions` share no key with the character's derived
+    `traditions` gets it. The rules make this whole-entry: a tradition
+    protects its rituals from Novice but its spells only up to the
+    tradition's tier (vault abilities, "Мистические традиции"), so a
+    per-rank Corruption note would need the tradition tier and is not
+    drawn. The builder doesn't track Corruption (ES §traditions).
+  - **No tradition at all → no badge.** Every entry would carry it,
+    and it would tell nothing apart.
+  - **Rituals get it too**: they carry traditions, and the protection
+    covers all of a tradition's rituals.
+  - **Placement:** at the end of the Traditions meta line, in the entry
+    and in the compact / ritual cards, after the tradition names.
+  - **Style:** `Atoms/Badge` Style = Mark only. The mark has the
+    tooltip (a tap opens it on touch, D32) and the same text as its
+    accessible name: "Outside your traditions: learning it costs
+    permanent Corruption." / «Вне твоих традиций: изучение даст
+    постоянную Порочность.» (RU placeholder). The red mark itself is a
+    Step 4 drawing.
+  - **Approved 2026-11-15** (user), as drawn in r5. The r5 frames stay
+    in explorations as state demos, like r4's touch frames: the
+    `picker` copies show no character outside a tradition, and the
+    components carry the badge switch. Left to the code phase: whether
+    a long Traditions value in the 192 card wraps or truncates (Figma
+    truncates it, keeping the mark). The list's mark showing beside
+    the open card popover on phones is expected; it reads as a stray
+    dot only while the mark is a placeholder.
 
 ## Steps
 
@@ -1565,7 +1756,7 @@ outcome, not on a commit.
     - Chip hover (rotation vs caption-only scale, D10) → Step 1, tried
       in the round-1 layouts.
     - Scrollbar A (divider as rail) vs B (separate), D12 → Step 1.
-    - Outside-traditions badge option (D11) → Step 3 with open item B.
+    - Outside-traditions badge option (D11) → Step 3, round r5.
     - Trial atoms that find no place (D11) are deprecated → Step 1.
     - Native vs scripted search clear ✕ (D7) → implementation (parent
       plan step 2c); scripted if the D25 empty ✕ is kept.
@@ -1625,6 +1816,22 @@ outcome, not on a commit.
   >   are parked for traits too (open item F).
 - **Step 3 — Breakpoints.** Settle open item B; narrow (and middle)
   frames for each catalog. **Done when:** the matrix is all ✅.
+
+  > ✅ **Completed 2026-11-15.** Divergences from the text above:
+  > - Besides the narrow and middle layouts (D32), the step added a
+  >   short-window layout (below 500 px tall, any width) and rules for
+  >   touch and the on-screen keyboard.
+  > - The aside's free space became the user's artwork, and Remember /
+  >   Recall became a two-column feature (D33).
+  > - The parked D29 variants were settled: two came back into use and
+  >   the rest are deprecated. Two new components were added for pieces
+  >   drawn by hand: `Atoms/Count badge` and `Molecules/Card popover`.
+  > - The outside-traditions badge, deferred from Step 0, was settled
+  >   here in round r5 (D34). Its frames stay in explorations, and the
+  >   badge reaches `picker` through the components.
+  > - Talents and rituals got no middle-width frames of their own in
+  >   `picker`; the slim aside (800) covers that range. Only traits has
+  >   the 700 one-column frame.
 - **Step 4 — Assets.** User draws; agent cleans, imports into Figma and
   checks them in the approved frames. Code-side colour (D5): the icon
   SVGs swap their baked `style="fill: #…"` for `currentColor` /
@@ -1660,6 +1867,6 @@ outcome, not on a commit.
 - [x] Step 0 — Component library _(2026-10-31)_
 - [x] Step 1 — Round 1: traits layout, desktop _(2026-10-31)_
 - [x] Step 2 — Talents and rituals variants _(2026-11-08)_
-- [ ] Step 3 — Breakpoints
+- [x] Step 3 — Breakpoints _(2026-11-15)_
 - [ ] Step 4 — Assets
 - [ ] Step 5 — Hand-off to code
