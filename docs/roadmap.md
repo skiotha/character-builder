@@ -693,11 +693,14 @@ Discord bot.
       endpoint or editor is needed. What remains is the display only,
       e.g. a read-only line on the sheet that resolves each key to its
       tradition ability's localized name.
-- [ ] **Catalog picker: remember / recall to compare.** The Figma
-      ability picker (frame `ability-select-popup`) reserves the lower
-      right column of the dialog, under search, for "remember abilities and
+- [ ] **Catalog picker: remember / recall to compare.** The approved
+      picker design (Figma `picker` frames) keeps the lower right column
+      of the dialog, under the preview, for "remember abilities and
       recall them to compare": the player pins entries while browsing and
-      sees them side by side as compact (sheet-style) cards. The
+      sees them side by side as compact (sheet-style) cards. The design
+      offers it only in the two-column layouts; because zoomed desktops
+      count as narrow, the feature still needs a narrow fallback,
+      designed with it (DS §responsive). The
       [catalog-picker plan](../.github/plans/catalog-picker-dialog-plan.md)
       ships the dialog without it: that area holds disabled stub buttons
       (`TODO(trait-recall)` in the dialog module). Design it together with
@@ -766,9 +769,11 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       and store EN display strings (`equipment.weapons[].name`, …) in the
       character, so RU display must resolve names by `id` from the catalog,
       never from the stored string. English is the primary language. The
-      served fonts (`public/assets/fonts/*-en.ttf`) are Latin-only subsets,
-      cut by hand in FontForge; RU needs matching Cyrillic cuts from the
-      originals in `fonts-src/` (not served; see the font item below).
+            served fonts (`public/assets/fonts/*.woff2`) ship Latin and Cyrillic
+            files split by `unicode-range`, re-cut from the originals in
+            `fonts-src/` by `scripts/subset-fonts.py` (DS §type). "Nagara
+            Display" holds only the wordmark's letters; widen its cut if RU
+            needs Display text.
 - [ ] Deduplicate `getNestedValue` — four independent copies exist in
       `state.mjs`, `section-renderer.mjs`, `validation/engine.mjs` (×2).
       Extract a single version into `public/utils/object.mjs` and import
@@ -831,16 +836,19 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
 
 ### Asset & Delivery Optimization
 
-- [ ] Strip unnecessary metadata from SVG icons (Illustrator export bloat)
-- [ ] Split `public/common/icons/` by role: icons, decorations (isle,
+- [x] Strip unnecessary metadata from SVG icons (Illustrator export bloat)
+      — `scripts/clean-svg.mts`, kept clean by `test/svg-assets.test.mts`
+      (DS §assets)
+- [x] Split `public/common/icons/` by role: icons, decorations (isle,
       keep, ship, cannon, name background) and button borders — borders
-      and decorations are not icons
-- [ ] Optimize font files: re-cut the served subsets from the originals
+      and decorations are not icons. Now `public/assets/{icons,decor,strokes}/`.
+- [x] Optimize font files: re-cut the served subsets from the originals
       in `fonts-src/` with fontTools' `pyftsubset` (scripted and
       re-runnable, replacing hand cuts in FontForge), Latin / Cyrillic
       split by `unicode-range`, WOFF2 output (needs the `brotli` Python
       package). `ElMessiri-VariableFont_wght.ttf` is served but unused —
-      keep or drop.
+      keep or drop. Done by `scripts/subset-fonts.py`; El Messiri and
+      Philosopher Bold dropped.
 - [ ] Add Brotli/gzip `Content-Encoding` for static assets and API responses
       (precompressed files or on-the-fly compression via `node:zlib`)
 - [ ] Set `Cache-Control` headers for static assets (fonts, icons, CSS)

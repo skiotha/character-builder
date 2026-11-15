@@ -1,11 +1,5 @@
 @layer reset, page, theme, layout, animations, media;
 
-/* make new font file */
-@font-face {
-  font-family: "Ahani Header";
-  src: url("/assets/fonts/amenu-en2.ttf") format("truetype");
-}
-
 @layer reset {
   *,
   *::before,
@@ -190,7 +184,7 @@
   }
 
   html {
-    font-family: "Ahani Regular";
+    font-family: "Nagara Body";
   }
 
   h1 {
@@ -203,7 +197,7 @@
   h3,
   h4,
   div#portrait-placeholder span {
-    font-family: "Ahani Header";
+    font-family: "Nagara Header";
     font-weight: normal;
     text-transform: capitalize;
   }
@@ -232,7 +226,7 @@
     line-height: calc(var(--body-14) * 1.5);
 
     &:first-of-type:first-letter {
-      font-family: "Ahani First Letter";
+      font-family: "Nagara Body";
       font-size: var(--body-64);
       line-height: 2rem;
 
@@ -254,17 +248,17 @@
   }
 
   dt {
-    font-family: "Ahani Header";
+    font-family: "Nagara Header";
     font-size: var(--menu-20);
   }
 
   dd {
-    font-family: "Ahani Header";
+    font-family: "Nagara Header";
     font-size: var(--menu-22);
   }
 
   em {
-    font-family: "Ahani Regular";
+    font-family: "Nagara Body";
     font-style: normal;
   }
 
@@ -273,12 +267,12 @@
   }
 
   button {
-    font-family: "Ahani Header";
+    font-family: "Nagara Header";
     font-size: var(--menu-20);
   }
 
   nav a {
-    font-family: "Ahani Header";
+    font-family: "Nagara Header";
     font-size: var(--menu-20);
   }
 
@@ -297,6 +291,14 @@
     color-scheme: only dark;
     scrollbar-color: var(--color-main) transparent;
     scrollbar-width: thin;
+
+    /* Palette roles for the cleaned SVGs (DS §assets); defaults reproduce
+       the colours the files used to bake in. */
+    --icon-secondary: var(--color-accent);
+    --icon-ink: var(--color-black);
+    --icon-light: var(--color-white);
+    --grade-disc: var(--color-main);
+    --grade-letter: var(--color-black);
 
     @supports (scrollbar-width: auto) {
       scrollbar-width: none;
@@ -419,6 +421,33 @@
     color: var(--color-main);
   }
 
+  svg:has(> use) {
+    color: var(--color-main);
+  }
+
+  /* Drawn border: a stroke SVG used as a mask over the text colour (DS
+     §assets). Sites opt in with `--button-border`; the transparent fallback
+     keeps buttons without one bare. `mask-repeat` / `-size` / `-position`
+     set on the button are inert there (it has no mask image) and only feed
+     the pseudo-element. */
+  button.primary {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+
+      background-color: currentColor;
+      mask-image: var(--button-border, linear-gradient(transparent, transparent));
+      mask-repeat: inherit;
+      mask-size: inherit;
+      mask-position: inherit;
+    }
+  }
+
   ul {
     h3 {
       color: var(--color-main);
@@ -485,7 +514,7 @@
 
     button.primary {
       align-self: flex-end;
-      background-image: url(/common/icons/icon-button-border-1.svg);
+      --button-border: url(/assets/strokes/button-border-1.svg);
 
       margin-block-end: 0.625rem;
 
@@ -514,9 +543,9 @@
   button[data-action="edit"].primary {
     display: block;
 
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    mask-position: center;
   }
 
   /* @TODO: debug */
@@ -632,7 +661,7 @@
 
   @scope (main#initial-view) {
     :scope {
-      background-image: url(/common/icons/icon-isle.svg);
+      background-image: url(/assets/decor/isle.svg);
       background-repeat: no-repeat;
       background-size: auto min(42.375rem, 73%);
       background-position: right 3.4375rem bottom 1.875rem;
@@ -747,7 +776,7 @@
         }
 
         &.primary {
-          background-image: url(/common/icons/icon-button-border-1.svg);
+          --button-border: url(/assets/strokes/button-border-1.svg);
 
           span {
             rotate: z -5deg;
@@ -759,7 +788,7 @@
 
   @scope (main#dashboard-view) {
     :scope {
-      background-image: url(/common/icons/icon-ship.svg);
+      background-image: url(/assets/decor/ship.svg);
       background-repeat: no-repeat;
       background-size: auto min(39.75rem, 65%);
       background-position: left 3rem bottom 1.125rem;
@@ -846,7 +875,7 @@
             }
 
             &.primary {
-              background-image: url(/common/icons/icon-button-border-2.svg);
+              --button-border: url(/assets/strokes/button-border-2.svg);
 
               span {
                 rotate: z 5.5deg;
@@ -895,7 +924,7 @@
 
   @scope (main#creation-view, main#character-view) {
     :scope {
-      background-image: url(/common/icons/icon-cannon.svg);
+      background-image: url(/assets/decor/cannon.svg);
       background-repeat: no-repeat;
       background-size: auto min(22.3125rem, 38%);
       background-position: right 3.125rem bottom 1.375rem;
@@ -1654,7 +1683,7 @@
       inline-size: 28.125rem;
       block-size: 9.375rem;
 
-      background-image: url("/common/icons/icon-name-background.svg");
+      background-image: url("/assets/decor/name-background.svg");
       background-size: contain;
       background-repeat: no-repeat;
 
@@ -1693,7 +1722,7 @@
       background-image: unset;
 
       &::after {
-        content: url(/common/icons/icon-keep.svg);
+        content: url(/assets/decor/keep.svg);
 
         position: absolute;
         inline-size: 26.9375rem;
@@ -2077,8 +2106,8 @@
         inline-size: 9.375rem;
         block-size: 4.6875rem;
 
-        background-repeat: no-repeat;
-        background-position: center;
+        mask-repeat: no-repeat;
+        mask-position: center;
       }
 
       main {

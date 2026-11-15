@@ -1,7 +1,8 @@
 # Plan — Catalog picker: visual design (Figma rounds → code)
 
-**Status:** active (2026-10-25) — workspace set up in Figma; round 1 not
-started. Companion to
+**Status:** active (2026-10-25) — Steps 0–3 closed; Step 4 partial (font
+pass and SVG pipeline done, drawings deferred to the roadmap's Phase 8);
+Step 5 (hand-off to code) next. Companion to
 [`catalog-picker-dialog-plan.md`](./catalog-picker-dialog-plan.md): that
 plan owns **what the dialog does** (behavior, data, API — its S2 / S2b
 decisions are fixed inputs here); this one owns **how it looks** and
@@ -563,7 +564,8 @@ decisions below keep the picker-specific reasoning.
   `Semantic` and the `Foundations` sheet) whenever the old ones don't
   fit — groundwork for the roadmap's design-token rework (Phase 8).
 - D5 (2026-10-26): icons. Originals stay the source
-  (`public/common/icons/`); the user drops them into empty, labelled
+  (`public/common/icons/`; since D36 `public/assets/icons/`, no `icon-`
+  prefix); the user drops them into empty, labelled
   slots on the `Components` Icons sheet, and the agent scales them,
   binds the fills and derives variants. Colour comes from variables,
   never baked hexes: `Icon/Default` (→ Main), `Icon/Secondary`
@@ -817,8 +819,8 @@ decisions below keep the picker-specific reasoning.
   node, so projecting needs the dialog to re-render it on selection
   change (e.g. `header?: Node | (selection) → Node`) — settle in parent
   step 2c or the abilities caller step. The served Header subset
-  (`amenu-en*.ttf`) lacks "→"; the original `zenkurenaido.ttf` has it,
-  so add it when re-subsetting (Step 4 font pass). Built on the Molecules sheet:
+  (`amenu-en*.ttf`) lacked "→"; the D36 font pass re-cut Header from the
+  original `zenkurenaido.ttf`, which has it. Built on the Molecules sheet:
   `Molecules/Section heading` (`1485:128`; Level = Title / Aside; TEXT
   Title), `Molecules/Counter` (`1485:123`; Projection = None /
   Projected / Over; TEXT Balance, After), `Molecules/Dialog header`
@@ -1716,6 +1718,44 @@ decisions below keep the picker-specific reasoning.
       background squiggle.
     - When the drawings land, they get one check round, in Figma and
       in the browser at desktop and narrow widths.
+- D36 (2026-11-15): **font pass and SVG pipeline** (user, Step 4).
+  - **Fonts.** Four faces ship: Body regular and italic
+    (Philosopher), Header (Zen Kurenaido), Display (TorukSC).
+    - Dropped: Philosopher Bold (nothing uses bold; the Level
+      numerals export as outlines), El Messiri, the unused "Ahani
+      Display" cut, and the separate first-letter cut (the drop cap
+      uses Body, the same font).
+    - Families are renamed "Nagara Body" / "Nagara Header" / "Nagara
+      Display"; italic is a face of Body chosen by `font-style`.
+    - WOFF2 only, Latin and Cyrillic files split by `unicode-range`,
+      `font-display: swap`; the Latin Body regular, Header and Display
+      files are preloaded.
+    - Display is a wordmark cut (the letters of "Nagara", 3 KB),
+      widened when a design uses Display elsewhere.
+    - Philosopher has no arrows, "−" or "≤"; product text doesn't use
+      them in Body, so they fall back per glyph. The counter's "→" is
+      in Header, which has it.
+    - Re-cut by `scripts/subset-fonts.py` (dev-only Python: fontTools
+      and brotli); `fonts-src/` keeps every original.
+  - **SVGs.**
+    - Folders by role under `public/assets/`: `icons/`, `decor/`
+      (isle, keep, ship, cannon, name background), `strokes/` (button
+      borders, chip strokes, focus underlines, loader), with no
+      `icon-` prefix.
+    - `scripts/clean-svg.mts` (zero-dep, re-runnable) strips editor
+      ids and metadata, keeps the viewBox, and maps baked fills to
+      `currentColor` and custom properties. A lint test keeps
+      `icons/` and `strokes/` free of baked colours and ids.
+    - Existing `<use>` icons swap colours now, with CSS defaults that
+      keep today's look on the palette tokens.
+    - Strokes are coloured with `mask-image` + `background-color`, so
+      one file serves every colour and stretches.
+    - Multi-tone decor drawn as CSS images keeps its baked colours
+      (an image can't take CSS colours); it is only cleaned.
+    - The cleaned placeholders are **not** re-imported into Figma
+      (user, accepting the recommendation): Figma is already their
+      source. The import rule (DS §assets) starts with the real
+      drawings.
 
 ## Steps
 
@@ -1846,6 +1886,34 @@ outcome, not on a commit.
   D35: the font pass and the SVG pipeline run on the placeholders now
   (the step closes ⏳ Partial with them); the drawings themselves are
   owned by the roadmap's Phase 8 "Visual redesign" item._
+
+  > ⏳ **Partial 2026-11-15.** The agent's half shipped (D36); the
+  > drawings did not (D35).
+  >
+  > **Deferred** (owned by the roadmap's Phase 8 "Visual redesign" item,
+  > briefs in DS §assets):
+  > - every hand-drawn asset, each replacing its placeholder file at the
+  >   same slot size;
+  > - swapping the drawn glyphs into their `Icons/*` components and
+  >   placing them in `picker`;
+  > - the check round in Figma and in the browser (D35 known costs).
+  >
+  > ✅ **Completed 2026-11-15 (font pass and SVG pipeline).** Divergences
+  > from the text above:
+  > - No extra symbols were added to Body: "→" is drawn in Header, which
+  >   already has it, and the rest fall back per glyph (D36).
+  > - One stroke file per shape, not per colour: checked and unchecked
+  >   chips, and the two focus-underline tones, share a file and take
+  >   their colour from CSS.
+  > - The button borders became a mask on `button.primary::before`, set
+  >   per site through `--button-border`; the old background-image sites
+  >   now feed `mask-*` instead.
+  > - The level placeholders were cut from the Boon variants; the hero
+  >   icons moved to `icons/hero/<id>.svg`; the name background is
+  >   decor and keeps its baked colours.
+  > - Mapping baked fills to the palette shifted two shades slightly:
+  >   #f1c724 → `--color-main` (#efbf04) and #ef1a04 / #f13724 →
+  >   `--color-accent` (#f14634).
 - **Step 5 — Hand-off to code.** Settle open item S; parent step 2c
   implements from `picker`. Before the plan is archived, one Figma pass
   repoints component descriptions that cite this plan's D-numbers to
@@ -1872,5 +1940,6 @@ outcome, not on a commit.
 - [x] Step 1 — Round 1: traits layout, desktop _(2026-10-31)_
 - [x] Step 2 — Talents and rituals variants _(2026-11-08)_
 - [x] Step 3 — Breakpoints _(2026-11-15)_
-- [ ] Step 4 — Assets
+- [ ] Step 4 — Assets — ⏳ partial _(2026-11-15)_: font pass and SVG
+  pipeline done; drawings deferred to roadmap Phase 8 (D35)
 - [ ] Step 5 — Hand-off to code

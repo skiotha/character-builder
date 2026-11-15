@@ -1305,11 +1305,11 @@ describe("static files", () => {
   });
 
   it("GET /assets/fonts/... serves with correct MIME type", async () => {
-    const res = await fetch(`${BASE}/assets/fonts/abody-en.ttf`);
+    const res = await fetch(`${BASE}/assets/fonts/body-regular.latin.woff2`);
 
     assert.equal(res.status, 200);
     const ct = res.headers.get("content-type") ?? "";
-    assert.ok(ct.includes("font/ttf"), `expected font/ttf, got ${ct}`);
+    assert.ok(ct.includes("font/woff2"), `expected font/woff2, got ${ct}`);
     // Verify cache header
     const cc = res.headers.get("cache-control") ?? "";
     assert.ok(cc.includes("max-age"), "assets should have Cache-Control");

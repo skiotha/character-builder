@@ -81,7 +81,7 @@ function buildContactsBlock() {
     svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", `${contact.label} icon`);
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    use.setAttribute("href", `/assets/icons/hero/icon-${contact.id}.svg`);
+    use.setAttribute("href", `/assets/icons/hero/${contact.id}.svg`);
     svg.appendChild(use);
     wrapper.appendChild(svg);
 

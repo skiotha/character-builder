@@ -21,9 +21,9 @@ import { NagaraElement, componentFactory, isWritable } from "./base.mjs";
 
 const TIER_ORDER = ["novice", "adept", "master"];
 const TIER_ICONS = {
-  novice: "/common/icons/icon-grade-novice.svg",
-  adept: "/common/icons/icon-grade-adept.svg",
-  master: "/common/icons/icon-grade-master.svg",
+  novice: "/assets/icons/grade-novice.svg",
+  adept: "/assets/icons/grade-adept.svg",
+  master: "/assets/icons/grade-master.svg",
 };
 
 function currentLocale() {
@@ -167,7 +167,7 @@ function renderAddSlot(index) {
   icon.setAttribute("role", "img");
   icon.setAttribute("aria-hidden", "true");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", "/common/icons/icon-plus-trait.svg");
+  use.setAttribute("href", "/assets/icons/plus-trait.svg");
   icon.appendChild(use);
   button.appendChild(icon);
 

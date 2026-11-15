@@ -766,10 +766,12 @@ revisited during planning of their owning steps, not deferred to close-out.
     >   resets); the second Escape cancels the dialog.
   - **Step 2c — Dialog CSS pass.** Brings the dialog chrome to the
     redesign now instead of waiting for Chunk I step 5 (which keeps
-    the rest of the sheet). Tokens from Figma per the
-    **ui-figma-source** rule (`get_variable_defs` on
-    `ability-select-popup` and the `view` frame), mapped to `:root`
-    custom properties — no hex / fonts from memory. Per the **styling**
+    the rest of the sheet). The source is the approved Figma `picker`
+    frames and the `Components` library (**ui-figma-source** rule), under
+    the rules in [`docs/design-system.md`](../../docs/design-system.md).
+    Tokens come from the library's variables (`get_variable_defs`; every
+    variable carries its CSS name), mapped to `:root` custom properties —
+    no hex / fonts from memory. Per the **styling**
     rule: an `@layer`ed, `@scope`d dialog stylesheet with native nesting;
     surface, `::backdrop`, header / title type, columns and divider,
     search and chips, preview frame, stubs, footer buttons (primary vs
@@ -779,12 +781,12 @@ revisited during planning of their owning steps, not deferred to close-out.
     aside, one column, short windows; they replace the earlier "columns
     stack, list scrolls" fallback). Also the **card contract** the step-4 / 5
     renderers fill: a styled card skeleton (name, attribute lines,
-    description, rank row of three blocks as in the frame, selected rank)
-    so the real cards land pre-styled. Re-check the frame first: it is
-    an early draft, so settle open visual questions with the user before
-    styling them. Those questions are worked in
-    [`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md);
-    2c implements from its approved Figma `picker` frames.
+    description, the rank row as drawn per catalog — three tiers for
+    traits, levels for talents, none for rituals — and the selected rank)
+    so the real cards land pre-styled. The visual questions were settled
+    in [`catalog-picker-design-plan.md`](./catalog-picker-design-plan.md)
+    (all three catalogs approved at every layout); the few it left to the
+    browser are settled here with the user.
     Behaviour the design adds (design D19, the Message molecule): the
     loader shows only after ~300 ms of pending `entries`, with
     "Loading…" announced but not shown; No matches gains a
@@ -794,7 +796,7 @@ revisited during planning of their owning steps, not deferred to close-out.
     here." / "Nothing matches." / "Select a rank to see it here." (the
     last is caller-tunable for untiered catalogs).
     **Done when:** screenshots at desktop and narrow widths reviewed by
-    the user against the frame; keyboard-only run through every control
+    the user against the `picker` frames; keyboard-only run through every control
     shows focus; reduced motion disables the animation; the 2a / 2b
     paths still pass; `npm test` green.
 - **Step 2½ — Existing-character XP transition (decision gate).** Lock

@@ -227,6 +227,17 @@ The project-agnostic rules — stable-vs-ephemeral cite discipline, the `TODO(<s
   carve-out: this script imports `src/models/storage.mts` directly
   (sibling to `src/lib/backup.mts`); request handlers must keep going
   through `#models`.
+- `scripts/clean-svg.mts` — normalises hand-exported SVGs under
+  `public/assets/{icons,decor,strokes}/` (strips editor bloat, maps baked
+  fills to `currentColor` / custom properties; DS §assets). Run
+  `node scripts/clean-svg.mts <file-or-dir>...` on every new or replaced
+  asset; `--check` reports without writing. `test/svg-assets.test.mts`
+  fails on any asset it would still change.
+- `scripts/subset-fonts.py` — re-cuts the served WOFF2 fonts from
+  `fonts-src/` (Latin / Cyrillic split) and rewrites
+  `public/common/fonts.css` (DS §type). Dev-only Python:
+  `python -m pip install fonttools brotli`, then
+  `python scripts/subset-fonts.py`.
 
 ## Roadmap
 

@@ -131,6 +131,13 @@ mark, text) always carries it too.
   stays case-insensitive), search fields included.
 - A placeholder hint appears only while its field is focused, in a style
   that can't be mistaken for an entered value.
+- **Served fonts** are three families in `public/common/fonts.css`:
+  "Nagara Body" (Philosopher, regular and italic), "Nagara Header" (Zen
+  Kurenaido) and "Nagara Display" (TorukSC, cut to the wordmark's
+  letters). Each is WOFF2, split into Latin and Cyrillic files by
+  `unicode-range`. `python scripts/subset-fonts.py` re-cuts them from the
+  originals in `fonts-src/` and rewrites `fonts.css`. A design that
+  needs a new glyph, weight or Display text widens the cut there.
 
 ## Interaction
 
@@ -221,13 +228,38 @@ so the briefs below are briefs, not specs.
 1. Illustrator *Export As → SVG*: presentation attributes, outlined text,
    no embedded images, 2 decimals, Responsive on. The user's `.ai`
    sources stay with the user.
-2. The agent strips editor ids and metadata, checks the viewBox, and
-   replaces baked fills with `currentColor` or a custom property (e.g.
-   `var(--icon-secondary)`; grade discs use one property for the disc
-   and one for the letter). Custom properties inherit into `<use>`
-   shadow trees, so one file serves every colour and the disabled state.
+2. The agent drops the file into its role folder and runs
+   `node scripts/clean-svg.mts <file>`, which strips editor ids and
+   metadata, keeps the viewBox, and replaces baked fills with
+   `currentColor` or a custom property (e.g. `var(--icon-secondary)`;
+   grade discs use one property for the disc and one for the letter).
+   Custom properties inherit into `<use>` shadow trees, so one file
+   serves every colour and the disabled state.
 3. The cleaned SVG in the repo is the one shipped copy. Figma imports
    that same file into the asset's placeholder component (DS §library).
+   The current placeholders were exported *from* Figma, so the import
+   starts with the real drawings.
+
+**Files and colour.** Assets live under `public/assets/` in three role
+folders, without an `icon-` prefix:
+
+- `icons/` — glyphs, drawn through `<svg><use href="…">`. They take
+  `color` (default `--color-main`) plus the role properties
+  `--icon-secondary` (red), `--icon-ink`, `--icon-light`; grade and level
+  discs take `--grade-disc` and `--grade-letter`. Contact icons sit in
+  `icons/hero/`.
+- `strokes/` — brush strokes (button borders, chip strokes, focus
+  underlines, loader). They are painted as `mask-image` over a
+  `background-color`, so one file per **shape** serves every colour and
+  stretches. Primary buttons draw the border on `::before`; a site
+  picks the shape with `--button-border: url(…)`.
+- `decor/` — multi-tone illustrations used as CSS images (isle, keep,
+  ship, cannon, name background). An image can't take CSS colours, so
+  these keep their baked colours and are only cleaned.
+
+The cleaner picks its colour mode from the folder and file name, and
+rejects any colour outside the palette. `test/svg-assets.test.mts` fails
+on any asset the cleaner would still change.
 
 **Placeholders ship until a drawing exists.** Each drawing replaces its
 placeholder file at the same slot size. Design-only placeholders (dashed
