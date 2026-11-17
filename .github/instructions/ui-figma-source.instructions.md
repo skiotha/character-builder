@@ -4,7 +4,7 @@ applyTo: "public/**/*.css, public/**/*.html, public/**/*.mjs"
 
 # UI design source (Figma)
 
-Figma file **Ahani.Base** is the design source of truth for the `public/`
+Figma file **Nagara** is the design source of truth for the `public/`
 redesign — for how things **look** (colors, type, layout, composition),
 not for what things **are**. Information architecture, the field
 inventory, widget behavior, and data shapes are owned by the schema
@@ -14,12 +14,13 @@ The live client may still lag — see **ui-navigation-playbook**. Adapt MCP
 output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
 **hypertext**).
 
-- File: https://www.figma.com/design/n61wtRUXEaxhSc2gnL640J/Ahani.Base
+- File: https://www.figma.com/design/n61wtRUXEaxhSc2gnL640J/Nagara
 - `fileKey`: `n61wtRUXEaxhSc2gnL640J`
-- Page: `Nagara Character Builder` (`1017:14`) — holds the canonical
-  view frames below, approved designs only
-- Page: `Explorations` (`1772:23369`) — design rounds, one section per
-  view (drafts, rejected options, state demos)
+- Pages, after a divider: one per app view — `Welcome`, `Dashboard`,
+  `Creation`, `Character`, `Picker` (ids in the table below). Each holds
+  the view's canonical frame (approved designs only) and, once the view
+  has design rounds, a `<view> — explorations` section beside it (drafts,
+  rejected options, state demos)
 - Page: `Components` (`944:15`) — the reusable component library, one
   section per layer: `Foundations` (`1403:14`, sheet `1403:15`, a token /
   type sheet), `Icons` (`1403:224`, sheet `1416:2`), `Atoms` (`1403:225`,
@@ -29,8 +30,6 @@ output to this stack (vanilla HTML/CSS/JS, ADR-012, **styling** /
   palette candidates). Variables: `Primitives`
   (colours hidden from pickers) and `Semantic` (aliases components bind
   to); every variable carries its CSS name as WEB code syntax.
-- **Not sources:** the file's other pages (`Webpage`, `Charsheet`,
-  `List`).
 - **Design rules** — how the library is named, extended and drafted in
   rounds, tokens, palette roles, motion, focus, responsive layouts and
   the hand-drawn asset briefs — live in
@@ -62,20 +61,20 @@ results instead of re-fetching.
 
 ## Canonical view frames
 
-| App view | Figma frame | `node-id` | MCP `nodeId` |
-| --- | --- | --- | --- |
-| Welcome / initial | `initial` | `1021-58` | `1021:58` |
-| Dashboard | `menu` | `1021-4` | `1021:4` |
-| Creation form | `creation` | `1021-62` | `1021:62` |
-| Character view | `view` | `1021-66` | `1021:66` |
-| Catalog picker (approved) | `picker` | `1389-14` | `1389:14` |
+| App view                  | Page                      | Figma frame | `node-id` | MCP `nodeId` |
+| ------------------------- | ------------------------- | ----------- | --------- | ------------ |
+| Welcome / initial         | `Welcome` (`1787:4432`)   | `initial`   | `1021-58` | `1021:58`    |
+| Dashboard                 | `Dashboard` (`1787:4433`) | `menu`      | `1021-4`  | `1021:4`     |
+| Creation form             | `Creation` (`1787:4434`)  | `creation`  | `1021-62` | `1021:62`    |
+| Character view            | `Character` (`1017:14`)   | `view`      | `1021-66` | `1021:66`    |
+| Catalog picker (approved) | `Picker` (`1787:4435`)    | `picker`    | `1389-14` | `1389:14`    |
 
 Picker design rounds (drafts, rejected options, the original
 `ability-select-popup`) live in the `picker — explorations` section
-(`1389:15`) on the `Explorations` page.
+(`1389:15`) below the `picker` frame on the `Picker` page.
 
 To explore further: Figma MCP `get_metadata` on `fileKey` (omit `nodeId`
-for page list) or on `1017:14`.
+for page list) or on a page id from the table.
 
 ## How to read design
 

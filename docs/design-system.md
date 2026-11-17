@@ -65,8 +65,9 @@ keep the reasoning behind each choice; this document keeps the rule.
 
 ### DS §workflow — design rounds
 
-- **Canonical frames hold approved designs only.** Drafts live on the
-  `Explorations` page, in a section per view, one sub-section per round
+- **Canonical frames hold approved designs only.** Each view has its own
+  page. Drafts live on that page, in a `<view> — explorations` section
+  beside the canonical frame, one sub-section per round
   (`rN — <theme>`), with frames named `<view> / <width> / rN-<letter>`.
 - **Draft → review → record → code.** The agent drafts two to four
   options and screenshots them to catch build errors. The user reviews

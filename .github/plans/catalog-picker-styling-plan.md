@@ -1,6 +1,8 @@
 # Plan — Catalog picker: styling (design → code)
 
-**Status:** active (2026-11-15) — written; part 0 (open item S) next.
+**Status:** active (2026-11-15) — written; part 0 (open item S) next,
+in a fresh session. Start by discussing S's three questions with the
+user before building anything.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
 **Session note:** sessions start cold. This file, the approved Figma
@@ -19,9 +21,11 @@ motion, plus a few questions left for the browser. This plan owns step
 
 ## Where things live
 
-- **Design source:** Figma `picker` frames (`1389:14`, approved only) and
-  the `Components` page (`944:15`) — node map in the **ui-figma-source**
-  rule. Design values come from the library's variables
+- **Design source:** Figma file `Nagara`, page `Picker`: the `picker`
+  frame (`1389:14`, approved only) with the design rounds in
+  `picker — explorations` (`1389:15`) below it; and the `Components`
+  page (`944:15`) — node map in the **ui-figma-source** rule. Design
+  values come from the library's variables
   (`get_variable_defs`; each carries its CSS name), never from memory.
 - **Rules:** `docs/design-system.md` (`DS §anchor`). Component-specific
   reasoning (sizes, markup notes, why an option won) is in the archived
@@ -33,6 +37,20 @@ motion, plus a few questions left for the browser. This plan owns step
   functional `@scope (dialog.catalog-dialog)` block at the end of the
   `layout` layer in `public/common/styles.css`. Assets in
   `public/assets/{icons,strokes}/` (DS §assets).
+- **Content extremes** (measured 2026-10-27 from `reference/*.json`;
+  re-measure if the catalogs change much) — for the check page's fixed
+  set (S), card wrapping (part 3) and narrow layouts (part 4):
+
+  | | abilities en / ru | spells en / ru | rituals en |
+  | --- | --- | --- | --- |
+  | entries | 75 | 49 | 68 |
+  | longest name | 35 "Mystical Tradition: Witches' Circle" / 41 "Исключительный Атрибут: Сообразительность" | 19 "Illusory Correction" / 20 "Иллюзорная Коррекция" | 35 "Rite of Opening and Rite of Sealing" |
+  | description median / max | 84 / 120 · 84 / 107 | 72 / 90 · 76 / 105 | 144 / 210 |
+  | rank text median / p90 / max | 68 / 97 / 137 · 70 / 95 / 139 | 68 / 88 / 113 | — (untiered) |
+  | effects per rank | 1–5, median 1 | 1–3 | — |
+
+  `acrobatics` carries every field at once (starting equipment, a check
+  attribute, a reaction) — a good "everything" sample.
 
 ## Goals
 
