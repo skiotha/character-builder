@@ -23,6 +23,7 @@ tempDir = await createTempDir();
 
 mock.module("#config", {
   namedExports: {
+    IS_DEV: true,
     DATA_DIR: tempDir.dir,
     REFERENCE_DIR: tempDir.referenceDir,
     LOCALES: ["en", "ru"] as const,
@@ -1275,6 +1276,31 @@ describe("API routing", () => {
 // ── Static File Serving ───────────────────────────────────────────
 
 describe("static files", () => {
+  it("serves the development catalog-picker gallery and its fixtures", async () => {
+    const page = await fetch(`${BASE}/__dev/catalog-picker/`);
+    assert.equal(page.status, 200);
+    assert.ok((page.headers.get("content-type") ?? "").includes("text/html"));
+    assert.equal(page.headers.get("cache-control"), "no-store");
+    assert.ok((await page.text()).includes("Catalog picker check gallery"));
+
+    const fixtures = await fetch(
+      `${BASE}/__dev/catalog-picker/fixtures.mjs`,
+    );
+    assert.equal(fixtures.status, 200);
+    assert.ok((fixtures.headers.get("content-type") ?? "").includes("javascript"));
+    assert.ok((await fixtures.text()).includes("acrobatics"));
+
+    const frameStyles = await fetch(`${BASE}/__dev/catalog-picker/frame.css`);
+    assert.equal(frameStyles.status, 200);
+    assert.ok((frameStyles.headers.get("content-type") ?? "").includes("text/css"));
+  });
+
+  it("does not SPA-fallback for unknown development gallery files", async () => {
+    const res = await fetch(`${BASE}/__dev/catalog-picker/private.json`);
+    assert.equal(res.status, 404);
+    assert.equal(await res.text(), "Not found");
+  });
+
   it("GET / returns index.html", async () => {
     const res = await fetch(`${BASE}/`);
 

@@ -192,6 +192,16 @@ sketches remain provisional where a follow-up changes their assumptions.
   picker is open, and an explicit detected-conflict versus accepted-risk
   policy for other tabs / clients. Do not silently turn this into a
   server-pricing rewrite.
+  _Outstanding after the 2026-11-17 styling readiness review: design
+  D24 shows the held selection becoming unaffordable after an external
+  balance change, but S2-5 freezes the dialog's inputs. Step 2c uses
+  frozen fixtures and does not implement that scenario. Settle the final
+  policy in step 3 before caller integration in steps 4–6: retain the
+  snapshot with save-time revalidation and reconcile the design's live
+  expectation, or amend S2-5 and specify which state updates in the open
+  dialog, including selection invalidation and subscription cleanup.
+  Verify the chosen policy with real state changes during integration;
+  styling fixtures are not evidence that freshness handling is complete._
 3. **Low — Tradition contract coordination (steps 0 / 1 / 7).** Writable
   ability IDs becoming server-owned tradition keys is a **breaking
   behavior change**, despite retaining `string[]`. Its operational
@@ -376,10 +386,17 @@ for the dialog primitive and replace the provisional API sketch.
   After a pick the caller re-checks against current state (already
   learned, still affordable, still eligible) before saving, and reports
   instead of saving when the pick went stale.
+  _2026-11-17: remains the styling contract. The conflict with design
+  D24's live balance-change example is explicitly pending under review
+  follow-up 2; approval of frozen styling inputs does not close it._
 - **S2-6. Focus.** Opening focuses the search box. On close, focus returns
   to the opener if it is still connected, else to a caller-given
   `returnFocus` fallback (hosts `rebuild()` their children, so the opener
   button is often gone by then).
+  _Step 2c amendment (design D32): no search autofocus on touch screens;
+  the keyboard's Search action moves focus to the first result without
+  committing. The styling plan's part 4 implements and verifies this
+  exception; desktop opening focus and close-time restoration remain._
 - **S2-7. One dialog at a time.** Opening while a catalog dialog is
   already open resolves `null` immediately.
 - **S2-8. Right column: search, filters, preview, recall stubs.** Left
@@ -413,6 +430,14 @@ for the dialog primitive and replace the provisional API sketch.
   (Playwright) on a running sheet, against the **traits** catalog (pinned
   in this step), not the weapons catalog. Search / filter / exclude
   logic lives in a pure module so `node:test` covers it.
+  _Amended 2026-11-17 for step 2c: the user approved a dev-only interactive
+  gallery with separate iframe viewports, using the real picker code and
+  no Storybook dependency. It uses fixed representative fixtures, with
+  gallery-only files outside `public/`, served by the existing server
+  during normal `npm run start:dev`; production returns 404 for gallery
+  and fixture URLs. The styling plan's item S records the settled scope;
+  part 0 implements it. The completed 2a / 2b checks remain regression
+  obligations._
 
 ## Step-2b decisions (2026-10-25, with the user)
 
@@ -772,6 +797,10 @@ revisited during planning of their owning steps, not deferred to close-out.
     out on 2026-11-15 into its own plan,
     [`catalog-picker-styling-plan.md`](./catalog-picker-styling-plan.md),
     which owns the scope, the behaviour the design adds and the gate.
+    Its card skeletons are reusable presentation code exercised with
+    fixtures, not throwaway gallery markup. Later integration supplies
+    real formatted data, eligibility, prices and saving. Completing 2c
+    does not close the live-update / freshness gap in review follow-up 2.
     **Done when:** that plan closes.
 - **Step 2½ — Existing-character XP transition (decision gate).** Lock
   the policy with the user before implementing the XP model or enabling
@@ -792,6 +821,8 @@ revisited during planning of their owning steps, not deferred to close-out.
   Requires the step-2½ decision. Reassess shared draft accounting and
   mutation freshness (review follow-ups 1 / 2), and use the step-0
   formatter metadata decisions (follow-up 5).
+  Record the open-dialog freshness policy under follow-up 2 before
+  dependent caller integration; amend S2-5 if live updates are chosen.
   `public/utils/xp.mjs`: `TRAIT_TIER_COST = { novice: 10, adept: 20,
   master: 30 }` (incremental), `traitCumulativeCost(tier)`,
   `traitDelta(fromTier | null, toTier | null)`, `talentDelta(source,
@@ -813,6 +844,8 @@ revisited during planning of their owning steps, not deferred to close-out.
   mixed-picker draft spending and the creation tier ceiling; formatter
   coverage includes mixed prose / mechanics, cumulative effects and
   action replacement, not just one case per effect / action kind.
+  The open-dialog freshness policy and its integration checks are
+  recorded, not left implicit in the styling fixtures.
 - **Step 4 — Traits picker (view mode).** `trait-list.mjs` becomes a real
   editor on `createCatalogCache(api.getTraits)`: vacant card opens
   `openCatalogDialog` with all traits minus learned ids (decision 13),

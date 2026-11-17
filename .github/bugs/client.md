@@ -26,3 +26,10 @@
 - **Impact:** The link's accessible name names another project and describes the icon rather than the destination.
 - **Fix when scoped:** name the link by its purpose (e.g. `aria-label="Dashboard"` on the `<a>`, the SVG `aria-hidden="true"`), with the copy following the l10n pass.
 - **Status:** ⚠️ Open — noticed 2026-11-17 while separating the Nagara and Ahani Figma files.
+
+### NB-55. SPA fallback keeps an invalid pathname when navigating to a hash route
+- **Where:** `src/app.mts` `serveClient` serves the SPA for an unknown pathname; `public/router.mjs` `navigate` changes only `window.location.hash`, leaving that pathname intact.
+- **Reproduction:** open a mistyped address such as `http://127.0.0.1:3000/randomstring`, then navigate to the dashboard. The resulting URL is `/randomstring#dashboard` rather than `/#dashboard`.
+- **Impact:** The app may recover to a valid view, but the address bar, copied links and subsequent hash navigation retain the invalid path.
+- **Expected / fix when scoped:** keep the permissive initial-page / dashboard fallback, but normalize the pathname to the application's root when recovering. Verify direct typo URLs, subsequent navigation, refresh and browser back/forward; do not rewrite legitimate static-file, API or dev-gallery URLs.
+- **Status:** ⚠️ Open — reported by the user and reproduced 2026-11-17; recorded only, not fixed as part of the gallery work.

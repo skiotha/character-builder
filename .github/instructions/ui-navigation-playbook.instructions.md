@@ -22,8 +22,10 @@ were ironed out or register a new bug.
   `EventSource` error right after navigation (it auto-reconnects).
 - Field ids follow `field-<dotted.path>` (`#field-location`,
   `#field-background\.profession`) — escape the dots in CSS selectors.
-- Screenshots save into the Playwright server's own cwd, not the workspace;
-  treat accessibility snapshots as the verification record.
+- With the current Playwright MCP configuration, screenshots, page snapshots
+  and console logs land in `.playwright-mcp/` at the workspace root
+  (gitignored). These are local verification outputs, not committed
+  regression baselines.
 
 ## Routing & getting around
 

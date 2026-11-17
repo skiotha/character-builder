@@ -20,7 +20,7 @@ const __dirname: string = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT: string = join(__dirname, "..");
 const SERVER_PATH: string = join(PROJECT_ROOT, "src", "server.mts");
 
-const WATCH_DIRS: readonly string[] = ["src", "public", "reference"];
+const WATCH_DIRS: readonly string[] = ["src", "public", "reference", "dev"];
 const DEBOUNCE_MS = 300 as const;
 const CRASH_RESTART_MS = 2_000 as const;
 const ORPHAN_POLL_MS = 2_000 as const;

@@ -1,0 +1,36 @@
+@layer gallery-frame {
+  @scope (html) {
+    :scope,
+    body {
+      min-block-size: 100%;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .fixture-card {
+      padding: 1rem;
+    }
+
+    .fixture-card h3 {
+      margin-block-start: 0;
+    }
+
+    .fixture-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .fixture-choices button {
+      inline-size: auto;
+      block-size: auto;
+      padding: 0.5rem;
+    }
+
+    .fixture-note {
+      color: var(--color-grey);
+    }
+  }
+}

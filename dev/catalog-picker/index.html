@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catalog picker check gallery</title>
+    <link rel="stylesheet" href="/__dev/catalog-picker/gallery.css" />
+    <script type="module" src="/__dev/catalog-picker/gallery.mjs"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Catalog picker check gallery</h1>
+        <p>
+          Development-only fixture gallery. Pickers run in isolated viewport
+          frames and never save character data.
+        </p>
+      </header>
+      <form aria-label="Gallery controls">
+        <label>
+          Catalog
+          <select name="catalog">
+            <option value="traits">Traits</option>
+            <option value="talents">Talents</option>
+            <option value="rituals">Rituals</option>
+          </select>
+        </label>
+        <label>
+          Viewport
+          <select name="viewport">
+            <option value="desktop">Desktop — 1264 × 864</option>
+            <option value="slim">Slim aside — 800 × 864</option>
+            <option value="single">One column — 700 × 864</option>
+            <option value="phone">Phone — 360 × 740</option>
+            <option value="small-phone">Small phone — 320 × 568</option>
+            <option value="short">Short window — 844 × 390</option>
+          </select>
+        </label>
+        <label>
+          Scenario
+          <select name="scenario">
+            <option value="browse">Browse entries</option>
+            <option value="selected">Selected entry</option>
+            <option value="blocked">Blocked selection</option>
+            <option value="unavailable">Unavailable rank</option>
+            <option value="loading">Loading</option>
+            <option value="error">Load error and retry</option>
+            <option value="empty">Empty catalog</option>
+            <option value="no-matches">No matches</option>
+            <option value="ritual-limit">Ritual limit reached</option>
+          </select>
+        </label>
+      </form>
+      <p id="gallery-status" role="status" aria-live="polite"></p>
+      <section aria-label="Picker preview">
+        <iframe title="Catalog picker fixture"></iframe>
+      </section>
+    </main>
+  </body>
+</html>

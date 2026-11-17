@@ -1,0 +1,74 @@
+@layer reset, gallery;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    color: #eee;
+    background: #171717;
+    font: 1rem/1.5 system-ui, sans-serif;
+  }
+
+  button,
+  select {
+    font: inherit;
+  }
+}
+
+@layer gallery {
+  @scope (main) {
+    :scope {
+      max-inline-size: 90rem;
+      margin-inline: auto;
+      padding: 1.5rem;
+    }
+
+    header {
+      margin-block-end: 1.5rem;
+    }
+
+    h1 {
+      margin-block: 0;
+      font-size: 1.5rem;
+    }
+
+    p {
+      max-inline-size: 70ch;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-block-end: 1rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.25rem;
+    }
+
+    select {
+      min-inline-size: 13rem;
+      padding: 0.5rem;
+    }
+
+    section {
+      max-inline-size: 100%;
+      max-block-size: calc(100dvh - 12rem);
+      overflow: auto;
+      border: 1px solid #777;
+      background: #000;
+    }
+
+    iframe {
+      display: block;
+      border: 0;
+    }
+  }
+}

@@ -73,7 +73,10 @@ const SSL: SSLOptions | null = isDev
       }
     : null;
 
+const IS_DEV: boolean = isDev;
+
 export {
+  IS_DEV,
   PORT,
   LOCAL_ADDRESS,
   MIME_TYPES,

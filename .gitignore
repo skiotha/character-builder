@@ -14,6 +14,9 @@ data/aliases.json
 # Logs
 *.log
 
+# Browser verification output
+/.playwright-mcp/
+
 # OS
 Thumbs.db
 Desktop.ini

@@ -30,11 +30,13 @@ import { createCharacterRoute, createPortraitRoute } from "./routes/routes.mts";
 import { getSerializedSchema } from "#models/schema-serializer";
 
 import {
+  IS_DEV,
   MIME_TYPES,
   PUBLIC_DIR,
   DATA_DIR,
   API_ROUTE,
   LOCAL_ADDRESS,
+  PROJECT_ROOT,
 } from "#config";
 
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -44,6 +46,22 @@ const getCharacterHandler = createCharacterRoute();
 const portraitHandler = createPortraitRoute();
 
 const PORTRAITS_DIR = path.join(DATA_DIR, "uploads", "portraits");
+const DEV_CATALOG_PICKER_PREFIX = "/__dev/catalog-picker";
+const DEV_CATALOG_PICKER_DIR = path.join(
+  PROJECT_ROOT,
+  "dev",
+  "catalog-picker",
+);
+const DEV_CATALOG_PICKER_FILES: Record<string, string> = {
+  "/": "index.html",
+  "/index.html": "index.html",
+  "/gallery.css": "gallery.css",
+  "/gallery.mjs": "gallery.mjs",
+  "/frame.html": "frame.html",
+  "/frame.css": "frame.css",
+  "/frame.mjs": "frame.mjs",
+  "/fixtures.mjs": "fixtures.mjs",
+};
 
 // Load the reference-data registry once at startup: the ADR-016 quality
 // catalog, the ability/spell (trait) and boon/sin (talent) effects and
@@ -73,6 +91,11 @@ export default async function app(
   const url = new URL(req.url!, `http://${LOCAL_ADDRESS}/`);
   const { pathname } = url;
 
+  const devCatalogPickerPath = getDevCatalogPickerPath(pathname);
+  if (devCatalogPickerPath !== null) {
+    return serveDevCatalogPicker(devCatalogPickerPath, res);
+  }
+
   // Portrait uploads
   if (pathname.startsWith("/uploads/portraits")) {
     return servePortrait(pathname, res);
@@ -91,6 +114,84 @@ export default async function app(
 
   // Client SPA files (everything else)
   return serveClient(pathname, res);
+}
+
+/**
+ * Resolve only paths under the reserved gallery prefix, including encoded
+ * separators, so unknown gallery URLs cannot fall through to the SPA.
+ */
+function getDevCatalogPickerPath(pathname: string): string | null {
+  let decodedPath: string;
+  try {
+    decodedPath = decodeURIComponent(pathname);
+  } catch {
+    return pathname === DEV_CATALOG_PICKER_PREFIX ||
+      pathname.startsWith(`${DEV_CATALOG_PICKER_PREFIX}/`)
+      ? ""
+      : null;
+  }
+
+  if (
+    decodedPath !== DEV_CATALOG_PICKER_PREFIX &&
+    !decodedPath.startsWith(`${DEV_CATALOG_PICKER_PREFIX}/`)
+  ) {
+    return null;
+  }
+
+  return decodedPath.slice(DEV_CATALOG_PICKER_PREFIX.length) || "/";
+}
+
+/**
+ * Serve the allowlisted gallery files only in development. Its reserved
+ * prefix always resolves here, so production and unknown paths return 404
+ * rather than falling through to the SPA.
+ */
+async function serveDevCatalogPicker(
+  relativePath: string,
+  res: ServerResponse,
+): Promise<void> {
+  if (!IS_DEV) {
+    res.writeHead(404);
+    res.end("Not found");
+    return;
+  }
+
+  const filename = DEV_CATALOG_PICKER_FILES[relativePath];
+  if (!filename) {
+    res.writeHead(404);
+    res.end("Not found");
+    return;
+  }
+
+  try {
+    const fullPath = path.join(DEV_CATALOG_PICKER_DIR, filename);
+    const content = await fs.readFile(fullPath);
+    const ext = path.extname(fullPath).slice(1);
+    const mimeType = MIME_TYPES[ext] ?? MIME_TYPES.default;
+
+    res.writeHead(200, {
+      "Content-Type": mimeType!,
+      "Cache-Control": "no-store",
+      "Content-Length": content.length,
+    });
+    res.end(content);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      res.writeHead(404);
+      res.end("Not found");
+      return;
+    }
+
+    console.error("Dev catalog picker serve error:", error);
+    if (!res.headersSent) {
+      res.writeHead(500);
+      res.end("Server error");
+    }
+  }
 }
 
 async function serveClient(
