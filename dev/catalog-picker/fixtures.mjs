@@ -112,6 +112,108 @@ const CATALOG_TITLES = {
   rituals: "Rituals",
 };
 
+// Fixed display-only snapshots; these are not pricing or eligibility rules.
+const PICKER_PRESENTATIONS = {
+  traits: {
+    kind: "xp",
+    balance: "70",
+    emptyHint: "Select a rank to learn.",
+    blocked: { before: "15", after: "-5", projection: "over" },
+    choices: {
+      "acrobatics:novice": {
+        after: "60",
+        summary: "Acrobatics, Novice — 10 XP",
+      },
+      "acrobatics:adept": {
+        after: "40",
+        summary: "Acrobatics, Adept — 30 XP",
+      },
+      "acrobatics:master": {
+        after: "10",
+        summary: "Acrobatics, Master — 60 XP",
+      },
+      "mystical-tradition-order:novice": {
+        after: "60",
+        summary: "Mystical Tradition: Order, Novice — 10 XP",
+      },
+      "mystical-tradition-order:adept": {
+        after: "40",
+        summary: "Mystical Tradition: Order, Adept — 30 XP",
+      },
+      "mystical-tradition-order:master": {
+        after: "10",
+        summary: "Mystical Tradition: Order, Master — 60 XP",
+      },
+      "mystical-tradition-witches-circle:novice": {
+        after: "60",
+        summary: "Mystical Tradition: Witches' Circle, Novice — 10 XP",
+      },
+      "mystical-tradition-witches-circle:adept": {
+        after: "40",
+        summary: "Mystical Tradition: Witches' Circle, Adept — 30 XP",
+      },
+      "mystical-tradition-witches-circle:master": {
+        after: "10",
+        summary: "Mystical Tradition: Witches' Circle, Master — 60 XP",
+      },
+      "anathema:novice": {
+        after: "60",
+        summary: "Anathema, Novice — 10 XP",
+      },
+      "anathema:adept": {
+        after: "40",
+        summary: "Anathema, Adept — 30 XP",
+      },
+      "anathema:master": {
+        after: "10",
+        summary: "Anathema, Master — 60 XP",
+      },
+    },
+  },
+  talents: {
+    kind: "xp",
+    balance: "70",
+    emptyHint: "Select a level to choose a talent.",
+    blocked: { before: "5", after: "-5", projection: "over" },
+    choices: {
+      "cartographer:1": {
+        after: "65",
+        summary: "Cartographer, Level 1 — 5 XP",
+      },
+      "cartographer:2": {
+        after: "60",
+        summary: "Cartographer, Level 2 — 10 XP",
+      },
+      "cartographer:3": {
+        after: "55",
+        summary: "Cartographer, Level 3 — 15 XP",
+      },
+      "bloodthirst:1": {
+        after: "75",
+        kind: "gain",
+        summary: "Bloodthirst, Level 1 — +5 XP",
+      },
+    },
+  },
+  rituals: {
+    kind: "count",
+    balance: "1",
+    limit: "3",
+    emptyHint: "Select a ritual to learn.",
+    blocked: { before: "3", after: "4", limit: "3", projection: "over" },
+    choices: {
+      "rite-of-opening-and-sealing:entry": {
+        after: "2",
+        summary: "Rite of Opening and Rite of Sealing — free",
+      },
+      "telepathic-interrogation:entry": {
+        after: "2",
+        summary: "Telepathic Interrogation — free",
+      },
+    },
+  },
+};
+
 const VIEWPORTS = {
   desktop: { label: "Desktop", width: 1264, height: 864 },
   slim: { label: "Slim aside", width: 800, height: 864 },
@@ -131,11 +233,13 @@ const SCENARIOS = [
   "empty",
   "no-matches",
   "ritual-limit",
+  "static-header",
 ];
 
 export {
   CATALOG_FIXTURES,
   CATALOG_TITLES,
+  PICKER_PRESENTATIONS,
   SCENARIOS,
   VIEWPORTS,
 };

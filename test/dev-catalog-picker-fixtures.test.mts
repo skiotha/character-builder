@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { CATALOG_FIXTURES } from "../dev/catalog-picker/fixtures.mjs";
+import {
+  CATALOG_FIXTURES,
+  PICKER_PRESENTATIONS,
+} from "../dev/catalog-picker/fixtures.mjs";
 
 const REFERENCE_FILES = {
   ability: "abilities.en.json",
@@ -66,6 +69,28 @@ describe("catalog picker gallery fixtures", () => {
           assert.deepEqual(fixture.traditions, source.traditions);
         }
       });
+    }
+  }
+
+  for (const catalog of ["traits", "talents", "rituals"] as const) {
+    for (const fixture of CATALOG_FIXTURES[catalog]) {
+      const choices = fixture.tiers
+        ? fixture.tiers.map((tier) => `${fixture.id}:${tier}`)
+        : fixture.levels !== undefined
+          ? Array.from(
+              { length: fixture.levels },
+              (_, index) => `${fixture.id}:${index + 1}`,
+            )
+          : [`${fixture.id}:entry`];
+
+      for (const choice of choices) {
+        it(`${catalog} picker has display data for ${choice}`, () => {
+          assert.ok(
+            Object.hasOwn(PICKER_PRESENTATIONS[catalog].choices, choice),
+            `missing picker presentation for ${choice}`,
+          );
+        });
+      }
     }
   }
 });

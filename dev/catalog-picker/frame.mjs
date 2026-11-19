@@ -3,7 +3,14 @@ import { openCatalogDialog } from "/components/catalog-dialog.mjs";
 import {
   CATALOG_FIXTURES,
   CATALOG_TITLES,
+  PICKER_PRESENTATIONS,
 } from "/__dev/catalog-picker/fixtures.mjs";
+
+/**
+ * @typedef {object} FixtureSelection
+ * @property {{ id: string, name: string }} entry
+ * @property {{ tier?: string, level?: number }} detail
+ */
 
 const INITIAL_CHOICES = new Map([
   ["traits", "acrobatics:adept"],
@@ -142,6 +149,119 @@ function buildPreview(selection) {
   return preview;
 }
 
+/**
+ * Return the fixed display data for one fixture selection.
+ * @param {FixtureSelection|null} selection
+ * @returns {{ before: string, after?: string, limit?: string, kind: string, projection?: string, summary?: string }}
+ */
+function getPickerPresentation(selection) {
+  const fixture = PICKER_PRESENTATIONS[catalog];
+  const baseline = {
+    before: fixture.balance,
+    ...(fixture.limit ? { limit: fixture.limit } : {}),
+    kind: fixture.kind,
+  };
+  if (!selection) return baseline;
+  if (scenario === "blocked" || scenario === "ritual-limit") {
+    return { ...baseline, ...fixture.blocked };
+  }
+
+  const detail = selection.detail.tier ?? selection.detail.level ?? "entry";
+  const key = `${selection.entry.id}:${detail}`;
+  const choice = fixture.choices[key];
+  if (!choice) {
+    throw new Error(`Missing picker presentation fixture: ${catalog}/${key}`);
+  }
+  return { ...baseline, ...choice };
+}
+
+/**
+ * Render the current counter from fixed gallery presentation values.
+ * @param {FixtureSelection|null} selection
+ * @param {true|string|false} verdict
+ * @returns {HTMLOutputElement}
+ */
+function renderCounter(selection, verdict) {
+  const presentation = getPickerPresentation(selection);
+  const counter = document.createElement("output");
+  counter.className = "picker-counter";
+  counter.dataset.kind = presentation.kind;
+  counter.dataset.projection =
+    presentation.projection ?? (selection ? "projected" : "none");
+  counter.dataset.commitState = !selection
+    ? "empty"
+    : verdict === true
+      ? "ready"
+      : "blocked";
+
+  const unit = presentation.kind === "count" ? "rituals" : "XP";
+  counter.setAttribute(
+    "aria-label",
+    selection
+      ? presentation.kind === "count"
+        ? `${presentation.before} ritual${presentation.before === "1" ? "" : "s"}; ${presentation.after} of ${presentation.limit} after selection`
+        : `${presentation.before} XP before selection; ${presentation.after} XP after selection`
+      : presentation.kind === "count"
+        ? `${presentation.before} of ${presentation.limit} rituals known`
+        : `${presentation.before} ${unit} left`,
+  );
+
+  const before = document.createElement("span");
+  before.dataset.part = "before";
+  before.textContent = presentation.before;
+  counter.append(before);
+
+  if (selection) {
+    const arrow = document.createElement("span");
+    arrow.dataset.part = "arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "→";
+
+    const after = document.createElement("span");
+    after.dataset.part = "after";
+    after.textContent = presentation.after ?? "";
+    counter.append(arrow, after);
+  }
+
+  if (presentation.limit) {
+    const limit = document.createElement("span");
+    limit.dataset.part = "limit";
+    limit.textContent = `/ ${presentation.limit}`;
+    counter.append(limit);
+  }
+
+  return counter;
+}
+
+/**
+ * Render the fixture's Empty, Ready or Blocked footer text.
+ * @param {FixtureSelection|null} selection
+ * @param {true|string|false} verdict
+ * @returns {HTMLSpanElement}
+ */
+function renderSelectionStatus(selection, verdict) {
+  const status = document.createElement("span");
+  if (!selection) {
+    status.textContent = PICKER_PRESENTATIONS[catalog].emptyHint;
+  } else if (typeof verdict === "string") {
+    status.textContent = verdict;
+  } else {
+    status.textContent = getPickerPresentation(selection).summary ?? "";
+  }
+  return status;
+}
+
+/**
+ * Build a static header node for the backwards-compatibility scenario.
+ * @returns {HTMLOutputElement}
+ */
+function buildStaticHeader() {
+  const counter = document.createElement("output");
+  counter.setAttribute("aria-label", "70 XP left");
+  counter.textContent = "70";
+  return counter;
+}
+
 function selectInitialFixture() {
   const initialChoice = INITIAL_CHOICES.get(catalog);
   const choice = document.querySelector(
@@ -161,14 +281,21 @@ if (scenario === "loading") {
 
 const dialogPromise = openCatalogDialog({
   title: CATALOG_TITLES[catalog],
+  header: scenario === "static-header" ? buildStaticHeader() : renderCounter,
   entries,
   reload: () => sourceEntries,
   search: { fields: ["name", "description", "tags"] },
   renderCard: buildCard,
   renderPreview: buildPreview,
   commitLabel: catalog === "rituals" ? "Learn" : "Choose",
+  renderSelectionStatus:
+    scenario === "static-header" ? undefined : renderSelectionStatus,
   canCommit: () => {
-    if (scenario === "blocked") return "Not enough experience for this choice.";
+    if (scenario === "blocked") {
+      return catalog === "rituals"
+        ? "Ritual limit reached."
+        : "Not enough experience for this choice.";
+    }
     if (scenario === "ritual-limit") return "Ritual limit reached.";
     return true;
   },
@@ -180,7 +307,9 @@ if (scenario === "no-matches") {
   search.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-if (["selected", "blocked", "ritual-limit"].includes(scenario)) {
+if (
+  ["selected", "blocked", "ritual-limit", "static-header"].includes(scenario)
+) {
   selectInitialFixture();
 }
 

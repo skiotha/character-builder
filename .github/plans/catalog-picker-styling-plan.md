@@ -1,8 +1,7 @@
 # Plan — Catalog picker: styling (design → code)
 
-**Status:** active — Part 0 complete (2026-11-17). Part 1a is implemented,
-browser-checked and user-approved (2026-11-19); awaiting user commit before
-1b. Open item S is resolved.
+**Status:** active — Part 0 complete (2026-11-17). Part 1 complete
+(2026-11-20). Open item S is resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
 **Session note:** sessions start cold. This file, the approved Figma
@@ -251,6 +250,8 @@ substeps. Substeps run in the listed order.
   shell matches the 1200-wide design for all three catalogs at the
   recorded viewport, and fixture selections exercise counter projection
   and Empty / Ready / Blocked footer content.
+  > ✅ **Completed 2026-11-20.**
+  > Divergences from the text above: none beyond those recorded under 1b.
   - **1a — Stylesheet, tokens and desktop shell.** Create
     `public/common/picker.css` (layer, reset and loading per the
     Decisions log), move the dialog block there, map the design tokens,
@@ -258,14 +259,23 @@ substeps. Substeps run in the listed order.
     header, columns, divider and footer shell with static content.
     **Done when:** all three empty-list desktop shells match their frames;
     stylesheet loading preserves the existing picker behaviour.
-    > ⏳ Partial — implementation and browser checks are user-approved.
-    > Deferred: user commit.
+    > ✅ **Completed 2026-11-19.**
+    > Divergences from the text above: none.
   - **1b — Counter and footer status.** Settle the counter markup and
     implement dynamic header / selection-status options with fixtures.
     Keep static-header compatibility and `canCommit` guards; animation
     waits for 5b. **Done when:** selection updates old → new balance and
     Empty / Ready / Blocked status for all three catalogs without
     introducing pricing logic.
+    > ✅ **Completed 2026-11-20.**
+    > Divergences from the text above: keeping static-header
+    > compatibility needed a fix in dialog code that predates this plan.
+    > The status line, commit button and search input were found with
+    > unscoped lookups, so a caller header with its own `<output>` took
+    > every status update; the lookups are now scoped to their regions.
+    > Counter and status use fixed gallery snapshots; no pricing logic.
+    > Review also found the header and footer clipped below 572 px and the
+    > status wrapping at phone widths; both belong to 4a.
 - **Part 2 — Aside.** Search with the scripted ✕, filter chips (strokes
   from `strokes/`, chip hover settled), preview frame and hint, Remember
   / Recall stubs, the messages and their behaviour. **Done when:** the
@@ -385,9 +395,9 @@ The parent's step-2c gate, owned here:
 ## Progress
 
 - [x] Part 0 — Check page
-- [ ] Part 1 — Base
-  - [ ] 1a — Stylesheet, tokens and desktop shell
-  - [ ] 1b — Counter and footer status
+- [x] Part 1 — Base
+  - [x] 1a — Stylesheet, tokens and desktop shell
+  - [x] 1b — Counter and footer status
 - [ ] Part 2 — Aside
   - [ ] 2a — Search and filters
   - [ ] 2b — Preview area and messages

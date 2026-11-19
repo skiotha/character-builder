@@ -35,6 +35,8 @@
  *     button commits. It is disabled until something is selected and while
  *     `canCommit(selection)` returns anything but `true`; a string return is
  *     shown as the reason.
+ *   - Header and selection-status renderers receive the current selection
+ *     and commit verdict, so projections stay in sync with the commit guard.
  *   - The rendered data is frozen at open; a selection change re-renders
  *     only the previously and newly selected cards, keeping focus on the
  *     control at the same position in the new card.
@@ -65,6 +67,8 @@ let openDialog = null;
  *   `{ tier: "adept" }`; `{}` when it passed nothing
  */
 
+/** @typedef {true|string|false} CommitVerdict */
+
 /**
  * @typedef {object} FilterOption
  * @property {string} label - Checkbox caption
@@ -82,7 +86,9 @@ let openDialog = null;
 /**
  * @typedef {object} CatalogDialogOptions
  * @property {string} title - Dialog heading
- * @property {Node} [header] - Extra header content (e.g. the XP balance)
+ * @property {Node | ((selection: Selection|null, verdict: CommitVerdict) => Element|null)} [header]
+ *   - Static extra header content, or a renderer called on initial open and
+ *   each selection change (e.g. an XP balance projection)
  * @property {object[] | Promise<object[]>} entries - Catalog entries, or a
  *   promise of them (e.g. a `createCatalogCache` `get()`)
  * @property {() => object[] | Promise<object[]>} [reload] - Called by Retry
@@ -103,6 +109,9 @@ let openDialog = null;
  * @property {(selection: Selection) => true | string} [canCommit] - `true`
  *   enables the primary button; a string disables it and is shown as the
  *   reason
+ * @property {(selection: Selection|null, verdict: CommitVerdict) => Node|null} [renderSelectionStatus]
+ *   - Builds the live footer status for the current selection and commit
+ *   verdict. Without it, a `canCommit` reason is shown as plain text.
  * @property {AbortSignal} [signal] - Aborting closes the dialog with `null`
  * @property {Element | (() => Element|null)} [returnFocus] - Focus target
  *   on close when the opener is no longer in the document
@@ -136,6 +145,7 @@ export function openCatalogDialog(options) {
     renderPreview,
     commitLabel,
     canCommit,
+    renderSelectionStatus,
     signal,
     returnFocus,
   } = options;
@@ -159,21 +169,27 @@ export function openCatalogDialog(options) {
     group.options.map((option) => Boolean(option.checked)),
   );
 
-  const dialog = buildSkeleton(title, header, commitLabel);
+  const staticHeader = typeof header === "function" ? undefined : header;
+  const dialog = buildSkeleton(title, staticHeader, commitLabel);
+  const heading = /** @type {HTMLElement} */ (
+    dialog.querySelector("h2")
+  );
   const listRegion = /** @type {HTMLElement} */ (
     dialog.querySelector(":scope > section")
   );
   const searchInput = /** @type {HTMLInputElement} */ (
-    dialog.querySelector("input[type=search]")
+    dialog.querySelector(":scope > aside input[type=search]")
   );
   const previewRegion = /** @type {HTMLElement} */ (
     dialog.querySelector(":scope > aside > section")
   );
+  // Region-scoped lookups: a caller header sits inside the dialog and may
+  // carry its own `<output>` or button.
   const commitButton = /** @type {HTMLButtonElement} */ (
-    dialog.querySelector("button.primary")
+    dialog.querySelector(":scope > footer button.primary")
   );
   const reasonLine = /** @type {HTMLOutputElement} */ (
-    dialog.querySelector("output")
+    dialog.querySelector(":scope > footer output")
   );
 
   /** @type {CardRecord[]} */
@@ -184,6 +200,8 @@ export function openCatalogDialog(options) {
   let selection = null;
   /** @type {CardRecord | null} */
   let selectedRecord = null;
+  /** @type {Element|null} */
+  let renderedHeader = null;
 
   const close = () => dialog.close();
 
@@ -313,7 +331,37 @@ export function openCatalogDialog(options) {
         : true
       : false;
     commitButton.disabled = verdict !== true;
-    reasonLine.textContent = typeof verdict === "string" ? verdict : "";
+
+    if (typeof header === "function") {
+      const nextHeader = header(selection, verdict);
+      if (nextHeader !== renderedHeader) {
+        renderedHeader?.parentNode?.removeChild(renderedHeader);
+        if (nextHeader) heading.after(nextHeader);
+        renderedHeader = nextHeader;
+      }
+    }
+
+    if (renderSelectionStatus) {
+      reasonLine.dataset.state = !selection
+        ? "empty"
+        : typeof verdict === "string"
+          ? "blocked"
+          : "ready";
+      const content = renderSelectionStatus(selection, verdict);
+      const children = [];
+      if (typeof verdict === "string") {
+        const alert = document.createElement("span");
+        alert.className = "selection-alert";
+        alert.setAttribute("aria-hidden", "true");
+        alert.textContent = "!";
+        children.push(alert);
+      }
+      if (content) children.push(content);
+      reasonLine.replaceChildren(...children);
+    } else {
+      delete reasonLine.dataset.state;
+      reasonLine.textContent = typeof verdict === "string" ? verdict : "";
+    }
   };
 
   commitButton.addEventListener("click", () => {
@@ -469,7 +517,7 @@ function buildSkeleton(title, header, commitLabel) {
   if (header) heading.after(header);
 
   const commit = /** @type {HTMLButtonElement} */ (
-    dialog.querySelector("button.primary")
+    dialog.querySelector(":scope > footer button.primary")
   );
   commit.textContent = commitLabel;
 
