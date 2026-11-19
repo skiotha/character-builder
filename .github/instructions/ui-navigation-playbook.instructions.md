@@ -17,7 +17,9 @@ were ironed out or register a new bug.
 - `npm run start:dev` → `http://127.0.0.1:3000`. Catalog `[effects]` warn
   lines at startup are expected authoring noise, not a failure.
 - Playwright MCP: element-addressing arguments take `target` (a snapshot ref
-  like `e56` or a CSS selector) — not `ref`.
+  or a CSS selector) — not `ref`. The first page after browser launch gets
+  plain refs like `e56`; later pages get an `fN` prefix (`f4e1`). Copy refs
+  from the latest snapshot rather than guessing them.
 - Safe-to-ignore console noise: favicon fetch failures; one SSE
   `EventSource` error right after navigation (it auto-reconnects).
 - Field ids follow `field-<dotted.path>` (`#field-location`,
