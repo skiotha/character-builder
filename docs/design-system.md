@@ -87,7 +87,13 @@ keep the reasoning behind each choice; this document keeps the rule.
   `Semantic`, so the palette can be remapped, or a mode added (e.g. a
   light or inverted one), without redrawing. One mode (`Dark`) today.
 - **One name across tools:** every variable carries its CSS custom
-  property name as its WEB code syntax, and CSS uses that name.
+  property name as its WEB code syntax, and CSS uses that name. Each
+  name is unique: a `Semantic` variable is named after its own role,
+  `--<group>-<name>` in kebab case (`Text/Heading` → `--text-heading`,
+  `State/Focus on accent` → `--state-focus-on-accent`), never after the
+  primitive it aliases. CSS maps the role to the primitive
+  (`--text-heading: var(--color-pale-gold);`), so re-pointing a role in
+  Figma changes one CSS line and no name.
 - **`1rem` = the browser default (16 px).** No root `font-size` tricks
   (no 62.5 %, no viewport clamp), so the reader's font-size setting and
   zoom work. Sizes are authored in rem.

@@ -818,6 +818,17 @@ Discovered during Phase 3 Session 4. Moved from `deferred-tasks.md` §4.
       `1rem` = browser default (the root `font-size` clamp was removed
       2026-10-26) and the six named spacing steps sit on the 4px scale.
       The catalog-picker component library adds tokens as it goes.
+      **Naming:** give lengths (spacing, radii, border widths, sizes)
+      and the other non-colour tokens (type, opacity) clear, reusable
+      names, as the `Semantic` colours already have (DS §tokens), and
+      rename them in CSS and in Figma's WEB code syntax together. Today
+      Figma's length variables copy the old ad-hoc CSS names
+      (`--block-tight-pad`, `--block-align-pad`, `--block-inner-pad`,
+      `--sm-pad`, `--block-outer-pad`, `--sm-crns`, `--md-crns`,
+      `--border-width`; `--md-crns` = 30 px is also off the 4px scale),
+      type exists only as Figma text styles (`Fonts/…`), and
+      `public/common/picker.css` uses those length names plus temporary
+      `--picker-type-*` names until this rename.
 - [ ] **Visual redesign.** Redesign the app's pages in Figma and bring
       the client up to them, beyond the style clean-ups listed here. It
       continues the catalog picker's design: the same Figma file and

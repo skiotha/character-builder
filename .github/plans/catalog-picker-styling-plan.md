@@ -1,7 +1,8 @@
 # Plan — Catalog picker: styling (design → code)
 
-**Status:** active — Part 0 complete (2026-11-17); awaiting user review
-before Part 1a. Open item S is resolved.
+**Status:** active — Part 0 complete (2026-11-17). Part 1a is implemented,
+browser-checked and user-approved (2026-11-19); awaiting user commit before
+1b. Open item S is resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
 **Session note:** sessions start cold. This file, the approved Figma
@@ -179,6 +180,37 @@ Moved from the parent's step 2c:
   1–5 and their scope, but split them into the lettered substeps below.
   Each substep gets its own browser review and user commit; completing a
   substep does not mark its parent part complete.
+- **2026-11-19 — Token names fixed in Figma.** Every `Semantic` variable
+  now carries its own `var(--<group>-<name>)` WEB code syntax (DS
+  §tokens); before, 16 mirrored their primitive's name, 6 carried a
+  stale one and 11 had none, so `get_variable_defs` collapsed roles
+  into one key. `Opacity/disabled` became `var(--opacity-disabled)`.
+  Primitive values already matched the CSS.
+- **2026-11-19 — Picker stylesheet: own file, own layer.** New
+  `public/common/picker.css`, loaded by a `<link>` right after
+  `styles.css` in `public/index.html` and the gallery's `frame.html`.
+  The whole file sits in a `picker` layer, appended to the layer
+  statement on `styles.css` line 1 so it outranks every old layer.
+  Inside the dialog, a `picker.reset` sublayer uses `all: revert` (not
+  `revert-layer`, which would fall back to the old layers) to drop the
+  old global rules, replacing the leak neutralizers; this also fixes the
+  narrow-width leak where the old `media` layer hides the picker header.
+  New semantic and type tokens and the breakpoints live only in the new
+  file; primitives stay in the old `:root`. Type tokens get new names,
+  since `all` does not reset custom properties and the old ones are
+  redefined at ≤ 900 px. The old file changes only by the layer name
+  and the moved picker block; where an old rule still leaks through,
+  commenting it out is the fallback. The file merges into the new main
+  stylesheet when the global CSS is refactored. Rejected: `@import`
+  (serial download), CSS module scripts (no Safari support) and a
+  script-injected `<link>` (unstyled first open).
+- **2026-11-19 — Length and type token names deferred.** The `:root`
+  semantic tokens stay in `picker.css` and move with the file into the
+  new main stylesheet. `picker.css` keeps the old length names, which
+  Figma also uses (`--block-outer-pad`, `--md-crns`, …), and temporary
+  `--picker-type-*` type names. Reusable names for lengths and other
+  non-colour tokens, in CSS and Figma together, belong to the roadmap's
+  "Design-token system rework" item; this plan does not rename them.
 
 ## Steps
 
@@ -209,9 +241,9 @@ substeps. Substeps run in the listed order.
   > card presentation, or character writes were added in this part.
 - **Part 1 — Base.** The dialog's own `@layer`ed, `@scope`d stylesheet
   with native nesting (**styling** rule; the functional block in
-  `styles.css` moves there; the global-leak
-  neutralizers stay until the old global rules are fixed), design values
-  mapped to `:root` custom properties, surface and `::backdrop`, header
+  `styles.css` moves there; a reset sublayer replaces the global-leak
+  neutralizers — Decisions log 2026-11-19), design values mapped to
+  custom properties in that file, surface and `::backdrop`, header
   (title, counter, ✕), columns and the list | aside divider, footer
   (status line, Cancel, primary). Define and implement the dynamic
   header and selection-status options; preserve existing static-header
@@ -219,11 +251,15 @@ substeps. Substeps run in the listed order.
   shell matches the 1200-wide design for all three catalogs at the
   recorded viewport, and fixture selections exercise counter projection
   and Empty / Ready / Blocked footer content.
-  - **1a — Stylesheet, tokens and desktop shell.** Extract the dialog
-    stylesheet, map the design tokens, and style the surface, backdrop,
+  - **1a — Stylesheet, tokens and desktop shell.** Create
+    `public/common/picker.css` (layer, reset and loading per the
+    Decisions log), move the dialog block there, map the design tokens,
+    and style the surface, backdrop,
     header, columns, divider and footer shell with static content.
     **Done when:** all three empty-list desktop shells match their frames;
     stylesheet loading preserves the existing picker behaviour.
+    > ⏳ Partial — implementation and browser checks are user-approved.
+    > Deferred: user commit.
   - **1b — Counter and footer status.** Settle the counter markup and
     implement dynamic header / selection-status options with fixtures.
     Keep static-header compatibility and `canCommit` guards; animation

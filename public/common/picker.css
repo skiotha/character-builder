@@ -1,0 +1,339 @@
+@layer picker {
+  @layer tokens, reset, shell;
+
+  @layer tokens {
+    :root {
+      --opacity-disabled: 0.5;
+
+      --surface-base: var(--color-black);
+      --surface-glass: oklch(from var(--color-black) l c h / 0.5);
+      --surface-active: var(--color-main);
+      --surface-muted: var(--color-grey);
+      --surface-backdrop: oklch(from var(--color-black) l c h / 0.5);
+
+      --text-default: var(--color-white);
+      --text-heading: var(--color-pale-gold);
+      --text-muted: var(--color-grey);
+      --text-alert: var(--color-accent);
+      --text-inverse: var(--color-black);
+      --text-disabled: var(--color-grey-dim);
+      --text-interactive: var(--color-main);
+      --text-kind-a: var(--color-verdigris);
+      --text-kind-b: var(--color-amethyst);
+
+      --border-default: var(--color-main);
+      --border-muted: var(--color-grey);
+      --border-alert: var(--color-accent);
+      --border-disabled: var(--color-grey-dim);
+      --border-decor: var(--color-ochre);
+
+      --state-focus: var(--color-accent);
+      --state-focus-on-accent: var(--color-main);
+
+      --icon-default: var(--color-main);
+      --icon-alert: var(--color-accent);
+      --icon-muted: var(--color-grey);
+      --icon-disabled: var(--color-grey-dim);
+      --icon-marker: var(--color-pale-gold);
+
+      --grade-kind-a: var(--color-verdigris);
+      --grade-kind-b: var(--color-amethyst);
+      --grade-unlearned: var(--color-grey);
+      --grade-on-kind-a: var(--color-black);
+      --grade-on-kind-b: var(--color-black);
+      --grade-on-unlearned: var(--color-black);
+
+      --picker-font-heading: "Nagara Header";
+      --picker-font-body: "Nagara Body";
+      --picker-type-title: 2.25rem;
+      --picker-type-counter: 2.25rem;
+      --picker-type-aside-heading: 1.75rem;
+      --picker-type-body: 0.875rem;
+      --picker-type-menu-20: 1.25rem;
+      --picker-type-close: 1.5rem;
+      --picker-leading-body: 1.5;
+    }
+  }
+
+  @layer reset {
+    @scope (dialog.catalog-dialog) {
+      :scope,
+      :scope::backdrop,
+      :scope *,
+      :scope *::before,
+      :scope *::after,
+      :scope *::first-letter {
+        all: revert;
+      }
+
+      :scope,
+      :scope * {
+        box-sizing: border-box;
+      }
+
+      :scope,
+      :scope * {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  @layer shell {
+    @scope (dialog.catalog-dialog) {
+      :scope {
+        inline-size: min(75rem, 100vw - 4rem);
+        block-size: min(50rem, 100dvh - 4rem);
+        max-inline-size: none;
+        max-block-size: none;
+        margin: auto;
+        padding: var(--block-outer-pad);
+
+        border: var(--border-width) solid var(--border-decor);
+        border-radius: var(--md-crns);
+        background: var(--surface-base);
+        color: var(--text-default);
+        font: var(--picker-type-body) / var(--picker-leading-body)
+          var(--picker-font-body);
+        overflow: clip;
+
+        &[open] {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 25.625rem;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          grid-template-areas:
+            "header header"
+            "list aside"
+            "footer footer";
+          column-gap: var(--block-outer-pad);
+          row-gap: var(--block-outer-pad);
+        }
+
+        &::backdrop {
+          background: var(--surface-backdrop);
+        }
+      }
+
+      :scope > header {
+        grid-area: header;
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        min-inline-size: 0;
+
+        h2 {
+          flex: 1 1 auto;
+          min-inline-size: 0;
+          color: var(--text-heading);
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-title);
+          font-weight: normal;
+          line-height: 1;
+        }
+
+        h2 + * {
+          flex: 0 0 auto;
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-counter);
+          line-height: 1;
+          white-space: nowrap;
+        }
+
+        form {
+          display: flex;
+          flex: 0 0 auto;
+        }
+
+        button {
+          inline-size: 2rem;
+          block-size: 2rem;
+          min-block-size: 0;
+          padding: 0;
+          border: 0;
+          color: var(--icon-default);
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-close);
+          line-height: 1;
+        }
+      }
+
+      :scope > section {
+        grid-area: list;
+        min-inline-size: 0;
+        min-block-size: 0;
+        padding-inline-end: var(--sm-pad);
+        border-inline-end: var(--border-width) solid var(--border-decor);
+        overflow-y: auto;
+        scrollbar-color: var(--border-default) transparent;
+        scrollbar-width: thin;
+
+        > ul {
+          list-style: none;
+
+          > li {
+            padding: 0.5rem;
+            border: var(--border-width) solid transparent;
+
+            & + li {
+              margin-block-start: 0.5rem;
+            }
+
+            &[aria-current="true"] {
+              border-color: var(--border-alert);
+            }
+          }
+        }
+      }
+
+      :scope > aside {
+        grid-area: aside;
+        min-inline-size: 0;
+        min-block-size: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--block-outer-pad);
+        overflow-y: auto;
+        scrollbar-color: var(--border-default) transparent;
+        scrollbar-width: thin;
+
+        search {
+          display: block;
+
+          label {
+            display: block;
+          }
+        }
+
+        fieldset {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem 1rem;
+          padding: 0.5rem;
+          border: var(--border-width) solid var(--border-default);
+        }
+
+        label:has(input[type="checkbox"]) {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          cursor: pointer;
+        }
+
+        h3 {
+          color: var(--text-heading);
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-aside-heading);
+          font-weight: normal;
+          line-height: 1;
+        }
+
+        menu {
+          display: flex;
+          gap: var(--block-outer-pad);
+          list-style: none;
+
+          button {
+            block-size: 3rem;
+            min-block-size: 3rem;
+            padding-inline: var(--block-inner-pad);
+            border: 0;
+            color: var(--text-disabled);
+            opacity: 1;
+          }
+        }
+      }
+
+      :scope > aside > section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--block-inner-pad);
+      }
+
+      :scope > footer {
+        grid-area: footer;
+        padding-block-start: 1rem;
+        border-block-start: var(--border-width) solid var(--border-decor);
+
+        form {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 1rem;
+        }
+
+        output {
+          margin-inline-end: auto;
+          color: var(--text-alert);
+          font-size: var(--picker-type-body);
+        }
+
+        button.primary {
+          block-size: 3rem;
+          min-block-size: 3rem;
+          min-inline-size: 8rem;
+          padding-inline: var(--sm-pad);
+          border-width: 2px;
+          border-radius: 0.25rem;
+        }
+
+        button[value="cancel"] {
+          block-size: 3rem;
+          min-block-size: 3rem;
+          padding-inline: var(--block-inner-pad);
+          border: 0;
+        }
+      }
+
+      input[type="checkbox"] {
+        accent-color: var(--icon-secondary);
+      }
+
+      input[type="search"] {
+        display: block;
+        box-sizing: border-box;
+        inline-size: 100%;
+        block-size: auto;
+        padding: 0.5rem;
+        border: 0;
+        border-block-end: var(--border-width) solid var(--border-default);
+        background: transparent;
+        color: var(--text-default);
+        font: inherit;
+      }
+
+      button {
+        inline-size: auto;
+        min-block-size: 2.375rem;
+        padding: 0.25rem 1rem;
+        border: var(--border-width) solid var(--border-default);
+        background: transparent;
+        color: var(--text-interactive);
+        font-family: var(--picker-font-heading);
+        font-size: var(--picker-type-menu-20);
+        line-height: 1;
+        text-transform: uppercase;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: var(--opacity-disabled);
+          cursor: not-allowed;
+        }
+
+        &[value="cancel"] {
+          border-color: transparent;
+          color: var(--text-default);
+        }
+      }
+
+      :focus-visible {
+        outline: 0.125rem solid var(--state-focus);
+        outline-offset: 0.125rem;
+      }
+
+      [hidden] {
+        display: none;
+      }
+    }
+  }
+}
