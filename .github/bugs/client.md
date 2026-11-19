@@ -8,6 +8,14 @@
 > See [`README.md`](README.md) for the `NB-N` id scheme, the severity rubric,
 > and the filing / closing procedure. Cite a bug from code as `NB-<n>`.
 
+## MEDIUM — Address during current work
+
+### NB-56. Client `DEFAULT_CHARACTER` still has the pre-Chunk-D shape and schema 1
+- **Where:** `public/utils/rpg.mjs` `DEFAULT_CHARACTER` — `combat.weapons` with a scalar `attackAttribute`, empty `equipment.weapons`, `schemaVersion: 1`. The server's `generateDefaultCharacter` already seeds `natural_weapon` and schema 2.
+- **Impact:** The creation view sources its form from this object, so a new character starts from a shape the server no longer produces. It blocks the weapon-slots renderer in creation mode and will surface as the catalog pickers (Chunk I) reach the creation flow.
+- **Fix when scoped:** align with the Chunk-D shape (`combat: { carried }`, seed `equipment.weapons[0]` with `natural_weapon` from the catalog, `schemaVersion: 2`); ideally derive it from the server's default or schema so the two cannot drift again. Already described under the Chunk-D weapon-slots follow-up in `docs/roadmap.md`; this entry gives it a citable id.
+- **Status:** ⚠️ Open — noticed 2026-11-19 during a read-only project review.
+
 ## LOW — Fix opportunistically
 
 ### NB-52. Router drops a hash change that arrives while a view is still loading
@@ -33,3 +41,9 @@
 - **Impact:** The app may recover to a valid view, but the address bar, copied links and subsequent hash navigation retain the invalid path.
 - **Expected / fix when scoped:** keep the permissive initial-page / dashboard fallback, but normalize the pathname to the application's root when recovering. Verify direct typo URLs, subsequent navigation, refresh and browser back/forward; do not rewrite legitimate static-file, API or dev-gallery URLs.
 - **Status:** ⚠️ Open — reported by the user and reproduced 2026-11-17; recorded only, not fixed as part of the gallery work.
+
+### NB-57. Unused no-op `sanitizeTextFields` stub in a misspelled file
+- **Where:** `public/validation/sanitatization.mjs` — `sanitizeTextFields` returns a shallow copy and changes nothing; no module imports it.
+- **Impact:** Dead code that suggests client-side text sanitization exists when it does not. The filename typo ("sanitatization") also hides it from searches for "sanitization".
+- **Fix when scoped:** delete it, or rename it to `sanitization.mjs` and give it a real job if a client-side hook is still wanted. Server-side validation stays authoritative either way.
+- **Status:** ⚠️ Open — noticed 2026-11-19 during a read-only project review.
