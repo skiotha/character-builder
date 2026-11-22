@@ -468,6 +468,8 @@ contract gaps the step-2 sketch left open and amend its `filters` /
   split on whitespace and **every** token must occur in some field;
   case-insensitive and diacritic-insensitive (NFD, combining marks
   stripped) on both sides. Empty query matches everything.
+  Optional `search.placeholder` describes the searched fields; it is
+  display-only and defaults to "Type to search".
 - **S2b-4. Filter groups.** `filters: [{ legend, options: [{ label,
   predicate, checked? }] }]`, one `<fieldset>` of checkboxes per group.
   Options are **OR**-ed within a group, groups are **AND**-ed, and a
@@ -698,7 +700,7 @@ revisited during planning of their owning steps, not deferred to close-out.
   and S2b-1 … S2b-5.
   `public/components/catalog-dialog.mjs`: `openCatalogDialog({ title,
   header?, entries, reload?, exclude?: Iterable<id>, search: { fields:
-  (key | (entry) → string | string[])[] }, filters: [{ legend, options:
+  (key | (entry) → string | string[])[], placeholder?: string }, filters: [{ legend, options:
   [{ label, predicate, checked? }] }], renderCard(entry, select,
   selection) → Node, renderPreview?(selection) → Node, commitLabel,
   canCommit?(selection) → true | string, signal?, returnFocus? }) →

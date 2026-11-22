@@ -1,5 +1,5 @@
 @layer picker {
-  @layer tokens, reset, shell;
+  @layer tokens, reset, shell, controls;
 
   @layer tokens {
     :root {
@@ -222,29 +222,6 @@
         scrollbar-color: var(--border-default) transparent;
         scrollbar-width: thin;
 
-        search {
-          display: block;
-
-          label {
-            display: block;
-          }
-        }
-
-        fieldset {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem 1rem;
-          padding: 0.5rem;
-          border: var(--border-width) solid var(--border-default);
-        }
-
-        label:has(input[type="checkbox"]) {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          cursor: pointer;
-        }
-
         h3 {
           color: var(--text-heading);
           font-family: var(--picker-font-heading);
@@ -334,23 +311,6 @@
         }
       }
 
-      input[type="checkbox"] {
-        accent-color: var(--icon-secondary);
-      }
-
-      input[type="search"] {
-        display: block;
-        box-sizing: border-box;
-        inline-size: 100%;
-        block-size: auto;
-        padding: 0.5rem;
-        border: 0;
-        border-block-end: var(--border-width) solid var(--border-default);
-        background: transparent;
-        color: var(--text-default);
-        font: inherit;
-      }
-
       button {
         inline-size: auto;
         min-block-size: 2.375rem;
@@ -382,6 +342,262 @@
 
       [hidden] {
         display: none;
+      }
+    }
+  }
+
+  @layer controls {
+    @scope (dialog.catalog-dialog) {
+      :scope > aside {
+        /* Let the focused label grow upward into the gap above the scroll pane. */
+        margin-block-start: -1rem;
+        padding-block-start: 1rem;
+      }
+
+      :scope > aside > search {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: flex-end;
+        gap: 0.5rem;
+        block-size: 3.5rem;
+        min-inline-size: 0;
+
+        svg {
+          display: block;
+          inline-size: 1.5rem;
+          block-size: 1.5rem;
+          color: inherit;
+        }
+
+        > svg,
+        > button {
+          flex: 0 0 1.5rem;
+          margin-block-end: 0.25rem;
+          color: var(--icon-default);
+        }
+
+        &:has(input:focus) {
+          > svg,
+          > button:enabled {
+            margin-block-end: 0.75rem;
+          }
+        }
+
+        label {
+          --search-height: 2rem;
+          position: relative;
+          flex: 1 1 auto;
+          min-inline-size: 0;
+          block-size: 100%;
+          cursor: text;
+
+          > span {
+            position: absolute;
+            inset-inline-start: 0.5rem;
+            inset-block-end: 1rem;
+            translate: 0 50%;
+            color: var(--text-heading);
+            font: var(--picker-type-body) / var(--picker-leading-body)
+              var(--picker-font-body);
+            pointer-events: none;
+          }
+
+          &:has(input:focus, input:not(:placeholder-shown)) > span {
+            inset-block-end: var(--search-height);
+            translate: none;
+          }
+
+          &:has(input:focus) {
+            --search-height: 3rem;
+          }
+        }
+
+        input {
+          position: absolute;
+          inset-inline: 0;
+          inset-block-end: 0;
+          inline-size: 100%;
+          block-size: var(--search-height);
+          padding-inline: 1.5rem;
+          border: 0;
+          border-block: 1px solid var(--border-default);
+          appearance: none;
+          outline: none;
+          background: transparent;
+          color: var(--text-default);
+          caret-color: var(--state-focus);
+          font: var(--picker-type-menu-20) / normal var(--picker-font-heading);
+          text-transform: capitalize;
+
+          &::placeholder {
+            color: transparent;
+            opacity: 1;
+            font: italic var(--picker-type-body) / 1 var(--picker-font-body);
+            text-transform: none;
+          }
+
+          &:focus {
+            border-block-start-color: var(--state-focus);
+            background: var(--surface-active);
+            color: var(--text-inverse);
+
+            &::placeholder {
+              color: var(--text-inverse);
+            }
+          }
+
+          &::-webkit-search-cancel-button,
+          &::-webkit-search-decoration {
+            appearance: none;
+            display: none;
+          }
+        }
+
+        button {
+          inline-size: 1.5rem;
+          block-size: 1.5rem;
+          min-block-size: 0;
+          padding: 0;
+          border: 0;
+          outline: none;
+          background: transparent;
+
+          &:disabled {
+            color: var(--icon-disabled);
+            opacity: 1;
+            cursor: default;
+          }
+
+          &:focus-visible svg {
+            scale: 1.25;
+          }
+
+          @media (hover: hover) {
+            &:enabled:hover svg {
+              rotate: 12deg;
+            }
+          }
+        }
+      }
+
+      :scope > aside > .filters {
+        display: flex;
+        flex: 0 0 auto;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+
+        fieldset {
+          position: relative;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem 0.5rem;
+          min-inline-size: 0;
+          padding: 0;
+          border: 0;
+        }
+
+        legend,
+        input {
+          position: absolute;
+          inline-size: 1px;
+          block-size: 1px;
+          overflow: hidden;
+          clip-path: inset(50%);
+          white-space: nowrap;
+        }
+
+        label {
+          --chip-width: 4rem;
+          --chip-stroke: url("/assets/strokes/chip-s.svg");
+          --chip-checked-stroke: url("/assets/strokes/chip-s-checked.svg");
+          position: relative;
+          display: inline-grid;
+          flex: 0 0 auto;
+          place-items: center;
+          min-inline-size: var(--chip-width);
+          inline-size: max-content;
+          block-size: 2rem;
+          padding-inline: 0.75rem;
+          color: var(--text-inverse);
+          font: var(--picker-type-body) / var(--picker-leading-body)
+            var(--picker-font-body);
+          cursor: pointer;
+
+          &[data-size="m"] {
+            --chip-width: 6rem;
+            --chip-stroke: url("/assets/strokes/chip-m.svg");
+            --chip-checked-stroke: url("/assets/strokes/chip-m-checked.svg");
+          }
+
+          &[data-size="l"] {
+            --chip-width: 8rem;
+            --chip-stroke: url("/assets/strokes/chip-l.svg");
+            --chip-checked-stroke: url("/assets/strokes/chip-l-checked.svg");
+          }
+
+          &::before,
+          &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            mask-size: 100% 100%;
+            mask-repeat: no-repeat;
+          }
+
+          &::before {
+            background: var(--surface-muted);
+            mask-image: var(--chip-stroke);
+          }
+
+          &::after {
+            background: var(--surface-active);
+            mask-image: var(--chip-checked-stroke);
+            opacity: 0;
+          }
+
+          &:has(:checked) {
+            &::before {
+              opacity: 0;
+            }
+
+            &::after {
+              opacity: 1;
+            }
+          }
+
+          > span {
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+            rotate: var(--chip-tilt);
+          }
+
+          &:has(:focus-visible) > span::after {
+            content: "";
+            position: absolute;
+            inset-inline: -0.5rem;
+            inset-block-start: 100%;
+            block-size: 0.75rem;
+            background: var(--state-focus);
+            mask: url("/assets/strokes/focus-underline-1.svg") center / 100% 100%
+              no-repeat;
+            pointer-events: none;
+          }
+
+          @media (hover: hover) {
+            &:hover:not(:has(:focus-visible)) > span {
+              rotate: calc(var(--chip-tilt) + 4deg);
+            }
+          }
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        :scope > aside > search button svg,
+        :scope > aside > .filters label > span {
+          transition: rotate 120ms ease-out;
+        }
       }
     }
   }

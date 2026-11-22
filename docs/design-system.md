@@ -206,6 +206,13 @@ mark, text) always carries it too.
     legend may be hidden visually but stays for screen readers;
   - **labels and tags** are plain text: no fill, no border, no hover, so
     they never pass for a toggle or an action.
+- **Picker source chips:** Ability / Spell for traits, Boon / Sin for
+  talents, none for rituals. Start unchecked; tradition tags are searched,
+  not repeated as chips. Hover rotates the caption without changing the
+  stroke or ink.
+- **Search clear** is a scripted button outside the field: always present,
+  natively disabled and Grey-dim while empty. Clearing returns focus to
+  search and leaves any checked filter chips alone.
 - **Red never means "clickable"**: it already means focus and alert.
   Interactivity shows through shape, hover motion and the pointer.
 - **Scrollbars use the standard properties only** (`scrollbar-width:
@@ -293,6 +300,9 @@ folders, without an `icon-` prefix:
   `background-color`, so one file per **shape** serves every colour and
   stretches. Primary buttons draw the border on `::before`; a site
   picks the shape with `--button-border: url(…)`.
+  Masks that must stretch non-uniformly (chip fills and caption focus
+  underlines) set `preserveAspectRatio="none"` on the SVG root; otherwise
+  the drawing keeps its aspect ratio inside the resized mask.
 - `decor/` — multi-tone illustrations used as CSS images (isle, keep,
   ship, cannon, name background). An image can't take CSS colours, so
   these keep their baked colours and are only cleaned.

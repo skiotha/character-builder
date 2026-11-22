@@ -1,3 +1,3 @@
-<svg viewBox="0 0 128 32" xmlns="http://www.w3.org/2000/svg" fill="none">
+<svg viewBox="0 0 128 32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="none">
   <rect x="4.38574" y="3.91211" width="120" height="20" rx="3" transform="rotate(2 4.38574 3.91211)" fill="currentColor"/>
 </svg>

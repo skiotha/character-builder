@@ -18,6 +18,12 @@ const INITIAL_CHOICES = new Map([
   ["rituals", "rite-of-opening-and-sealing"],
 ]);
 
+const SOURCE_FILTERS = {
+  traits: [["Ability", "ability"], ["Spell", "spell"]],
+  talents: [["Boon", "boon"], ["Sin", "sin"]],
+  rituals: [],
+};
+
 const params = new URLSearchParams(location.search);
 const requestedCatalog = params.get("catalog");
 const requestedScenario = params.get("scenario");
@@ -284,7 +290,19 @@ const dialogPromise = openCatalogDialog({
   header: scenario === "static-header" ? buildStaticHeader() : renderCounter,
   entries,
   reload: () => sourceEntries,
-  search: { fields: ["name", "description", "tags"] },
+  search: {
+    fields: ["name", "description", "tags"],
+    placeholder: "Name, text or tag",
+  },
+  filters: SOURCE_FILTERS[catalog].length
+    ? [{
+        legend: "Source",
+        options: SOURCE_FILTERS[catalog].map(([label, source]) => ({
+          label,
+          predicate: (entry) => entry.source === source,
+        })),
+      }]
+    : [],
   renderCard: buildCard,
   renderPreview: buildPreview,
   commitLabel: catalog === "rituals" ? "Learn" : "Choose",

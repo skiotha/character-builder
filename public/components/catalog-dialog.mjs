@@ -21,7 +21,7 @@
  *     settles the promise exactly once, removes the element and restores
  *     focus. Only commit resolves non-`null`.
  *   - One dialog at a time: opening while one is open resolves `null`.
- *   - The search input and filter checkboxes sit outside the
+ *   - The search controls and filter checkboxes sit outside the
  *     `method="dialog"` forms, so Enter in them can never implicitly submit
  *     the ✕ / Cancel buttons; the commit button is `type="button"` for the
  *     same reason.
@@ -96,8 +96,9 @@ let openDialog = null;
  *   button is offered
  * @property {Iterable<string>} [exclude] - Entry ids left out of the list
  *   (e.g. those already learned)
- * @property {{ fields: import("../utils/catalog-filter.mjs").SearchField[] }} [search]
- *   - Searched keys / accessors; defaults to `["name"]`
+ * @property {{ fields: import("../utils/catalog-filter.mjs").SearchField[], placeholder?: string }} [search]
+ *   - Searched keys / accessors (defaults to `["name"]`) and an optional
+ *   hint describing them; the hint defaults to "Type to search"
  * @property {FilterGroup[]} [filters] - Filter chip groups
  * @property {(entry: object, select: (detail?: object) => void, selection: Selection|null) => Node} renderCard
  *   - Builds one card for the left column. `selection` is non-`null` only
@@ -180,6 +181,10 @@ export function openCatalogDialog(options) {
   const searchInput = /** @type {HTMLInputElement} */ (
     dialog.querySelector(":scope > aside input[type=search]")
   );
+  const clearSearchButton = /** @type {HTMLButtonElement} */ (
+    dialog.querySelector(":scope > aside > search button")
+  );
+  searchInput.placeholder = search?.placeholder ?? "Type to search";
   const previewRegion = /** @type {HTMLElement} */ (
     dialog.querySelector(":scope > aside > section")
   );
@@ -370,14 +375,29 @@ export function openCatalogDialog(options) {
     close();
   });
 
-  searchInput.addEventListener("input", applyVisibility);
-  /** @type {HTMLElement} */ (searchInput.closest("search")).after(
-    ...buildFilters(filters, (g, o, checked) => {
-      const group = checkedState[g];
-      if (group) group[o] = checked;
-      applyVisibility();
-    }),
-  );
+  const updateSearch = () => {
+    clearSearchButton.disabled = searchInput.value.length === 0;
+    applyVisibility();
+  };
+  searchInput.addEventListener("input", updateSearch);
+  clearSearchButton.addEventListener("click", () => {
+    searchInput.value = "";
+    updateSearch();
+    searchInput.focus();
+  });
+
+  if (filters.length) {
+    const filterRow = document.createElement("div");
+    filterRow.className = "filters";
+    filterRow.append(
+      ...buildFilters(filters, (g, o, checked) => {
+        const group = checkedState[g];
+        if (group) group[o] = checked;
+        applyVisibility();
+      }),
+    );
+    /** @type {HTMLElement} */ (searchInput.closest("search")).after(filterRow);
+  }
 
   /**
    * Render the card list for a loaded catalog.
@@ -461,6 +481,12 @@ export function openCatalogDialog(options) {
   load(entries);
   dialog.showModal();
 
+  if (filters.length) {
+    document.fonts.ready.then(() => {
+      if (dialog.isConnected) sizeFilterChips(dialog);
+    });
+  }
+
   return promise;
 }
 
@@ -490,10 +516,18 @@ function buildSkeleton(title, header, commitLabel) {
     <section aria-label="Catalog entries"></section>
     <aside>
       <search>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <use href="/assets/icons/search.svg"></use>
+        </svg>
         <label>
-          Search
+          <span>Search</span>
           <input type="search" autocomplete="off" autofocus />
         </label>
+        <button type="button" aria-label="Clear search" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <use href="/assets/icons/close-clear.svg"></use>
+          </svg>
+        </button>
       </search>
       <section aria-labelledby="${PREVIEW_TITLE_ID}">
         <h3 id="${PREVIEW_TITLE_ID}">Preview</h3>
@@ -541,15 +575,41 @@ function buildFilters(groups, onToggle) {
     group.options.forEach((option, o) => {
       const label = document.createElement("label");
       const input = document.createElement("input");
+      const caption = document.createElement("span");
+      input.id = `catalog-filter-${g}-${o}`;
       input.type = "checkbox";
       input.checked = Boolean(option.checked);
       input.addEventListener("change", () => onToggle(g, o, input.checked));
-      label.append(input, option.label);
+      caption.textContent = option.label;
+
+      let seed = 0;
+      for (const char of input.id) seed = (seed * 31 + char.charCodeAt(0)) >>> 0;
+      label.style.setProperty("--chip-tilt", `${seed % 7 - 3}deg`);
+      label.append(input, caption);
       fieldset.append(label);
     });
 
     return fieldset;
   });
+}
+
+/**
+ * Pick the S / M / L stroke from the caption's loaded-font width (DS §assets).
+ * Call after mounting and `document.fonts.ready`; longer captions can still
+ * expand the largest stroke rather than being clipped.
+ * @param {HTMLDialogElement} dialog
+ * @returns {void}
+ */
+function sizeFilterChips(dialog) {
+  const rem = Number.parseFloat(
+    getComputedStyle(document.documentElement).fontSize,
+  );
+  for (const label of dialog.querySelectorAll(":scope > aside > .filters label")) {
+    const caption = /** @type {HTMLElement} */ (label.querySelector("span"));
+    const width = caption.offsetWidth + 1.5 * rem;
+    /** @type {HTMLElement} */ (label).dataset.size =
+      width <= 4 * rem ? "s" : width <= 6 * rem ? "m" : "l";
+  }
 }
 
 /**

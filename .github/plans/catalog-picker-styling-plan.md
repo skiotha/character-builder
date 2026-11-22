@@ -1,7 +1,8 @@
 # Plan — Catalog picker: styling (design → code)
 
 **Status:** active — Part 0 complete (2026-11-17). Part 1 complete
-(2026-11-20). Open item S is resolved.
+(2026-11-20). Part 2 ⏳ partial: 2a complete (2026-11-22), 2b remains.
+Open items S and F are resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
 **Session note:** sessions start cold. This file, the approved Figma
@@ -33,8 +34,8 @@ motion, plus a few questions left for the browser. This plan owns step
   done steps 2a / 2b. Changing them is a parent-plan decision.
 - **Code today:** `public/components/catalog-dialog.mjs` (the dialog),
   `public/utils/catalog-filter.mjs` (search / filter logic), and the
-  functional `@scope (dialog.catalog-dialog)` block at the end of the
-  `layout` layer in `public/common/styles.css`. Assets in
+  `@layer picker` / `@scope (dialog.catalog-dialog)` stylesheet at
+  `public/common/picker.css`. Assets in
   `public/assets/{icons,strokes}/` (DS §assets).
 - **Content extremes** (measured 2026-10-27 from `reference/*.json`;
   re-measure if the catalogs change much) — for the check page's fixed
@@ -135,12 +136,15 @@ Moved from the parent's step 2c:
   320 px phones, and the 844 × 390 short-window case. Map each frame to
   its viewport before comparing; exact breakpoint thresholds settle
   in part 4.
-- **F. Tradition chips** (design D31). Dropped from traits and rituals
-  for now; revisit in part 2 with the real space and a feel for how
-  search alone works. `Molecules/Filter group` keeps its tradition kinds
-  until then.
-- **Chip hover** (design D10): never drawn; settle in the browser in
-  part 2.
+- **F. Tradition chips** (design D31). ✅ _Resolved 2026-11-22._
+  Keep source chips only: Ability / Spell for traits, Boon / Sin for
+  talents, none for rituals. Neither "My traditions" nor individual
+  tradition chips are added; tradition tags remain searchable.
+  `Molecules/Filter group` keeps its unused tradition kinds.
+- **Chip hover** (design D10). ✅ _Resolved 2026-11-22._
+  Rotate the caption by 4° from its stable per-chip tilt; keep the
+  stroke and ink unchanged. Only real hover triggers it, and reduced
+  motion makes the change instant.
 - **Counter markup and motion** (design D24): one cross-fading element or
   two (old slides left, "→ new" fades in). The choice follows the markup;
   settle in part 1.
@@ -210,6 +214,11 @@ Moved from the parent's step 2c:
   `--picker-type-*` type names. Reusable names for lengths and other
   non-colour tokens, in CSS and Figma together, belong to the roadmap's
   "Design-token system rework" item; this plan does not rename them.
+- **2026-11-22 — Source-only filters and rotation hover approved.**
+  Keep the approved source groups and search-only tradition narrowing;
+  use caption rotation rather than scale for chip hover. Open item F
+  and the hover choice are resolved. Search clear resets only the query,
+  not checked chips; the separate Clear filters action remains in 2b.
 
 ## Steps
 
@@ -281,11 +290,24 @@ substeps. Substeps run in the listed order.
   / Recall stubs, the messages and their behaviour. **Done when:** the
   aside matches, Clear filters and the delayed loader work and are
   tested, open item F is decided.
+  > ⏳ **Partial 2026-11-22.**
+  > 2a is complete. Remaining: **2b — Preview area and messages** below
+  > (preview frame / hint, Remember / Recall stubs, delayed loader,
+  > messages and Clear filters).
   - **2a — Search and filters.** Style the search field and scripted
     clear button, build the chip presentation, settle chip hover and
     open item F. **Done when:** search and filter controls match the
     desktop design and work by pointer and keyboard; the clear button
     is inert while the search is empty.
+    > ✅ **Completed 2026-11-22.**
+    > Divergences from the text above: none. The optional
+    > `search.placeholder` supplies a caller's display-only hint;
+    > without it the hint is "Type to search". Chip and focus-underline
+    > SVG masks opt out of aspect-ratio preservation so they stretch
+    > with the caption; the placeholder drawings themselves are unchanged.
+    > Search / chip keyboard focus and hover are included here. The
+    > remaining state transitions, check / uncheck wipe and pressed
+    > wobble belong to 5b.
   - **2b — Preview area and messages.** Style the preview frame / hint
     and Remember / Recall stubs; implement the delayed loader and
     loading / error / empty / no-matches messages. **Done when:** Retry
@@ -362,7 +384,8 @@ substeps. Substeps run in the listed order.
     **Done when:** the keyboard-only pass reaches every available
     control with visible focus and all relevant states match the design.
   - **5b — Motion and reduced motion.** Add open / close transitions and
-    counter motion using the settled markup.
+    counter motion using the settled markup; finish search focus / clear
+    state transitions, the chip check / uncheck wipe and pressed wobble.
     **Done when:** transitions behave correctly during interaction and
     reduced motion makes them instant without changing selection,
     dismissal or focus behaviour.
@@ -399,7 +422,7 @@ The parent's step-2c gate, owned here:
   - [x] 1a — Stylesheet, tokens and desktop shell
   - [x] 1b — Counter and footer status
 - [ ] Part 2 — Aside
-  - [ ] 2a — Search and filters
+  - [x] 2a — Search and filters
   - [ ] 2b — Preview area and messages
 - [ ] Part 3 — Card skeletons
   - [ ] 3a — Trait cards
