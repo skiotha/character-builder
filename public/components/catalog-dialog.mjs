@@ -396,6 +396,15 @@ export function openCatalogDialog(options) {
         applyVisibility();
       }),
     );
+    // Wait for the label's checkbox click; keyboard and touch keep native focus.
+    filterRow.addEventListener("click", (event) => {
+      if (
+        event.pointerType === "mouse" &&
+        event.target instanceof HTMLInputElement
+      ) {
+        searchInput.focus();
+      }
+    });
     /** @type {HTMLElement} */ (searchInput.closest("search")).after(filterRow);
   }
 

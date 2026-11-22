@@ -157,6 +157,12 @@ Moved from the parent's step 2c:
 - **Browser results back into Figma.** When a browser round changes the
   look, the agent proposes the matching Figma change; it writes only
   when the user asks (**ui-figma-source**).
+  ✅ _Synced 2026-11-22 at the user's request._
+  `Atoms/Search input` (`1460:31`), State = Focused (`1460:41`):
+  the grey `Clear` instance (`1598:3337`) moved up 8 px to align with the
+  search glyph, as the enabled clear already does. The component
+  description now records the scripted clear and mouse-only chip-refocus
+  behavior instead of the old native-clear / trial wording.
 
 ## Decisions log
 
@@ -219,6 +225,15 @@ Moved from the parent's step 2c:
   use caption rotation rather than scale for chip hover. Open item F
   and the hover choice are resolved. Search clear resets only the query,
   not checked chips; the separate Clear filters action remains in 2b.
+- **2026-11-22 — Browser review: clear alignment and chip focus.**
+  Both clear states follow the search glyph when the field gains focus;
+  the lower empty-focused mark was a Figma-variant inconsistency, not
+  intentional behavior. Mouse chip activation returns focus to search;
+  keyboard and touch activation keep native focus behavior.
+- **2026-11-22 — Search component synced in Figma.**
+  The user requested the matching design update. Raised the focused
+  disabled clear mark and updated the component description to the
+  approved clear / focus contract; the other three variants are unchanged.
 
 ## Steps
 
@@ -300,7 +315,11 @@ substeps. Substeps run in the listed order.
     desktop design and work by pointer and keyboard; the clear button
     is inert while the search is empty.
     > ✅ **Completed 2026-11-22.**
-    > Divergences from the text above: none. The optional
+    > Divergences from the text above: browser review aligned the disabled
+    > clear with the focused search glyph instead of keeping the Figma
+    > variant's lower position; Figma was synced on 2026-11-22.
+    > Mouse chip activation now refocuses search, while keyboard and touch
+    > keep native focus behavior. The optional
     > `search.placeholder` supplies a caller's display-only hint;
     > without it the hint is "Type to search". Chip and focus-underline
     > SVG masks opt out of aspect-ratio preservation so they stretch

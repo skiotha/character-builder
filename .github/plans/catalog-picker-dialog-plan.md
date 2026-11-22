@@ -393,6 +393,9 @@ for the dialog primitive and replace the provisional API sketch.
   to the opener if it is still connected, else to a caller-given
   `returnFocus` fallback (hosts `rebuild()` their children, so the opener
   button is often gone by then).
+  Clearing the query and mouse-activating a filter chip return focus to
+  search. Keyboard and touch chip activation do not redirect focus
+  (browser review, 2026-11-22).
   _Step 2c amendment (design D32): no search autofocus on touch screens;
   the keyboard's Search action moves focus to the first result without
   committing. The styling plan's part 4 implements and verifies this

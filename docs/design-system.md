@@ -209,10 +209,12 @@ mark, text) always carries it too.
 - **Picker source chips:** Ability / Spell for traits, Boon / Sin for
   talents, none for rituals. Start unchecked; tradition tags are searched,
   not repeated as chips. Hover rotates the caption without changing the
-  stroke or ink.
+  stroke or ink. Mouse activation returns focus to search after toggling;
+  keyboard and touch activation do not redirect focus.
 - **Search clear** is a scripted button outside the field: always present,
   natively disabled and Grey-dim while empty. Clearing returns focus to
-  search and leaves any checked filter chips alone.
+  search and leaves any checked filter chips alone. Its alignment follows
+  field focus in both enabled and disabled states.
 - **Red never means "clickable"**: it already means focus and alert.
   Interactivity shows through shape, hover motion and the pointer.
 - **Scrollbars use the standard properties only** (`scrollbar-width:
