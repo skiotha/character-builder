@@ -1,7 +1,7 @@
 # Plan — Catalog picker: styling (design → code)
 
 **Status:** active — Part 0 complete (2026-11-17). Part 1 complete
-(2026-11-20). Part 2 ⏳ partial: 2a complete (2026-11-22), 2b remains.
+(2026-11-20). Part 2 complete (2026-11-23).
 Open items S and F are resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
@@ -154,6 +154,40 @@ Moved from the parent's step 2c:
   behaviour.
 - **Long Traditions value** in the 192 preview card (design D34): wrap or
   truncate (Figma truncates, keeping the mark); settle in part 3.
+- **Search focus across refocus** (exploration, raised by the user
+  2026-11-23); settle in 5b. Keep the refocus behaviour, but let the
+  focused search look persist through quick actions. Every control that
+  hands focus back to search does so on `click`: the ✕ clear, mouse chip
+  clicks, Clear filters and Retry. Between `mousedown` and `click` the
+  field blurs, so its focused look (taller field, raised label, accent
+  rule, active fill) drops and returns. Today it snaps. Once 5b animates
+  search focus, each such click would replay the collapse / expand.
+  - **Option 1: delay the collapse** (the user's suggestion). Only the
+    unfocused rule carries a short `transition-delay` (~100–150 ms); the
+    focused rule has none. Focusing stays instant, and a refocus inside
+    the window cancels the pending collapse. CSS-only. Caveats: every
+    focus-driven property needs the delayed transition (field height,
+    label position, rule and fill colours, icon margins);
+    `--search-height` needs `@property`, or the transitions go on
+    `block-size` / `inset-block-end` directly. A press held past the
+    delay still replays it, and a real blur lags by the delay. DS
+    §motion stops every transition under reduced motion, so a
+    delay-only transition needs a DS note there or the snap returns.
+  - **Option 2: keep focus from leaving.** Call `preventDefault()` on a
+    mouse `mousedown` over those controls. The field never blurs; the
+    click still clears / toggles / retries, and the existing refocus
+    still covers focus arriving from elsewhere. Touch and keyboard keep
+    native focus, as now. This removes the cause, so long presses,
+    reduced motion and real blurs need nothing extra. Caveats: gate on
+    the pointer type, because touch also fires a compatibility
+    `mousedown`. Firefox drops `:active` after a prevented `mousedown`,
+    which matters if the 5b pressed wobble keys on `:active`.
+  - **Option 3: sticky engaged state.** A scripted `data-*` flag is set
+    on focus and cleared on `focusout` only when focus leaves the aside.
+    This is the most flexible option, but it adds state to keep in sync.
+    Use it only if options 1–2 fall short.
+  - **Agent's lean:** use option 2 as the fix. Add a short collapse
+    delay (option 1) only if real focus moves still feel abrupt.
 - **Browser results back into Figma.** When a browser round changes the
   look, the agent proposes the matching Figma change; it writes only
   when the user asks (**ui-figma-source**).
@@ -305,10 +339,11 @@ substeps. Substeps run in the listed order.
   / Recall stubs, the messages and their behaviour. **Done when:** the
   aside matches, Clear filters and the delayed loader work and are
   tested, open item F is decided.
-  > ⏳ **Partial 2026-11-22.**
-  > 2a is complete. Remaining: **2b — Preview area and messages** below
-  > (preview frame / hint, Remember / Recall stubs, delayed loader,
-  > messages and Clear filters).
+  > ✅ **Completed 2026-11-23.**
+  > Divergences from the text above: none beyond those recorded under 2a
+  > and 2b. The user's manual browser review of 2b passed, and 2b was
+  > committed. Compact preview content is owned by 3d, responsive
+  > layouts by part 4, and the remaining state / motion work by part 5.
   - **2a — Search and filters.** Style the search field and scripted
     clear button, build the chip presentation, settle chip hover and
     open item F. **Done when:** search and filter controls match the
@@ -333,6 +368,26 @@ substeps. Substeps run in the listed order.
     restores entries, Clear filters resets both search and chips, both
     actions focus search, and the loader delay / announcements are
     tested. The real compact preview content follows in 3d.
+    > ✅ **Completed 2026-11-23.**
+    > Divergences from the text above: none. The preview slot is 192 px
+    > when selected; the full-width hint is caller-tunable via
+    > `previewHint`. The Compare divider ships, but the design-only tray
+    > and artwork placeholder do not. Loading and quiet-message
+    > announcements use a persistent live status outside the busy list;
+    > loader timers are cancelled on settlement and close. Retry and
+    > Clear filters have plain-button hover / keyboard focus, and the
+    > loader has a static reduced-motion frame.
+    >
+    > Browser checks used Chrome Canary, including the exact 299 / 300 ms
+    > boundary, cached / fast loads, rejection and retry, late settlement
+    > after close, initial filters across multiple groups, and preserved
+    > selection after clearing. All three catalogs were checked at
+    > 1264 × 864 (1200 × 800 dialog, 410 px aside). Clear filters also
+    > worked at 800 × 864 and 844 × 390; those retain the existing desktop
+    > geometry / scrolling until 4a, not the approved responsive layouts.
+    > Live-region DOM and accessibility snapshots were checked; this was
+    > not an audible screen-reader session. Real compact preview markup
+    > still follows in 3d.
 - **Part 3 — Card skeletons.** Reusable entry markup and styles per
   catalog: name, meta and action lines, description, rank blocks (three
   stacked tiers for traits, levels for talents, none for rituals),
@@ -404,7 +459,8 @@ substeps. Substeps run in the listed order.
     control with visible focus and all relevant states match the design.
   - **5b — Motion and reduced motion.** Add open / close transitions and
     counter motion using the settled markup; finish search focus / clear
-    state transitions, the chip check / uncheck wipe and pressed wobble.
+    state transitions (settling open item "Search focus across
+    refocus"), the chip check / uncheck wipe and pressed wobble.
     **Done when:** transitions behave correctly during interaction and
     reduced motion makes them instant without changing selection,
     dismissal or focus behaviour.
@@ -440,9 +496,9 @@ The parent's step-2c gate, owned here:
 - [x] Part 1 — Base
   - [x] 1a — Stylesheet, tokens and desktop shell
   - [x] 1b — Counter and footer status
-- [ ] Part 2 — Aside
+- [x] Part 2 — Aside
   - [x] 2a — Search and filters
-  - [ ] 2b — Preview area and messages
+  - [x] 2b — Preview area and messages
 - [ ] Part 3 — Card skeletons
   - [ ] 3a — Trait cards
   - [ ] 3b — Talent cards

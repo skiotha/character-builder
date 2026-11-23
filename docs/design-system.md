@@ -163,7 +163,10 @@ mark, text) always carries it too.
   slide.
 - **Loading indicators wait ~300 ms** before showing, so a fast or cached
   load never flashes them. The "Loading…" text is for screen readers
-  only (`role="status"`, `aria-busy` on the region).
+  only (`role="status"`, `aria-busy` on the region). The live status sits
+  outside the busy region so its announcement is not deferred until the
+  load finishes. Settling the load or closing the dialog cancels the
+  pending indicator.
 - **`prefers-reduced-motion`:** every transition and animation stops.
   Static end states (a grown glyph, an underline) stay, so no state
   depends on motion.
@@ -215,6 +218,15 @@ mark, text) always carries it too.
   natively disabled and Grey-dim while empty. Clearing returns focus to
   search and leaves any checked filter chips alone. Its alignment follows
   field focus in both enabled and disabled states.
+- **Picker messages:** no matches offers **Clear filters**, which clears
+  the query and every chip without clearing the selection; an empty
+  catalog has no reset action. Load failure offers **Retry** when the
+  caller can reload. Both actions return focus to search. Quiet messages
+  use muted italic text and a polite live status; failures use an alert.
+- **Picker preview:** "On your sheet" heads a 192 px compact-card slot;
+  the empty hint spans the aside and names the caller's choice (rank,
+  talent or ritual). Remember / Recall remain natively disabled plain
+  buttons below a divider; design-only compare trays are not rendered.
 - **Red never means "clickable"**: it already means focus and alert.
   Interactivity shows through shape, hover motion and the pointer.
 - **Scrollbars use the standard properties only** (`scrollbar-width:

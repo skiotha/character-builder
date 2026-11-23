@@ -305,6 +305,11 @@ const dialogPromise = openCatalogDialog({
     : [],
   renderCard: buildCard,
   renderPreview: buildPreview,
+  previewHint: catalog === "talents"
+    ? "Select a talent to see it here."
+    : catalog === "rituals"
+      ? "Select a ritual to see it here."
+      : undefined,
   commitLabel: catalog === "rituals" ? "Learn" : "Choose",
   renderSelectionStatus:
     scenario === "static-header" ? undefined : renderSelectionStatus,

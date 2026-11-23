@@ -25,10 +25,10 @@
  *     `method="dialog"` forms, so Enter in them can never implicitly submit
  *     the ✕ / Cancel buttons; the commit button is `type="button"` for the
  *     same reason.
- *   - `entries` may be a promise: the dialog opens at once with a loader,
- *     and a rejection shows an error with Retry (via the caller's
- *     `reload()`). A load that resolves after close, or after a newer
- *     retry, is dropped.
+ *   - `entries` may be a promise: the dialog opens at once, showing and
+ *     announcing a loader only after 300 ms (DS §motion). A rejection
+ *     shows an error with Retry (via the caller's `reload()`). A load
+ *     that resolves after close, or after a newer retry, is dropped.
  *
  * Selection model:
  *   - Cards only select (via the `select(detail)` callback); the primary
@@ -106,6 +106,8 @@ let openDialog = null;
  *   that changes
  * @property {(selection: Selection) => Node} [renderPreview] - Builds the
  *   preview of the current selection; without it the entry's name is shown
+ * @property {string} [previewHint] - Empty-preview hint; defaults to
+ *   "Select a rank to see it here." Callers can name an untiered choice.
  * @property {string} commitLabel - Primary button caption (e.g. "Learn")
  * @property {(selection: Selection) => true | string} [canCommit] - `true`
  *   enables the primary button; a string disables it and is shown as the
@@ -144,6 +146,7 @@ export function openCatalogDialog(options) {
     filters = [],
     renderCard,
     renderPreview,
+    previewHint = "Select a rank to see it here.",
     commitLabel,
     canCommit,
     renderSelectionStatus,
@@ -178,6 +181,9 @@ export function openCatalogDialog(options) {
   const listRegion = /** @type {HTMLElement} */ (
     dialog.querySelector(":scope > section")
   );
+  const announcement = /** @type {HTMLElement} */ (
+    dialog.querySelector(":scope > .catalog-announcement")
+  );
   const searchInput = /** @type {HTMLInputElement} */ (
     dialog.querySelector(":scope > aside input[type=search]")
   );
@@ -186,7 +192,7 @@ export function openCatalogDialog(options) {
   );
   searchInput.placeholder = search?.placeholder ?? "Type to search";
   const previewRegion = /** @type {HTMLElement} */ (
-    dialog.querySelector(":scope > aside > section")
+    dialog.querySelector(":scope > aside > section > .preview-content")
   );
   // Region-scoped lookups: a caller header sits inside the dialog and may
   // carry its own `<output>` or button.
@@ -207,12 +213,21 @@ export function openCatalogDialog(options) {
   let selectedRecord = null;
   /** @type {Element|null} */
   let renderedHeader = null;
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let loadingTimer = null;
+
+  const clearLoading = () => {
+    clearTimeout(loadingTimer);
+    loadingTimer = null;
+    announcement.textContent = "";
+  };
 
   const close = () => dialog.close();
 
   dialog.addEventListener("close", () => {
     if (settled) return;
     settled = true;
+    clearLoading();
     openDialog = null;
     window.removeEventListener("hashchange", close);
     signal?.removeEventListener("abort", close);
@@ -256,7 +271,10 @@ export function openCatalogDialog(options) {
       record.item.hidden = !visible;
       if (visible) shown++;
     }
-    if (noMatches) noMatches.hidden = shown > 0;
+    if (noMatches) {
+      noMatches.hidden = shown > 0;
+      announcement.textContent = shown > 0 ? "" : "Nothing matches.";
+    }
   };
 
   /**
@@ -310,13 +328,11 @@ export function openCatalogDialog(options) {
   };
 
   const showPreview = () => {
-    const heading = /** @type {HTMLElement} */ (
-      previewRegion.querySelector("h3")
-    );
     let content;
+    previewRegion.dataset.state = selection ? "selected" : "empty";
     if (!selection) {
       content = document.createElement("p");
-      content.textContent = "Select an entry to preview it here.";
+      content.textContent = previewHint;
     } else if (renderPreview) {
       content = renderPreview(selection);
     } else {
@@ -326,7 +342,7 @@ export function openCatalogDialog(options) {
       );
       content.textContent = entry.name ?? entry.id ?? "";
     }
-    previewRegion.replaceChildren(heading, content);
+    previewRegion.replaceChildren(content);
   };
 
   const updateCommit = () => {
@@ -408,6 +424,16 @@ export function openCatalogDialog(options) {
     /** @type {HTMLElement} */ (searchInput.closest("search")).after(filterRow);
   }
 
+  const clearFilters = () => {
+    searchInput.value = "";
+    for (const group of checkedState) group.fill(false);
+    for (const input of dialog.querySelectorAll(":scope > aside > .filters input")) {
+      input.checked = false;
+    }
+    updateSearch();
+    searchInput.focus();
+  };
+
   /**
    * Render the card list for a loaded catalog.
    * @param {object[]} items
@@ -419,9 +445,10 @@ export function openCatalogDialog(options) {
     if (visible.length === 0) {
       records = [];
       noMatches = null;
-      const empty = document.createElement("p");
-      empty.textContent = "Nothing to choose from.";
-      listRegion.replaceChildren(empty);
+      listRegion.replaceChildren(
+        buildMessage("empty", "Nothing left to learn here."),
+      );
+      announcement.textContent = "Nothing left to learn here.";
       return;
     }
 
@@ -435,9 +462,11 @@ export function openCatalogDialog(options) {
     });
     for (const record of records) renderRecord(record);
 
-    noMatches = document.createElement("p");
-    noMatches.setAttribute("role", "status");
-    noMatches.textContent = "No matches.";
+    noMatches = buildMessage(
+      "no-matches",
+      "Nothing matches.",
+      { label: "Clear filters", run: clearFilters },
+    );
     listRegion.replaceChildren(list, noMatches);
     applyVisibility();
   };
@@ -451,6 +480,7 @@ export function openCatalogDialog(options) {
    */
   const load = (source) => {
     const token = ++loadToken;
+    clearLoading();
     if (Array.isArray(source)) {
       showEntries(source);
       return;
@@ -458,14 +488,23 @@ export function openCatalogDialog(options) {
 
     records = [];
     noMatches = null;
-    showLoading(listRegion);
+    listRegion.setAttribute("aria-busy", "true");
+    listRegion.replaceChildren();
+    loadingTimer = setTimeout(() => {
+      if (settled || !dialog.open || token !== loadToken) return;
+      loadingTimer = null;
+      showLoading(listRegion);
+      announcement.textContent = "Loading…";
+    }, 300);
     Promise.resolve(source).then(
       (items) => {
-        if (settled || token !== loadToken) return;
+        if (settled || !dialog.open || token !== loadToken) return;
+        clearLoading();
         showEntries(Array.isArray(items) ? items : []);
       },
       () => {
-        if (settled || token !== loadToken) return;
+        if (settled || !dialog.open || token !== loadToken) return;
+        clearLoading();
         showError(listRegion, reload ? retry : null);
       },
     );
@@ -523,6 +562,7 @@ function buildSkeleton(title, header, commitLabel) {
       </form>
     </header>
     <section aria-label="Catalog entries"></section>
+    <p class="catalog-announcement" role="status"></p>
     <aside>
       <search>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -539,7 +579,8 @@ function buildSkeleton(title, header, commitLabel) {
         </button>
       </search>
       <section aria-labelledby="${PREVIEW_TITLE_ID}">
-        <h3 id="${PREVIEW_TITLE_ID}">Preview</h3>
+        <h3 id="${PREVIEW_TITLE_ID}">On your sheet</h3>
+        <div class="preview-content"></div>
       </section>
       <menu aria-label="Compare">
         <li><button type="button" disabled>Remember</button></li>
@@ -633,15 +674,55 @@ function focusables(root) {
 }
 
 /**
- * Show the pending-load state.
+ * Show the delayed visual loader. Its live announcement is outside the
+ * busy region, where `aria-busy` cannot defer it until loading finishes.
  * @param {HTMLElement} region
  */
 function showLoading(region) {
-  region.setAttribute("aria-busy", "true");
-  const loader = document.createElement("p");
-  loader.setAttribute("role", "status");
-  loader.textContent = "Loading…";
-  region.replaceChildren(loader);
+  const message = document.createElement("div");
+  message.className = "catalog-message";
+  message.dataset.state = "loading";
+  const loader = document.createElement("span");
+  loader.className = "loader";
+  loader.setAttribute("aria-hidden", "true");
+  message.append(loader);
+  region.replaceChildren(message);
+}
+
+/**
+ * Build a list message with an optional plain action. Quiet messages use
+ * the dialog's persistent live region; errors announce as alerts.
+ * @param {"empty" | "no-matches" | "error"} state
+ * @param {string} text
+ * @param {{ label: string, run: () => void }} [action]
+ * @returns {HTMLDivElement}
+ */
+function buildMessage(state, text, action) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "catalog-message";
+  wrapper.dataset.state = state;
+  const message = document.createElement("p");
+  if (state === "error") {
+    message.setAttribute("role", "alert");
+    message.innerHTML = `
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <use href="/assets/icons/alert.svg"></use>
+      </svg>
+    `;
+  }
+  message.append(document.createTextNode(text));
+  wrapper.append(message);
+
+  if (action) {
+    const button = document.createElement("button");
+    const caption = document.createElement("span");
+    button.type = "button";
+    caption.textContent = action.label;
+    button.append(caption);
+    button.addEventListener("click", action.run);
+    wrapper.append(button);
+  }
+  return wrapper;
 }
 
 /**
@@ -651,20 +732,11 @@ function showLoading(region) {
  */
 function showError(region, retry) {
   region.removeAttribute("aria-busy");
-  const message = document.createElement("p");
-  message.setAttribute("role", "alert");
-  message.textContent = "The catalog could not be loaded.";
-
-  if (!retry) {
-    region.replaceChildren(message);
-    return;
-  }
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = "Retry";
-  button.addEventListener("click", retry);
-  region.replaceChildren(message, button);
+  region.replaceChildren(buildMessage(
+    "error",
+    "Couldn't load the list.",
+    retry ? { label: "Retry", run: retry } : undefined,
+  ));
 }
 
 /**

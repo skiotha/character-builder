@@ -232,7 +232,10 @@
 
         menu {
           display: flex;
+          flex: 0 0 auto;
           gap: var(--block-outer-pad);
+          padding-block-start: var(--block-inner-pad);
+          border-block-start: var(--border-width) solid var(--border-decor);
           list-style: none;
 
           button {
@@ -242,14 +245,35 @@
             border: 0;
             color: var(--text-disabled);
             opacity: 1;
+            white-space: nowrap;
           }
         }
       }
 
       :scope > aside > section {
         display: flex;
+        flex: 0 0 auto;
         flex-direction: column;
         gap: var(--block-inner-pad);
+
+        > h3 {
+          line-height: normal;
+        }
+
+        > .preview-content {
+          min-inline-size: 0;
+
+          &[data-state="empty"] {
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: normal;
+          }
+
+          &[data-state="selected"] {
+            inline-size: 12rem;
+            max-inline-size: 100%;
+          }
+        }
       }
 
       :scope > footer {
@@ -348,6 +372,92 @@
 
   @layer controls {
     @scope (dialog.catalog-dialog) {
+      :scope > .catalog-announcement {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      :scope > section > .catalog-message {
+        min-block-size: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--block-inner-pad);
+        text-align: center;
+
+        &:not([hidden]) {
+          display: flex;
+        }
+
+        > p {
+          color: var(--text-muted);
+          font-style: italic;
+          line-height: normal;
+        }
+
+        &[data-state="error"] > p {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--block-align-pad);
+          color: var(--text-default);
+          font-style: normal;
+          line-height: var(--picker-leading-body);
+        }
+
+        svg {
+          flex: 0 0 auto;
+          inline-size: 1rem;
+          block-size: 1rem;
+          margin-block-start: 0.1875rem;
+          color: var(--icon-alert);
+        }
+
+        .loader {
+          inline-size: 3rem;
+          block-size: 3rem;
+          background: var(--border-decor);
+          mask: url("/assets/strokes/loader.svg") center / contain no-repeat;
+        }
+
+        button {
+          block-size: 3rem;
+          padding-inline: var(--block-inner-pad);
+          border: 0;
+          color: var(--text-default);
+
+          > span {
+            position: relative;
+            display: inline-block;
+          }
+
+          &:focus-visible {
+            outline: none;
+
+            > span::after {
+              content: "";
+              position: absolute;
+              inset-inline: -0.5rem;
+              inset-block-start: 100%;
+              block-size: 0.75rem;
+              background: var(--state-focus);
+              mask: url("/assets/strokes/focus-underline-1.svg") center / 100% 100%
+                no-repeat;
+              pointer-events: none;
+            }
+          }
+
+          @media (hover: hover) {
+            &:hover:not(:focus-visible) > span {
+              rotate: 4deg;
+            }
+          }
+        }
+      }
+
       :scope > aside {
         /* Let the focused label grow upward into the gap above the scroll pane. */
         margin-block-start: -1rem;
@@ -594,9 +704,20 @@
       }
 
       @media (prefers-reduced-motion: no-preference) {
+        :scope > section > .catalog-message .loader {
+          animation: picker-loading 1.2s linear infinite;
+        }
+
+        :scope > section > .catalog-message button > span,
         :scope > aside > search button svg,
         :scope > aside > .filters label > span {
           transition: rotate 120ms ease-out;
+        }
+
+        @keyframes picker-loading {
+          to {
+            rotate: 1turn;
+          }
         }
       }
     }
