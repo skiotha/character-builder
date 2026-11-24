@@ -1,5 +1,5 @@
 @layer picker {
-  @layer tokens, reset, shell, controls;
+  @layer tokens, reset, shell, controls, entries;
 
   @layer tokens {
     :root {
@@ -190,23 +190,19 @@
         padding-inline-end: var(--sm-pad);
         border-inline-end: var(--border-width) solid var(--border-decor);
         overflow-y: auto;
+        scrollbar-gutter: stable;
         scrollbar-color: var(--border-default) transparent;
         scrollbar-width: thin;
 
         > ul {
           list-style: none;
 
-          > li {
-            padding: 0.5rem;
-            border: var(--border-width) solid transparent;
-
-            & + li {
-              margin-block-start: 0.5rem;
-            }
-
-            &[aria-current="true"] {
-              border-color: var(--border-alert);
-            }
+          /* A divider between visible entries; selection shows inside the
+             entry (DS §focus), not on the item. */
+          > li:not([hidden]) ~ li {
+            margin-block-start: var(--block-outer-pad);
+            padding-block-start: var(--block-outer-pad);
+            border-block-start: var(--border-width) solid var(--border-decor);
           }
         }
       }
@@ -718,6 +714,225 @@
           to {
             rotate: 1turn;
           }
+        }
+      }
+    }
+  }
+
+  @layer entries {
+    @scope (dialog.catalog-dialog) {
+      .trait-entry {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sm-pad);
+
+        &[data-kind="ability"] {
+          --entry-name: var(--text-kind-a);
+          --rank-bar: var(--border-default);
+          --grade-disc: var(--grade-kind-a);
+          --grade-letter: var(--grade-on-kind-a);
+        }
+
+        &[data-kind="spell"] {
+          --entry-name: var(--text-kind-b);
+          --rank-bar: var(--grade-kind-b);
+          --grade-disc: var(--grade-kind-b);
+          --grade-letter: var(--grade-on-kind-b);
+        }
+
+        > header {
+          display: flex;
+          flex-direction: column;
+          gap: var(--block-align-pad);
+
+          > h3 {
+            color: var(--entry-name);
+            font-family: var(--picker-font-heading);
+            font-size: var(--picker-type-aside-heading);
+            font-weight: normal;
+            line-height: normal;
+          }
+
+          > p {
+            font-style: italic;
+            line-height: normal;
+          }
+
+          /* DS §controls: label / value groups. */
+          > dl {
+            display: grid;
+            grid-template-columns: max-content minmax(0, 1fr);
+            gap: var(--block-tight-pad) 0.75rem;
+
+            > dt {
+              color: var(--text-muted);
+              text-align: end;
+            }
+
+            svg {
+              inline-size: 1rem;
+              block-size: 1.3125rem;
+              margin-inline-start: 0.75rem;
+              color: var(--icon-alert);
+              vertical-align: top;
+            }
+          }
+        }
+
+        > ol {
+          list-style: none;
+        }
+      }
+
+      .trait-entry > ol > li {
+        display: grid;
+        grid-template-columns: 0.25rem minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        gap: var(--block-align-pad) 0.75rem;
+        cursor: pointer;
+
+        /* The rank bar: Selected and the Included ranks before it. */
+        &::before {
+          content: "";
+          grid-column: 1;
+          grid-row: 1 / -1;
+        }
+
+        &[data-selection]::before {
+          background: var(--rank-bar);
+        }
+
+        > [data-part] {
+          grid-column: 2;
+          min-inline-size: 0;
+        }
+
+        > [data-part="head"] {
+          display: flex;
+          align-items: baseline;
+          gap: var(--block-align-pad);
+          padding-block-start: var(--block-align-pad);
+        }
+
+        button {
+          flex: 1;
+          display: flex;
+          align-items: baseline;
+          gap: var(--block-align-pad);
+          min-inline-size: 0;
+          min-block-size: 0;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: var(--text-default);
+          font: inherit;
+          text-align: start;
+          text-transform: none;
+          cursor: inherit;
+
+          /* Focus is the hand-drawn underline under the rank name. */
+          &:focus-visible {
+            outline: none;
+
+            > [data-part="name"]::after {
+              content: "";
+              position: absolute;
+              inset-inline: 0;
+              inset-block-start: 100%;
+              block-size: 0.75rem;
+              background: var(--state-focus);
+              mask: url("/assets/strokes/focus-underline-1.svg") center / 100% 100%
+                no-repeat;
+              pointer-events: none;
+            }
+          }
+
+          > svg {
+            flex: none;
+            inline-size: 2rem;
+            block-size: 2rem;
+          }
+        }
+
+        [data-part="name"] {
+          position: relative;
+          color: var(--text-interactive);
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-menu-20);
+          line-height: normal;
+          white-space: nowrap;
+        }
+
+        [data-part="cost"] {
+          flex: 1;
+          color: var(--text-muted);
+          text-align: end;
+        }
+
+        [data-part="reason"] {
+          color: var(--text-disabled);
+          white-space: nowrap;
+
+          &::before {
+            content: "· " / "";
+          }
+        }
+
+        > [data-part="body"] {
+          display: flex;
+          flex-direction: column;
+          gap: var(--block-align-pad);
+          padding-inline-start: 2.5rem;
+          padding-block-end: var(--block-align-pad);
+        }
+
+        b {
+          color: var(--text-heading);
+          font-weight: inherit;
+        }
+
+        [data-action] {
+          display: flex;
+          gap: var(--block-align-pad);
+
+          > svg {
+            flex: none;
+            inline-size: 1rem;
+            block-size: 1.3125rem;
+            color: var(--icon-marker);
+          }
+        }
+
+        [data-part="term"] {
+          color: var(--text-heading);
+          text-decoration: underline dotted var(--border-width);
+        }
+
+        [data-part="conditions"] {
+          color: var(--text-muted);
+        }
+
+        &[data-unavailable] {
+          --grade-disc: var(--grade-unlearned);
+          --grade-letter: var(--grade-on-unlearned);
+          cursor: default;
+
+          [data-part="name"],
+          [data-part="cost"] {
+            color: var(--text-disabled);
+          }
+        }
+
+        @media (hover: hover) {
+          &:hover:not([data-unavailable], :has(:focus-visible)) button > svg {
+            rotate: 12deg;
+          }
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .trait-entry > ol > li button > svg {
+          transition: rotate 120ms ease-out;
         }
       }
     }

@@ -185,6 +185,10 @@ mark, text) always carries it too.
   label and value in grey; text fields have no separate disabled state.
 - **Disabled** controls are natively `disabled` (skipped by Tab, no hover
   motion) and drawn in Grey-dim.
+  **Unavailable picker ranks** are the exception: `aria-disabled` keeps
+  them in the tab order so their adjacent reason (`aria-describedby`)
+  can be read. Click, Enter and Space cannot select them; their bodies
+  stay readable and their grade discs do not animate on hover.
 - **Selection has one signal** (e.g. the picker's rank bars), not
   several that could disagree. A live status (`<output>`) describes the
   current selection only. A reason that blocks a choice sits beside
@@ -235,6 +239,9 @@ mark, text) always carries it too.
 - **Label / value groups** are one `<dl>` grid whose label column is as
   wide as the group's longest label (`max-content`), labels right-aligned,
   rows 4 px apart, so a single row has no stray indent.
+  Trait entries with no metadata omit the group and its spacing rather
+  than reserving an empty slot (in Figma, turn `Organisms/Trait entry`'s
+  `Meta` property off).
 
 ### DS §responsive — sizes, touch and short windows
 

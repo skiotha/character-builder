@@ -1,9 +1,12 @@
 import { openCatalogDialog } from "/components/catalog-dialog.mjs";
+import { renderTraitEntry } from "/components/catalog-entry.mjs";
 
 import {
   CATALOG_FIXTURES,
   CATALOG_TITLES,
   PICKER_PRESENTATIONS,
+  TRAIT_CARDS,
+  TRAIT_RANKS,
 } from "/__dev/catalog-picker/fixtures.mjs";
 
 /**
@@ -32,6 +35,49 @@ const catalog = Object.hasOwn(CATALOG_FIXTURES, requestedCatalog)
   : "traits";
 const scenario = requestedScenario ?? "browse";
 const sourceEntries = CATALOG_FIXTURES[catalog];
+
+// The unavailable scenario's stand-in for eligibility: Master ranks close.
+const UNAVAILABLE_REASON = "not at creation";
+
+/**
+ * Build a trait entry from its fixture display data. Each rank button
+ * carries `data-fixture-choice` so the scenarios can preselect it.
+ * @param {import("./fixtures.mjs").CatalogFixture} entry
+ * @param {(detail?: object) => void} select
+ * @param {FixtureSelection|null} selection
+ * @returns {HTMLElement}
+ */
+function buildTraitCard(entry, select, selection) {
+  const card = TRAIT_CARDS[entry.id];
+  if (!card) throw new Error(`Missing trait card fixture: ${entry.id}`);
+
+  const element = renderTraitEntry(
+    {
+      id: entry.id,
+      kind: entry.source,
+      name: entry.name,
+      description: entry.description,
+      meta: card.meta,
+      ranks: entry.tiers.map((tier) => ({
+        tier,
+        ...TRAIT_RANKS[tier],
+        ...card.ranks[tier],
+        ...(scenario === "unavailable" && tier === "master"
+          ? { unavailable: UNAVAILABLE_REASON }
+          : {}),
+      })),
+    },
+    {
+      selectedTier: selection?.detail.tier,
+      onSelect: (tier) => select({ tier }),
+    },
+  );
+  for (const rank of element.querySelectorAll("li[data-tier]")) {
+    rank.querySelector("button").dataset.fixtureChoice =
+      `${entry.id}:${rank.dataset.tier}`;
+  }
+  return element;
+}
 
 function buildCard(entry, select, selection) {
   const card = document.createElement("article");
@@ -67,44 +113,7 @@ function buildCard(entry, select, selection) {
     }
   }
 
-  if (entry.tiers) {
-    const choices = document.createElement("div");
-    choices.className = "fixture-choices";
-    for (const [index, tier] of entry.tiers.entries()) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.dataset.fixtureChoice = `${entry.id}:${tier}`;
-      const selectedTier = selection?.detail.tier;
-      const selectedIndex = entry.tiers.indexOf(selectedTier);
-      const state =
-        selectedTier && index < selectedIndex
-          ? " — Included"
-          : selectedTier === tier
-            ? " — Selected"
-            : "";
-      button.textContent = `${tier[0].toUpperCase()}${tier.slice(1)}${state}`;
-      button.setAttribute("aria-pressed", String(selectedTier === tier));
-
-      const isUnavailable =
-        scenario === "unavailable" && tier === "master";
-      if (isUnavailable) {
-        const reason = document.createElement("span");
-        reason.id = `fixture-${entry.id}-master-reason`;
-        reason.className = "fixture-note";
-        reason.textContent = "Not available in this scenario.";
-        card.append(reason);
-        button.setAttribute("aria-disabled", "true");
-        button.setAttribute("aria-describedby", reason.id);
-      }
-
-      button.addEventListener("click", () => {
-        if (button.getAttribute("aria-disabled") === "true") return;
-        select({ tier });
-      });
-      choices.append(button);
-    }
-    card.append(choices);
-  } else if (entry.levels) {
+  if (entry.levels) {
     const choices = document.createElement("div");
     choices.className = "fixture-choices";
     for (let level = 1; level <= entry.levels; level++) {
@@ -303,7 +312,7 @@ const dialogPromise = openCatalogDialog({
         })),
       }]
     : [],
-  renderCard: buildCard,
+  renderCard: catalog === "traits" ? buildTraitCard : buildCard,
   renderPreview: buildPreview,
   previewHint: catalog === "talents"
     ? "Select a talent to see it here."

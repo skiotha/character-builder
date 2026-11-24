@@ -6,6 +6,8 @@ import { join } from "node:path";
 import {
   CATALOG_FIXTURES,
   PICKER_PRESENTATIONS,
+  TRAIT_CARDS,
+  TRAIT_RANKS,
 } from "../dev/catalog-picker/fixtures.mjs";
 
 const REFERENCE_FILES = {
@@ -16,11 +18,22 @@ const REFERENCE_FILES = {
   ritual: "rituals.en.json",
 };
 
+interface ReferenceAction {
+  name: string;
+  description: string;
+}
+
+interface ReferenceTier {
+  effects?: Array<{ description: string }>;
+  reactions?: ReferenceAction[];
+  specialAttacks?: ReferenceAction[];
+}
+
 interface ReferenceEntry {
   id: string;
   name: string;
   description: string;
-  tiers?: Record<string, unknown>;
+  tiers?: Record<string, ReferenceTier>;
   levels?: number;
   tradition?: string;
   traditions?: string[];
@@ -92,5 +105,57 @@ describe("catalog picker gallery fixtures", () => {
         });
       }
     }
+  }
+
+  it("trait cards cover exactly the trait fixtures", () => {
+    assert.deepEqual(
+      Object.keys(TRAIT_CARDS).sort(),
+      CATALOG_FIXTURES.traits.map((fixture) => fixture.id).sort(),
+    );
+  });
+
+  for (const fixture of CATALOG_FIXTURES.traits) {
+    it(`${fixture.id} card text follows its reference tiers`, () => {
+      const card = TRAIT_CARDS[fixture.id];
+      const source = references.get(fixture.source!)?.get(fixture.id);
+      assert.ok(card && source?.tiers);
+      assert.deepEqual(Object.keys(card.ranks), Object.keys(source.tiers));
+
+      for (const [tier, rank] of Object.entries(card.ranks)) {
+        assert.ok(Object.hasOwn(TRAIT_RANKS, tier), `no rank caption for ${tier}`);
+        const reference: ReferenceTier = source.tiers[tier]!;
+        assert.deepEqual(
+          rank.effects.map((effect) =>
+            typeof effect === "string"
+              ? effect
+              : effect
+                  .map((run) => (typeof run === "string" ? run : run.attribute))
+                  .join(""),
+          ),
+          (reference.effects ?? []).map((effect) => effect.description),
+          `${fixture.id} ${tier} effects`,
+        );
+        assert.deepEqual(
+          (rank.actions ?? []).map(({ kind, name, description }) => ({
+            kind,
+            name,
+            description,
+          })),
+          [
+            ...(reference.specialAttacks ?? []).map((action) => ({
+              kind: "specialAttack",
+              name: action.name,
+              description: action.description,
+            })),
+            ...(reference.reactions ?? []).map((action) => ({
+              kind: "reaction",
+              name: action.name,
+              description: action.description,
+            })),
+          ],
+          `${fixture.id} ${tier} actions`,
+        );
+      }
+    });
   }
 });

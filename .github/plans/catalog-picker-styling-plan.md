@@ -2,6 +2,7 @@
 
 **Status:** active — Part 0 complete (2026-11-17). Part 1 complete
 (2026-11-20). Part 2 complete (2026-11-23).
+Part 3a complete (2026-11-24); Part 3 continues with 3b.
 Open items S and F are resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
@@ -197,6 +198,30 @@ Moved from the parent's step 2c:
   search glyph, as the enabled clear already does. The component
   description now records the scripted clear and mouse-only chip-refocus
   behavior instead of the old native-clear / trial wording.
+  ✅ _Synced 2026-11-24 at the user's request._
+  `Organisms/Trait entry` (`1573:2144`) gained a `Meta` boolean
+  property (on by default), bound to each variant's `Meta` frame
+  (`1612:3362`–`1612:3365`). The Russian long-name example (`1574:1669`)
+  turns it off, so its empty 46 px frame and 8 px gap are gone (card
+  425 → 371 px). The set description and the sheet caption (`1573:1058`)
+  list the property.
+
+  Follow-up Figma readback (2026-11-24) confirmed the saved property
+  bindings on all four variants and these instance measurements:
+
+  | Instance | `Meta` | Header height | Ranks start |
+  | --- | --- | --- | --- |
+  | Russian long-name example (`1574:1669`) | Off | 65 px | 89 px |
+  | Approved Acrobatics (`1646:9586`) | On | 119 px | 143 px |
+  | Approved Anathema (`1646:9587`) | On | 119 px | 143 px |
+
+  The no-meta example retains only the intended 24 px header-to-ranks
+  gap. Both metadata-bearing references retain their 46 px metadata
+  group, two visible rows and original header geometry. Figma exports
+  were also visually checked: [no-meta example](../../.playwright-mcp/3a-figma-readback-no-meta.png)
+  and [Acrobatics](../../.playwright-mcp/3a-figma-readback-acrobatics.png)
+  (local, gitignored; the latter is clipped at the enclosing scrollport,
+  but shows the complete header).
 
 ## Decisions log
 
@@ -268,6 +293,11 @@ Moved from the parent's step 2c:
   The user requested the matching design update. Raised the focused
   disabled clear mark and updated the component description to the
   approved clear / focus contract; the other three variants are unchanged.
+- **2026-11-24 — Empty trait metadata collapses.** The user chose the
+  browser's layout over the reserved empty `Meta` slot in Figma's
+  long-name example: an entry without meta lines drops the group and its
+  gap. Figma was synced the same day (see "Browser results back into
+  Figma" above).
 
 ## Steps
 
@@ -407,6 +437,58 @@ substeps. Substeps run in the listed order.
     **Done when:** the representative and long-content fixtures match
     the trait frames; unavailable ranks remain focusable but cannot
     be selected.
+
+    > ✅ **Completed 2026-11-24.**
+    > Divergences from the text above: reusable `renderTraitEntry` in
+    > `public/components/catalog-entry.mjs` drives the trait gallery,
+    > including Street Fighting's special attack and Witches' Circle's
+    > long-content case. Fixture text and actions are checked against the
+    > reference tiers; prices and availability remain fixture-supplied.
+    >
+    > - The user approved collapsing the empty metadata group, as the
+    >   Witches' Circle card does in the browser, over the reserved slot in
+    >   Figma's long-name example. Figma now follows the browser through
+    >   the new `Meta` property (synced 2026-11-24, see "Browser results
+    >   back into Figma"); DS §controls records the rule.
+    > - Unavailable ranks use `aria-disabled`, not native `disabled`,
+    >   as specified by design D16; DS §focus now records the exception.
+    >   The gallery uses "not at creation", not an affordability reason
+    >   contradicting its 70 XP balance.
+    > - Dividers appear between visible entries only, not after the
+    >   last one (design D21). The rank-name focus underline follows the
+    >   text box, about 1.6 px below Figma's fixed offset.
+    > - The list now reserves its scrollbar gutter (DS §controls):
+    >   filtering a tall list to a single short card no longer widens
+    >   the card and rewraps its text.
+    > - Action descriptions and the outside-traditions tooltip remain
+    >   in **3d**; compact previews are still stand-ins. Russian strings
+    >   remain outside this plan. No domain formatting or pricing was added.
+    >
+    > Part 3 stays open for **3b–3d**.
+
+    Browser verification (Chrome Canary, 2026-11-24): 1264 × 864 viewport,
+    1200 × 800 dialog. Acrobatics (`1646:9586`) has a 118.8 px header
+    against Figma's 119 px, ranks 132.8 / 140.8 / 169.8 px against
+    133 / 141 / 170 px, and total content 586.2 px against 587 px
+    (excluding the divider). Card width is 657.2 px against 658 px and
+    stays unchanged by filtering. Witches' Circle is 437.2 px tall,
+    without clipped or overflowing text. Like Figma's synced Russian
+    long-name example, it has no metadata group, though the two cards'
+    content differs. Anathema's spell colours, 32 px grade discs and
+    16 × 21 px outside-traditions mark were checked.
+    Tab reaches unavailable Master and its reason; Enter, Space and
+    clicks leave the selected Adept unchanged. Keyboard selection restores
+    focus; body clicks also select available ranks. Reduced motion removes
+    the hover transition. Filtering, Clear filters, blocked commit and
+    the talent / ritual stand-ins also passed.
+
+    Local review captures (gitignored, not regression baselines):
+    [desktop](../../.playwright-mcp/3a-review-desktop.png),
+    [Acrobatics lower content](../../.playwright-mcp/3a-review-acrobatics-bottom.png),
+    [Witches' Circle](../../.playwright-mcp/3a-review-witches-circle.png),
+    [Anathema](../../.playwright-mcp/3a-review-anathema.png),
+    [Street Fighting](../../.playwright-mcp/3a-review-street-fighting.png).
+
   - **3b — Talent cards.** Build reusable boon / sin presentation with
     level selection and fixture-supplied cost / gain text.
     **Done when:** both sources match their frames and selecting levels
@@ -487,8 +569,11 @@ The parent's step-2c gate, owned here:
 
 ## References to sweep on completion
 
-- _(none yet)_ — `TODO(trait-recall)` in `catalog-dialog.mjs` cites the
-  roadmap item, not this plan, and stays.
+- `TODO(picker-tooltips)` in `public/components/catalog-entry.mjs`:
+  `ActionLine.description` and the outside-traditions mark in
+  `renderMeta`; implement and remove both in **3d**.
+- `TODO(trait-recall)` in `catalog-dialog.mjs` cites the roadmap item,
+  not this plan, and stays.
 
 ## Progress
 
@@ -500,7 +585,7 @@ The parent's step-2c gate, owned here:
   - [x] 2a — Search and filters
   - [x] 2b — Preview area and messages
 - [ ] Part 3 — Card skeletons
-  - [ ] 3a — Trait cards
+  - [x] 3a — Trait cards
   - [ ] 3b — Talent cards
   - [ ] 3c — Ritual cards
   - [ ] 3d — Compact previews and tooltips

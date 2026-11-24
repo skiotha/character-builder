@@ -24,6 +24,15 @@ const TRAIT_ENTRIES = [
     tiers: ["novice", "adept", "master"],
   },
   {
+    id: "street-fighting",
+    name: "Street Fighting",
+    description:
+      "Rough and brutal melee techniques for stunning, knocking down, and countering opponents.",
+    source: "ability",
+    tags: ["melee", "status", "reaction", "piercing", "quick"],
+    tiers: ["novice", "adept", "master"],
+  },
+  {
     id: "mystical-tradition-order",
     name: "Mystical Tradition: Order",
     description:
@@ -106,6 +115,219 @@ const CATALOG_FIXTURES = {
   rituals: RITUAL_ENTRIES,
 };
 
+/**
+ * Effect text as display runs; `{ attribute }` marks a check attribute.
+ * @typedef {string | Array<string | { attribute: string }>} TraitEffectFixture
+ */
+
+/**
+ * @typedef {object} TraitActionFixture
+ * @property {"reaction" | "specialAttack"} kind
+ * @property {string} name
+ * @property {string} [conditions]
+ * @property {string} description
+ */
+
+/**
+ * @typedef {object} TraitCardFixture
+ * @property {Array<{ label: string, value: string, outsideTraditions?: boolean }>} [meta]
+ * @property {Record<string, { effects: TraitEffectFixture[], actions?: TraitActionFixture[] }>} ranks
+ */
+
+// Display-only rank captions and cumulative costs, shared by every trait.
+const TRAIT_RANKS = {
+  novice: { label: "Novice", cost: "10 XP" },
+  adept: { label: "Adept", cost: "30 XP" },
+  master: { label: "Master", cost: "60 XP" },
+};
+
+const QUICK = { attribute: "Quick" };
+
+/**
+ * Display text for the trait cards: effects and actions follow the
+ * reference entries word for word (the fixture test checks it); meta lines
+ * and the outside-traditions mark are fixed for the gallery character, a
+ * member of the Order.
+ * @type {Record<string, TraitCardFixture>}
+ */
+const TRAIT_CARDS = {
+  acrobatics: {
+    meta: [
+      { label: "Equipment", value: "Battle Heels" },
+      { label: "Attributes", value: "Quick" },
+    ],
+    ranks: {
+      novice: {
+        effects: [
+          [
+            QUICK,
+            " check to defend against enemy's free attacks when moving away from, past, or toward them.",
+          ],
+          "You may cross spaces occupied by an enemy if you can slip through or leap over, but you cannot end your movement there.",
+        ],
+      },
+      adept: {
+        effects: [
+          "The Adept may use combat heels as if they lacked the unwieldy quality.",
+          [
+            QUICK,
+            " check to instantly spring to your feet as a reaction after falling prone.",
+          ],
+        ],
+        actions: [
+          {
+            kind: "reaction",
+            name: "Bounce Back",
+            conditions: "when knocked prone",
+            description: "Attempt to get up instantly.",
+          },
+        ],
+      },
+      master: {
+        effects: [
+          "If you end your movement on an enemy, your next attack this turn is made with advantage.",
+          [
+            QUICK,
+            " check to use an enemy as a shield against incoming attacks they can no longer dodge.",
+          ],
+          "You may end your movement in a space occupied by an enemy if their position allows it.",
+        ],
+        actions: [
+          {
+            kind: "reaction",
+            name: "Hide Behind Enemy",
+            conditions: "when attacked",
+            description: "Attempt to hide behind an enemy.",
+          },
+        ],
+      },
+    },
+  },
+  "street-fighting": {
+    meta: [
+      { label: "Equipment", value: "2 × Short Weapon" },
+      { label: "Attributes", value: "Quick" },
+    ],
+    ranks: {
+      novice: {
+        effects: [
+          "Cheap Shot deals d6 damage and stuns on hit.",
+          "The stun allows you to immediately make one more normal attack.",
+        ],
+        actions: [
+          {
+            kind: "specialAttack",
+            name: "Cheap Shot",
+            description:
+              "Cheap Shot can stun the target. If successful, you can perform one additional normal attack right after.",
+          },
+        ],
+      },
+      adept: {
+        effects: [
+          [
+            QUICK,
+            " check to make any successful attack end with a trip or shove that knocks the enemy prone.",
+          ],
+        ],
+        actions: [
+          {
+            kind: "reaction",
+            name: "Knock Over",
+            conditions: "after a hit",
+            description:
+              "After a successful melee atack, can attempt to knock the target prone.",
+          },
+        ],
+      },
+      master: {
+        effects: [
+          "A counterattack as a reaction deals d6 armor-ignoring damage each time the Master is targeted by a melee attack.",
+        ],
+        actions: [
+          {
+            kind: "reaction",
+            name: "Riposte",
+            conditions: "when attacked",
+            description:
+              "When targeted by a melee attack, the Master can make a counterattack as a reaction.",
+          },
+        ],
+      },
+    },
+  },
+  "mystical-tradition-order": {
+    ranks: {
+      novice: {
+        effects: [
+          "Magic knowledge.",
+          "The Order Initiate gains no permanent Corruption when learning Novice-tier spells and rituals of the academic tradition.",
+        ],
+      },
+      adept: {
+        effects: [
+          "Casting academic spells and rituals raises temporary Corruption by no more than one point.",
+          "The full Order member gains no permanent Corruption when learning adept-tier spells of their tradition.",
+        ],
+      },
+      master: {
+        effects: [
+          "The Senior Order Mage gains no permanent Corruption when learning master-tier spells of their tradition.",
+          "Failed checks related to the duration or effectiveness of chained and mass spells may be rerolled.",
+        ],
+      },
+    },
+  },
+  "mystical-tradition-witches-circle": {
+    ranks: {
+      novice: {
+        effects: [
+          "Magic knowledge.",
+          "The Witch Apprentice gains no permanent Corruption when learning Novice-tier spells and rituals of the wild tradition.",
+        ],
+      },
+      adept: {
+        effects: [
+          "Casting wild spells and rituals raises temporary Corruption by no more than one point.",
+          "The Witch gains no permanent Corruption when learning Adept-tier spells of their tradition.",
+        ],
+      },
+      master: {
+        effects: [
+          "The Elder Witch of the Mists gains no permanent Corruption when learning master-tier spells of their wild tradition.",
+        ],
+      },
+    },
+  },
+  anathema: {
+    meta: [
+      { label: "Attributes", value: "Resolute" },
+      {
+        label: "Traditions",
+        value: "Runes, Theurgy, Circle",
+        outsideTraditions: true,
+      },
+    ],
+    ranks: {
+      novice: {
+        effects: [
+          "Resolute lets the mystic remove an ongoing effect of another caster's spell from themselves or from any other target.",
+        ],
+      },
+      adept: {
+        effects: [
+          "The spell may be used to dispel effects from a whole group of creatures or objects at once.",
+        ],
+      },
+      master: {
+        effects: [
+          "The Master may remove any magic from an area, including summoned creatures and magically created phenomena.",
+        ],
+      },
+    },
+  },
+};
+
 const CATALOG_TITLES = {
   traits: "Traits",
   talents: "Talents",
@@ -131,6 +353,18 @@ const PICKER_PRESENTATIONS = {
       "acrobatics:master": {
         after: "10",
         summary: "Acrobatics, Master — 60 XP",
+      },
+      "street-fighting:novice": {
+        after: "60",
+        summary: "Street Fighting, Novice — 10 XP",
+      },
+      "street-fighting:adept": {
+        after: "40",
+        summary: "Street Fighting, Adept — 30 XP",
+      },
+      "street-fighting:master": {
+        after: "10",
+        summary: "Street Fighting, Master — 60 XP",
       },
       "mystical-tradition-order:novice": {
         after: "60",
@@ -241,5 +475,7 @@ export {
   CATALOG_TITLES,
   PICKER_PRESENTATIONS,
   SCENARIOS,
+  TRAIT_CARDS,
+  TRAIT_RANKS,
   VIEWPORTS,
 };
