@@ -203,6 +203,10 @@
             margin-block-start: var(--block-outer-pad);
             padding-block-start: var(--block-outer-pad);
             border-block-start: var(--border-width) solid var(--border-decor);
+
+            &:has(> .talent-entry) {
+              padding-block-start: 0;
+            }
           }
         }
       }
@@ -721,6 +725,26 @@
 
   @layer entries {
     @scope (dialog.catalog-dialog) {
+      /* DS §controls: label / value groups. */
+      .entry-meta {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: var(--block-tight-pad) 0.75rem;
+
+        > dt {
+          color: var(--text-muted);
+          text-align: end;
+        }
+
+        svg {
+          inline-size: 1rem;
+          block-size: 1.3125rem;
+          margin-inline-start: 0.75rem;
+          color: var(--icon-alert);
+          vertical-align: top;
+        }
+      }
+
       .trait-entry {
         display: flex;
         flex-direction: column;
@@ -756,26 +780,6 @@
           > p {
             font-style: italic;
             line-height: normal;
-          }
-
-          /* DS §controls: label / value groups. */
-          > dl {
-            display: grid;
-            grid-template-columns: max-content minmax(0, 1fr);
-            gap: var(--block-tight-pad) 0.75rem;
-
-            > dt {
-              color: var(--text-muted);
-              text-align: end;
-            }
-
-            svg {
-              inline-size: 1rem;
-              block-size: 1.3125rem;
-              margin-inline-start: 0.75rem;
-              color: var(--icon-alert);
-              vertical-align: top;
-            }
           }
         }
 
@@ -930,8 +934,150 @@
         }
       }
 
+      .talent-entry {
+        --entry-name: var(--text-kind-a);
+        --entry-disc: var(--grade-kind-a);
+        --grade-disc: var(--grade-unlearned);
+        --grade-letter: var(--grade-on-unlearned);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        cursor: pointer;
+
+        &[data-kind="sin"] {
+          --entry-name: var(--text-kind-b);
+          --entry-disc: var(--grade-kind-b);
+
+          [data-part="cost"] {
+            color: var(--text-kind-b);
+          }
+        }
+
+        > h3 {
+          color: var(--entry-name);
+          font-family: var(--picker-font-heading);
+          font-size: var(--picker-type-aside-heading);
+          font-weight: normal;
+          line-height: normal;
+
+          > button {
+            position: relative;
+            display: inline-block;
+            min-block-size: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            text-align: start;
+            text-transform: none;
+            cursor: pointer;
+
+            &:focus-visible {
+              outline: none;
+            }
+          }
+        }
+
+        > [data-part="body"] {
+          display: grid;
+          grid-template-columns: 0.25rem minmax(0, 1fr);
+          column-gap: 0.75rem;
+
+          &::before {
+            content: "";
+          }
+
+          > div {
+            display: flex;
+            flex-direction: column;
+            gap: var(--block-align-pad);
+            min-inline-size: 0;
+          }
+        }
+
+        &[data-selected] > [data-part="body"]::before {
+          background: var(--border-default);
+        }
+
+        [data-part="levels"] {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          svg {
+            display: block;
+            flex: none;
+            inline-size: 2rem;
+            block-size: 2rem;
+            pointer-events: none;
+          }
+        }
+
+        [data-part="cost"] {
+          flex: 1;
+          color: var(--text-muted);
+          text-align: end;
+        }
+
+        fieldset {
+          display: flex;
+          flex: none;
+          gap: var(--block-align-pad);
+          min-inline-size: 0;
+          border: 0;
+
+          > label {
+            position: relative;
+            cursor: pointer;
+
+            &[data-selection] {
+              --grade-disc: var(--entry-disc);
+            }
+
+            > input {
+              position: absolute;
+              inset: 0;
+              inline-size: 100%;
+              block-size: 100%;
+              opacity: 0;
+              cursor: inherit;
+            }
+          }
+        }
+
+        button:focus-visible::after,
+        label:has(:focus-visible)::after {
+          content: "";
+          position: absolute;
+          inset-inline: 0;
+          inset-block-start: 100%;
+          block-size: 0.75rem;
+          background: var(--state-focus);
+          mask: url("/assets/strokes/focus-underline-1.svg") center / 100% 100%
+            no-repeat;
+          pointer-events: none;
+        }
+
+        &[data-single-level] {
+          --grade-disc: var(--icon-disabled);
+
+          &[data-selected] {
+            --grade-disc: var(--entry-disc);
+          }
+        }
+
+        @media (hover: hover) {
+          label:hover:not(:has(:focus-visible)) > svg,
+          &[data-single-level]:hover:not(:has(:focus-visible)) [data-part="levels"] > svg {
+            rotate: 12deg;
+          }
+        }
+      }
+
       @media (prefers-reduced-motion: no-preference) {
-        .trait-entry > ol > li button > svg {
+        .trait-entry > ol > li button > svg,
+        .talent-entry [data-part="levels"] svg {
           transition: rotate 120ms ease-out;
         }
       }

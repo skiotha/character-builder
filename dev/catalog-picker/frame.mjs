@@ -1,10 +1,11 @@
 import { openCatalogDialog } from "/components/catalog-dialog.mjs";
-import { renderTraitEntry } from "/components/catalog-entry.mjs";
+import { renderTalentEntry, renderTraitEntry } from "/components/catalog-entry.mjs";
 
 import {
   CATALOG_FIXTURES,
   CATALOG_TITLES,
   PICKER_PRESENTATIONS,
+  TALENT_CARDS,
   TRAIT_CARDS,
   TRAIT_RANKS,
 } from "/__dev/catalog-picker/fixtures.mjs";
@@ -79,7 +80,36 @@ function buildTraitCard(entry, select, selection) {
   return element;
 }
 
-function buildCard(entry, select, selection) {
+/**
+ * Adapt a talent fixture to the reusable entry without calculating prices.
+ * @param {import("./fixtures.mjs").CatalogFixture} entry
+ * @param {(detail?: object) => void} select
+ * @param {FixtureSelection|null} selection
+ * @returns {HTMLElement}
+ */
+function buildTalentCard(entry, select, selection) {
+  const card = TALENT_CARDS[entry.id];
+  if (!card) throw new Error(`Missing talent card fixture: ${entry.id}`);
+  const element = renderTalentEntry(
+    {
+      id: entry.id,
+      kind: entry.source,
+      name: entry.name,
+      description: entry.description,
+      ...card,
+    },
+    {
+      selectedLevel: selection?.detail.level,
+      onSelect: (level) => select({ level }),
+    },
+  );
+  for (const control of element.querySelectorAll("[data-level]")) {
+    control.dataset.fixtureChoice = `${entry.id}:${control.dataset.level}`;
+  }
+  return element;
+}
+
+function buildRitualCard(entry, select, selection) {
   const card = document.createElement("article");
   card.className = "fixture-card";
 
@@ -90,13 +120,6 @@ function buildCard(entry, select, selection) {
   const description = document.createElement("p");
   description.textContent = entry.description;
   card.append(description);
-
-  if (entry.levelNote) {
-    const levelNote = document.createElement("p");
-    levelNote.className = "fixture-note";
-    levelNote.textContent = entry.levelNote;
-    card.append(levelNote);
-  }
 
   if (entry.traditions?.length) {
     const traditions = document.createElement("p");
@@ -113,34 +136,13 @@ function buildCard(entry, select, selection) {
     }
   }
 
-  if (entry.levels) {
-    const choices = document.createElement("div");
-    choices.className = "fixture-choices";
-    for (let level = 1; level <= entry.levels; level++) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.dataset.fixtureChoice = `${entry.id}:${level}`;
-      button.textContent =
-        selection?.detail.level === level
-          ? `Level ${level} — Selected`
-          : `Level ${level}`;
-      button.setAttribute(
-        "aria-pressed",
-        String(selection?.detail.level === level),
-      );
-      button.addEventListener("click", () => select({ level }));
-      choices.append(button);
-    }
-    card.append(choices);
-  } else {
-    const choose = document.createElement("button");
-    choose.type = "button";
-    choose.dataset.fixtureChoice = entry.id;
-    choose.textContent = "Select ritual";
-    choose.setAttribute("aria-pressed", String(selection !== null));
-    choose.addEventListener("click", () => select());
-    card.append(choose);
-  }
+  const choose = document.createElement("button");
+  choose.type = "button";
+  choose.dataset.fixtureChoice = entry.id;
+  choose.textContent = "Select ritual";
+  choose.setAttribute("aria-pressed", String(selection !== null));
+  choose.addEventListener("click", () => select());
+  card.append(choose);
 
   return card;
 }
@@ -312,14 +314,18 @@ const dialogPromise = openCatalogDialog({
         })),
       }]
     : [],
-  renderCard: catalog === "traits" ? buildTraitCard : buildCard,
+  renderCard: catalog === "traits"
+    ? buildTraitCard
+    : catalog === "talents"
+      ? buildTalentCard
+      : buildRitualCard,
   renderPreview: buildPreview,
   previewHint: catalog === "talents"
     ? "Select a talent to see it here."
     : catalog === "rituals"
       ? "Select a ritual to see it here."
       : undefined,
-  commitLabel: catalog === "rituals" ? "Learn" : "Choose",
+  commitLabel: catalog === "rituals" ? "Learn" : catalog === "talents" ? "Take" : "Choose",
   renderSelectionStatus:
     scenario === "static-header" ? undefined : renderSelectionStatus,
   canCommit: () => {

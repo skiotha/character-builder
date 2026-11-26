@@ -178,6 +178,9 @@ mark, text) always carries it too.
     (red; yellow under red captions);
   - icon buttons → the glyph grows (×1.25) inside its click area. Hover
     doesn't scale, so focus can't be mistaken for hover;
+  - talent level radios → a hand-drawn underline beneath the disc,
+    without rotation while focused; a single-level talent's name button
+    uses the text-button underline;
   - text fields → the field grows, its top line turns red, and it fills
     yellow with black text.
 - **Invalid** text fields (filled only) pulse yellow ↔ red; under
@@ -231,6 +234,19 @@ mark, text) always carries it too.
   the empty hint spans the aside and names the caller's choice (rank,
   talent or ritual). Remember / Recall remain natively disabled plain
   buttons below a divider; design-only compare trays are not rendered.
+- **Talent entries:** three-level choices use native radio groups, with
+  arrow-key navigation and Space to select. Unpicked discs are grey; the
+  selected level and preceding levels use the talent's kind colour.
+  Clicking the rest of an unselected multi-level entry selects its first
+  level. Once selected, whole-card clicks preserve that level; only the
+  radio group changes it. Native disc / label clicks remain independent.
+  A single-level talent has one name button and whole-card click
+  forwarding, not a one-option radio; its decorative disc is Grey-dim
+  until selected. Text selection must not choose the entry.
+  A yellow bar identifies the selected entry for both boons and sins;
+  disc colours identify the included levels. Costs are caller-formatted
+  cumulative values, with sins' gains in amethyst. The primary action
+  reads "Take".
 - **Red never means "clickable"**: it already means focus and alert.
   Interactivity shows through shape, hover motion and the pointer.
 - **Scrollbars use the standard properties only** (`scrollbar-width:

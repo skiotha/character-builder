@@ -15,12 +15,25 @@
  * reason beside it and tied by `aria-describedby`) and never selects.
  * The DOM shape doesn't depend on the selection, so the dialog can
  * restore focus by position after it rebuilds the card.
+ *
+ * Talent entry: name, level pick, description and optional check metadata.
+ * Multiple levels use native radios; a single-level entry uses a name
+ * button with whole-card click forwarding and a decorative level disc.
+ * Clicking elsewhere in an unselected multi-level entry picks its first
+ * level; whole-card clicks never replace an already selected level.
+ * Costs and gains are display strings supplied by the caller.
  */
 
 const TIER_ICONS = {
   novice: "/assets/icons/grade-novice.svg",
   adept: "/assets/icons/grade-adept.svg",
   master: "/assets/icons/grade-master.svg",
+};
+
+const LEVEL_ICONS = {
+  1: "/assets/icons/level-1.svg",
+  2: "/assets/icons/level-2.svg",
+  3: "/assets/icons/level-3.svg",
 };
 
 const ACTION_MARKS = {
@@ -122,6 +135,105 @@ export function renderTraitEntry(view, { selectedTier = null, onSelect }) {
 }
 
 /**
+ * @typedef {object} TalentLevelView
+ * @property {1 | 2 | 3} level
+ * @property {string} label - Accessible level name, e.g. "Level II"
+ * @property {string} cost - Cumulative cost or gain, e.g. "10 XP", "+5 XP"
+ */
+
+/**
+ * @typedef {object} TalentEntryView
+ * @property {string} id - Entry id; scopes the radio group and element ids
+ * @property {"boon" | "sin"} kind
+ * @property {string} name
+ * @property {string} description
+ * @property {MetaLine[]} [meta] - Check attributes, when present
+ * @property {string} cost - Unselected cost text, e.g. "5 / 10 / 15 XP"
+ * @property {TalentLevelView[]} levels - One or three levels, lowest first
+ */
+
+/**
+ * Build a talent entry. A selected level lights its disc and preceding
+ * discs; only that level's radio is checked. Single-level talents expose
+ * one name button instead of a redundant one-option radio group. Clicking
+ * outside a radio group selects its first level only while unselected.
+ * @param {TalentEntryView} view
+ * @param {{ selectedLevel?: number | null, onSelect: (level: number) => void }} options
+ * @returns {HTMLElement}
+ */
+export function renderTalentEntry(view, { selectedLevel = null, onSelect }) {
+  const entry = document.createElement("article");
+  entry.className = "talent-entry";
+  entry.dataset.kind = view.kind;
+  const selectedIndex = view.levels.findIndex(
+    ({ level }) => level === selectedLevel,
+  );
+  if (selectedIndex >= 0) entry.dataset.selected = "";
+
+  const name = document.createElement("h3");
+  const body = document.createElement("div");
+  body.dataset.part = "body";
+  const content = document.createElement("div");
+  const row = document.createElement("div");
+  row.dataset.part = "levels";
+  const cost = document.createElement("span");
+  cost.dataset.part = "cost";
+  cost.id = `talent-entry-${view.id}-cost`;
+  cost.textContent = view.levels[selectedIndex]?.cost ?? view.cost;
+
+  if (view.levels.length === 1) {
+    entry.dataset.singleLevel = "";
+    const level = view.levels[0];
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.level = String(level.level);
+    button.textContent = view.name;
+    button.setAttribute("aria-pressed", String(selectedIndex >= 0));
+    button.setAttribute("aria-describedby", cost.id);
+    button.addEventListener("click", () => onSelect(level.level));
+    name.append(button);
+    row.append(icon(LEVEL_ICONS[level.level]));
+    forwardClicks(entry, button);
+  } else {
+    name.textContent = view.name;
+    const levels = document.createElement("fieldset");
+    levels.setAttribute("aria-label", `${view.name} level`);
+    view.levels.forEach((level, index) => {
+      const label = document.createElement("label");
+      if (index <= selectedIndex) {
+        label.dataset.selection =
+          index === selectedIndex ? "selected" : "included";
+      }
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `talent-entry-${view.id}-level`;
+      input.value = String(level.level);
+      input.dataset.level = String(level.level);
+      input.checked = index === selectedIndex;
+      input.setAttribute("aria-label", `${level.label} — ${level.cost}`);
+      input.addEventListener("change", () => {
+        if (input.checked) onSelect(level.level);
+      });
+      label.append(input, icon(LEVEL_ICONS[level.level]));
+      levels.append(label);
+      if (index === 0 && selectedIndex < 0) {
+        forwardClicks(entry, input, levels);
+      }
+    });
+    row.append(levels);
+  }
+
+  const description = document.createElement("p");
+  description.textContent = view.description;
+  row.append(cost);
+  content.append(row, description);
+  if (view.meta?.length) content.append(renderMeta(view.meta));
+  body.append(content);
+  entry.append(name, body);
+  return entry;
+}
+
+/**
  * Build the label / value fact lines as one `<dl>` grid, so the labels
  * share the width of the longest one (DS §controls).
  * @param {MetaLine[]} lines
@@ -129,6 +241,7 @@ export function renderTraitEntry(view, { selectedTier = null, onSelect }) {
  */
 function renderMeta(lines) {
   const list = document.createElement("dl");
+  list.className = "entry-meta";
   for (const line of lines) {
     const label = document.createElement("dt");
     label.textContent = line.label;
@@ -194,14 +307,7 @@ function renderRank(entryId, rank, selection, onSelect) {
     if (!rank.unavailable) onSelect(rank.tier);
   });
 
-  // The whole block is the click target; the head button stays the one
-  // control. A drag that selected text inside the block is not a click.
-  item.addEventListener("click", (event) => {
-    if (button.contains(/** @type {Node} */ (event.target))) return;
-    const text = getSelection();
-    if (text && !text.isCollapsed && item.contains(text.anchorNode)) return;
-    button.click();
-  });
+  forwardClicks(item, button);
 
   const body = document.createElement("div");
   body.dataset.part = "body";
@@ -210,6 +316,27 @@ function renderRank(entryId, rank, selection, onSelect) {
 
   item.append(head, body);
   return item;
+}
+
+/**
+ * Forward whole-card clicks without intercepting native control / label
+ * activation or text selection. A radio forwards only until its group
+ * has a selection, including before the caller rebuilds the view.
+ * @param {HTMLElement} target
+ * @param {HTMLButtonElement | HTMLInputElement} control
+ * @param {HTMLElement} [controls] - Native controls excluded from forwarding
+ * @returns {void}
+ */
+function forwardClicks(target, control, controls = control) {
+  target.addEventListener("click", (event) => {
+    if (controls.contains(/** @type {Node} */ (event.target))) return;
+    if (
+      control.matches("input[type=radio]") && controls.querySelector(":checked")
+    ) return;
+    const text = getSelection();
+    if (text && !text.isCollapsed && target.contains(text.anchorNode)) return;
+    control.click();
+  });
 }
 
 /**

@@ -7,7 +7,6 @@
  * @property {string[]} [tags]
  * @property {string[]} [tiers]
  * @property {number} [levels]
- * @property {string} [levelNote]
  * @property {string} [tradition]
  * @property {string[]} [traditions]
  */
@@ -74,7 +73,33 @@ const TALENT_ENTRIES = [
     source: "boon",
     tags: ["boon", "profession", "knowledge", "support"],
     levels: 3,
-    levelNote: "Boon · 5 XP per level",
+  },
+  {
+    id: "contacts",
+    name: "Contacts",
+    description:
+      "With a successful Appealing check, the character can recall an acquaintance able to help with a specific problem or pull them out of a difficult situation. If the character can get a message to them, that contact comes to help even from afar.",
+    source: "boon",
+    tags: ["boon", "appealing", "support"],
+    levels: 1,
+  },
+  {
+    id: "damage",
+    name: "Damage",
+    description:
+      "After each removal of Corruption, the character cannot cast spells, though they can still use abilities, for a number of hours equal to the Corruption removed.",
+    source: "sin",
+    tags: ["sin", "corruption", "magic", "status"],
+    levels: 1,
+  },
+  {
+    id: "deceiver",
+    name: "Deceiver",
+    description:
+      "Grants a +1 bonus on all Appealing and Vigilant checks related to lies, including spotting someone else’s lies.",
+    source: "boon",
+    tags: ["boon", "appealing", "vigilant", "knowledge"],
+    levels: 3,
   },
   {
     id: "bloodthirst",
@@ -84,7 +109,6 @@ const TALENT_ENTRIES = [
     source: "sin",
     tags: ["sin", "status", "corruption"],
     levels: 1,
-    levelNote: "Sin · grants 5 XP per level",
   },
 ];
 
@@ -328,6 +352,49 @@ const TRAIT_CARDS = {
   },
 };
 
+/** @type {import("../../public/components/catalog-entry.mjs").TalentLevelView[]} */
+const BOON_LEVELS = [
+  { level: 1, label: "Level I", cost: "5 XP" },
+  { level: 2, label: "Level II", cost: "10 XP" },
+  { level: 3, label: "Level III", cost: "15 XP" },
+];
+
+/** @type {import("../../public/components/catalog-entry.mjs").TalentLevelView[]} */
+const SIN_LEVELS = [
+  { level: 1, label: "Level I", cost: "+5 XP" },
+];
+
+/**
+ * Fixed talent display data: no pricing or check-attribute formatting.
+ * @type {Record<string, Pick<import("../../public/components/catalog-entry.mjs").TalentEntryView, "meta" | "cost" | "levels">>}
+ */
+const TALENT_CARDS = {
+  cartographer: {
+    cost: "5 / 10 / 15 XP",
+    levels: BOON_LEVELS,
+    meta: [{ label: "Attributes", value: "Quick" }],
+  },
+  contacts: {
+    cost: "5 XP",
+    levels: BOON_LEVELS.slice(0, 1),
+    meta: [{ label: "Attributes", value: "Appealing" }],
+  },
+  damage: {
+    cost: "+5 XP",
+    levels: SIN_LEVELS,
+  },
+  deceiver: {
+    cost: "5 / 10 / 15 XP",
+    levels: BOON_LEVELS,
+    meta: [{ label: "Attributes", value: "Appealing, Vigilant" }],
+  },
+  bloodthirst: {
+    cost: "+5 XP",
+    levels: SIN_LEVELS,
+    meta: [{ label: "Attributes", value: "Vigilant" }],
+  },
+};
+
 const CATALOG_TITLES = {
   traits: "Traits",
   talents: "Talents",
@@ -412,20 +479,41 @@ const PICKER_PRESENTATIONS = {
     choices: {
       "cartographer:1": {
         after: "65",
-        summary: "Cartographer, Level 1 — 5 XP",
+        summary: "Cartographer, Level I — 5 XP",
       },
       "cartographer:2": {
         after: "60",
-        summary: "Cartographer, Level 2 — 10 XP",
+        summary: "Cartographer, Level II — 10 XP",
       },
       "cartographer:3": {
         after: "55",
-        summary: "Cartographer, Level 3 — 15 XP",
+        summary: "Cartographer, Level III — 15 XP",
+      },
+      "contacts:1": {
+        after: "65",
+        summary: "Contacts, Level I — 5 XP",
+      },
+      "damage:1": {
+        after: "75",
+        kind: "gain",
+        summary: "Damage, Level I — +5 XP",
+      },
+      "deceiver:1": {
+        after: "65",
+        summary: "Deceiver, Level I — 5 XP",
+      },
+      "deceiver:2": {
+        after: "60",
+        summary: "Deceiver, Level II — 10 XP",
+      },
+      "deceiver:3": {
+        after: "55",
+        summary: "Deceiver, Level III — 15 XP",
       },
       "bloodthirst:1": {
         after: "75",
         kind: "gain",
-        summary: "Bloodthirst, Level 1 — +5 XP",
+        summary: "Bloodthirst, Level I — +5 XP",
       },
     },
   },
@@ -475,6 +563,7 @@ export {
   CATALOG_TITLES,
   PICKER_PRESENTATIONS,
   SCENARIOS,
+  TALENT_CARDS,
   TRAIT_CARDS,
   TRAIT_RANKS,
   VIEWPORTS,

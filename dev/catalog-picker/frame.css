@@ -13,26 +13,13 @@
       padding: 1rem;
     }
 
-    /* Stand-in selection cue for the talent and ritual placeholder cards;
-       trait entries show their selection on the rank bars. */
+    /* Ritual placeholder only; reusable entries carry their own bars. */
     li[aria-current="true"] > .fixture-card {
       outline: 1px solid var(--border-alert);
     }
 
     .fixture-card h3 {
       margin-block-start: 0;
-    }
-
-    .fixture-choices {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .fixture-choices button {
-      inline-size: auto;
-      block-size: auto;
-      padding: 0.5rem;
     }
 
     .fixture-note {

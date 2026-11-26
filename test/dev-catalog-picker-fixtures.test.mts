@@ -6,6 +6,7 @@ import { join } from "node:path";
 import {
   CATALOG_FIXTURES,
   PICKER_PRESENTATIONS,
+  TALENT_CARDS,
   TRAIT_CARDS,
   TRAIT_RANKS,
 } from "../dev/catalog-picker/fixtures.mjs";
@@ -37,6 +38,7 @@ interface ReferenceEntry {
   levels?: number;
   tradition?: string;
   traditions?: string[];
+  check?: string[];
 }
 
 const referenceEntries: Array<
@@ -158,4 +160,41 @@ describe("catalog picker gallery fixtures", () => {
       }
     });
   }
+
+  it("talent cards cover the fixture levels and reference check metadata", () => {
+    const presentations = new Map(
+      Object.entries(PICKER_PRESENTATIONS.talents.choices),
+    );
+    assert.deepEqual(
+      Object.keys(TALENT_CARDS).sort(),
+      CATALOG_FIXTURES.talents.map((fixture) => fixture.id).sort(),
+    );
+    for (const fixture of CATALOG_FIXTURES.talents) {
+      const card = TALENT_CARDS[fixture.id]!;
+      const source = references.get(fixture.source!)!.get(fixture.id)!;
+      assert.deepEqual(
+        card.levels.map(({ level }) => level),
+        Array.from({ length: source.levels! }, (_, index) => index + 1),
+        `${fixture.id} level choices`,
+      );
+      const attributes = source.check?.map(
+        (attribute) => attribute[0]!.toUpperCase() + attribute.slice(1),
+      );
+      assert.deepEqual(
+        card.meta ?? [],
+        attributes ? [{ label: "Attributes", value: attributes.join(", ") }] : [],
+        `${fixture.id} check metadata`,
+      );
+      for (const level of card.levels) {
+        const key = `${fixture.id}:${level.level}`;
+        const presentation = presentations.get(key);
+        assert.ok(presentation, `missing picker presentation for ${key}`);
+        assert.equal(
+          presentation.summary,
+          `${fixture.name}, ${level.label} — ${level.cost}`,
+          `${key} card and footer agree`,
+        );
+      }
+    }
+  });
 });

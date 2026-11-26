@@ -2,7 +2,9 @@
 
 **Status:** active — Part 0 complete (2026-11-17). Part 1 complete
 (2026-11-20). Part 2 complete (2026-11-23).
-Part 3a complete (2026-11-24); Part 3 continues with 3b.
+Part 3a complete (2026-11-24).
+Part 3b complete (2026-11-26); metadata label-width difference accepted
+as a documented visual divergence.
 Open items S and F are resolved.
 **Owner:** user (design authority, reviews every part in the browser,
 commits) + agent (CSS, the behaviour the design adds, browser checks)
@@ -493,6 +495,109 @@ substeps. Substeps run in the listed order.
     level selection and fixture-supplied cost / gain text.
     **Done when:** both sources match their frames and selecting levels
     updates the card state without calculating prices.
+
+    > ✅ **Completed 2026-11-26.**
+    > Divergences from the text above: reusable `renderTalentEntry` in
+    > `public/components/catalog-entry.mjs` drives the talent gallery.
+    > Cartographer, Contacts, Damage and Deceiver cover the approved
+    > desktop examples; Bloodthirst retains the original sin fixture with
+    > check metadata.
+    >
+    > - Three-level entries use native radios. Arrow keys change level;
+    >   Space selects; Tab leaves the group. Unpicked discs are grey and
+    >   picked / included discs use the kind colour (design D30).
+    > - Single-level entries have a native name button with whole-card
+    >   click forwarding. Their disc is decorative, dim until selected.
+    >   Keyboard focus underlines the name; radio focus underlines the
+    >   disc. Text selection does not choose an entry.
+    >   **Review amendment (2026-11-26):** clicking outside a multi-level
+    >   entry's radios now selects its first level if unselected.
+    >   Later whole-card clicks preserve the chosen level; only explicit
+    >   radio selection changes it. This replaces the initial disc-only
+    >   behavior at the user's request.
+    > - Figma's Cartographer Attributes label is fixed at 65 px, while
+    >   code follows DS §controls / design D27 and sizes the column to its
+    >   60.15 px text. Both have zero padding and a 12 px gap. The user
+    >   reviewed and accepted the browser result; this small visual
+    >   difference is recorded, not a blocker or a change to the sizing
+    >   rule.
+    > - Talent dividers follow their denser approved frames: 32 px before
+    >   the divider, no extra gap after it, and no trailing divider.
+    >   Trait divider spacing remains unchanged.
+    > - The primary action is now "Take"; footer level labels use Roman
+    >   numerals while selection details remain numeric. Costs, XP gains,
+    >   counter projections and check metadata are all fixed display
+    >   fixtures, not domain calculations.
+    >
+    > Compact previews and tooltips stay in **3d**, responsive geometry
+    > and enlarged touch targets in **4a / 4c**. No Figma changes were
+    > needed for this step. Part 3 remains open for **3c–3d**.
+
+    **Accepted visual divergence — metadata label width (2026-11-26).**
+    This is not missing padding: the approved Cartographer instance's Attributes
+    row (`I1658:10183;1654:3485`) has zero padding and a 12 px column gap,
+    like the browser. Its right-aligned Label node
+    (`I1658:10183;1654:3485;1504:295`) is fixed at 65 px, so the value
+    starts 77 px from the row's left edge. The browser's `max-content`
+    column is 60.15 px and the value starts at 72.15 px.
+    DS §controls, design D27 and `Molecules/Meta line`'s description all
+    specify content-sized labels, with no unused indent for a single
+    row. The drawn instance disagrees with those instructions. The
+    earlier geometry check covered row heights but missed this horizontal
+    mismatch. The user reviewed the browser result and approved closing
+    3b without changing the existing content-sized label rule.
+
+    Browser verification (Chrome Canary 160.0.8184.0, 2026-11-26):
+    1264 × 864 viewport, 1200 × 800 dialog, 657.2 px entry width
+    against Figma's 658 px. Content heights exclude the divider and its
+    spacing:
+
+    | Entry | Browser | Figma | Reference |
+    | --- | --- | --- | --- |
+    | Cartographer | 163.8 px | 164 px | `1658:10183` |
+    | Contacts | 184.8 px | 185 px | `1658:10184` |
+    | Damage | 134.8 px | 135 px | `1658:10185` |
+
+    Names are 40.8 px high against 41 px; level blocks start at 52.8 px
+    against 53 px. The 32 × 32 discs, 8 px disc gaps, 4 px yellow bar,
+    12 px bar-to-body gap and body heights (111 / 132 / 82 px) match.
+    All nine fixture choices updated selection, card cost, footer and
+    projected balance. Keyboard radios retained focus after re-render;
+    single-level Enter / Space and body clicks worked. Hover rotates
+    discs 12°; focus removes that rotation; reduced motion has no
+    transition and retains the static cue.
+
+    Search and source filters, no matches / Clear filters, selection
+    retained while hidden, stable width when filtering down to one entry,
+    blocked Take and successful dialog settlement were exercised. Shared
+    metadata and click-forwarding changes preserved trait geometry,
+    text-selection protection, body selection and unavailable-rank guards;
+    ritual placeholders still select. A navigation during a dev-watcher
+    restart lost static requests; repeating it after readiness passed.
+    The display renderer was also checked with arbitrary caller-supplied
+    price strings, literal markup-looking text and empty metadata.
+    The final browser pass had no page errors or failed requests.
+    Typecheck and the 99 targeted fixture, filter, production-gallery and
+    documentation checks passed.
+
+    Local review captures (gitignored, not regression baselines):
+    [selected boon](../../.playwright-mcp/3b-review-selected.png),
+    [selected sin](../../.playwright-mcp/3b-review-sin.png),
+    [level focus](../../.playwright-mcp/3b-review-level-focus.png),
+    [single-level focus](../../.playwright-mcp/3b-review-single-focus.png),
+    [lower entries](../../.playwright-mcp/3b-review-lower-entries.png).
+
+    Review-amendment verification (Chrome Canary, 2026-11-26): an
+    unselected title / body click selects level I; repeated whole-card
+    clicks preserve levels II and III and their projected balances.
+    Direct disc-label clicks and native arrow keys still change levels,
+    with focus restored. Text selection does not choose an unselected
+    entry. The first-level fallback also stays inert once a native radio
+    is checked before the caller re-renders. Single-level body clicks
+    and unavailable trait guards still pass. Metadata sizing is unchanged.
+    Typecheck and 76 targeted fixture / documentation checks passed.
+    [Follow-up capture](../../.playwright-mcp/3b-review-card-click.png).
+
   - **3c — Ritual cards.** Build reusable untiered presentation with
     traditions, availability and long-content cases.
     **Done when:** ritual fixtures match their frames and selection /
@@ -586,7 +691,7 @@ The parent's step-2c gate, owned here:
   - [x] 2b — Preview area and messages
 - [ ] Part 3 — Card skeletons
   - [x] 3a — Trait cards
-  - [ ] 3b — Talent cards
+  - [x] 3b — Talent cards / TODO: Recorded divergence tied to sizing differences in Figma and browsers is to be discussed and assessed
   - [ ] 3c — Ritual cards
   - [ ] 3d — Compact previews and tooltips
 - [ ] Part 4 — Layouts
